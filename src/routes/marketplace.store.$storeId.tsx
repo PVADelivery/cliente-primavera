@@ -24,7 +24,7 @@ function StoreDetail() {
     queryFn: async () => {
       if (!isSupabaseConfigured) return null;
       const { data } = await supabase.from("companies").select("*").eq("id", storeId).maybeSingle();
-      return (data as Company) ?? null;
+      return ((data as Company | null) ?? null);
     },
   });
 
