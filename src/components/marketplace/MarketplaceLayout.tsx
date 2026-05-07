@@ -4,13 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 
-const tabs = [
+const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
   { to: "/marketplace", label: "Início", icon: Home, exact: true },
   { to: "/marketplace/search", label: "Buscar", icon: Search },
   { to: "/marketplace/cart", label: "Carrinho", icon: ShoppingBag },
   { to: "/marketplace/orders", label: "Pedidos", icon: ClipboardList },
   { to: "/marketplace/profile", label: "Perfil", icon: User },
-] as const;
+];
 
 export function MarketplaceLayout() {
   const { user } = useAuth();
@@ -46,7 +46,7 @@ export function MarketplaceLayout() {
             return (
               <li key={t.to} className="relative">
                 <Link
-                  to={t.to}
+                  to={t.to as "/marketplace"}
                   className={`flex flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors ${
                     active ? "text-primary" : "text-muted-foreground"
                   }`}
