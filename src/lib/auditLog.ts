@@ -43,7 +43,7 @@ export async function recordAuditLog(entry: AuditLogPayload): Promise<void> {
   if (!isSupabaseConfigured) return;
 
   try {
-    const { error } = await supabase.from("audit_logs").insert({
+    const row = {
       request_id: entry.request_id,
       event: entry.event,
       user_id: entry.user_id ?? null,
@@ -53,7 +53,9 @@ export async function recordAuditLog(entry: AuditLogPayload): Promise<void> {
       error_message: entry.error_message ?? null,
       payload: entry.payload ?? {},
       context: entry.context ?? {},
-    });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("audit_logs") as any).insert(row);
     if (error && error.code !== "PGRST205") {
       // eslint-disable-next-line no-console
       console.warn("[audit] insert failed (non-fatal)", error.code, error.message);
