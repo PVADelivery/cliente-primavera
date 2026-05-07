@@ -9,38 +9,108 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
+import { Route as MarketplaceSearchRouteImport } from './routes/marketplace.search'
+import { Route as MarketplaceCartRouteImport } from './routes/marketplace.cart'
+import { Route as MarketplaceStoreStoreIdRouteImport } from './routes/marketplace.store.$storeId'
 
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceSearchRoute = MarketplaceSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceCartRoute = MarketplaceCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceStoreStoreIdRoute = MarketplaceStoreStoreIdRouteImport.update({
+  id: '/store/$storeId',
+  path: '/store/$storeId',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/marketplace'
+    | '/marketplace/cart'
+    | '/marketplace/search'
+    | '/marketplace/'
+    | '/marketplace/store/$storeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/marketplace/cart'
+    | '/marketplace/search'
+    | '/marketplace'
+    | '/marketplace/store/$storeId'
+  id:
+    | '__root__'
+    | '/'
+    | '/marketplace'
+    | '/marketplace/cart'
+    | '/marketplace/search'
+    | '/marketplace/'
+    | '/marketplace/store/$storeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +118,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/search': {
+      id: '/marketplace/search'
+      path: '/search'
+      fullPath: '/marketplace/search'
+      preLoaderRoute: typeof MarketplaceSearchRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/cart': {
+      id: '/marketplace/cart'
+      path: '/cart'
+      fullPath: '/marketplace/cart'
+      preLoaderRoute: typeof MarketplaceCartRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/store/$storeId': {
+      id: '/marketplace/store/$storeId'
+      path: '/store/$storeId'
+      fullPath: '/marketplace/store/$storeId'
+      preLoaderRoute: typeof MarketplaceStoreStoreIdRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
   }
 }
 
+interface MarketplaceRouteChildren {
+  MarketplaceCartRoute: typeof MarketplaceCartRoute
+  MarketplaceSearchRoute: typeof MarketplaceSearchRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  MarketplaceStoreStoreIdRoute: typeof MarketplaceStoreStoreIdRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceCartRoute: MarketplaceCartRoute,
+  MarketplaceSearchRoute: MarketplaceSearchRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
+  MarketplaceStoreStoreIdRoute: MarketplaceStoreStoreIdRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
