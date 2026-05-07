@@ -9,16 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
+import { Route as MarketplaceTermsRouteImport } from './routes/marketplace.terms'
 import { Route as MarketplaceSearchRouteImport } from './routes/marketplace.search'
+import { Route as MarketplaceProfileRouteImport } from './routes/marketplace.profile'
+import { Route as MarketplacePrivacyRouteImport } from './routes/marketplace.privacy'
+import { Route as MarketplaceOrdersRouteImport } from './routes/marketplace.orders'
+import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceCartRouteImport } from './routes/marketplace.cart'
 import { Route as MarketplaceStoreStoreIdRouteImport } from './routes/marketplace.store.$storeId'
+import { Route as MarketplaceOrdersOrderIdRouteImport } from './routes/marketplace.orders.$orderId'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,9 +49,34 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceTermsRoute = MarketplaceTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const MarketplaceSearchRoute = MarketplaceSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceProfileRoute = MarketplaceProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplacePrivacyRoute = MarketplacePrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceOrdersRoute = MarketplaceOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceCheckoutRoute = MarketplaceCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => MarketplaceRoute,
 } as any)
 const MarketplaceCartRoute = MarketplaceCartRouteImport.update({
@@ -46,69 +89,139 @@ const MarketplaceStoreStoreIdRoute = MarketplaceStoreStoreIdRouteImport.update({
   path: '/store/$storeId',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceOrdersOrderIdRoute =
+  MarketplaceOrdersOrderIdRouteImport.update({
+    id: '/$orderId',
+    path: '/$orderId',
+    getParentRoute: () => MarketplaceOrdersRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/signup': typeof SignupRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
+  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
+  '/marketplace/privacy': typeof MarketplacePrivacyRoute
+  '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
+  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
+  '/marketplace/privacy': typeof MarketplacePrivacyRoute
+  '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace': typeof MarketplaceIndexRoute
+  '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/signup': typeof SignupRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
+  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
+  '/marketplace/privacy': typeof MarketplacePrivacyRoute
+  '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
     | '/marketplace'
+    | '/signup'
     | '/marketplace/cart'
+    | '/marketplace/checkout'
+    | '/marketplace/orders'
+    | '/marketplace/privacy'
+    | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/terms'
     | '/marketplace/'
+    | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/signup'
     | '/marketplace/cart'
+    | '/marketplace/checkout'
+    | '/marketplace/orders'
+    | '/marketplace/privacy'
+    | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/terms'
     | '/marketplace'
+    | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
   id:
     | '__root__'
     | '/'
+    | '/login'
     | '/marketplace'
+    | '/signup'
     | '/marketplace/cart'
+    | '/marketplace/checkout'
+    | '/marketplace/orders'
+    | '/marketplace/privacy'
+    | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/terms'
     | '/marketplace/'
+    | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace': {
       id: '/marketplace'
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -125,11 +238,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceIndexRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/terms': {
+      id: '/marketplace/terms'
+      path: '/terms'
+      fullPath: '/marketplace/terms'
+      preLoaderRoute: typeof MarketplaceTermsRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/search': {
       id: '/marketplace/search'
       path: '/search'
       fullPath: '/marketplace/search'
       preLoaderRoute: typeof MarketplaceSearchRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/profile': {
+      id: '/marketplace/profile'
+      path: '/profile'
+      fullPath: '/marketplace/profile'
+      preLoaderRoute: typeof MarketplaceProfileRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/privacy': {
+      id: '/marketplace/privacy'
+      path: '/privacy'
+      fullPath: '/marketplace/privacy'
+      preLoaderRoute: typeof MarketplacePrivacyRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/orders': {
+      id: '/marketplace/orders'
+      path: '/orders'
+      fullPath: '/marketplace/orders'
+      preLoaderRoute: typeof MarketplaceOrdersRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/checkout': {
+      id: '/marketplace/checkout'
+      path: '/checkout'
+      fullPath: '/marketplace/checkout'
+      preLoaderRoute: typeof MarketplaceCheckoutRouteImport
       parentRoute: typeof MarketplaceRoute
     }
     '/marketplace/cart': {
@@ -146,19 +294,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceStoreStoreIdRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/orders/$orderId': {
+      id: '/marketplace/orders/$orderId'
+      path: '/$orderId'
+      fullPath: '/marketplace/orders/$orderId'
+      preLoaderRoute: typeof MarketplaceOrdersOrderIdRouteImport
+      parentRoute: typeof MarketplaceOrdersRoute
+    }
   }
 }
 
+interface MarketplaceOrdersRouteChildren {
+  MarketplaceOrdersOrderIdRoute: typeof MarketplaceOrdersOrderIdRoute
+}
+
+const MarketplaceOrdersRouteChildren: MarketplaceOrdersRouteChildren = {
+  MarketplaceOrdersOrderIdRoute: MarketplaceOrdersOrderIdRoute,
+}
+
+const MarketplaceOrdersRouteWithChildren =
+  MarketplaceOrdersRoute._addFileChildren(MarketplaceOrdersRouteChildren)
+
 interface MarketplaceRouteChildren {
   MarketplaceCartRoute: typeof MarketplaceCartRoute
+  MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
+  MarketplaceOrdersRoute: typeof MarketplaceOrdersRouteWithChildren
+  MarketplacePrivacyRoute: typeof MarketplacePrivacyRoute
+  MarketplaceProfileRoute: typeof MarketplaceProfileRoute
   MarketplaceSearchRoute: typeof MarketplaceSearchRoute
+  MarketplaceTermsRoute: typeof MarketplaceTermsRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   MarketplaceStoreStoreIdRoute: typeof MarketplaceStoreStoreIdRoute
 }
 
 const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceCartRoute: MarketplaceCartRoute,
+  MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
+  MarketplaceOrdersRoute: MarketplaceOrdersRouteWithChildren,
+  MarketplacePrivacyRoute: MarketplacePrivacyRoute,
+  MarketplaceProfileRoute: MarketplaceProfileRoute,
   MarketplaceSearchRoute: MarketplaceSearchRoute,
+  MarketplaceTermsRoute: MarketplaceTermsRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   MarketplaceStoreStoreIdRoute: MarketplaceStoreStoreIdRoute,
 }
@@ -169,7 +345,9 @@ const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
