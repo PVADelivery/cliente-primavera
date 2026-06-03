@@ -113,13 +113,32 @@ function SkeletonCarouselItem() {
 
 // ─── Smart Search Bar ─────────────────────────────────────────────────────────
 function SmartSearchBar() {
-  const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
-  const [location, setLocation] = useState("Primavera, SP");
+  const [location, setLocation] = useState("");
   const [locOpen, setLocOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const recents = loadRecents();
++
++  // Attempt to get user's location on mount
++  useEffect(() => {
++    if (!location) {
++      if (navigator.geolocation) {
++        navigator.geolocation.getCurrentPosition(
++          (pos) => {
++            // Here you could call a reverse‑geocode API. For now we just format lat/long.
++            const { latitude, longitude } = pos.coords;
++            setLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
++          },
++          () => {
++            // Fallback if permission denied
++            setLocation("Primavera, SP");
++          }
++        );
++      } else {
++        setLocation("Primavera, SP");
++      }
++    }
++  }, []);
 
   const locSuggestions = query.length > 0
     ? LOCATION_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
