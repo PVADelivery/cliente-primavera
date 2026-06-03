@@ -23,11 +23,11 @@ export function MarketplaceLayout() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
         <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
-          <Link to="/marketplace" className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden shadow-sm bg-black p-0.5">
-              <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
+          <Link to="/marketplace" className="flex items-center gap-2.5">
+            <span className="flex items-center justify-center w-12 h-12 rounded-2xl overflow-hidden shadow-md bg-black">
+              <img src={logoIcon} alt="Logo" className="w-full h-full object-cover" />
             </span>
-            <span className="font-display font-bold tracking-tight">Primavera Delivery</span>
+            <span className="font-display font-bold tracking-tight text-base">Primavera Delivery</span>
           </Link>
           {!user ? (
             <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
