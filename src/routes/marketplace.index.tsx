@@ -515,14 +515,23 @@ function MarketplaceHome() {
       >
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
         
-        {/* Semi-círculo preto na direita contendo a moto e a frase */}
-        <div className="absolute top-0 right-0 bottom-0 w-[45%] bg-[#080808] rounded-l-[120px] flex items-center justify-center border-l-4 border-black/30 shadow-[-15px_0_40px_rgba(0,0,0,0.5)] z-0">
+        {/* Semi-círculo preto gigante na direita */}
+        <div className="absolute -right-[80px] top-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full shadow-[0_0_50px_rgba(0,0,0,0.6)] ring-[10px] ring-black/10 flex items-center justify-center z-0 group">
+          {/* A imagem logoIcon tem cantos brancos, o rounded-full corta eles perfeitamente */}
           <img 
             src={logoIcon} 
             alt="Primavera Delivery" 
             aria-hidden 
-            className="w-[85%] h-[85%] object-contain opacity-95 drop-shadow-[0_0_20px_rgba(255,255,255,0.05)]" 
+            className="w-full h-full object-cover rounded-full" 
           />
+          {/* Overlay gradiente escuro para garantir que o texto fique legível */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          
+          {/* Frase e Moto aparecendo */}
+          <div className="absolute bottom-[40px] left-0 right-[40px] text-center flex flex-col items-center drop-shadow-2xl">
+            <span className="font-display font-black text-white text-3xl tracking-tight leading-none">Primavera</span>
+            <span className="font-display font-bold text-primary text-[11px] tracking-[0.3em] uppercase mt-1">Delivery</span>
+          </div>
         </div>
 
         <div className="relative z-10 max-w-[55%]">
