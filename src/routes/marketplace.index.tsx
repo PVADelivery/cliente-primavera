@@ -516,18 +516,19 @@ function MarketplaceHome() {
       >
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
         
-        {/* Semi-círculo preto gigante na direita */}
-        <div className="absolute -right-[80px] top-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full shadow-[0_0_50px_rgba(0,0,0,0.6)] ring-[10px] ring-black/10 flex items-center justify-center z-0 bg-black">
-          {/* A imagem logo-banner tem fundo preto. Com object-contain e bg-black no container, ela se mistura perfeitamente. */}
-          <img 
-            src={logoBanner} 
-            alt="Primavera Delivery" 
-            aria-hidden 
-            className="w-[85%] h-[85%] object-contain" 
-          />
+        {/* Fundo preto na direita com borda esquerda arredondada (semi-círculo) */}
+        <div className="absolute right-0 top-0 bottom-0 w-[55%] flex items-center justify-end z-0 pointer-events-none">
+          <div className="w-full h-full bg-black rounded-l-[140px] flex items-center justify-center px-8 shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+            <img 
+              src={logoBanner} 
+              alt="Primavera Delivery" 
+              aria-hidden 
+              className="w-full h-full object-contain" 
+            />
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-[55%]">
+        <div className="relative z-10 max-w-[45%]">
           <h1 className="font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
             Sua cidade,<br />em minutos.
           </h1>
