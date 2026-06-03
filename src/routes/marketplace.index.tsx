@@ -14,6 +14,7 @@ import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
+import heroPrimavera from "@/assets/hero-primavera.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -128,9 +129,9 @@ function SmartSearchBar() {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             // For a real app, use reverse geocoding API to get the city.
-            // Since we don't have an API key right now, we default to Primavera, SP
+            // Since we don't have an API key right now, we default to Primavera do Leste, MT
             // so the user sees the actual city name instead of lat/long coordinates.
-            setLocation("Primavera, SP");
+            setLocation("Primavera do Leste, MT");
           },
           () => {
             // Fallback if permission denied
@@ -512,7 +513,7 @@ function MarketplaceHome() {
         style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
       >
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
-        <img src={heroFood} alt="" aria-hidden className="absolute -right-10 -top-6 w-44 h-44 object-cover rounded-full opacity-90 ring-8 ring-background/10" style={{ boxShadow: "var(--shadow-glow)" }} />
+        <img src={heroPrimavera} alt="Primavera Delivery" aria-hidden className="absolute -right-10 -top-6 w-44 h-44 object-cover rounded-full opacity-90 ring-8 ring-background/10" style={{ boxShadow: "var(--shadow-glow)" }} />
         <div className="relative max-w-[60%]">
           <h1 className="font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
             Sua cidade,<br />em minutos.
