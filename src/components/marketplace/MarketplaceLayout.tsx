@@ -21,13 +21,13 @@ export function MarketplaceLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
+      <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
         <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
           <Link to="/marketplace" className="flex items-center gap-2.5">
-            <span className="flex items-center justify-center w-12 h-12 rounded-2xl overflow-hidden shadow-md bg-black">
+            <span className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-black shadow-lg ring-1 ring-white/10">
               <img src={logoIcon} alt="Logo" className="w-full h-full object-cover" />
             </span>
-            <span className="font-display font-bold tracking-tight text-base">Primavera Delivery</span>
+            <span className="font-display font-bold tracking-tight text-sm text-white">Primavera Delivery</span>
           </Link>
           {!user ? (
             <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
