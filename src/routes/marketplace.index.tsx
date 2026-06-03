@@ -14,6 +14,7 @@ import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
+import logoIcon from "@/assets/logo-icon.png";
 import heroPrimavera from "@/assets/hero-primavera.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
@@ -513,8 +514,18 @@ function MarketplaceHome() {
         style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
       >
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
-        <img src={heroPrimavera} alt="Primavera Delivery" aria-hidden className="absolute -right-10 -top-6 w-44 h-44 object-cover rounded-full opacity-90 ring-8 ring-background/10" style={{ boxShadow: "var(--shadow-glow)" }} />
-        <div className="relative max-w-[60%]">
+        
+        {/* Semi-círculo preto na direita contendo a moto e a frase */}
+        <div className="absolute top-0 right-0 bottom-0 w-[45%] bg-[#080808] rounded-l-[120px] flex items-center justify-center border-l-4 border-black/30 shadow-[-15px_0_40px_rgba(0,0,0,0.5)] z-0">
+          <img 
+            src={logoIcon} 
+            alt="Primavera Delivery" 
+            aria-hidden 
+            className="w-[85%] h-[85%] object-contain opacity-95 drop-shadow-[0_0_20px_rgba(255,255,255,0.05)]" 
+          />
+        </div>
+
+        <div className="relative z-10 max-w-[55%]">
           <h1 className="font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
             Sua cidade,<br />em minutos.
           </h1>
