@@ -1,9 +1,10 @@
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
-import { Home, BookUser, ShoppingBag, ClipboardList, User } from "lucide-react";
+import { Home, BookUser, ShoppingBag, ClipboardList, User, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon.png";
+import { useState, useEffect } from "react";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
   { to: "/marketplace", label: "Início", icon: Home, exact: true },
@@ -19,6 +20,31 @@ export function MarketplaceLayout() {
   const router = useRouter();
   const path = router.state.location.pathname;
 
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      setTheme("light");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setTheme("light");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
@@ -29,11 +55,20 @@ export function MarketplaceLayout() {
             </span>
             <span className="font-display font-bold tracking-tight text-sm text-white">Primavera Delivery</span>
           </Link>
-          {!user ? (
-            <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
-          ) : (
-            <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>
-          )}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+              aria-label="Alternar tema"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            {!user ? (
+              <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
+            ) : (
+              <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>
+            )}
+          </div>
         </div>
       </header>
 
