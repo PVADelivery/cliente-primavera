@@ -19,6 +19,7 @@ import { Route as MarketplaceSearchRouteImport } from './routes/marketplace.sear
 import { Route as MarketplaceProfileRouteImport } from './routes/marketplace.profile'
 import { Route as MarketplacePrivacyRouteImport } from './routes/marketplace.privacy'
 import { Route as MarketplaceOrdersRouteImport } from './routes/marketplace.orders'
+import { Route as MarketplaceErrandsRouteImport } from './routes/marketplace.errands'
 import { Route as MarketplaceDirectoryRouteImport } from './routes/marketplace.directory'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceCartRouteImport } from './routes/marketplace.cart'
@@ -75,6 +76,11 @@ const MarketplaceOrdersRoute = MarketplaceOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceErrandsRoute = MarketplaceErrandsRouteImport.update({
+  id: '/errands',
+  path: '/errands',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const MarketplaceDirectoryRoute = MarketplaceDirectoryRouteImport.update({
   id: '/directory',
   path: '/directory',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
+  '/marketplace/errands': typeof MarketplaceErrandsRoute
   '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
+  '/marketplace/errands': typeof MarketplaceErrandsRoute
   '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
+  '/marketplace/errands': typeof MarketplaceErrandsRoute
   '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
+    | '/marketplace/errands'
     | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
+    | '/marketplace/errands'
     | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
+    | '/marketplace/errands'
     | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceOrdersRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/errands': {
+      id: '/marketplace/errands'
+      path: '/errands'
+      fullPath: '/marketplace/errands'
+      preLoaderRoute: typeof MarketplaceErrandsRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/directory': {
       id: '/marketplace/directory'
       path: '/directory'
@@ -338,6 +357,7 @@ interface MarketplaceRouteChildren {
   MarketplaceCartRoute: typeof MarketplaceCartRoute
   MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
   MarketplaceDirectoryRoute: typeof MarketplaceDirectoryRoute
+  MarketplaceErrandsRoute: typeof MarketplaceErrandsRoute
   MarketplaceOrdersRoute: typeof MarketplaceOrdersRouteWithChildren
   MarketplacePrivacyRoute: typeof MarketplacePrivacyRoute
   MarketplaceProfileRoute: typeof MarketplaceProfileRoute
@@ -351,6 +371,7 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceCartRoute: MarketplaceCartRoute,
   MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
   MarketplaceDirectoryRoute: MarketplaceDirectoryRoute,
+  MarketplaceErrandsRoute: MarketplaceErrandsRoute,
   MarketplaceOrdersRoute: MarketplaceOrdersRouteWithChildren,
   MarketplacePrivacyRoute: MarketplacePrivacyRoute,
   MarketplaceProfileRoute: MarketplaceProfileRoute,
@@ -373,3 +394,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

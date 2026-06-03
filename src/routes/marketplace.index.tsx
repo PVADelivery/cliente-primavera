@@ -118,27 +118,29 @@ function SmartSearchBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const recents = loadRecents();
-+
-+  // Attempt to get user's location on mount
-+  useEffect(() => {
-+    if (!location) {
-+      if (navigator.geolocation) {
-+        navigator.geolocation.getCurrentPosition(
-+          (pos) => {
-+            // Here you could call a reverse‑geocode API. For now we just format lat/long.
-+            const { latitude, longitude } = pos.coords;
-+            setLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
-+          },
-+          () => {
-+            // Fallback if permission denied
-+            setLocation("Primavera, SP");
-+          }
-+        );
-+      } else {
-+        setLocation("Primavera, SP");
-+      }
-+    }
-+  }, []);
+  // State for autocomplete query
+  const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+  // Attempt to get user's location on mount
+  useEffect(() => {
+    if (!location) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            // Here you could call a reverse‑geocode API. For now we just format lat/long.
+            const { latitude, longitude } = pos.coords;
+            setLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+          },
+          () => {
+            // Fallback if permission denied
+            setLocation("Primavera, SP");
+          }
+        );
+      } else {
+        setLocation("Primavera, SP");
+      }
+    }
+  }, []);
 
   const locSuggestions = query.length > 0
     ? LOCATION_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
@@ -343,7 +345,7 @@ function FilterBar({
         );
       })}
       <motion.button
-        onClick={() => setOpenOnly(v => !v)}
+        onClick={() => setOpenOnly(!openOnly)}
         whileTap={{ scale: 0.92 }}
         layout
         className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border whitespace-nowrap transition-all duration-200 ${
