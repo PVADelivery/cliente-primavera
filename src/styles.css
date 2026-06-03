@@ -54,89 +54,90 @@
 }
 
 /* ══════════════════════════════════════════════
-   60% — #0d0d0d   Preto quase puro (bg)
-   30% — #242424   Grafite escuro    (cards/surfaces)
-   10% — #e02d2d   Vermelho da moto  (acento)
+   60% — Preto puxado pro cinza escuro (bg)
+   30% — Cinza (cards/surfaces)
+   10% — Amarelo (acento)
+   Verde — Status de sucesso/aberto
    ══════════════════════════════════════════════ */
 :root,
 .dark {
   --radius: 0.75rem;
 
-  /* ── 60% Fundo ── quase preto, como o Medal */
-  --background: oklch(0.10 0.004 250);
+  /* ── 60% Fundo ── preto mais próximo do cinza */
+  --background: oklch(0.16 0 0);
 
   /* ── 30% Texto ── branco puro */
-  --foreground: oklch(0.97 0.003 250);
+  --foreground: oklch(0.98 0 0);
 
-  /* ── Cards / Superfícies ── grafite escuro */
-  --card:            oklch(0.16 0.006 250);
-  --card-foreground: oklch(0.97 0.003 250);
-  --popover:         oklch(0.16 0.006 250);
-  --popover-foreground: oklch(0.97 0.003 250);
+  /* ── Cards / Superfícies ── cinza grafite */
+  --card:            oklch(0.22 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover:         oklch(0.22 0 0);
+  --popover-foreground: oklch(0.98 0 0);
 
-  /* ── 10% Vermelho acento ── igual ao tank da moto */
-  --primary:            oklch(0.55 0.22 22);
-  --primary-foreground: oklch(0.99 0.003 250);
-  --primary-glow:       oklch(0.62 0.21 24);
+  /* ── 10% Amarelo acento ── vibrante e premium */
+  --primary:            oklch(0.85 0.18 95);
+  --primary-foreground: oklch(0.15 0 0); /* Texto preto sobre fundo amarelo */
+  --primary-glow:       oklch(0.88 0.19 95);
 
-  /* ── Superfície intermediária ── um degrau acima do card */
-  --secondary:            oklch(0.20 0.006 250);
-  --secondary-foreground: oklch(0.90 0.003 250);
+  /* ── Superfície intermediária ── */
+  --secondary:            oklch(0.26 0 0);
+  --secondary-foreground: oklch(0.90 0 0);
 
   /* ── Muted ── texto/ícone secundário */
-  --muted:            oklch(0.19 0.006 250);
-  --muted-foreground: oklch(0.55 0.006 250);
+  --muted:            oklch(0.26 0 0);
+  --muted-foreground: oklch(0.65 0 0);
 
-  /* ── Accent ── branco-prata (cromado da moto) */
-  --accent:            oklch(0.80 0.005 250);
-  --accent-foreground: oklch(0.10 0.004 250);
+  /* ── Accent ── */
+  --accent:            oklch(0.30 0 0);
+  --accent-foreground: oklch(0.98 0 0);
 
   --destructive:            oklch(0.60 0.22 27);
   --destructive-foreground: oklch(0.99 0.003 250);
 
-  /* ── Bordas ── linha mínima, quase invisível */
-  --border: oklch(1 0 0 / 8%);
-  --input:  oklch(1 0 0 / 10%);
-  --ring:   oklch(0.55 0.22 22);
+  /* ── Bordas ── */
+  --border: oklch(1 0 0 / 12%);
+  --input:  oklch(1 0 0 / 15%);
+  --ring:   oklch(0.85 0.18 95);
 
   /* ── Gradientes ── */
-  /* Botão/badge: vermelho sólido */
-  --gradient-primary: linear-gradient(135deg, oklch(0.55 0.22 22) 0%, oklch(0.42 0.19 18) 100%);
+  /* Botão/badge: amarelo */
+  --gradient-primary: linear-gradient(135deg, oklch(0.85 0.18 95) 0%, oklch(0.75 0.16 90) 100%);
 
-  /* Hero banner: grafite → vermelho (como o Medal tem dark bg com accent no canto) */
-  --gradient-hero: linear-gradient(150deg, oklch(0.14 0.006 250) 0%, oklch(0.20 0.050 15) 60%, oklch(0.55 0.22 22) 100%);
+  /* Hero banner: cinza escuro → amarelo (acento no canto) */
+  --gradient-hero: linear-gradient(150deg, oklch(0.18 0 0) 0%, oklch(0.25 0.05 90) 60%, oklch(0.85 0.18 95) 100%);
 
   /* Card featured / errands */
-  --gradient-sunset: linear-gradient(140deg, oklch(0.55 0.22 22) 0%, oklch(0.44 0.20 20) 60%, oklch(0.32 0.15 16) 100%);
+  --gradient-sunset: linear-gradient(140deg, oklch(0.85 0.18 95) 0%, oklch(0.70 0.15 85) 60%, oklch(0.50 0.10 70) 100%);
 
-  /* Mesh overlay: brilho vermelho nos cantos */
+  /* Mesh overlay: brilho amarelo nos cantos */
   --gradient-mesh:
-    radial-gradient(at 15% 10%, oklch(0.55 0.22 22 / 0.28) 0px, transparent 55%),
-    radial-gradient(at 85% 5%,  oklch(0.44 0.20 20 / 0.18) 0px, transparent 50%),
-    radial-gradient(at 50% 90%, oklch(0.32 0.15 16 / 0.15) 0px, transparent 50%);
+    radial-gradient(at 15% 10%, oklch(0.85 0.18 95 / 0.15) 0px, transparent 55%),
+    radial-gradient(at 85% 5%,  oklch(0.75 0.16 90 / 0.10) 0px, transparent 50%),
+    radial-gradient(at 50% 90%, oklch(0.50 0.10 70 / 0.08) 0px, transparent 50%);
 
   /* ── Sombras ── */
-  --shadow-elegant: 0 8px 32px -8px oklch(0.55 0.22 22 / 0.45);
+  --shadow-elegant: 0 8px 32px -8px oklch(0.85 0.18 95 / 0.25);
   --shadow-card:    0 2px 16px -4px oklch(0 0 0 / 0.70);
-  --shadow-premium: 0 20px 56px -16px oklch(0.55 0.22 22 / 0.35), 0 6px 20px -8px oklch(0 0 0 / 0.60);
-  --shadow-glow:    0 0 40px oklch(0.55 0.22 22 / 0.40);
+  --shadow-premium: 0 20px 56px -16px oklch(0.85 0.18 95 / 0.15), 0 6px 20px -8px oklch(0 0 0 / 0.60);
+  --shadow-glow:    0 0 40px oklch(0.85 0.18 95 / 0.25);
 
   /* ── Charts ── */
-  --chart-1: oklch(0.55 0.22 22);
+  --chart-1: oklch(0.85 0.18 95);
   --chart-2: oklch(0.80 0.005 250);
   --chart-3: oklch(0.42 0.19 18);
   --chart-4: oklch(0.68 0.006 250);
   --chart-5: oklch(0.32 0.15 16);
 
   /* ── Sidebar ── */
-  --sidebar:                    oklch(0.12 0.005 250);
-  --sidebar-foreground:         oklch(0.97 0.003 250);
-  --sidebar-primary:            oklch(0.55 0.22 22);
-  --sidebar-primary-foreground: oklch(0.99 0.003 250);
-  --sidebar-accent:             oklch(0.18 0.006 250);
-  --sidebar-accent-foreground:  oklch(0.90 0.003 250);
-  --sidebar-border:             oklch(1 0 0 / 7%);
-  --sidebar-ring:               oklch(0.55 0.22 22);
+  --sidebar:                    oklch(0.18 0 0);
+  --sidebar-foreground:         oklch(0.98 0 0);
+  --sidebar-primary:            oklch(0.85 0.18 95);
+  --sidebar-primary-foreground: oklch(0.15 0 0);
+  --sidebar-accent:             oklch(0.24 0 0);
+  --sidebar-accent-foreground:  oklch(0.98 0 0);
+  --sidebar-border:             oklch(1 0 0 / 10%);
+  --sidebar-ring:               oklch(0.85 0.18 95);
 }
 
 @layer base {
@@ -170,7 +171,7 @@
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: oklch(1 0 0 / 18%); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: oklch(0.55 0.22 22 / 70%); }
+::-webkit-scrollbar-thumb:hover { background: oklch(0.85 0.18 95 / 70%); }
 
 /* Ocultar badge Lovable */
 #lovable-badge,
