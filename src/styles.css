@@ -161,3 +161,15 @@
     letter-spacing: -0.01em;
   }
 }
+
+/* Forçar remoção/ocultação da marca/badge da Lovable */
+#lovable-badge,
+.lovable-badge,
+lovable-badge,
+[id^="lovable-"],
+[class*="lovable-"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+

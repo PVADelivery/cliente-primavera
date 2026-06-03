@@ -70,7 +70,7 @@ function MarketplaceHome() {
           <h1 className="mt-3 font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
             Sua cidade,<br />em minutos.
           </h1>
-          <p className="mt-2 text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa do seu bairro.</p>
+          <p className="mt-2 text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa da sua cidade.</p>
         </div>
         <Link
           to="/marketplace/search"
@@ -116,6 +116,16 @@ function MarketplaceHome() {
           <Tag className="w-5 h-5 mb-2" />
           <p className="font-display font-bold text-sm leading-tight">Agenda da cidade</p>
           <p className="text-[11px] opacity-80 mt-0.5">Telefones e contatos</p>
+        </Link>
+      </section>
+
+      <section>
+        <Link to="/marketplace/errands" className="block p-5 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-elegant)" }}>
+          <div className="relative z-10">
+            <Zap className="w-6 h-6 mb-2" />
+            <h2 className="font-display font-bold text-xl leading-tight">Precisa enviar algo?</h2>
+            <p className="text-xs opacity-90 mt-1">Chame um entregador agora para buscar e levar qualquer coisa para você na cidade.</p>
+          </div>
         </Link>
       </section>
 

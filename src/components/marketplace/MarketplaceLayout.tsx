@@ -24,8 +24,8 @@ export function MarketplaceLayout() {
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur border-b border-border">
         <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
           <Link to="/marketplace" className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden shadow-sm" style={{ background: "var(--gradient-primary)" }}>
-              <img src={logoIcon} alt="Logo" className="w-5 h-5 object-contain" />
+            <span className="flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden shadow-sm bg-black p-0.5">
+              <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
             </span>
             <span className="font-display font-bold tracking-tight">Primavera Delivery</span>
           </Link>
