@@ -15,6 +15,7 @@ import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
 import logoIcon from "@/assets/logo-icon.png";
+import logoBanner from "@/assets/logo-banner.png";
 import heroPrimavera from "@/assets/hero-primavera.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
@@ -516,22 +517,14 @@ function MarketplaceHome() {
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
         
         {/* Semi-círculo preto gigante na direita */}
-        <div className="absolute -right-[80px] top-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full shadow-[0_0_50px_rgba(0,0,0,0.6)] ring-[10px] ring-black/10 flex items-center justify-center z-0 group">
-          {/* A imagem logoIcon tem cantos brancos, o rounded-full corta eles perfeitamente */}
+        <div className="absolute -right-[80px] top-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full shadow-[0_0_50px_rgba(0,0,0,0.6)] ring-[10px] ring-black/10 flex items-center justify-center z-0 bg-black">
+          {/* A imagem logo-banner tem fundo preto. Com object-contain e bg-black no container, ela se mistura perfeitamente. */}
           <img 
-            src={logoIcon} 
+            src={logoBanner} 
             alt="Primavera Delivery" 
             aria-hidden 
-            className="w-full h-full object-cover rounded-full" 
+            className="w-[85%] h-[85%] object-contain" 
           />
-          {/* Overlay gradiente escuro para garantir que o texto fique legível */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          {/* Frase e Moto aparecendo */}
-          <div className="absolute bottom-[40px] left-0 right-[40px] text-center flex flex-col items-center drop-shadow-2xl">
-            <span className="font-display font-black text-white text-3xl tracking-tight leading-none">Primavera</span>
-            <span className="font-display font-bold text-primary text-[11px] tracking-[0.3em] uppercase mt-1">Delivery</span>
-          </div>
         </div>
 
         <div className="relative z-10 max-w-[55%]">
