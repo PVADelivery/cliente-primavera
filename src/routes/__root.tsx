@@ -11,7 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
-import faviconUrl from "@/assets/logo-icon.png";
+import faviconUrl from "@/assets/favicon.png";
 
 function NotFoundComponent() {
   return (
