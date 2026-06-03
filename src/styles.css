@@ -87,6 +87,10 @@
   --gradient-hero: linear-gradient(180deg, oklch(0.99 0.02 85), oklch(0.96 0.04 95));
   --shadow-elegant: 0 10px 30px -10px oklch(0.62 0.22 18 / 0.25);
   --shadow-card: 0 4px 16px -8px oklch(0.18 0.03 25 / 0.15);
+  --gradient-sunset: linear-gradient(135deg, oklch(0.65 0.24 15) 0%, oklch(0.72 0.20 35) 50%, oklch(0.82 0.17 75) 100%);
+  --gradient-mesh: radial-gradient(at 20% 10%, oklch(0.78 0.18 30 / 0.35) 0px, transparent 50%), radial-gradient(at 80% 0%, oklch(0.65 0.24 15 / 0.30) 0px, transparent 50%), radial-gradient(at 60% 80%, oklch(0.82 0.17 75 / 0.25) 0px, transparent 50%);
+  --shadow-premium: 0 24px 60px -20px oklch(0.62 0.22 18 / 0.35), 0 8px 24px -12px oklch(0.18 0.03 25 / 0.2);
+  --shadow-glow: 0 0 40px oklch(0.72 0.20 35 / 0.4);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
