@@ -5,6 +5,10 @@ import { motion } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
 import heroFood from "@/assets/hero-food.jpg";
+import coverItalian from "@/assets/cover-italian.jpg";
+import coverBurger from "@/assets/cover-burger.jpg";
+import coverMarket from "@/assets/cover-market.jpg";
+import coverPharmacy from "@/assets/cover-pharmacy.jpg";
 
 export const Route = createFileRoute("/marketplace/")({
   head: () => ({
@@ -17,10 +21,10 @@ export const Route = createFileRoute("/marketplace/")({
 });
 
 const MOCK: Company[] = [
-  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: null, description: "Massas artesanais", category: "Italiana", rating: 4.8, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", active: true },
-  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: null, description: "Hambúrgueres autorais", category: "Burguer", rating: 4.6, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", active: true },
-  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: null, description: "Mercado completo", category: "Mercado", rating: 4.4, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", active: true },
-  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: null, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", active: true },
+  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 4.8, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", active: true },
+  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 4.6, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", active: true },
+  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 4.4, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", active: true },
+  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", active: true },
 ];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
@@ -153,31 +157,101 @@ function MarketplaceHome() {
       </section>
 
       <section>
-        <h2 className="font-display text-lg font-bold mb-3">Lojas próximas</h2>
-        <ul className="space-y-3">
-          {stores.map((s) => (
-            <li key={s.id}>
-              <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="flex gap-3 p-3 bg-card rounded-2xl border border-border hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-                <div className="w-16 h-16 rounded-xl bg-secondary shrink-0 grid place-items-center font-display font-bold text-xl text-muted-foreground overflow-hidden">
-                  {s.logo_url ? <img src={s.logo_url} alt={s.name} className="w-full h-full object-cover" /> : s.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-semibold truncate">{s.name}</h3>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${s.is_open ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                      {s.is_open ? "Aberto" : "Fechado"}
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <h2 className="font-display text-lg font-bold leading-tight">Lojas próximas</h2>
+            <p className="text-xs text-muted-foreground">Selecionadas para você</p>
+          </div>
+          <button className="text-xs font-medium text-primary flex items-center gap-0.5">Filtrar <ChevronRight className="w-3 h-3" /></button>
+        </div>
+        <ul className="space-y-4">
+          {stores.map((s, i) => {
+            const eta = 20 + ((i * 7) % 25);
+            const freeShip = (s.delivery_fee ?? 0) === 0;
+            return (
+              <motion.li
+                key={s.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
+              >
+                <Link
+                  to="/marketplace/store/$storeId"
+                  params={{ storeId: s.id }}
+                  className="block group rounded-3xl overflow-hidden bg-card border border-border/60 hover:border-primary/50 transition-all duration-300 active:scale-[0.985]"
+                  style={{ boxShadow: "var(--shadow-card)" }}
+                >
+                  <div className="relative aspect-[16/9] bg-secondary overflow-hidden">
+                    {s.cover_url ? (
+                      <img
+                        src={s.cover_url}
+                        alt={s.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full" style={{ background: "var(--gradient-primary)" }} />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                    {/* Top chips */}
+                    <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2">
+                      <div className="flex flex-wrap gap-1.5">
+                        {freeShip && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                            <Zap className="w-2.5 h-2.5 fill-white" /> Grátis
+                          </span>
+                        )}
+                        {s.rating && s.rating >= 4.7 && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide bg-accent text-accent-foreground px-2 py-1 rounded-full">
+                            Top rated
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        className={`text-[10px] font-semibold px-2.5 py-1 rounded-full backdrop-blur ${
+                          s.is_open ? "bg-white/90 text-emerald-700" : "bg-black/60 text-white"
+                        }`}
+                      >
+                        ● {s.is_open ? "Aberto" : "Fechado"}
+                      </span>
+                    </div>
+
+                    {/* Bottom info on image */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-white">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 rounded-2xl bg-white shrink-0 grid place-items-center font-display font-extrabold text-xl text-foreground ring-2 ring-white/80 overflow-hidden" style={{ boxShadow: "var(--shadow-elegant)" }}>
+                          {s.logo_url ? <img src={s.logo_url} alt="" className="w-full h-full object-cover" /> : s.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-display font-bold text-base truncate drop-shadow">{s.name}</h3>
+                          <p className="text-[11px] opacity-90 truncate">{s.category} · {s.address ?? "—"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="px-4 py-3 flex items-center gap-2 text-xs">
+                    <span className="flex items-center gap-1 font-semibold text-foreground">
+                      <Star className="w-3.5 h-3.5 fill-accent text-accent" />
+                      {s.rating?.toFixed(1) ?? "—"}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-border" />
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5" /> {eta}–{eta + 10} min
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-border" />
+                    <span className={`font-medium ${freeShip ? "text-emerald-600" : "text-muted-foreground"}`}>
+                      {freeShip ? "Entrega grátis" : `R$ ${(s.delivery_fee ?? 0).toFixed(2).replace(".", ",")}`}
+                    </span>
+                    <span className="ml-auto inline-flex items-center gap-0.5 text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                      Abrir <ChevronRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">{s.category} · {s.address ?? "—"}</p>
-                  <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-accent text-accent" />{s.rating?.toFixed(1) ?? "—"}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.business_hours ?? "—"}</span>
-                    <span>R$ {(s.delivery_fee ?? 0).toFixed(2).replace(".", ",")}</span>
-                  </div>
-                </div>
-              </Link>
-            </li>
-          ))}
+                </Link>
+              </motion.li>
+            );
+          })}
         </ul>
       </section>
     </div>
