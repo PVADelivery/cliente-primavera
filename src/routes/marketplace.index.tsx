@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Star, MapPin, Clock } from "lucide-react";
+import { Star, MapPin, Clock, Search, Zap, Tag, ChevronRight, UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
+import heroFood from "@/assets/hero-food.jpg";
 
 export const Route = createFileRoute("/marketplace/")({
   head: () => ({
@@ -22,7 +23,14 @@ const MOCK: Company[] = [
   { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: null, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", active: true },
 ];
 
-const CATEGORIES = ["Tudo", "Italiana", "Burguer", "Mercado", "Farmácia", "Pizza", "Japonesa", "Doces"];
+const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
+  { label: "Restaurantes", icon: UtensilsCrossed },
+  { label: "Mercado", icon: ShoppingBasket },
+  { label: "Farmácia", icon: Pill },
+  { label: "Pizza", icon: Pizza },
+  { label: "Doces", icon: IceCream },
+  { label: "Cafés", icon: Coffee },
+];
 
 function MarketplaceHome() {
   const { data: stores = MOCK } = useQuery<Company[]>({
@@ -39,35 +47,81 @@ function MarketplaceHome() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl p-6 text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}>
-        <h1 className="font-display text-2xl font-bold leading-tight">
-          Sua cidade<br />no app.
-        </h1>
-        <p className="mt-2 text-sm opacity-90 max-w-xs">Comida, mercado e farmácia em minutos — direto na sua porta.</p>
-        <div className="mt-4 inline-flex items-center gap-2 text-xs bg-background/15 backdrop-blur px-3 py-1.5 rounded-full">
-          <MapPin className="w-3.5 h-3.5" /> Primavera, SP
+      <section
+        className="rounded-3xl p-6 pb-7 text-primary-foreground relative overflow-hidden"
+        style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
+      >
+        <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
+        <img
+          src={heroFood}
+          alt=""
+          aria-hidden
+          className="absolute -right-10 -top-6 w-44 h-44 object-cover rounded-full opacity-90 ring-8 ring-background/10"
+          style={{ boxShadow: "var(--shadow-glow)" }}
+        />
+        <div className="relative max-w-[60%]">
+          <button className="inline-flex items-center gap-1 text-xs bg-background/15 backdrop-blur px-3 py-1.5 rounded-full font-medium">
+            <MapPin className="w-3.5 h-3.5" /> Primavera, SP <ChevronRight className="w-3 h-3" />
+          </button>
+          <h1 className="mt-3 font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
+            Sua cidade,<br />em minutos.
+          </h1>
+          <p className="mt-2 text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa do seu bairro.</p>
         </div>
+        <Link
+          to="/marketplace/search"
+          className="relative mt-5 flex items-center gap-2 bg-background/95 backdrop-blur text-foreground rounded-2xl px-4 py-3 text-sm font-medium"
+        >
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <span className="text-muted-foreground">Buscar lojas, pratos…</span>
+        </Link>
       </section>
 
       <section>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-none">
-          {CATEGORIES.map((c, i) => (
-            <button
-              key={c}
-              className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                i === 0 ? "bg-foreground text-background border-foreground" : "bg-card text-foreground border-border hover:border-primary"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+        <div className="grid grid-cols-6 gap-2 sm:gap-3">
+          {CATEGORIES.map((c, i) => {
+            const Icon = c.icon;
+            return (
+              <motion.button
+                key={c.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+                className="flex flex-col items-center gap-1.5 group"
+              >
+                <span
+                  className="w-12 h-12 rounded-2xl grid place-items-center bg-card border border-border group-hover:border-primary/40 transition-colors"
+                  style={{ boxShadow: "var(--shadow-card)" }}
+                >
+                  <Icon className="w-5 h-5 text-primary" />
+                </span>
+                <span className="text-[10px] font-medium text-foreground/80 text-center leading-tight">{c.label}</span>
+              </motion.button>
+            );
+          })}
         </div>
       </section>
 
+      <section className="grid grid-cols-2 gap-3">
+        <div className="p-4 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}>
+          <Zap className="w-5 h-5 mb-2" />
+          <p className="font-display font-bold text-sm leading-tight">Entrega expressa</p>
+          <p className="text-[11px] opacity-90 mt-0.5">Em até 30 min</p>
+        </div>
+        <Link to="/marketplace/directory" className="p-4 rounded-2xl bg-foreground text-background relative overflow-hidden">
+          <Tag className="w-5 h-5 mb-2" />
+          <p className="font-display font-bold text-sm leading-tight">Agenda da cidade</p>
+          <p className="text-[11px] opacity-80 mt-0.5">Telefones e contatos</p>
+        </Link>
+      </section>
+
       <section>
-        <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
-          <Star className="w-4 h-4 text-accent fill-accent" /> Mais bem avaliados
-        </h2>
+        <div className="flex items-end justify-between mb-3">
+          <h2 className="font-display text-lg font-bold flex items-center gap-2">
+            <Star className="w-4 h-4 text-accent fill-accent" /> Mais bem avaliados
+          </h2>
+          <button className="text-xs font-medium text-primary">Ver tudo</button>
+        </div>
         <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-none snap-x">
           {top.map((s, i) => (
             <motion.div
