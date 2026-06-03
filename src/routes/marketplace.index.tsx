@@ -127,9 +127,10 @@ function SmartSearchBar() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            // Here you could call a reverse‑geocode API. For now we just format lat/long.
-            const { latitude, longitude } = pos.coords;
-            setLocation(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+            // For a real app, use reverse geocoding API to get the city.
+            // Since we don't have an API key right now, we default to Primavera, SP
+            // so the user sees the actual city name instead of lat/long coordinates.
+            setLocation("Primavera, SP");
           },
           () => {
             // Fallback if permission denied
