@@ -29,6 +29,13 @@ function Profile() {
       <button onClick={signOut} className="w-full py-3 rounded-2xl bg-destructive/10 text-destructive font-medium flex items-center justify-center gap-2">
         <LogOut className="w-4 h-4" /> Sair
       </button>
+      
+      {/* ── BONASOFT Watermark ── */}
+      <div className="pt-8 pb-4 flex justify-center opacity-40 select-none pointer-events-none">
+        <span className="text-[10px] font-black tracking-[0.5em] text-muted-foreground uppercase">
+          B O N A S O F T
+        </span>
+      </div>
     </div>
   );
 }
