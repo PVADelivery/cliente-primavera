@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, MapPin, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
-  SlidersHorizontal, CheckCircle2, X, History, TrendingUp,
+  SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -44,6 +44,8 @@ const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Pizza", icon: Pizza },
   { label: "Doces", icon: IceCream },
   { label: "Cafés", icon: Coffee },
+  { label: "Shopping", icon: ShoppingBag },
+  { label: "Bebidas", icon: Wine },
 ];
 
 const LOCATION_SUGGESTIONS = [
@@ -541,7 +543,7 @@ function MarketplaceHome() {
 
       {/* ── Categories ── */}
       <section>
-        <div className="grid grid-cols-6 gap-2 sm:gap-3">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
