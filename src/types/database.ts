@@ -53,7 +53,7 @@ export interface Company {
   delivery_fee: number | null;
   is_open: boolean | null;
   business_hours: string | null;
-  active: boolean;
+  is_active: boolean;
 }
 
 export interface Product {

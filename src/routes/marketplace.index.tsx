@@ -31,10 +31,10 @@ export const Route = createFileRoute("/marketplace/")({
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const MOCK: Company[] = [
-  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 4.8, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", active: true },
-  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 4.6, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", active: true },
-  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 4.4, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", active: true },
-  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", active: true },
+  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 4.8, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", is_active: true },
+  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 4.6, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", is_active: true },
+  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 4.4, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", is_active: true },
+  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", is_active: true },
 ];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
@@ -83,9 +83,9 @@ function SkeletonPulse({ className }: { className?: string }) {
       className={`relative overflow-hidden rounded-2xl bg-card ${className}`}
     >
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-        animate={{ x: ["-100%", "100%"] }}
-        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-[200%]"
+        animate={{ x: ["-100%", "50%"] }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
       />
     </div>
   );
@@ -337,13 +337,13 @@ function FilterBar({
             onClick={() => setSort(opt.key)}
             whileTap={{ scale: 0.92 }}
             layout
-            className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border whitespace-nowrap transition-all duration-200 ${
+            className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
               active
-                ? "bg-primary text-primary-foreground border-primary shadow-[0_0_18px_oklch(0.58_0.23_22/0.4)]"
-                : "bg-card border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-2 ring-primary/20"
+                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             }`}
           >
-            {active && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
+            {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
             {opt.label}
           </motion.button>
         );
@@ -352,10 +352,10 @@ function FilterBar({
         onClick={() => setOpenOnly(!openOnly)}
         whileTap={{ scale: 0.92 }}
         layout
-        className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border whitespace-nowrap transition-all duration-200 ${
+        className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
           openOnly
-            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_18px_oklch(0.72_0.18_145/0.4)]"
-            : "bg-card border-border/60 text-muted-foreground hover:border-emerald-500/40 hover:text-foreground"
+            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-emerald-500/40 ring-2 ring-emerald-500/20"
+            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
         }`}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
@@ -379,13 +379,14 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
     >
       <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="block group">
         <motion.div
-          whileHover={{ y: -5 }}
-          whileTap={{ scale: 0.975 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
-          className="rounded-3xl overflow-hidden border border-border/50 group-hover:border-primary/40 transition-colors duration-300"
+          whileHover={{ y: -6, scale: 1.01 }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+          className="rounded-3xl overflow-hidden border border-white/5 group-hover:border-primary/50 transition-all duration-400 relative z-0"
           style={{
-            boxShadow: "var(--shadow-card)",
-            background: "var(--card)",
+            boxShadow: "0 12px 40px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+            background: "rgba(255,255,255,0.02)",
+            backdropFilter: "blur(20px)",
           }}
         >
           {/* 16:9 image */}
@@ -433,10 +434,10 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                   {s.logo_url ? <img src={s.logo_url} alt="" className="w-full h-full object-cover" /> : s.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1 pb-0.5">
-                  <h3 className="font-display font-black text-lg leading-tight text-white truncate" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}>
+                  <h3 className="font-display font-black text-xl tracking-tight leading-tight text-white truncate" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.9)" }}>
                     {s.name}
                   </h3>
-                  <p className="text-[11px] text-white/70 truncate mt-0.5">{s.category} · {s.address ?? "—"}</p>
+                  <p className="text-xs font-medium text-white/80 truncate mt-1 drop-shadow-md">{s.category} • {s.address ?? "—"}</p>
                 </div>
               </div>
             </div>
@@ -444,13 +445,13 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
 
           {/* Footer */}
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
-            <span className="flex items-center gap-1 font-bold text-[13px] text-foreground">
-              <Star className="w-3.5 h-3.5 fill-primary text-primary" />
+            <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
+              <Star className="w-4 h-4 fill-primary text-primary" />
               {s.rating?.toFixed(1) ?? "—"}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="w-3.5 h-3.5" /> {eta}–{eta + 10} min
+            <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
+              <Clock className="w-4 h-4" /> {eta}–{eta + 10} min
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
             <span className={`font-semibold ${freeShip ? "text-emerald-400" : "text-muted-foreground"}`}>
@@ -487,7 +488,7 @@ function MarketplaceHome() {
     queryKey: ["companies"],
     queryFn: async () => {
       if (!isSupabaseConfigured) return MOCK;
-      const { data, error } = await supabase.from("companies").select("*").eq("active", true).limit(40);
+      const { data, error } = await supabase.from("companies").select("*").eq("is_active", true).limit(40);
       if (error || !data || data.length === 0) return MOCK;
       return data as Company[];
     },
