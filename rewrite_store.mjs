@@ -1,4 +1,6 @@
-import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
+import fs from 'fs';
+
+const fileContent = `import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -212,7 +214,7 @@ function StoreDetail() {
           className="grid grid-cols-3 rounded-2xl border border-border bg-card overflow-hidden divide-x divide-border/50"
           style={{ boxShadow: "var(--shadow-elegant)" }}
         >
-          <InfoCell icon={<Bike className="w-5 h-5" />} label="Entrega" value={deliveryFee === 0 ? "Grátis" : `R$ ${deliveryFee.toFixed(2).replace(".", ",")}`} />
+          <InfoCell icon={<Bike className="w-5 h-5" />} label="Entrega" value={deliveryFee === 0 ? "Grátis" : \`R$ \${deliveryFee.toFixed(2).replace(".", ",")}\`} />
           <InfoCell icon={<Clock className="w-5 h-5" />} label="Tempo" value="25-35 min" />
           <InfoCell icon={<ShoppingBag className="w-5 h-5" />} label="Pedido Mín." value="R$ 20,00" />
         </div>
@@ -247,7 +249,7 @@ function StoreDetail() {
                 <span className="text-sm font-bold">{rev.name}</span>
                 <div className="flex items-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, idx) => (
-                    <Star key={idx} className={`w-3 h-3 ${idx < rev.rating ? 'fill-accent text-accent' : 'fill-muted text-muted'}`} />
+                    <Star key={idx} className={\`w-3 h-3 \${idx < rev.rating ? 'fill-accent text-accent' : 'fill-muted text-muted'}\`} />
                   ))}
                 </div>
               </div>
@@ -265,11 +267,11 @@ function StoreDetail() {
               <button
                 key={cat}
                 onClick={() => scrollToCat(cat)}
-                className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                className={\`shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all \${
                   activeCat === cat
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
+                }\`}
               >
                 {cat}
               </button>
@@ -362,7 +364,7 @@ function StoreDetail() {
                       <button
                         onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: p.image_url })}
                         className="sm:hidden absolute -bottom-3 right-2 w-10 h-10 rounded-xl bg-primary text-primary-foreground grid place-items-center active:scale-95 transition-transform shadow-md"
-                        aria-label={`Adicionar ${p.name}`}
+                        aria-label={\`Adicionar \${p.name}\`}
                       >
                         <Plus className="w-5 h-5" strokeWidth={3} />
                       </button>
@@ -440,7 +442,7 @@ function StoreDetail() {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Taxa de entrega</span>
-                            <span className="font-semibold">{deliveryFee === 0 ? "Grátis" : `R$ ${deliveryFee.toFixed(2).replace(".", ",")}`}</span>
+                            <span className="font-semibold">{deliveryFee === 0 ? "Grátis" : \`R$ \${deliveryFee.toFixed(2).replace(".", ",")}\`}</span>
                           </div>
                           <div className="flex justify-between text-lg pt-2 font-black border-t border-border mt-2">
                             <span>Total</span>
@@ -489,3 +491,7 @@ function InfoCell({
     </div>
   );
 }
+\`;
+
+fs.writeFileSync('c:\\\\Users\\\\antho\\\\.gemini\\\\antigravity-ide\\\\scratch\\\\pva-delivery-primavera\\\\cliente-primavera\\\\src\\\\routes\\\\marketplace.store.$storeId.tsx', fileContent);
+console.log('Store page generated!');
