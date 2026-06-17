@@ -1,18 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
-// Preencha estes valores com seu projeto Supabase externo.
-// (Não use Lovable Cloud — este projeto consome um Supabase já existente, compartilhado com /admin, /business e /driver.)
+// Supabase externo (compartilhado com /admin, /business e /driver).
+// Aceita tanto o nome legado VITE_SUPABASE_ANON_KEY quanto o novo VITE_SUPABASE_PUBLISHABLE_KEY.
 const supabaseUrl =
   (import.meta.env.VITE_SUPABASE_URL as string | undefined) ??
   "https://YOUR-PROJECT.supabase.co";
 
 const supabaseAnonKey =
+  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) ??
   (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ??
   "YOUR-ANON-KEY";
 
+// Configurado de verdade quando a URL aponta para supabase E a chave tem formato JWT (eyJ...) ou sb_publishable_*.
 export const isSupabaseConfigured =
-  !supabaseUrl.includes("YOUR-PROJECT") && !supabaseAnonKey.includes("YOUR-ANON");
+  supabaseUrl.includes("supabase.") &&
+  !supabaseUrl.includes("YOUR-PROJECT") &&
+  (supabaseAnonKey.startsWith("eyJ") || supabaseAnonKey.startsWith("sb_publishable_"));
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {

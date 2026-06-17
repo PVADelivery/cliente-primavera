@@ -62,19 +62,37 @@ function StoreDetail() {
 
   const { data: store } = useQuery<Company | null>({
     queryKey: ["company", storeId],
+    placeholderData: null,
     queryFn: async () => {
       if (!isSupabaseConfigured) return null;
-      const { data } = await supabase.from("companies").select("*").eq("id", storeId).maybeSingle();
-      return ((data as Company | null) ?? null);
+      try {
+        const result = await Promise.race([
+          supabase.from("companies").select("*").eq("id", storeId).maybeSingle(),
+          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
+        ]);
+        return ((result as { data: Company | null }).data) ?? null;
+      } catch {
+        return null;
+      }
     },
   });
 
   const { data: products = MOCK_PRODUCTS } = useQuery<(Product & { promo?: number })[]>({
     queryKey: ["products", storeId],
+    placeholderData: MOCK_PRODUCTS,
     queryFn: async () => {
       if (!isSupabaseConfigured) return MOCK_PRODUCTS;
-      const { data } = await supabase.from("products").select("*").eq("company_id", storeId).eq("active", true);
-      return ((data as Product[]) as (Product & { promo?: number })[]) ?? MOCK_PRODUCTS;
+      try {
+        const result = await Promise.race([
+          supabase.from("products").select("*").eq("company_id", storeId).eq("active", true),
+          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
+        ]);
+        const data = (result as { data: Product[] | null }).data;
+        if (!data || data.length === 0) return MOCK_PRODUCTS;
+        return data as (Product & { promo?: number })[];
+      } catch {
+        return MOCK_PRODUCTS;
+      }
     },
   });
 
