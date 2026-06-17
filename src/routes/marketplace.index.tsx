@@ -524,14 +524,14 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 pb-7 text-primary-foreground relative overflow-hidden"
+        className="rounded-3xl p-5 sm:p-6 pb-7 text-primary-foreground relative overflow-hidden min-h-[230px]"
         style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
       >
         <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
         
         {/* Fundo preto na direita com borda esquerda arredondada (semi-círculo) */}
-        <div className="absolute right-0 top-0 bottom-0 w-[52%] flex items-center justify-end z-0 pointer-events-none">
-          <div className="w-full h-full bg-black rounded-l-[130px] flex items-center justify-center pl-10 pr-6 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+        <div className="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[48%] flex items-center justify-end z-0 pointer-events-none">
+          <div className="w-full h-full bg-black rounded-l-[70px] sm:rounded-l-[130px] flex items-center justify-center pl-6 sm:pl-10 pr-4 sm:pr-6 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
             <img 
               src={logoBanner} 
               alt="Primavera Delivery" 
@@ -542,13 +542,15 @@ function MarketplaceHome() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-[48%]">
-          <h1 className="font-display text-[28px] font-extrabold leading-[1.05] tracking-tight">
+        <div className="relative z-10 max-w-[55%] sm:max-w-[50%]">
+          <h1 className="font-display text-[22px] sm:text-[28px] font-extrabold leading-[1.05] tracking-tight">
             Sua cidade,<br />em minutos.
           </h1>
-          <p className="mt-2 text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa da sua cidade.</p>
+          <p className="mt-2 text-[11px] sm:text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa da sua cidade.</p>
         </div>
-        <SmartSearchBar />
+        <div className="relative z-10">
+          <SmartSearchBar />
+        </div>
       </section>
 
       {/* ── Categories ── */}
