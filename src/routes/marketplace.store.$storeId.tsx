@@ -156,13 +156,14 @@ function StoreDetail() {
         <motion.img
           src={coverItalian}
           alt={name}
-          className="absolute inset-0 w-full h-full object-cover opacity-80"
+          className="absolute inset-0 w-full h-full object-cover"
           initial={{ scale: 1.05, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.8 }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 to-transparent" />
+        {/* Dark bottom gradient just for text legibility — no white "fog" */}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 to-transparent" />
 
         {/* Top actions */}
         <div className="absolute top-4 inset-x-4 flex items-center justify-between z-10">
