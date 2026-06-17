@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ArrowLeft,
   Star,
@@ -58,7 +58,25 @@ function StoreDetail() {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverFailed, setCoverFailed] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const coverImgRef = useRef<HTMLImageElement | null>(null);
+
+  // Parallax + fade leve no cover conforme rola
+  const { scrollY } = useScroll();
+  const coverY = useTransform(scrollY, [0, 320], [0, 60]);
+  const coverScale = useTransform(scrollY, [0, 320], [1, 1.08]);
+  const coverOpacity = useTransform(scrollY, [0, 280], [1, 0.6]);
+
+  // Imagens já em cache não disparam onLoad — checa .complete manualmente
+  useEffect(() => {
+    const img = coverImgRef.current;
+    if (img?.complete && img.naturalWidth > 0) setCoverLoaded(true);
+    // Defensivo: garante que o cover apareça mesmo se onLoad não disparar
+    const t = setTimeout(() => setCoverLoaded(true), 600);
+    return () => clearTimeout(t);
+  }, []);
 
   const { data: store } = useQuery<Company | null>({
     queryKey: ["company", storeId],
@@ -151,45 +169,86 @@ function StoreDetail() {
 
   return (
     <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen">
-      {/* 1. Hero / Cover (Premium, Floating Logo, Pills) */}
-      <div className="relative h-64 sm:h-80 overflow-hidden bg-black">
-        <motion.img
-          src={coverItalian}
-          alt={name}
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ scale: 1.05, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+      {/* 1. Hero / Cover (Premium, Parallax, Floating Logo) */}
+      <div className="relative h-64 sm:h-80 overflow-hidden bg-neutral-950 isolate">
+        {/* Premium gradient fallback: visível enquanto a foto carrega ou se ela falhar */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 80% at 30% 20%, oklch(0.42 0.18 30 / 0.9), transparent 60%), radial-gradient(100% 80% at 80% 80%, oklch(0.32 0.12 40 / 0.9), transparent 60%), linear-gradient(135deg, oklch(0.22 0.05 30), oklch(0.14 0.03 30))",
+          }}
         />
-        {/* Dark bottom gradient just for text legibility — no white "fog" */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 to-transparent" />
+
+        {/* Shimmer leve enquanto a imagem não carrega (sem flash branco) */}
+        {!coverLoaded && !coverFailed && (
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-60"
+            style={{
+              background:
+                "linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.06) 50%, transparent 65%)",
+              backgroundSize: "200% 100%",
+              animation: "cover-shimmer 1.6s ease-in-out infinite",
+            }}
+          />
+        )}
+
+        {!coverFailed && (
+          <motion.img
+            ref={coverImgRef}
+            src={coverItalian}
+            alt={name}
+            decoding="async"
+            fetchPriority="high"
+            onLoad={() => setCoverLoaded(true)}
+            onError={() => setCoverFailed(true)}
+            className="absolute inset-0 w-full h-full object-cover will-change-transform"
+            style={{
+              y: coverY,
+              scale: coverScale,
+              opacity: coverLoaded ? 1 : 0,
+              filter: "contrast(1.04) saturate(1.08)",
+              backfaceVisibility: "hidden",
+              transition: "opacity 500ms ease-out",
+            }}
+          />
+        )}
+
+        {/* Overlays sutis — apenas o suficiente para legibilidade do nome */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/35 to-transparent pointer-events-none" />
 
         {/* Top actions */}
         <div className="absolute top-4 inset-x-4 flex items-center justify-between z-10">
           <Link
             to="/marketplace"
-            className="w-10 h-10 grid place-items-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/10 shadow-lg hover:bg-white/30 transition-colors"
+            className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300"
             aria-label="Voltar"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 grid place-items-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/10 shadow-lg hover:bg-white/30 transition-colors">
+            <button className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300">
               <Share2 className="w-4 h-4" />
             </button>
-            <button className="w-10 h-10 grid place-items-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/10 shadow-lg hover:bg-white/30 transition-colors">
+            <button className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300 group">
               <Heart className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Floating Logo & Name inside cover */}
-        <div className="absolute bottom-6 left-4 right-4 flex items-end gap-4 z-10">
+        <motion.div
+          initial={{ y: 24, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          className="absolute bottom-6 left-4 right-4 flex items-end gap-4 z-10"
+        >
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
+            whileHover={{ y: -4, rotate: -2 }}
+            transition={{ type: "spring", stiffness: 280, damping: 18 }}
             className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl bg-card border-2 border-background grid place-items-center overflow-hidden"
             style={{ boxShadow: "var(--shadow-premium)" }}
           >
@@ -201,12 +260,20 @@ function StoreDetail() {
             </div>
           </motion.div>
           <div className="flex-1 min-w-0 pb-1">
-            <h1 className="font-display text-3xl sm:text-4xl font-black tracking-tight text-white drop-shadow-md truncate">{name}</h1>
-            <p className="text-white/90 text-sm font-medium mt-1 truncate drop-shadow-sm">
+            <h1
+              className="font-display text-3xl sm:text-4xl font-black tracking-tight text-white truncate"
+              style={{ textShadow: "0 2px 18px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.4)" }}
+            >
+              {name}
+            </h1>
+            <p
+              className="text-white/95 text-sm font-medium mt-1 truncate"
+              style={{ textShadow: "0 1px 8px rgba(0,0,0,0.55)" }}
+            >
               {store?.description ?? "Massas artesanais"} · {store?.category ?? "Italiana"}
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="px-4 pt-4 pb-4 space-y-6">

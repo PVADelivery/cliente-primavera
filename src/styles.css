@@ -205,3 +205,9 @@ lovable-badge,
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Hero cover shimmer — discreto, sem flash branco */
+@keyframes cover-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
