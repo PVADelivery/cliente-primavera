@@ -487,11 +487,22 @@ function MarketplaceHome() {
 
   const { data: stores, isLoading } = useQuery<Company[]>({
     queryKey: ["companies"],
+    placeholderData: MOCK,
     queryFn: async () => {
       if (!isSupabaseConfigured) return MOCK;
-      const { data, error } = await supabase.from("companies").select("*").eq("is_active", true).limit(40);
-      if (error || !data || data.length === 0) return MOCK;
-      return data as Company[];
+      try {
+        const result = await Promise.race([
+          supabase.from("companies").select("*").eq("is_active", true).limit(40),
+          new Promise<{ data: null; error: Error }>((resolve) =>
+            setTimeout(() => resolve({ data: null, error: new Error("timeout") }), 4000),
+          ),
+        ]);
+        const { data, error } = result as { data: Company[] | null; error: unknown };
+        if (error || !data || data.length === 0) return MOCK;
+        return data;
+      } catch {
+        return MOCK;
+      }
     },
   });
 
