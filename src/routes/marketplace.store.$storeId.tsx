@@ -61,12 +61,22 @@ function StoreDetail() {
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const coverImgRef = useRef<HTMLImageElement | null>(null);
 
   // Parallax + fade leve no cover conforme rola
   const { scrollY } = useScroll();
   const coverY = useTransform(scrollY, [0, 320], [0, 60]);
   const coverScale = useTransform(scrollY, [0, 320], [1, 1.08]);
-  const coverOpacity = useTransform(scrollY, [0, 280], [1, 0.55]);
+  const coverOpacity = useTransform(scrollY, [0, 280], [1, 0.6]);
+
+  // Imagens já em cache não disparam onLoad — checa .complete manualmente
+  useEffect(() => {
+    const img = coverImgRef.current;
+    if (img?.complete && img.naturalWidth > 0) setCoverLoaded(true);
+    // Defensivo: garante que o cover apareça mesmo se onLoad não disparar
+    const t = setTimeout(() => setCoverLoaded(true), 600);
+    return () => clearTimeout(t);
+  }, []);
 
   const { data: store } = useQuery<Company | null>({
     queryKey: ["company", storeId],
