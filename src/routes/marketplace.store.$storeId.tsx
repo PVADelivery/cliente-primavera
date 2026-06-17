@@ -197,6 +197,7 @@ function StoreDetail() {
 
         {!coverFailed && (
           <motion.img
+            ref={coverImgRef}
             src={coverItalian}
             alt={name}
             decoding="async"
@@ -207,12 +208,10 @@ function StoreDetail() {
             style={{
               y: coverY,
               scale: coverScale,
-              opacity: coverLoaded ? coverOpacity : 0,
+              opacity: coverLoaded ? 1 : 0,
               filter: "contrast(1.04) saturate(1.08)",
-              imageRendering: "auto",
-              transform: "translateZ(0)",
               backfaceVisibility: "hidden",
-              transition: coverLoaded ? undefined : "opacity 600ms ease-out",
+              transition: "opacity 500ms ease-out",
             }}
           />
         )}
