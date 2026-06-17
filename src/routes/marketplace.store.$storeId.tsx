@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ArrowLeft,
   Star,
@@ -58,7 +58,15 @@ function StoreDetail() {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverFailed, setCoverFailed] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Parallax + fade leve no cover conforme rola
+  const { scrollY } = useScroll();
+  const coverY = useTransform(scrollY, [0, 320], [0, 60]);
+  const coverScale = useTransform(scrollY, [0, 320], [1, 1.08]);
+  const coverOpacity = useTransform(scrollY, [0, 280], [1, 0.55]);
 
   const { data: store } = useQuery<Company | null>({
     queryKey: ["company", storeId],
