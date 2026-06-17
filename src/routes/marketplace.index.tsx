@@ -316,11 +316,10 @@ function SmartSearchBar() {
 }
 
 // ─── Filter chips ─────────────────────────────────────────────────────────────
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+const SORT_OPTIONS: { key: Exclude<SortKey, "open">; label: string }[] = [
   { key: "relevance", label: "Para você" },
   { key: "rating", label: "⭐ Top rated" },
   { key: "fee", label: "Menor taxa" },
-  { key: "open", label: "Aberto agora" },
 ];
 
 function FilterBar({
