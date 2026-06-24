@@ -333,33 +333,6 @@ function StoreDetail() {
         </div>
       </div>
 
-      {/* 2. Seção de Avaliações e Depoimentos */}
-      <div className="px-4 py-4 mb-2">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <MessageCircleHeart className="w-5 h-5 text-primary" /> Avaliações
-          </h2>
-          <span className="text-sm font-bold text-accent flex items-center gap-1">
-            <Star className="w-4 h-4 fill-accent" /> {rating}
-          </span>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-none -mx-4 px-4 snap-x">
-          {MOCK_REVIEWS.map((rev) => (
-            <div key={rev.id} className="shrink-0 w-64 p-3 bg-card rounded-2xl border border-border snap-start" style={{ boxShadow: "var(--shadow-sm)" }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold">{rev.name}</span>
-                <div className="flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, idx) => (
-                    <Star key={idx} className={`w-3 h-3 ${idx < rev.rating ? 'fill-accent text-accent' : 'fill-muted text-muted'}`} />
-                  ))}
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground line-clamp-3">"{rev.text}"</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Sticky category nav */}
       {categories.length > 0 && (
         <div className="sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border shadow-sm">
