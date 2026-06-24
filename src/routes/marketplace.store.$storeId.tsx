@@ -15,7 +15,6 @@ import {
   UtensilsCrossed,
   BadgePercent,
   Minus,
-  MessageCircleHeart
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useCart } from "@/contexts/CartContext";
@@ -43,12 +42,6 @@ const MOCK_PRODUCTS: (Product & { promo?: number })[] = [
   { id: "p2", company_id: "m1", name: "Nhoque ao Sugo", price: 36.0, description: "Receita tradicional da nona, molho de tomate San Marzano e manjericão fresco.", category: "Pratos Principais", image_url: dishGnocchi, image_urls: null, active: true },
   { id: "p3", company_id: "m1", name: "Tiramisu", price: 18.0, description: "Sobremesa italiana clássica com mascarpone, café espresso e cacau em pó.", category: "Sobremesas", image_url: dishTiramisu, image_urls: null, active: true },
   { id: "p4", company_id: "m1", name: "Refrigerante Cola", price: 6.0, description: "Lata 350ml bem gelada.", category: "Bebidas", image_url: null, image_urls: null, active: true },
-];
-
-const MOCK_REVIEWS = [
-  { id: 1, name: "Maria S.", rating: 5, text: "A melhor lasanha que já comi! Chegou quentinha e muito bem embalada." },
-  { id: 2, name: "João V.", rating: 5, text: "Porções generosas e sabor autêntico. Recomendo muito o Tiramisu." },
-  { id: 3, name: "Ana P.", rating: 4, text: "Muito bom, mas o entregador demorou um pouquinho. A comida compensou!" }
 ];
 
 function StoreDetail() {
@@ -91,6 +84,27 @@ function StoreDetail() {
         return ((result as { data: Company | null }).data) ?? null;
       } catch {
         return null;
+      }
+    },
+  });
+
+  // Reviews reais — toda loja começa em 5,0 e só baixa com avaliações reais
+  const { data: reviewStats = { avg: 5, count: 0 } } = useQuery<{ avg: number; count: number }>({
+    queryKey: ["review-stats", storeId],
+    placeholderData: { avg: 5, count: 0 },
+    queryFn: async () => {
+      if (!isSupabaseConfigured) return { avg: 5, count: 0 };
+      try {
+        const result = await Promise.race([
+          supabase.from("reviews").select("rating").eq("company_id", storeId),
+          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
+        ]);
+        const rows = (result as { data: { rating: number }[] | null }).data;
+        if (!rows || rows.length === 0) return { avg: 5, count: 0 };
+        const sum = rows.reduce((acc, r) => acc + Math.max(1, Math.min(5, Number(r.rating) || 5)), 0);
+        return { avg: sum / rows.length, count: rows.length };
+      } catch {
+        return { avg: 5, count: 0 };
       }
     },
   });
@@ -164,7 +178,8 @@ function StoreDetail() {
     setActiveCat(cat);
   };
 
-  const rating = store?.rating?.toFixed(1) ?? "4.8";
+  const rating = reviewStats.avg.toFixed(1);
+  const reviewCount = reviewStats.count;
   const deliveryFee = store?.delivery_fee ?? 6.9;
 
   return (
@@ -282,7 +297,9 @@ function StoreDetail() {
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/15 text-accent-foreground text-sm font-bold border border-accent/20">
             <Star className="w-4 h-4 fill-accent text-accent" />
             {rating}
-            <span className="text-muted-foreground font-semibold">(320+)</span>
+            <span className="text-muted-foreground font-semibold">
+              {reviewCount > 0 ? `(${reviewCount})` : "· Novo"}
+            </span>
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-sm font-bold border border-emerald-500/20">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
