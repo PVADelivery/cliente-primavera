@@ -131,19 +131,33 @@ function SmartSearchBar() {
     if (!location) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            // For a real app, use reverse geocoding API to get the city.
-            // Since we don't have an API key right now, we default to Primavera do Leste, MT
-            // so the user sees the actual city name instead of lat/long coordinates.
-            setLocation("Primavera do Leste, MT");
+          async (pos) => {
+            try {
+              const { latitude, longitude } = pos.coords;
+              // BigDataCloud free reverse geocoding (no API key required)
+              const res = await fetch(
+                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
+              );
+              const data = await res.json();
+              const city =
+                data.city ||
+                data.locality ||
+                data.principalSubdivision ||
+                "Sua localização";
+              const uf = data.principalSubdivisionCode?.split("-")?.[1] || "";
+              setLocation(uf ? `${city}, ${uf}` : city);
+            } catch {
+              setLocation("Sua localização");
+            }
           },
           () => {
-            // Fallback if permission denied
-            setLocation("Primavera, SP");
-          }
+            // Permissão negada — não chutar cidade
+            setLocation("Definir localização");
+          },
+          { timeout: 8000, maximumAge: 5 * 60 * 1000 }
         );
       } else {
-        setLocation("Primavera, SP");
+        setLocation("Definir localização");
       }
     }
   }, []);
