@@ -1,65 +1,31 @@
-## Diagnóstico (o que está realmente quebrado)
+## Objetivo
 
-Olhando o print da tela /marketplace, há 3 problemas concretos — não é "design ruim", é app quebrado:
+Eliminar todos os depoimentos/avaliações falsos (mocks) do app e fazer com que o rating exibido das lojas reflita avaliações reais: toda loja começa em 5,0 estrelas e só cai quando houver reviews ruins reais; se só houver reviews boas, mantém 5,0.
 
-1. **Conteúdo não carrega** — "Em destaque" e "Lojas próximas" ficam infinitos em skeleton (3 caixas brancas vazias), e o chip mostra "0 lojas". Causa raiz no código (`src/lib/supabase.ts` linhas 10–15 e `src/routes/marketplace.index.tsx` linhas 489–497):
-   - O arquivo `supabase.ts` lê `VITE_SUPABASE_ANON_KEY`, mas o `.env` do projeto só tem `VITE_SUPABASE_PUBLISHABLE_KEY` (o novo nome). Resultado: a chave cai no placeholder `"YOUR-ANON-KEY"`.
-   - `isSupabaseConfigured` então fica `false` em alguns cenários e `true` em outros (dependendo de qual env Vite injeta). Quando vira `true`, o `select` em `companies` chama Supabase com credencial inválida e o `useQuery` fica preso sem resolver — daí o skeleton infinito.
+## Mudanças
 
-2. **Aba "Aberto agora" duplicada** — aparece nas opções de ordenação (`SORT_OPTIONS` linha 323) **e** como toggle separado (linha 364). Duas abas com o mesmo nome lado a lado.
+### 1. `src/routes/marketplace.store.$storeId.tsx`
+- Remover a constante `MOCK_REVIEWS` (linhas 48–52).
+- Remover toda a seção "Avaliações" do hero (linhas 319–344), incluindo o carrossel de cards de depoimentos.
+- Remover o import `MessageCircleHeart` (não usado depois).
+- Buscar reviews reais via TanStack Query na tabela `reviews` do Supabase filtrando por `company_id = storeId` (com fallback gracioso: se a tabela não existir / erro / vazio → considera 5,0, count 0).
+- Calcular `rating` no componente:
+  - Se `reviewCount === 0` → `5.0`.
+  - Caso contrário → média das `rating` das reviews (clamp 1–5, 1 casa decimal).
+- Substituir o pill de rating no hero (linhas 282–286) para mostrar a nota calculada e `(N)` em vez de `(320+)` fixo; quando count = 0, mostrar apenas "Novo" ou a estrela com "5,0 · Novo".
+- Remover dependência de `store?.rating` para exibição (mas manter a coluna no banco intacta — não alteramos schema).
 
-3. **Hero com logo estourando** — em viewport estreito (~948px no print) o bloco preto à direita com o logo cobre metade do hero e empurra o título; o `max-w-[48%]` colide com a faixa preta `w-[52%]`.
+### 2. `src/routes/marketplace.index.tsx`
+- Nos MOCKs (`m1`–`m4`), trocar `rating` fixo (4.8, 4.6, 4.4, 4.9) por `5` para refletir o "começa em 5".
+- Onde o card exibe rating (linhas ~420, 451, 651), exibir `s.rating?.toFixed(1) ?? "5,0"` (ou apenas `5.0` quando null).
+- Manter ordenação `sort === "rating"` funcionando (já tolera null).
+- Não vamos puxar reviews por loja na listagem (custo). A nota da listagem continua vindo de `companies.rating`, que o backend deve atualizar a partir das reviews reais (fora deste escopo de frontend). Default visual: 5,0 quando null.
 
-A página `/marketplace/store/:storeId` também usa `MOCK_PRODUCTS` puro — não consulta Supabase de verdade — e o hero/cabeçalho precisa do mesmo tratamento responsivo.
+### 3. Sem mudanças de schema
+Não vamos criar nem alterar tabelas. Se a tabela `reviews` ainda não existir no Supabase, o fetch falha silenciosamente e a tela mostra 5,0 / "Novo". Quando a tabela existir (estrutura esperada mínima: `company_id uuid`, `rating int 1..5`, `comment text`, `created_at`, `customer_name text`), os dados reais aparecem automaticamente.
 
-## Etapa 1 — Destravar o carregamento de dados (prioridade máxima)
+## Fora do escopo
+- Criar tabela `reviews` e trigger para atualizar `companies.rating` (pode ser pedido em seguida).
+- Tela para o cliente enviar avaliação após o pedido.
 
-**Arquivo: `src/lib/supabase.ts`**
-- Aceitar os 3 nomes possíveis de chave anônima/publishable, na ordem: `VITE_SUPABASE_PUBLISHABLE_KEY` → `VITE_SUPABASE_ANON_KEY` → placeholder.
-- Trocar a heurística `isSupabaseConfigured` para validar formato real (URL com `supabase.co` E chave começando com `eyJ` ou `sb_publishable_`), em vez de só conferir o texto `"YOUR-"`.
-- Exportar `isSupabaseConfigured` consistente para uso no resto do app.
-
-**Arquivo: `src/routes/marketplace.index.tsx`** (linhas 489–497)
-- Envolver a chamada Supabase em `Promise.race` com timeout de 4s → se demorar, retorna `MOCK` em vez de pendurar a UI.
-- Adicionar `try/catch` explícito; qualquer erro também cai em `MOCK`.
-- Garantir que `stores` nunca fique `undefined` por muito tempo: usar `placeholderData: MOCK` no `useQuery` para a UI renderizar com dados imediatamente enquanto a query resolve.
-
-**Arquivo: `src/routes/marketplace.store.$storeId.tsx`**
-- Aplicar a mesma estratégia: timeout + fallback para MOCK, `placeholderData` no `useQuery`.
-
-Resultado esperado: a home mostra as 4 lojas do mock instantaneamente; quando Supabase real estiver configurado, ele assume sem flash de loading.
-
-## Etapa 2 — Corrigir bugs visíveis na home
-
-**Arquivo: `src/routes/marketplace.index.tsx`**
-
-- **Remover duplicação da aba "Aberto agora"**: tirar a opção `{ key: "open", label: "Aberto agora" }` do `SORT_OPTIONS` (linha 323). O toggle `openOnly` (linhas 353–365) é o único controle válido e fica destacado em verde quando ativo. Atualizar o tipo `SortKey` para `"relevance" | "rating" | "fee"`.
-
-- **Corrigir o hero responsivo** (linhas 515–542):
-  - Em telas <640px o bloco preto da logo cobre 52% e estoura. Reduzir para `w-[44%]` em mobile e `sm:w-[48%]`, com `max-w-[56%]` no bloco de texto à esquerda.
-  - Diminuir `rounded-l-[130px]` para `rounded-l-[80px] sm:rounded-l-[130px]` (curva proporcional).
-  - Diminuir headline para `text-[24px] sm:text-[28px]` e dar `min-h` ao hero para evitar colapso quando o seletor de endereço estiver vazio.
-  - Garantir `z-10` real no texto e no `SmartSearchBar` para nunca sumirem atrás do bloco preto.
-
-- **Polimento da grid de categorias** (linhas 545–569): mostrar todas as 8 categorias em mobile usando `grid-cols-4` (já faz) mas ajustar gap e tamanho do círculo para `w-14 h-14` para ficar mais Rappi/iFood; adicionar leve `bg-gradient` no hover do círculo.
-
-## Etapa 3 — Refinar a página da loja
-
-**Arquivo: `src/routes/marketplace.store.$storeId.tsx`**
-
-- Aplicar o mesmo padrão responsivo do hero (não há print novo, mas o usuário disse "ambas").
-- Garantir que a barra sticky de categorias não fique escondida atrás do header global do `MarketplaceLayout` (ajustar `top-` do `sticky`).
-- Reduzir tamanho de imagens dos pratos em mobile (`80×80` em vez de `88×88`) para não estourar largura em viewport ~360px.
-- Adicionar estado vazio bonito quando `filteredProducts.length === 0` (mensagem "Nenhum item encontrado para '...'" com ilustração leve).
-
-## Detalhes técnicos
-
-- Nenhuma mudança em schema/RLS — toda a etapa 1 é ajuste de cliente.
-- Nenhum novo `npm` package.
-- Não tocar em `MarketplaceLayout`, rotas de autenticação, ou outras telas.
-- Validação após cada etapa: `browser--screenshot` em viewport 390×844 (mobile) e 1280×800 (desktop) para confirmar que a home mostra as 4 lojas e a página da loja exibe os pratos.
-
-## Fora de escopo
-
-- Não vou refazer o design todo (você pediu "corrija tudo em etapas", não redesign). Se depois quiser 3 direções visuais novas, abrimos uma nova rodada.
-- Não vou popular a tabela `companies` real no Supabase — quando você quiser dados reais, basta inserir lojas na tabela e o app passa a usar automaticamente.
+Após sua aprovação eu aplico as mudanças.
