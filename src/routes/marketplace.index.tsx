@@ -31,10 +31,10 @@ export const Route = createFileRoute("/marketplace/")({
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const MOCK: Company[] = [
-  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 4.8, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", is_active: true },
-  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 4.6, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", is_active: true },
-  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 4.4, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", is_active: true },
-  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 4.9, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", is_active: true },
+  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", is_active: true },
+  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", is_active: true },
+  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", is_active: true },
+  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", is_active: true },
 ];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
@@ -417,7 +417,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                     <Zap className="w-2.5 h-2.5 fill-white" /> Grátis
                   </span>
                 )}
-                {s.rating && s.rating >= 4.7 && (
+                {(s.rating ?? 5) >= 4.7 && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     ⭐ Top rated
                   </span>
@@ -448,7 +448,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
             <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
               <Star className="w-4 h-4 fill-primary text-primary" />
-              {s.rating?.toFixed(1) ?? "—"}
+              {(s.rating ?? 5).toFixed(1)}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
             <span className="flex items-center gap-1.5 font-medium text-muted-foreground">
@@ -648,7 +648,7 @@ function MarketplaceHome() {
 
                         {/* Rating badge */}
                         <span className="absolute top-2 left-2 text-[10px] font-bold bg-black/70 text-white px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur">
-                          <Star className="w-3 h-3 fill-primary text-primary" /> {s.rating?.toFixed(1)}
+                          <Star className="w-3 h-3 fill-primary text-primary" /> {(s.rating ?? 5).toFixed(1)}
                         </span>
 
                         {freeShip && (
