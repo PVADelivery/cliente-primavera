@@ -487,7 +487,6 @@ function MarketplaceHome() {
   const saved = loadFilters();
   const [sort, setSort] = useState<SortKey>(saved.sort ?? "relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(saved.openOnly ?? false);
-  const [showAll, setShowAll] = useState(false);
 
   const handleSetSort = useCallback((s: SortKey) => {
     setSort(s);
