@@ -525,13 +525,24 @@ function MarketplaceHome() {
 
   const filtered = useMemo(() => {
     let list = openOnly ? allStores.filter(s => s.is_open) : [...allStores];
-    if (sort === "rating") list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    else if (sort === "fee") list.sort((a, b) => (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99));
-    else if (sort === "open") list.sort((a, b) => (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0));
+    if (sort === "fee") {
+      list.sort((a, b) => {
+        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        if (openDiff !== 0) return openDiff;
+        return (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99);
+      });
+    } else {
+      // default: abertas primeiro, ordenadas por avaliação; fechadas no fim
+      list.sort((a, b) => {
+        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        if (openDiff !== 0) return openDiff;
+        return (b.rating ?? 0) - (a.rating ?? 0);
+      });
+    }
     return list;
   }, [allStores, sort, openOnly]);
 
-  const visibleStores = showAll ? filtered : filtered.slice(0, 3);
+  const visibleStores = filtered;
 
   return (
     <div className="space-y-8">
