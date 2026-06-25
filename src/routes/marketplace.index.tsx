@@ -731,16 +731,6 @@ function MarketplaceHome() {
                 </motion.div>
               )}
 
-              {/* Ver mais */}
-              {!showAll && filtered.length > 3 && (
-                <motion.button
-                  onClick={() => setShowAll(true)}
-                  whileTap={{ scale: 0.97 }}
-                  className="mt-5 w-full py-3.5 rounded-2xl border border-primary/30 text-primary font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
-                >
-                  Ver mais {filtered.length - 3} lojas <ChevronRight className="w-4 h-4" />
-                </motion.button>
-              )}
             </>
           )}
         </div>
