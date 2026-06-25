@@ -411,7 +411,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 src={s.cover_url}
                 alt={s.name}
                 loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+                className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
               <div className="w-full h-full" style={{ background: "var(--gradient-primary)" }} />
