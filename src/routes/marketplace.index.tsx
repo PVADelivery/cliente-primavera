@@ -487,7 +487,6 @@ function MarketplaceHome() {
   const saved = loadFilters();
   const [sort, setSort] = useState<SortKey>(saved.sort ?? "relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(saved.openOnly ?? false);
-  const [showAll, setShowAll] = useState(false);
 
   const handleSetSort = useCallback((s: SortKey) => {
     setSort(s);
@@ -525,13 +524,24 @@ function MarketplaceHome() {
 
   const filtered = useMemo(() => {
     let list = openOnly ? allStores.filter(s => s.is_open) : [...allStores];
-    if (sort === "rating") list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    else if (sort === "fee") list.sort((a, b) => (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99));
-    else if (sort === "open") list.sort((a, b) => (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0));
+    if (sort === "fee") {
+      list.sort((a, b) => {
+        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        if (openDiff !== 0) return openDiff;
+        return (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99);
+      });
+    } else {
+      // default: abertas primeiro, ordenadas por avaliação; fechadas no fim
+      list.sort((a, b) => {
+        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        if (openDiff !== 0) return openDiff;
+        return (b.rating ?? 0) - (a.rating ?? 0);
+      });
+    }
     return list;
   }, [allStores, sort, openOnly]);
 
-  const visibleStores = showAll ? filtered : filtered.slice(0, 3);
+  const visibleStores = filtered;
 
   return (
     <div className="space-y-8">
@@ -720,16 +730,6 @@ function MarketplaceHome() {
                 </motion.div>
               )}
 
-              {/* Ver mais */}
-              {!showAll && filtered.length > 3 && (
-                <motion.button
-                  onClick={() => setShowAll(true)}
-                  whileTap={{ scale: 0.97 }}
-                  className="mt-5 w-full py-3.5 rounded-2xl border border-primary/30 text-primary font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
-                >
-                  Ver mais {filtered.length - 3} lojas <ChevronRight className="w-4 h-4" />
-                </motion.button>
-              )}
             </>
           )}
         </div>
