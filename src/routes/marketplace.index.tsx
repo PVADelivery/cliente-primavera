@@ -512,7 +512,10 @@ function MarketplaceHome() {
         ]);
         const { data, error } = result as { data: Company[] | null; error: unknown };
         if (error || !data || data.length === 0) return MOCK;
-        return data;
+        // Mantém as lojas de teste visíveis junto com as reais (evita "sumir" em ambientes de demo).
+        const realIds = new Set(data.map((d) => d.id));
+        const extras = MOCK.filter((m) => !realIds.has(m.id));
+        return [...data, ...extras];
       } catch {
         return MOCK;
       }
