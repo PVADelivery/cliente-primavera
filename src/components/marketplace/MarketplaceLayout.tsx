@@ -3,7 +3,7 @@ import { Home, BookUser, ShoppingBag, ClipboardList, User, Sun, Moon } from "luc
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
-import logoIcon from "@/assets/logo-icon-v2.png";
+import logoIcon from "@/assets/logo-icon-v3.png";
 import { useState, useEffect } from "react";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [

@@ -14,7 +14,7 @@ import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
-import logoIcon from "@/assets/logo-icon-v2.png";
+import logoIcon from "@/assets/logo-icon-v3.png";
 import logoBanner from "@/assets/logo-banner.png";
 import heroPrimavera from "@/assets/hero-primavera.png";
 
