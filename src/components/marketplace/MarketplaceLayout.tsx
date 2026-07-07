@@ -50,8 +50,8 @@ export function MarketplaceLayout() {
       <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
         <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
           <Link to="/marketplace" className="flex items-center gap-2.5">
-            <span className="flex items-center justify-center w-9 h-9 rounded-xl overflow-hidden bg-white shadow-lg ring-1 ring-white/10">
-              <img src={logoIcon} alt="Logo" className="w-full h-full object-cover scale-[2.2]" />
+            <span className="flex items-center justify-center w-8 h-8">
+              <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
             </span>
             <span className="font-display font-bold tracking-tight text-sm text-white">Primavera Delivery</span>
           </Link>
