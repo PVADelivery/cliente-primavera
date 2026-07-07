@@ -2,21 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
-  Star, MapPin, Clock, Search, Zap, Tag, ChevronRight,
+  Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
   SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
-import heroFood from "@/assets/hero-food.jpg";
 import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
-import logoIcon from "@/assets/logo-icon-v3.png";
 import logoBanner from "@/assets/logo-banner.png";
-import heroPrimavera from "@/assets/hero-primavera.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -46,17 +43,6 @@ const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Cafés", icon: Coffee },
   { label: "Shopping", icon: ShoppingBag },
   { label: "Bebidas", icon: Wine },
-];
-
-const LOCATION_SUGGESTIONS = [
-  "Centro, Primavera",
-  "Jardim das Flores",
-  "Bairro Alto",
-  "Vila Nova",
-  "Rua das Palmeiras",
-  "Av. Brasil",
-  "Parque Industrial",
-  "Residencial Primavera",
 ];
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
