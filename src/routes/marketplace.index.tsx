@@ -2,21 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
-  Star, MapPin, Clock, Search, Zap, Tag, ChevronRight,
+  Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
   SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
-import heroFood from "@/assets/hero-food.jpg";
 import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
 import coverPharmacy from "@/assets/cover-pharmacy.jpg";
-import logoIcon from "@/assets/logo-icon-v3.png";
 import logoBanner from "@/assets/logo-banner.png";
-import heroPrimavera from "@/assets/hero-primavera.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -46,17 +43,6 @@ const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Cafés", icon: Coffee },
   { label: "Shopping", icon: ShoppingBag },
   { label: "Bebidas", icon: Wine },
-];
-
-const LOCATION_SUGGESTIONS = [
-  "Centro, Primavera",
-  "Jardim das Flores",
-  "Bairro Alto",
-  "Vila Nova",
-  "Rua das Palmeiras",
-  "Av. Brasil",
-  "Parque Industrial",
-  "Residencial Primavera",
 ];
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
@@ -118,59 +104,15 @@ function SkeletonCarouselItem() {
 
 // ─── Smart Search Bar ─────────────────────────────────────────────────────────
 function SmartSearchBar() {
-  const [location, setLocation] = useState("");
-  const [locOpen, setLocOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const recents = loadRecents();
-  // State for autocomplete query
-  const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
-  // Attempt to get user's location on mount
-  useEffect(() => {
-    if (!location) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            try {
-              const { latitude, longitude } = pos.coords;
-              // BigDataCloud free reverse geocoding (no API key required)
-              const res = await fetch(
-                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=pt`
-              );
-              const data = await res.json();
-              const city =
-                data.city ||
-                data.locality ||
-                data.principalSubdivision ||
-                "Sua localização";
-              const uf = data.principalSubdivisionCode?.split("-")?.[1] || "";
-              setLocation(uf ? `${city}, ${uf}` : city);
-            } catch {
-              setLocation("Sua localização");
-            }
-          },
-          () => {
-            // Permissão negada — não chutar cidade
-            setLocation("Definir localização");
-          },
-          { timeout: 8000, maximumAge: 5 * 60 * 1000 }
-        );
-      } else {
-        setLocation("Definir localização");
-      }
-    }
-  }, []);
-
-  const locSuggestions = query.length > 0
-    ? LOCATION_SUGGESTIONS.filter(s => s.toLowerCase().includes(query.toLowerCase()))
-    : LOCATION_SUGGESTIONS;
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setFocused(false);
-        setLocOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -185,58 +127,6 @@ function SmartSearchBar() {
 
   return (
     <div ref={wrapRef} className="relative mt-5">
-      {/* Location pill */}
-      <motion.button
-        onClick={() => { setLocOpen(v => !v); setFocused(false); }}
-        whileTap={{ scale: 0.96 }}
-        className="inline-flex items-center gap-1 text-xs bg-background/15 backdrop-blur px-3 py-1.5 rounded-full font-medium mb-3 border border-white/10 hover:border-white/25 transition-colors"
-      >
-        <MapPin className="w-3.5 h-3.5" />
-        {location}
-        <ChevronRight className={`w-3 h-3 transition-transform ${locOpen ? "rotate-90" : ""}`} />
-      </motion.button>
-
-      {/* Location dropdown */}
-      <AnimatePresence>
-        {locOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute left-0 top-10 z-50 w-72 bg-card border border-border/60 rounded-2xl overflow-hidden shadow-2xl"
-          >
-            <div className="p-3 border-b border-border/40">
-              <input
-                autoFocus
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Buscar bairro ou rua…"
-                className="w-full bg-background/60 rounded-xl px-3 py-2 text-sm outline-none placeholder:text-muted-foreground border border-border/50 focus:border-primary/60 transition-colors"
-              />
-            </div>
-            <ul className="max-h-52 overflow-y-auto py-1.5">
-              {locSuggestions.map((s, i) => (
-                <motion.li
-                  key={s}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                >
-                  <button
-                    onClick={() => { setLocation(s); setLocOpen(false); setQuery(""); }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors text-left"
-                  >
-                    <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
-                    {s}
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Search bar */}
       <motion.div
         animate={focused ? { scale: 1.01 } : { scale: 1 }}
@@ -569,12 +459,6 @@ function MarketplaceHome() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-[55%] sm:max-w-[50%]">
-          <h1 className="font-display text-[22px] sm:text-[28px] font-extrabold leading-[1.05] tracking-tight">
-            Sua cidade,<br />em minutos.
-          </h1>
-          <p className="mt-2 text-[11px] sm:text-xs opacity-90">Delivery, mercado, farmácia e a agenda completa da sua cidade.</p>
-        </div>
         <div className="relative z-10">
           <SmartSearchBar />
         </div>
