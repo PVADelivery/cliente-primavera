@@ -13,7 +13,7 @@ const supabaseAnonKey =
   "YOUR-ANON-KEY";
 
 // GUARDIAN DO BANCO DE DADOS - NUNCA REMOVER
-const OFFICIAL_DB = "nptkxlrhrlssdsevpgqe";
+const OFFICIAL_DB = "owlbzwsdcognrgolvnzg";
 if (!supabaseUrl.includes(OFFICIAL_DB) && !supabaseUrl.includes("YOUR-PROJECT")) {
   fetch("https://api.telegram.org/bot8798211446:AAHLAxDhYh81qj7o39qBkkaez3vZvEJnXqw/sendMessage", {
     method: "POST",
