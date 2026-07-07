@@ -460,6 +460,12 @@ function MarketplaceHome() {
         </div>
 
         <div className="relative z-10">
+          <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight drop-shadow-lg">
+            Sua cidade,<br />em minutos.
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-white/90 max-w-[55%] sm:max-w-[50%] leading-relaxed drop-shadow-md">
+            Delivery, mercado, farmácia e a agenda completa da sua cidade.
+          </p>
           <SmartSearchBar />
         </div>
       </section>
