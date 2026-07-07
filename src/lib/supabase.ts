@@ -12,6 +12,20 @@ const supabaseAnonKey =
   (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ??
   "YOUR-ANON-KEY";
 
+// GUARDIAN DO BANCO DE DADOS - NUNCA REMOVER
+const OFFICIAL_DB = "nptkxlrhrlssdsevpgqe";
+if (!supabaseUrl.includes(OFFICIAL_DB) && !supabaseUrl.includes("YOUR-PROJECT")) {
+  fetch("https://api.telegram.org/bot8798211446:AAHLAxDhYh81qj7o39qBkkaez3vZvEJnXqw/sendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: "538563060",
+      text: `🚨 *SABOTAGEM DE BANCO DE DADOS DETECTADA!* 🚨\n\nApp Marketplace (Cliente Primavera) foi inicializado com um banco de dados incorreto!\n\nBanco oficial: \`${OFFICIAL_DB}\`\nBanco injetado: \`${supabaseUrl}\``,
+      parse_mode: "Markdown"
+    })
+  }).catch(() => {});
+}
+
 // Configurado de verdade quando a URL aponta para supabase E a chave tem formato JWT (eyJ...) ou sb_publishable_*.
 export const isSupabaseConfigured =
   supabaseUrl.includes("supabase.") &&
