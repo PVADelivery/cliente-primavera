@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -34,6 +34,7 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card_delivery" | "cash">("pix");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const deliveryFee = 6.9;
@@ -41,6 +42,8 @@ function Checkout() {
 
   const handleSubmit = async () => {
     if (!user || !companyId || items.length === 0) return;
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setErrorMsg(null);
     setSubmitting(true);
 
@@ -203,6 +206,7 @@ function Checkout() {
       console.error("[Checkout][fail]", { requestId, msg });
       setErrorMsg(msg);
     } finally {
+      isSubmittingRef.current = false;
       setSubmitting(false);
     }
   };
