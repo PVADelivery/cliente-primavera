@@ -26,13 +26,7 @@ export const Route = createFileRoute("/marketplace/")({
   component: MarketplaceHome,
 });
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK: Company[] = [
-  { id: "m1", user_id: null, name: "Cantina da Nona", document: null, phone: null, email: null, address: "Rua das Flores, 123", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverItalian, description: "Massas artesanais", category: "Italiana", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 6.9, is_open: true, business_hours: "18:00-23:00", is_active: true },
-  { id: "m2", user_id: null, name: "Burger Hub", document: null, phone: null, email: null, address: "Av. Central, 500", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverBurger, description: "Hambúrgueres autorais", category: "Burguer", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "own", city_id: null, delivery_fee: 4.9, is_open: true, business_hours: "18:00-00:00", is_active: true },
-  { id: "m3", user_id: null, name: "Mercadinho Bom Preço", document: null, phone: null, email: null, address: "Praça Velha", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverMarket, description: "Mercado completo", category: "Mercado", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 5.5, is_open: false, business_hours: "07:00-22:00", is_active: true },
-  { id: "m4", user_id: null, name: "Farmácia Saúde+", document: null, phone: null, email: null, address: "Rua A", city: "Primavera", state: "SP", zip_code: null, logo_url: null, banner_url: null, cover_url: coverPharmacy, description: "24 horas", category: "Farmácia", rating: 5, latitude: null, longitude: null, opening_hours: null, delivery_mode: "platform", city_id: null, delivery_fee: 0, is_open: true, business_hours: "24h", is_active: true },
-];
+// ─── Mock data removido para produção ──────────────────────────────────────────
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Restaurantes", icon: UtensilsCrossed },
@@ -390,9 +384,9 @@ function MarketplaceHome() {
 
   const { data: stores, isLoading } = useQuery<Company[]>({
     queryKey: ["companies"],
-    placeholderData: MOCK,
+    placeholderData: [],
     queryFn: async () => {
-      if (!isSupabaseConfigured) return MOCK;
+      if (!isSupabaseConfigured) return [];
       try {
         const result = await Promise.race([
           supabase.from("companies").select("*").eq("is_active", true).limit(40),
@@ -401,13 +395,10 @@ function MarketplaceHome() {
           ),
         ]);
         const { data, error } = result as { data: Company[] | null; error: unknown };
-        if (error || !data || data.length === 0) return MOCK;
-        // Mantém as lojas de teste visíveis junto com as reais (evita "sumir" em ambientes de demo).
-        const realIds = new Set(data.map((d) => d.id));
-        const extras = MOCK.filter((m) => !realIds.has(m.id));
-        return [...data, ...extras];
+        if (error || !data) return [];
+        return data;
       } catch {
-        return MOCK;
+        return [];
       }
     },
   });

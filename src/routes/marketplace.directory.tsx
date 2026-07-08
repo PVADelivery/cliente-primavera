@@ -28,17 +28,7 @@ type Business = {
   featured?: boolean;
 };
 
-const MOCK: Business[] = [
-  { id: "b1", name: "Cantina da Nona", category: "Restaurante", phone: "(11) 4002-8922", whatsapp: "5511999990001", address: "Rua das Flores, 123 — Centro", website: "cantinadanona.com.br", hours: "Ter–Dom 18h–23h", rating: 4.8, featured: true },
-  { id: "b2", name: "Burger Hub", category: "Hamburgueria", phone: "(11) 4002-3001", whatsapp: "5511999990002", address: "Av. Central, 500", website: null, hours: "Diariamente 18h–00h", rating: 4.6 },
-  { id: "b3", name: "Farmácia Saúde+", category: "Farmácia", phone: "(11) 4002-7700", whatsapp: "5511999990003", address: "Rua A, 45", website: "saudemais.com.br", hours: "24h", rating: 4.9, featured: true },
-  { id: "b4", name: "Mercadinho Bom Preço", category: "Mercado", phone: "(11) 4002-1212", whatsapp: null, address: "Praça Velha, s/n", website: null, hours: "Seg–Sáb 07h–22h", rating: 4.4 },
-  { id: "b5", name: "Pet Shop Amigo Fiel", category: "Pet Shop", phone: "(11) 4002-9090", whatsapp: "5511999990005", address: "Rua dos Cães, 88", website: null, hours: "Seg–Sáb 09h–19h", rating: 4.7 },
-  { id: "b6", name: "Auto Center Primavera", category: "Automotivo", phone: "(11) 4002-5050", whatsapp: "5511999990006", address: "Av. Industrial, 1200", website: "autoprimavera.com.br", hours: "Seg–Sex 08h–18h", rating: 4.5 },
-  { id: "b7", name: "Salão Bella Vita", category: "Beleza", phone: "(11) 4002-2233", whatsapp: "5511999990007", address: "Rua das Acácias, 77", website: null, hours: "Ter–Sáb 09h–20h", rating: 4.9 },
-  { id: "b8", name: "Clínica Vida Plena", category: "Saúde", phone: "(11) 4002-8080", whatsapp: "5511999990008", address: "Av. Saúde, 300", website: "vidaplena.med.br", hours: "Seg–Sex 07h–19h", rating: 4.8 },
-  { id: "b9", name: "Padaria Trigo Dourado", category: "Padaria", phone: "(11) 4002-1010", whatsapp: "5511999990009", address: "Rua do Trigo, 12", website: null, hours: "Diariamente 06h–21h", rating: 4.6 },
-];
+// ─── Mock data removido para produção ──────────────────────────────────────────
 
 const CATEGORIES = ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo"];
 
@@ -46,15 +36,15 @@ function DirectoryPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tudo");
 
-  const { data: businesses = MOCK } = useQuery<Business[]>({
+  const { data: businesses = [] } = useQuery<Business[]>({
     queryKey: ["directory"],
     queryFn: async () => {
-      if (!isSupabaseConfigured) return MOCK;
+      if (!isSupabaseConfigured) return [];
       const { data, error } = await (supabase as any)
         .from("business_directory")
         .select("*")
         .order("name");
-      if (error || !data || data.length === 0) return MOCK;
+      if (error || !data) return [];
       return data as Business[];
     },
   });
