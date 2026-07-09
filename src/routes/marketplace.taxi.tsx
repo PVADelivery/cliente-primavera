@@ -358,6 +358,18 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
+  // Helper para formatar sugestões com bairro correto
+  const formatSuggestionLabel = (item: any) => {
+    const addr = item.address || {};
+    const street = addr.road || addr.street || item.display_name.split(",")[0] || "";
+    const bairro = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || "";
+    const city = addr.city || addr.town || addr.municipality || "Primavera do Leste";
+    return {
+      main: bairro ? `${street}, ${bairro}` : street,
+      sub: `${city} - MT`
+    };
+  };
+
   // Geocodificação Reversa
   const fetchAddressFromCoords = async (lat: number, lng: number, type: "pickup" | "dropoff") => {
     try {
@@ -365,15 +377,19 @@ function TaxiPage() {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`
       );
       const data = await res.json();
-      if (data && data.display_name) {
-        const addressShort = data.display_name.split(",").slice(0, 3).join(",");
+      if (data && data.address) {
+        const addr = data.address;
+        const street = addr.road || addr.street || data.display_name.split(",")[0] || "";
+        const bairro = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || "";
+        const addressShort = bairro ? `${street}, ${bairro}` : street;
+        
         if (type === "pickup") {
           setPickupText(addressShort);
-          const houseNo = data.address?.house_number || "";
+          const houseNo = addr.house_number || "";
           if (houseNo) setPickupNumber(houseNo);
         } else {
           setDropoffText(addressShort);
-          const houseNo = data.address?.house_number || "";
+          const houseNo = addr.house_number || "";
           if (houseNo) setDropoffNumber(houseNo);
         }
       }
@@ -396,7 +412,7 @@ function TaxiPage() {
 
     searchTimeout.current = setTimeout(async () => {
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
           query
         )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
         const res = await fetch(url);
@@ -415,8 +431,9 @@ function TaxiPage() {
   const selectSuggestion = (item: any, type: "pickup" | "dropoff") => {
     const lat = parseFloat(item.lat);
     const lon = parseFloat(item.lon);
-    const parts = item.display_name.split(",");
-    const streetBairro = parts.slice(0, 2).join(", ");
+    
+    const label = formatSuggestionLabel(item);
+    const streetBairro = label.main;
 
     if (type === "pickup") {
       setPickupCoords([lon, lat]);
@@ -589,16 +606,22 @@ function TaxiPage() {
 
           {pickupSuggestions.length > 0 && (
             <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto z-40">
-              {pickupSuggestions.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => selectSuggestion(item, "pickup")}
-                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-muted border-b border-border last:border-0 flex items-center gap-2 text-foreground"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="truncate">{item.display_name}</span>
-                </button>
-              ))}
+              {pickupSuggestions.map((item, idx) => {
+                const label = formatSuggestionLabel(item);
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => selectSuggestion(item, "pickup")}
+                    className="w-full text-left px-4 py-2 hover:bg-muted border-b border-border last:border-0 flex flex-col gap-0.5 text-foreground"
+                  >
+                    <div className="flex items-center gap-2 text-xs font-semibold">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="truncate">{label.main}</span>
+                    </div>
+                    <span className="pl-[22px] text-[10px] text-muted-foreground">{label.sub}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -644,16 +667,22 @@ function TaxiPage() {
 
           {dropoffSuggestions.length > 0 && (
             <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto z-40">
-              {dropoffSuggestions.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => selectSuggestion(item, "dropoff")}
-                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-muted border-b border-border last:border-0 flex items-center gap-2 text-foreground"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span className="truncate">{item.display_name}</span>
-                </button>
-              ))}
+              {dropoffSuggestions.map((item, idx) => {
+                const label = formatSuggestionLabel(item);
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => selectSuggestion(item, "dropoff")}
+                    className="w-full text-left px-4 py-2 hover:bg-muted border-b border-border last:border-0 flex flex-col gap-0.5 text-foreground"
+                  >
+                    <div className="flex items-center gap-2 text-xs font-semibold">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{label.main}</span>
+                    </div>
+                    <span className="pl-[22px] text-[10px] text-muted-foreground">{label.sub}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -810,30 +839,42 @@ function TaxiPage() {
               
               {activeSelectType === "pickup" && pickupSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
-                  {pickupSuggestions.map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => selectSuggestion(item, "pickup")}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/30 flex items-center gap-1.5 text-foreground"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span className="truncate">{item.display_name}</span>
-                    </button>
-                  ))}
+                  {pickupSuggestions.map((item, idx) => {
+                    const label = formatSuggestionLabel(item);
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => selectSuggestion(item, "pickup")}
+                        className="w-full text-left px-3 py-2 hover:bg-muted border-b border-border/30 flex flex-col gap-0.5 text-foreground"
+                      >
+                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="truncate">{label.main}</span>
+                        </div>
+                        <span className="pl-[20px] text-[10px] text-muted-foreground">{label.sub}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
               {activeSelectType === "dropoff" && dropoffSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
-                  {dropoffSuggestions.map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => selectSuggestion(item, "dropoff")}
-                      className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/30 flex items-center gap-1.5 text-foreground"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                      <span className="truncate">{item.display_name}</span>
-                    </button>
-                  ))}
+                  {dropoffSuggestions.map((item, idx) => {
+                    const label = formatSuggestionLabel(item);
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => selectSuggestion(item, "dropoff")}
+                        className="w-full text-left px-3 py-2 hover:bg-muted border-b border-border/30 flex flex-col gap-0.5 text-foreground"
+                      >
+                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <span className="truncate">{label.main}</span>
+                        </div>
+                        <span className="pl-[20px] text-[10px] text-muted-foreground">{label.sub}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
