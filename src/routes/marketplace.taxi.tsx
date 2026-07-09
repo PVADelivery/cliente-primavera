@@ -12,11 +12,10 @@ export const Route = createFileRoute("/marketplace/taxi")({
   component: TaxiPage,
 });
 
-// Coordenadas centrais de Primavera do Leste - MT
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Raio da Terra em KM
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -47,7 +46,7 @@ function TaxiPage() {
   const [price, setPrice] = useState<number>(15.0);
   const [rates, setRates] = useState({ taxi: 3.5, mototaxi: 2.0 });
 
-  // Endereços textuais e sugestões
+  // Endereços e Autocomplete
   const [pickupText, setPickupText] = useState("");
   const [dropoffText, setDropoffText] = useState("");
   const [pickupSuggestions, setPickupSuggestions] = useState<any[]>([]);
@@ -58,7 +57,6 @@ function TaxiPage() {
 
   const pickupMarker = useRef<maplibregl.Marker | null>(null);
   const dropoffMarker = useRef<maplibregl.Marker | null>(null);
-  
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   // Inicializa o Mapa
@@ -91,7 +89,6 @@ function TaxiPage() {
       zoom: 14,
     });
 
-    // Ao clicar no mapa
     map.current.on("click", async (e) => {
       const { lng, lat } = e.lngLat;
       if (!pickupCoords) {
@@ -103,7 +100,7 @@ function TaxiPage() {
       }
     });
 
-    // Busca as taxas regionais
+    // Busca taxas
     supabase
       .from("regions")
       .select("taxi_rate_per_km, mototaxi_rate_per_km")
@@ -126,7 +123,7 @@ function TaxiPage() {
     };
   }, [pickupCoords, dropoffCoords]);
 
-  // Atualiza Marcadores e Câmera
+  // Atualiza Marcadores no Mapa
   useEffect(() => {
     if (!map.current) return;
 
@@ -176,7 +173,7 @@ function TaxiPage() {
       const bounds = new maplibregl.LngLatBounds()
         .extend(pickupCoords)
         .extend(dropoffCoords);
-      map.current.fitBounds(bounds, { padding: 80, maxZoom: 15 });
+      map.current.fitBounds(bounds, { padding: 90, maxZoom: 15 });
     }
   }, [pickupCoords, dropoffCoords]);
 
@@ -195,7 +192,7 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
-  // Geocodificação Reversa (Coordenadas -> Endereço Escrito)
+  // Geocodificação Reversa
   const fetchAddressFromCoords = async (lat: number, lng: number, type: "pickup" | "dropoff") => {
     try {
       const res = await fetch(
@@ -212,7 +209,7 @@ function TaxiPage() {
     }
   };
 
-  // Autocomplete Geocodificação Direta (Endereço Escrito -> Coordenadas)
+  // Autocomplete Geocodificação Direta
   const searchAddress = (query: string, type: "pickup" | "dropoff") => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (!query.trim()) {
@@ -226,7 +223,6 @@ function TaxiPage() {
 
     searchTimeout.current = setTimeout(async () => {
       try {
-        // Restringindo busca para Primavera do Leste - MT para maior precisão local
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
             query + ", Primavera do Leste, MT"
@@ -312,7 +308,7 @@ function TaxiPage() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-20 px-4">
+      <div className="flex flex-col items-center justify-center text-center py-20 px-4 h-full">
         <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4 animate-bounce" />
         <h2 className="text-2xl font-display font-bold mb-2">Corrida Solicitada!</h2>
         <p className="text-muted-foreground mb-8">
@@ -326,25 +322,23 @@ function TaxiPage() {
   }
 
   return (
-    <div className="pb-8 flex flex-col h-[calc(100vh-80px)]">
-      <div className="flex items-center gap-3 mb-4 shrink-0">
-        <button
-          onClick={() => window.history.back()}
-          className="w-10 h-10 rounded-full bg-secondary grid place-items-center text-muted-foreground active:scale-95 transition-transform"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold">Solicitar Viagem</h1>
-          <p className="text-xs text-muted-foreground">Digite o endereço ou use o mapa interativo</p>
-        </div>
-      </div>
+    <div className="relative h-[calc(100vh-80px)] -mx-4 -mt-4 overflow-hidden">
+      {/* ── MAPA EM TELA CHEIA ABSOLUTA ── */}
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full z-0" />
 
-      {/* Inputs de busca de endereços (Estilo Mobilidade) */}
-      <div className="bg-card border border-border p-4 rounded-2xl shadow-sm mb-4 space-y-3 relative z-30 shrink-0">
+      {/* ── BOTÃO FLUTUANTE DE VOLTAR ── */}
+      <button
+        onClick={() => window.history.back()}
+        className="absolute top-4 left-4 w-10 h-10 rounded-full bg-background/90 backdrop-blur shadow-lg grid place-items-center text-muted-foreground active:scale-95 transition-all z-20 border border-border"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
+
+      {/* ── CARD FLUTUANTE DE ENDEREÇOS (TOP) ── */}
+      <div className="absolute top-4 left-16 right-4 bg-background/95 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-border z-20 space-y-2.5 max-w-lg md:mx-auto">
         {/* Campo Partida */}
         <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
           </div>
           <input
@@ -354,8 +348,8 @@ function TaxiPage() {
               setPickupText(e.target.value);
               searchAddress(e.target.value, "pickup");
             }}
-            placeholder="De onde sairemos? (Endereço de partida)"
-            className="w-full pl-9 pr-8 h-11 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            placeholder="Onde te buscamos? (Partida)"
+            className="w-full pl-8 pr-8 h-10 rounded-xl border border-border/80 bg-background/80 text-xs focus:outline-none focus:ring-1.5 focus:ring-primary/40"
           />
           {pickupText && (
             <button
@@ -365,20 +359,19 @@ function TaxiPage() {
                 if (pickupMarker.current) pickupMarker.current.remove();
                 pickupMarker.current = null;
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           )}
 
-          {/* Sugestões Partida */}
           {pickupSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-56 overflow-y-auto z-40">
+            <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto z-40">
               {pickupSuggestions.map((item, idx) => (
                 <button
                   key={idx}
                   onClick={() => selectSuggestion(item, "pickup")}
-                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-muted border-b border-border last:border-0 flex items-center gap-2 text-foreground"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0 flex items-center gap-2 text-foreground"
                 >
                   <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
                   <span className="truncate">{item.display_name}</span>
@@ -390,7 +383,7 @@ function TaxiPage() {
 
         {/* Campo Destino */}
         <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
           </div>
           <input
@@ -400,8 +393,8 @@ function TaxiPage() {
               setDropoffText(e.target.value);
               searchAddress(e.target.value, "dropoff");
             }}
-            placeholder="Para onde vamos? (Endereço de destino)"
-            className="w-full pl-9 pr-8 h-11 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            placeholder="Para onde vamos? (Destino)"
+            className="w-full pl-8 pr-8 h-10 rounded-xl border border-border/80 bg-background/80 text-xs focus:outline-none focus:ring-1.5 focus:ring-primary/40"
           />
           {dropoffText && (
             <button
@@ -411,20 +404,19 @@ function TaxiPage() {
                 if (dropoffMarker.current) dropoffMarker.current.remove();
                 dropoffMarker.current = null;
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           )}
 
-          {/* Sugestões Destino */}
           {dropoffSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-56 overflow-y-auto z-40">
+            <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-2xl overflow-hidden max-h-48 overflow-y-auto z-40">
               {dropoffSuggestions.map((item, idx) => (
                 <button
                   key={idx}
                   onClick={() => selectSuggestion(item, "dropoff")}
-                  className="w-full text-left px-4 py-2.5 text-xs hover:bg-muted border-b border-border last:border-0 flex items-center gap-2 text-foreground"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0 flex items-center gap-2 text-foreground"
                 >
                   <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   <span className="truncate">{item.display_name}</span>
@@ -435,89 +427,97 @@ function TaxiPage() {
         </div>
       </div>
 
-      {/* Mapa do MapLibre */}
-      <div className="relative flex-1 rounded-3xl overflow-hidden border border-border shadow-inner mb-4 min-h-[220px] z-10">
-        <div ref={mapContainer} className="w-full h-full" />
+      {/* ── BALÃO INFORMATIVO DO STATUS DO MAPA ── */}
+      {(!pickupCoords || !dropoffCoords) && (
+        <div className="absolute top-36 left-1/2 -translate-x-1/2 bg-black/75 backdrop-blur text-white px-3.5 py-1.5 rounded-full text-[10px] font-bold flex items-center gap-2 pointer-events-none shadow-md z-10 transition-all">
+          <Navigation className="w-3 h-3 animate-pulse text-primary" />
+          {!pickupCoords ? "Toque no mapa para marcar a partida" : "Agora toque no destino"}
+        </div>
+      )}
+
+      {/* ── BOTÃO LIMPAR FLUTUANTE ── */}
+      {(pickupCoords || dropoffCoords) && (
+        <button
+          onClick={handleClear}
+          className="absolute bottom-[285px] right-4 bg-background/90 backdrop-blur border border-border text-foreground px-3 py-1.5 rounded-xl text-xs font-bold shadow-md hover:bg-muted active:scale-95 transition-all z-20"
+        >
+          Limpar Rota
+        </button>
+      )}
+
+      {/* ── CARD FLUTUANTE DE VALORES E CONFIRMAÇÃO (BOTTOM) ── */}
+      <div className="absolute bottom-4 left-4 right-4 bg-background/95 backdrop-blur-md p-4 rounded-3xl shadow-2xl border border-border z-20 space-y-4 max-w-lg md:mx-auto transition-all animate-in slide-in-from-bottom duration-300">
         
-        {(!pickupCoords || !dropoffCoords) && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 pointer-events-none shadow-lg z-20">
-            <Navigation className="w-3.5 h-3.5 animate-pulse text-primary" />
-            {!pickupCoords ? "Marque a Partida (A) no mapa ou acima" : "Agora marque o Destino (B)"}
-          </div>
-        )}
-
-        {(pickupCoords || dropoffCoords) && (
-          <button
-            onClick={handleClear}
-            className="absolute bottom-4 right-4 bg-background border border-border text-foreground px-3 py-1.5 rounded-xl text-xs font-bold shadow-md hover:bg-muted active:scale-95 transition-all z-20"
-          >
-            Limpar
-          </button>
-        )}
-      </div>
-
-      {/* Tipos de Veículos e Preço */}
-      <div className="shrink-0 space-y-4 relative z-20">
+        {/* Escolha do Veículo */}
         <div className="flex gap-3">
           <button
             type="button"
             onClick={() => setVehicleType("mototaxi")}
-            className={`flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+            className={`flex-1 flex items-center justify-between p-3 rounded-2xl border transition-all ${
               vehicleType === "mototaxi"
                 ? "border-primary bg-primary/10 text-primary shadow-sm"
                 : "border-border/60 bg-card hover:bg-muted text-muted-foreground"
             }`}
           >
-            <Bike className="w-7 h-7 mb-1" />
-            <span className="font-bold text-xs">Moto Táxi</span>
-            <span className="text-[10px] opacity-80 mt-0.5">R$ {rates.mototaxi.toFixed(2)}/KM</span>
+            <div className="flex items-center gap-2">
+              <Bike className="w-6 h-6" />
+              <span className="font-bold text-xs">Moto Táxi</span>
+            </div>
+            <span className="text-[10px] font-bold bg-primary/15 px-2 py-0.5 rounded-full">R$ {rates.mototaxi.toFixed(2)}/KM</span>
           </button>
 
           <button
             type="button"
             onClick={() => setVehicleType("taxi")}
-            className={`flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+            className={`flex-1 flex items-center justify-between p-3 rounded-2xl border transition-all ${
               vehicleType === "taxi"
                 ? "border-primary bg-primary/10 text-primary shadow-sm"
                 : "border-border/60 bg-card hover:bg-muted text-muted-foreground"
             }`}
           >
-            <Car className="w-7 h-7 mb-1" />
-            <span className="font-bold text-xs">Táxi (Carro)</span>
-            <span className="text-[10px] opacity-80 mt-0.5">R$ {rates.taxi.toFixed(2)}/KM</span>
+            <div className="flex items-center gap-2">
+              <Car className="w-6 h-6" />
+              <span className="font-bold text-xs">Táxi (Carro)</span>
+            </div>
+            <span className="text-[10px] font-bold bg-primary/15 px-2 py-0.5 rounded-full">R$ {rates.taxi.toFixed(2)}/KM</span>
           </button>
         </div>
 
-        {pickupCoords && dropoffCoords && (
-          <div className="bg-secondary/40 p-4 rounded-2xl flex items-center justify-between">
+        {/* Resumo da Corrida */}
+        {pickupCoords && dropoffCoords ? (
+          <div className="bg-secondary/35 p-3 rounded-2xl flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground font-semibold">Distância do Percurso</p>
-              <p className="text-sm font-bold text-foreground mt-0.5">{distance.toFixed(2)} km</p>
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Percurso</p>
+              <p className="text-xs font-bold text-foreground mt-0.5">{distance.toFixed(2)} km</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground font-semibold">Valor Estimado</p>
-              <p className="text-lg font-display font-black text-primary">R$ {price.toFixed(2).replace(".", ",")}</p>
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Valor Estimado</p>
+              <p className="text-base font-display font-black text-primary">R$ {price.toFixed(2).replace(".", ",")}</p>
             </div>
+          </div>
+        ) : (
+          <div className="text-center text-[11px] text-muted-foreground py-2 border border-dashed border-border rounded-xl">
+            Insira os locais para calcular o custo estimado
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="text"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Observações complementares para o motorista"
-            className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            placeholder="Observações complementares (ex: portão azul)"
+            className="w-full h-10 px-4 rounded-xl border border-border bg-background text-xs focus:outline-none focus:ring-1.5 focus:ring-primary/45"
           />
 
-          <div className="text-[10px] text-center text-muted-foreground px-2">
-            ⚠️ O pagamento deve ser efetuado fora do app diretamente ao motorista.
+          <div className="text-[9px] text-center text-muted-foreground/80 leading-normal">
+            ℹ️ O pagamento é efetuado fora do app diretamente ao motorista (Dinheiro/Pix).
           </div>
 
           <Button
             type="submit"
             disabled={loading || !pickupCoords || !dropoffCoords}
-            className="w-full h-12 rounded-xl font-bold shadow-[var(--shadow-elegant)]"
+            className="w-full h-11 rounded-xl text-xs font-bold shadow-[var(--shadow-elegant)]"
           >
             {loading ? "Solicitando..." : "Confirmar e Solicitar Corrida"}
           </Button>
