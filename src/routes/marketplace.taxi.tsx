@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, Search, X, Maximize2, Check } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,9 +12,7 @@ export const Route = createFileRoute("/marketplace/taxi")({
   component: TaxiPage,
 });
 
-// Coordenadas e Bounding Box de Primavera do Leste - MT
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
-// Bounding box: Oeste (lngMin), Sul (latMin), Leste (lngMax), Norte (latMax)
 const PVA_BOUNDS = "-54.3700,-15.6100,-54.2500,-15.5100";
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -48,6 +46,7 @@ function TaxiPage() {
 
   // Modal de Mapa
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [activeSelectType, setActiveSelectType] = useState<"pickup" | "dropoff">("pickup");
 
   // Coordenadas
   const [pickupCoords, setPickupCoords] = useState<[number, number] | null>(null);
@@ -69,7 +68,7 @@ function TaxiPage() {
   const [searchingPickup, setSearchingPickup] = useState(false);
   const [searchingDropoff, setSearchingDropoff] = useState(false);
 
-  // Marcadores
+  // Marcadores do Mapa
   const pickupMarkerSmall = useRef<maplibregl.Marker | null>(null);
   const dropoffMarkerSmall = useRef<maplibregl.Marker | null>(null);
   
@@ -141,6 +140,11 @@ function TaxiPage() {
       return;
     }
 
+    // Inicializa centralizando na coordenada ativa (se já existir) ou centro da cidade
+    const initialCenter = activeSelectType === "pickup" 
+      ? (pickupCoords || PVA_CENTER)
+      : (dropoffCoords || PVA_CENTER);
+
     mapFull.current = new maplibregl.Map({
       container: mapContainerFull.current,
       style: {
@@ -155,19 +159,8 @@ function TaxiPage() {
         },
         layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }],
       },
-      center: pickupCoords || PVA_CENTER,
-      zoom: 14,
-    });
-
-    mapFull.current.on("click", async (e) => {
-      const { lng, lat } = e.lngLat;
-      if (!pickupCoords) {
-        setPickupCoords([lng, lat]);
-        fetchAddressFromCoords(lat, lng, "pickup");
-      } else if (!dropoffCoords) {
-        setDropoffCoords([lng, lat]);
-        fetchAddressFromCoords(lat, lng, "dropoff");
-      }
+      center: initialCenter,
+      zoom: 15,
     });
 
     return () => {
@@ -176,7 +169,7 @@ function TaxiPage() {
         mapFull.current = null;
       }
     };
-  }, [isMapFullscreen, pickupCoords, dropoffCoords]);
+  }, [isMapFullscreen]);
 
   // 3. Atualiza marcadores no Mapa Pequeno
   useEffect(() => {
@@ -224,22 +217,15 @@ function TaxiPage() {
     const m = mapFull.current;
     if (!m || !isMapFullscreen) return;
 
+    // Marcador A (Partida)
     if (pickupCoords) {
       if (!pickupMarkerFull.current) {
         const el = document.createElement("div");
-        el.className = "w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs cursor-pointer";
+        el.className = "w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
         el.innerText = "A";
-        pickupMarkerFull.current = new maplibregl.Marker({ element: el, draggable: true })
+        pickupMarkerFull.current = new maplibregl.Marker({ element: el })
           .setLngLat(pickupCoords)
           .addTo(m);
-
-        pickupMarkerFull.current.on("dragend", () => {
-          const lngLat = pickupMarkerFull.current?.getLngLat();
-          if (lngLat) {
-            setPickupCoords([lngLat.lng, lngLat.lat]);
-            fetchAddressFromCoords(lngLat.lat, lngLat.lng, "pickup");
-          }
-        });
       } else {
         pickupMarkerFull.current.setLngLat(pickupCoords);
       }
@@ -248,33 +234,21 @@ function TaxiPage() {
       pickupMarkerFull.current = null;
     }
 
+    // Marcador B (Destino)
     if (dropoffCoords) {
       if (!dropoffMarkerFull.current) {
         const el = document.createElement("div");
-        el.className = "w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs cursor-pointer";
+        el.className = "w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
         el.innerText = "B";
-        dropoffMarkerFull.current = new maplibregl.Marker({ element: el, draggable: true })
+        dropoffMarkerFull.current = new maplibregl.Marker({ element: el })
           .setLngLat(dropoffCoords)
           .addTo(m);
-
-        dropoffMarkerFull.current.on("dragend", () => {
-          const lngLat = dropoffMarkerFull.current?.getLngLat();
-          if (lngLat) {
-            setDropoffCoords([lngLat.lng, lngLat.lat]);
-            fetchAddressFromCoords(lngLat.lat, lngLat.lng, "dropoff");
-          }
-        });
       } else {
         dropoffMarkerFull.current.setLngLat(dropoffCoords);
       }
     } else if (dropoffMarkerFull.current) {
       dropoffMarkerFull.current.remove();
       dropoffMarkerFull.current = null;
-    }
-
-    if (pickupCoords && dropoffCoords) {
-      const bounds = new maplibregl.LngLatBounds().extend(pickupCoords).extend(dropoffCoords);
-      m.fitBounds(bounds, { padding: 60, maxZoom: 15 });
     }
   }, [pickupCoords, dropoffCoords, isMapFullscreen]);
 
@@ -293,7 +267,7 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
-  // Geocodificação Reversa (Coordenadas -> Nome de Rua)
+  // Geocodificação Reversa
   const fetchAddressFromCoords = async (lat: number, lng: number, type: "pickup" | "dropoff") => {
     try {
       const res = await fetch(
@@ -304,7 +278,6 @@ function TaxiPage() {
         const addressShort = data.display_name.split(",").slice(0, 3).join(",");
         if (type === "pickup") {
           setPickupText(addressShort);
-          // Tenta extrair número da geocodificação reversa
           const houseNo = data.address?.house_number || "";
           if (houseNo) setPickupNumber(houseNo);
         } else {
@@ -318,7 +291,7 @@ function TaxiPage() {
     }
   };
 
-  // Autocomplete com Bounding Box estrito de Primavera do Leste - MT
+  // Autocomplete
   const searchAddress = (query: string, type: "pickup" | "dropoff") => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (!query.trim()) {
@@ -332,14 +305,11 @@ function TaxiPage() {
 
     searchTimeout.current = setTimeout(async () => {
       try {
-        // Usando viewbox e bounded=1 para focar e limitar exclusivamente nas ruas de Primavera do Leste
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           query
         )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
-        
         const res = await fetch(url);
         const data = await res.json();
-        
         if (type === "pickup") setPickupSuggestions(data);
         else setDropoffSuggestions(data);
       } catch (err) {
@@ -354,8 +324,6 @@ function TaxiPage() {
   const selectSuggestion = (item: any, type: "pickup" | "dropoff") => {
     const lat = parseFloat(item.lat);
     const lon = parseFloat(item.lon);
-    
-    // Simplificar exibição removendo partes redundantes como "Brasil", cep, etc.
     const parts = item.display_name.split(",");
     const streetBairro = parts.slice(0, 2).join(", ");
 
@@ -370,7 +338,28 @@ function TaxiPage() {
     }
 
     if (mapFull.current) {
-      mapFull.current.flyTo({ center: [lon, lat], zoom: 16, duration: 1500 });
+      mapFull.current.flyTo({ center: [lon, lat], zoom: 16, duration: 1000 });
+    }
+  };
+
+  // Trava a localização sob a mira central do mapa
+  const handleSelectLocationAtCenter = () => {
+    const m = mapFull.current;
+    if (!m) return;
+    const center = m.getCenter();
+    const coords: [number, number] = [center.lng, center.lat];
+
+    if (activeSelectType === "pickup") {
+      setPickupCoords(coords);
+      fetchAddressFromCoords(center.lat, center.lng, "pickup");
+      // Próximo passo sugerido: selecionar o destino
+      setActiveSelectType("dropoff");
+      if (dropoffCoords) {
+        m.flyTo({ center: dropoffCoords, zoom: 15, duration: 800 });
+      }
+    } else {
+      setDropoffCoords(coords);
+      fetchAddressFromCoords(center.lat, center.lng, "dropoff");
     }
   };
 
@@ -391,8 +380,7 @@ function TaxiPage() {
     setPickupNumber("");
     setDropoffText("");
     setDropoffNumber("");
-    setDistance(0);
-    setPrice(15.0);
+    distance && setDistance(0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -403,7 +391,6 @@ function TaxiPage() {
     }
     setLoading(true);
 
-    // Concatena rua + número
     const finalPickup = pickupNumber.trim() 
       ? `${pickupText}, nº ${pickupNumber} - Primavera do Leste` 
       : `${pickupText} - Primavera do Leste`;
@@ -661,13 +648,13 @@ function TaxiPage() {
         </form>
       </div>
 
-      {/* ── MODAL MAPA TELA CHEIA ── */}
+      {/* ── MODAL MAPA TELA CHEIA (COM MIRA FIXA CENTRAL) ── */}
       {isMapFullscreen && (
         <div className="fixed inset-0 bg-background z-50 flex flex-col animate-in fade-in duration-200">
           <div className="p-4 border-b border-border flex items-center justify-between shrink-0 bg-card shadow-sm">
             <div>
-              <h3 className="font-bold text-base">Posicionar no Mapa</h3>
-              <p className="text-xs text-muted-foreground">Toque no mapa para marcar ou arraste os pinos</p>
+              <h3 className="font-bold text-base">Arrastar Mapa sob a Mira</h3>
+              <p className="text-xs text-muted-foreground">Posicione a rua no centro da tela e clique para fixar</p>
             </div>
             <button
               onClick={() => setIsMapFullscreen(false)}
@@ -677,21 +664,61 @@ function TaxiPage() {
             </button>
           </div>
 
-          {/* Autocomplete de Endereço dentro do modal de tela cheia */}
-          <div className="p-3 bg-card border-b border-border flex flex-col gap-2 shrink-0">
+          {/* Seletores de Atividade da Mira */}
+          <div className="p-3 bg-card border-b border-border flex gap-2 shrink-0">
+            <button
+              onClick={() => {
+                setActiveSelectType("pickup");
+                if (pickupCoords && mapFull.current) mapFull.current.flyTo({ center: pickupCoords, zoom: 15 });
+              }}
+              className={`flex-1 py-2 px-3 rounded-lg border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                activeSelectType === "pickup"
+                  ? "bg-primary border-primary text-primary-foreground shadow"
+                  : "bg-background border-border text-foreground hover:bg-muted"
+              }`}
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-white border border-primary shrink-0" />
+              A: Partida {pickupCoords ? "✓" : ""}
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveSelectType("dropoff");
+                if (dropoffCoords && mapFull.current) mapFull.current.flyTo({ center: dropoffCoords, zoom: 15 });
+              }}
+              className={`flex-1 py-2 px-3 rounded-lg border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                activeSelectType === "dropoff"
+                  ? "bg-emerald-500 border-emerald-500 text-white shadow"
+                  : "bg-background border-border text-foreground hover:bg-muted"
+              }`}
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-white border border-emerald-500 shrink-0" />
+              B: Destino {dropoffCoords ? "✓" : ""}
+            </button>
+          </div>
+
+          {/* Autocomplete de Pesquisa */}
+          <div className="p-2.5 bg-card border-b border-border relative z-55 shrink-0">
             <div className="relative">
               <input
                 type="text"
-                value={pickupText}
+                value={activeSelectType === "pickup" ? pickupText : dropoffText}
                 onChange={(e) => {
-                  setPickupText(e.target.value);
-                  searchAddress(e.target.value, "pickup");
+                  if (activeSelectType === "pickup") {
+                    setPickupText(e.target.value);
+                    searchAddress(e.target.value, "pickup");
+                  } else {
+                    setDropoffText(e.target.value);
+                    searchAddress(e.target.value, "dropoff");
+                  }
                 }}
-                placeholder="Ponto de Partida (A)..."
+                placeholder={activeSelectType === "pickup" ? "Buscar partida..." : "Buscar destino..."}
                 className="w-full pl-8 pr-8 h-9 rounded-lg border border-border bg-background text-xs"
               />
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
-              {pickupSuggestions.length > 0 && (
+              <MapPinned className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              
+              {/* Sugestões de autocomplete */}
+              {activeSelectType === "pickup" && pickupSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
                   {pickupSuggestions.map((item, idx) => (
                     <button
@@ -705,21 +732,7 @@ function TaxiPage() {
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className="relative">
-              <input
-                type="text"
-                value={dropoffText}
-                onChange={(e) => {
-                  setDropoffText(e.target.value);
-                  searchAddress(e.target.value, "dropoff");
-                }}
-                placeholder="Ponto de Destino (B)..."
-                className="w-full pl-8 pr-8 h-9 rounded-lg border border-border bg-background text-xs"
-              />
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-emerald-500" />
-              {dropoffSuggestions.length > 0 && (
+              {activeSelectType === "dropoff" && dropoffSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
                   {dropoffSuggestions.map((item, idx) => (
                     <button
@@ -736,26 +749,47 @@ function TaxiPage() {
             </div>
           </div>
 
-          <div className="flex-1 relative">
+          {/* Div do Mapa com Alvo Central Fixo */}
+          <div className="flex-1 relative overflow-hidden">
             <div ref={mapContainerFull} className="w-full h-full" />
             
-            {(!pickupCoords || !dropoffCoords) && (
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 pointer-events-none shadow-lg z-10">
-                <Navigation className="w-3.5 h-3.5 animate-pulse text-primary" />
-                {!pickupCoords ? "Toque no mapa para marcar a partida" : "Agora toque no destino"}
+            {/* ── MIRA CENTRAL DE PRECISÃO (PIN FÍSICO NO MEIO) ── */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none z-30 flex flex-col items-center">
+              {/* Balão da Mira */}
+              <div className={`px-3 py-1.5 rounded-xl shadow-lg text-[10px] font-black text-white whitespace-nowrap mb-1 animate-bounce ${
+                activeSelectType === "pickup" ? "bg-primary" : "bg-emerald-500"
+              }`}>
+                {activeSelectType === "pickup" ? "Ponto de Partida" : "Ponto de Destino"}
               </div>
-            )}
+              {/* Pino/Alfinete físico */}
+              <div className={`w-4 h-4 rounded-full border-2 border-white shadow-md ${
+                activeSelectType === "pickup" ? "bg-primary" : "bg-emerald-500"
+              }`} />
+              <div className="w-0.5 h-6 bg-slate-800 shadow shadow-black/30" />
+            </div>
 
-            {(pickupCoords || dropoffCoords) && (
-              <button
-                onClick={handleClear}
-                className="absolute bottom-4 right-4 bg-background border border-border text-foreground px-3 py-1.5 rounded-xl text-xs font-bold shadow-md hover:bg-muted active:scale-95 transition-all z-25"
+            {/* Balão Informativo de Endereço sob a mira */}
+            <div className="absolute bottom-20 left-4 right-4 bg-black/80 backdrop-blur text-white p-3 rounded-2xl text-[11px] text-center pointer-events-none shadow-lg z-20">
+              <span className="font-semibold text-muted">Endereço no centro:</span>
+              <p className="font-bold truncate mt-0.5">
+                {activeSelectType === "pickup" ? (pickupText || "Primavera do Leste") : (dropoffText || "Primavera do Leste")}
+              </p>
+            </div>
+
+            {/* Botão de Gravar Coordenada no Centro */}
+            <div className="absolute bottom-4 left-4 right-4 z-20">
+              <Button
+                onClick={handleSelectLocationAtCenter}
+                className={`w-full h-12 rounded-xl text-xs font-bold text-white shadow-lg ${
+                  activeSelectType === "pickup" ? "bg-primary hover:bg-primary/95" : "bg-emerald-500 hover:bg-emerald-600"
+                }`}
               >
-                Limpar
-              </button>
-            )}
+                Definir Ponto {activeSelectType === "pickup" ? "A (Partida)" : "B (Destino)"} Aqui
+              </Button>
+            </div>
           </div>
 
+          {/* Rodapé de Salvar Modal */}
           <div className="p-4 bg-card border-t border-border flex gap-3 shrink-0">
             <Button
               variant="outline"
@@ -770,7 +804,7 @@ function TaxiPage() {
               className="flex-1 h-12 rounded-xl text-xs font-bold bg-primary text-primary-foreground flex items-center justify-center gap-2"
             >
               <Check className="w-4 h-4" />
-              Confirmar Pontos
+              Confirmar e Voltar
             </Button>
           </div>
         </div>
