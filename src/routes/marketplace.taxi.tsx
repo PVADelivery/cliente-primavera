@@ -33,6 +33,7 @@ function TaxiPage() {
   
   // Estado para armazenar o objeto maplibregl vindo do script global do navegador
   const [MapLibre, setMapLibre] = useState<any>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   const mapContainerSmall = useRef<HTMLDivElement>(null);
   const mapContainerFull = useRef<HTMLDivElement>(null);
@@ -75,6 +76,9 @@ function TaxiPage() {
   
   const pickupMarkerFull = useRef<any>(null);
   const dropoffMarkerFull = useRef<any>(null);
+  
+  const userMarkerSmall = useRef<any>(null);
+  const userMarkerFull = useRef<any>(null);
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -130,6 +134,22 @@ function TaxiPage() {
       });
   }, []);
 
+  // Obtém a geolocalização exata do usuário ao montar o componente
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords: [number, number] = [position.coords.longitude, position.coords.latitude];
+          setUserLocation(coords);
+        },
+        (error) => {
+          console.warn("Geolocalização não autorizada ou indisponível:", error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
+
   // 1. Inicializa o Mapa Pequeno
   useEffect(() => {
     if (!MapLibre || !mapContainerSmall.current || isMapFullscreen) {
@@ -153,7 +173,7 @@ function TaxiPage() {
         },
         layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }],
       },
-      center: PVA_CENTER,
+      center: pickupCoords || userLocation || PVA_CENTER,
       zoom: 12,
       interactive: false,
     });
@@ -164,7 +184,7 @@ function TaxiPage() {
         mapSmall.current = null;
       }
     };
-  }, [MapLibre, isMapFullscreen]);
+  }, [MapLibre, isMapFullscreen, userLocation]);
 
   // 2. Inicializa o Mapa Tela Cheia
   useEffect(() => {
@@ -177,8 +197,8 @@ function TaxiPage() {
     }
 
     const initialCenter = activeSelectType === "pickup" 
-      ? (pickupCoords || PVA_CENTER)
-      : (dropoffCoords || PVA_CENTER);
+      ? (pickupCoords || userLocation || PVA_CENTER)
+      : (dropoffCoords || userLocation || PVA_CENTER);
 
     mapFull.current = new MapLibre.Map({
       container: mapContainerFull.current,
@@ -204,13 +224,30 @@ function TaxiPage() {
         mapFull.current = null;
       }
     };
-  }, [MapLibre, isMapFullscreen]);
+  }, [MapLibre, isMapFullscreen, userLocation]);
 
   // 3. Atualiza marcadores no Mapa Pequeno
   useEffect(() => {
     if (!MapLibre) return;
     const m = mapSmall.current;
     if (!m) return;
+
+    // Marcador da Localização do Usuário (Ponto Verde Pulsante)
+    if (userLocation) {
+      if (!userMarkerSmall.current) {
+        const el = document.createElement("div");
+        el.className = "w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow flex items-center justify-center animate-pulse";
+        const inner = document.createElement("div");
+        inner.className = "w-1.5 h-1.5 bg-white rounded-full";
+        el.appendChild(inner);
+        userMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(userLocation).addTo(m);
+      } else {
+        userMarkerSmall.current.setLngLat(userLocation);
+      }
+    } else if (userMarkerSmall.current) {
+      userMarkerSmall.current.remove();
+      userMarkerSmall.current = null;
+    }
 
     if (pickupCoords) {
       if (!pickupMarkerSmall.current) {
@@ -246,13 +283,30 @@ function TaxiPage() {
     } else if (pickupCoords) {
       m.setCenter(pickupCoords);
     }
-  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen]);
+  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen, userLocation]);
 
   // 4. Marcadores no Modal (Tela Cheia)
   useEffect(() => {
     if (!MapLibre) return;
     const m = mapFull.current;
     if (!m || !isMapFullscreen) return;
+
+    // Marcador da Localização do Usuário (Ponto Verde Pulsante)
+    if (userLocation) {
+      if (!userMarkerFull.current) {
+        const el = document.createElement("div");
+        el.className = "w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center animate-pulse";
+        const inner = document.createElement("div");
+        inner.className = "w-1.5 h-1.5 bg-white rounded-full";
+        el.appendChild(inner);
+        userMarkerFull.current = new MapLibre.Marker({ element: el }).setLngLat(userLocation).addTo(m);
+      } else {
+        userMarkerFull.current.setLngLat(userLocation);
+      }
+    } else if (userMarkerFull.current) {
+      userMarkerFull.current.remove();
+      userMarkerFull.current = null;
+    }
 
     // Marcador A (Partida)
     if (pickupCoords) {
@@ -287,7 +341,7 @@ function TaxiPage() {
       dropoffMarkerFull.current.remove();
       dropoffMarkerFull.current = null;
     }
-  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen]);
+  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen, userLocation]);
 
   // Preço e Distância
   useEffect(() => {
