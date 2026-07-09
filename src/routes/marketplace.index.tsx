@@ -490,11 +490,11 @@ function MarketplaceHome() {
 
       {/* ── Quick banners ── */}
       <section className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}>
+        <Link to="/marketplace/errands" className="p-4 rounded-2xl text-primary-foreground relative overflow-hidden block" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}>
           <Zap className="w-5 h-5 mb-2" />
-          <p className="font-display font-bold text-sm leading-tight">Entrega expressa</p>
-          <p className="text-[11px] opacity-85 mt-0.5">Em até 30 min</p>
-        </div>
+          <p className="font-display font-bold text-sm leading-tight">Solicitar Entrega</p>
+          <p className="text-[11px] opacity-85 mt-0.5">Enviar encomendas</p>
+        </Link>
         <Link to="/marketplace/directory" className="p-4 rounded-2xl bg-card border border-border/60 relative overflow-hidden hover:border-primary/40 transition-colors">
           <Tag className="w-5 h-5 mb-2 text-primary" />
           <p className="font-display font-bold text-sm leading-tight">Agenda da cidade</p>
@@ -502,13 +502,13 @@ function MarketplaceHome() {
         </Link>
       </section>
 
-      {/* ── Errands ── */}
+      {/* ── Errands / Taxi ── */}
       <section>
-        <Link to="/marketplace/errands" className="block p-5 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-elegant)" }}>
+        <Link to="/marketplace/taxi" className="block p-5 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-elegant)" }}>
           <div className="relative z-10">
             <Zap className="w-6 h-6 mb-2" />
-            <h2 className="font-display font-bold text-xl leading-tight">Precisa enviar algo?</h2>
-            <p className="text-xs opacity-90 mt-1">Chame um entregador agora para buscar e levar qualquer coisa para você na cidade.</p>
+            <h2 className="font-display font-bold text-xl leading-tight">Táxi e Moto Táxi</h2>
+            <p className="text-xs opacity-90 mt-1">Solicite um carro ou moto para te buscar agora com segurança.</p>
           </div>
         </Link>
       </section>
