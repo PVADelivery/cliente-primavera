@@ -76,7 +76,7 @@ function TaxiPage() {
   const pickupMarkerFull = useRef<any>(null);
   const dropoffMarkerFull = useRef<any>(null);
   
-  const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Carrega dinamicamente via Script CDN para evitar que o bundler SSR acesse o pacote NPM no servidor
   useEffect(() => {
@@ -120,7 +120,7 @@ function TaxiPage() {
       .select("taxi_rate_per_km, mototaxi_rate_per_km")
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) {
           setRates({
             taxi: Number(data.taxi_rate_per_km) || 3.5,
