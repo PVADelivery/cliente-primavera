@@ -5,11 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
-// IMPORTANTE: CSS importado no topo é tratado corretamente pelo bundler Vite,
-// mas a biblioteca JS do MapLibre acessa APIs de janela (WebGL/window) no escopo global
-// e precisa ser carregada de forma assíncrona (dynamic import) para não quebrar o SSR da Lovable.
-import "maplibre-gl/dist/maplibre-gl.css";
-
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — Primavera Delivery" }] }),
   component: TaxiPage,
@@ -83,8 +78,17 @@ function TaxiPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // Carrega o MapLibre dinamicamente apenas no lado do cliente
+  // Carrega o MapLibre e injeta o CSS dinamicamente apenas no lado do cliente
   useEffect(() => {
+    // Injeta o arquivo CSS do MapLibre via CDN de forma segura para o SSR
+    if (!document.getElementById("maplibre-css")) {
+      const link = document.createElement("link");
+      link.id = "maplibre-css";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css";
+      document.head.appendChild(link);
+    }
+
     import("maplibre-gl").then((mod) => {
       const resolved = (mod as any).Map ? mod : ((mod as any).default || mod);
       setMapLibre(resolved);
@@ -735,7 +739,7 @@ function TaxiPage() {
               <MapPinned className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               
               {activeSelectType === "pickup" && pickupSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
+                <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
                   {pickupSuggestions.map((item, idx) => (
                     <button
                       key={idx}
@@ -749,7 +753,7 @@ function TaxiPage() {
                 </div>
               )}
               {activeSelectType === "dropoff" && dropoffSuggestions.length > 0 && (
-                <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
+                <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
                   {dropoffSuggestions.map((item, idx) => (
                     <button
                       key={idx}
