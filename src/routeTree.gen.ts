@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as MarketplaceTermsRouteImport } from './routes/marketplace.terms'
+import { Route as MarketplaceTaxiRouteImport } from './routes/marketplace.taxi'
 import { Route as MarketplaceSearchRouteImport } from './routes/marketplace.search'
 import { Route as MarketplaceProfileRouteImport } from './routes/marketplace.profile'
 import { Route as MarketplacePrivacyRouteImport } from './routes/marketplace.privacy'
@@ -54,6 +55,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const MarketplaceTermsRoute = MarketplaceTermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceTaxiRoute = MarketplaceTaxiRouteImport.update({
+  id: '/taxi',
+  path: '/taxi',
   getParentRoute: () => MarketplaceRoute,
 } as any)
 const MarketplaceSearchRoute = MarketplaceSearchRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/taxi': typeof MarketplaceTaxiRoute
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/taxi': typeof MarketplaceTaxiRoute
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/search': typeof MarketplaceSearchRoute
+  '/marketplace/taxi': typeof MarketplaceTaxiRoute
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/taxi'
     | '/marketplace/terms'
     | '/marketplace/'
     | '/marketplace/orders/$orderId'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/taxi'
     | '/marketplace/terms'
     | '/marketplace'
     | '/marketplace/orders/$orderId'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/search'
+    | '/marketplace/taxi'
     | '/marketplace/terms'
     | '/marketplace/'
     | '/marketplace/orders/$orderId'
@@ -267,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/marketplace/terms'
       preLoaderRoute: typeof MarketplaceTermsRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/taxi': {
+      id: '/marketplace/taxi'
+      path: '/taxi'
+      fullPath: '/marketplace/taxi'
+      preLoaderRoute: typeof MarketplaceTaxiRouteImport
       parentRoute: typeof MarketplaceRoute
     }
     '/marketplace/search': {
@@ -362,6 +381,7 @@ interface MarketplaceRouteChildren {
   MarketplacePrivacyRoute: typeof MarketplacePrivacyRoute
   MarketplaceProfileRoute: typeof MarketplaceProfileRoute
   MarketplaceSearchRoute: typeof MarketplaceSearchRoute
+  MarketplaceTaxiRoute: typeof MarketplaceTaxiRoute
   MarketplaceTermsRoute: typeof MarketplaceTermsRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   MarketplaceStoreStoreIdRoute: typeof MarketplaceStoreStoreIdRoute
@@ -376,6 +396,7 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplacePrivacyRoute: MarketplacePrivacyRoute,
   MarketplaceProfileRoute: MarketplaceProfileRoute,
   MarketplaceSearchRoute: MarketplaceSearchRoute,
+  MarketplaceTaxiRoute: MarketplaceTaxiRoute,
   MarketplaceTermsRoute: MarketplaceTermsRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   MarketplaceStoreStoreIdRoute: MarketplaceStoreStoreIdRoute,

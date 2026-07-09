@@ -4,11 +4,11 @@ import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPi
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
 
-// Resolve importação do MapLibre compatível com empacotadores Vite/Lovable
-const MapLibre = (maplibregl as any).Map ? maplibregl : ((maplibregl as any).default || maplibregl);
+// IMPORTANTE: CSS importado no topo é tratado corretamente pelo bundler Vite,
+// mas a biblioteca JS do MapLibre acessa APIs de janela (WebGL/window) no escopo global
+// e precisa ser carregada de forma assíncrona (dynamic import) para não quebrar o SSR da Lovable.
+import "maplibre-gl/dist/maplibre-gl.css";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — Primavera Delivery" }] }),
@@ -36,6 +36,9 @@ function TaxiPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   
+  // Estado para armazenar o módulo do MapLibre após carregamento dinâmico
+  const [MapLibre, setMapLibre] = useState<any>(null);
+
   const mapContainerSmall = useRef<HTMLDivElement>(null);
   const mapContainerFull = useRef<HTMLDivElement>(null);
   
@@ -80,7 +83,17 @@ function TaxiPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // Carrega tarifas
+  // Carrega o MapLibre dinamicamente apenas no lado do cliente
+  useEffect(() => {
+    import("maplibre-gl").then((mod) => {
+      const resolved = (mod as any).Map ? mod : ((mod as any).default || mod);
+      setMapLibre(resolved);
+    }).catch((err) => {
+      console.error("Falha ao carregar MapLibre dinamicamente:", err);
+    });
+  }, []);
+
+  // Carrega tarifas das regiões
   useEffect(() => {
     supabase
       .from("regions")
@@ -99,7 +112,7 @@ function TaxiPage() {
 
   // 1. Inicializa o Mapa Pequeno
   useEffect(() => {
-    if (!mapContainerSmall.current || isMapFullscreen) {
+    if (!MapLibre || !mapContainerSmall.current || isMapFullscreen) {
       if (mapSmall.current) {
         mapSmall.current.remove();
         mapSmall.current = null;
@@ -131,11 +144,11 @@ function TaxiPage() {
         mapSmall.current = null;
       }
     };
-  }, [isMapFullscreen]);
+  }, [MapLibre, isMapFullscreen]);
 
   // 2. Inicializa o Mapa Tela Cheia
   useEffect(() => {
-    if (!isMapFullscreen || !mapContainerFull.current) {
+    if (!MapLibre || !isMapFullscreen || !mapContainerFull.current) {
       if (mapFull.current) {
         mapFull.current.remove();
         mapFull.current = null;
@@ -171,10 +184,11 @@ function TaxiPage() {
         mapFull.current = null;
       }
     };
-  }, [isMapFullscreen]);
+  }, [MapLibre, isMapFullscreen]);
 
   // 3. Atualiza marcadores no Mapa Pequeno
   useEffect(() => {
+    if (!MapLibre) return;
     const m = mapSmall.current;
     if (!m) return;
 
@@ -212,10 +226,11 @@ function TaxiPage() {
     } else if (pickupCoords) {
       m.setCenter(pickupCoords);
     }
-  }, [pickupCoords, dropoffCoords, isMapFullscreen]);
+  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen]);
 
   // 4. Marcadores no Modal (Tela Cheia)
   useEffect(() => {
+    if (!MapLibre) return;
     const m = mapFull.current;
     if (!m || !isMapFullscreen) return;
 
@@ -252,7 +267,7 @@ function TaxiPage() {
       dropoffMarkerFull.current.remove();
       dropoffMarkerFull.current = null;
     }
-  }, [pickupCoords, dropoffCoords, isMapFullscreen]);
+  }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen]);
 
   // Preço e Distância
   useEffect(() => {
