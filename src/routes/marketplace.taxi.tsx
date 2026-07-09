@@ -12,7 +12,10 @@ export const Route = createFileRoute("/marketplace/taxi")({
   component: TaxiPage,
 });
 
+// Coordenadas e Bounding Box de Primavera do Leste - MT
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
+// Bounding box: Oeste (lngMin), Sul (latMin), Leste (lngMax), Norte (latMax)
+const PVA_BOUNDS = "-54.3700,-15.6100,-54.2500,-15.5100";
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
@@ -32,7 +35,6 @@ function TaxiPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Containers para os mapas (pequeno e tela cheia)
   const mapContainerSmall = useRef<HTMLDivElement>(null);
   const mapContainerFull = useRef<HTMLDivElement>(null);
   
@@ -54,16 +56,20 @@ function TaxiPage() {
   const [price, setPrice] = useState<number>(15.0);
   const [rates, setRates] = useState({ taxi: 3.5, mototaxi: 2.0 });
 
-  // Endereços e Autocomplete
+  // Endereços, Números e Autocomplete
   const [pickupText, setPickupText] = useState("");
+  const [pickupNumber, setPickupNumber] = useState("");
+  
   const [dropoffText, setDropoffText] = useState("");
+  const [dropoffNumber, setDropoffNumber] = useState("");
+  
   const [pickupSuggestions, setPickupSuggestions] = useState<any[]>([]);
   const [dropoffSuggestions, setDropoffSuggestions] = useState<any[]>([]);
   
   const [searchingPickup, setSearchingPickup] = useState(false);
   const [searchingDropoff, setSearchingDropoff] = useState(false);
 
-  // Markers Refs
+  // Marcadores
   const pickupMarkerSmall = useRef<maplibregl.Marker | null>(null);
   const dropoffMarkerSmall = useRef<maplibregl.Marker | null>(null);
   
@@ -72,7 +78,7 @@ function TaxiPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // Carrega as tarifas regionais na inicialização
+  // Carrega tarifas
   useEffect(() => {
     supabase
       .from("regions")
@@ -89,7 +95,7 @@ function TaxiPage() {
       });
   }, []);
 
-  // 1. Inicializa o Mapa Pequeno (Estático/Miniatura)
+  // 1. Inicializa o Mapa Pequeno
   useEffect(() => {
     if (!mapContainerSmall.current || isMapFullscreen) {
       if (mapSmall.current) {
@@ -114,7 +120,7 @@ function TaxiPage() {
       },
       center: PVA_CENTER,
       zoom: 12,
-      interactive: false, // apenas visualização no form principal
+      interactive: false,
     });
 
     return () => {
@@ -125,7 +131,7 @@ function TaxiPage() {
     };
   }, [isMapFullscreen]);
 
-  // 2. Inicializa o Mapa Tela Cheia (Interativo) quando o modal é aberto
+  // 2. Inicializa o Mapa Tela Cheia
   useEffect(() => {
     if (!isMapFullscreen || !mapContainerFull.current) {
       if (mapFull.current) {
@@ -153,7 +159,6 @@ function TaxiPage() {
       zoom: 14,
     });
 
-    // Clique no mapa em tela cheia para posicionar pinos
     mapFull.current.on("click", async (e) => {
       const { lng, lat } = e.lngLat;
       if (!pickupCoords) {
@@ -214,7 +219,7 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, isMapFullscreen]);
 
-  // 4. Atualiza marcadores no Mapa do Modal (Tela Cheia)
+  // 4. Marcadores no Modal (Tela Cheia)
   useEffect(() => {
     const m = mapFull.current;
     if (!m || !isMapFullscreen) return;
@@ -273,7 +278,7 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, isMapFullscreen]);
 
-  // Calcula Preço e Distância
+  // Preço e Distância
   useEffect(() => {
     if (pickupCoords && dropoffCoords) {
       const dist = calculateDistance(
@@ -288,7 +293,7 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
-  // Geocodificação Reversa (Coordenadas -> Endereço)
+  // Geocodificação Reversa (Coordenadas -> Nome de Rua)
   const fetchAddressFromCoords = async (lat: number, lng: number, type: "pickup" | "dropoff") => {
     try {
       const res = await fetch(
@@ -297,15 +302,23 @@ function TaxiPage() {
       const data = await res.json();
       if (data && data.display_name) {
         const addressShort = data.display_name.split(",").slice(0, 3).join(",");
-        if (type === "pickup") setPickupText(addressShort);
-        else setDropoffText(addressShort);
+        if (type === "pickup") {
+          setPickupText(addressShort);
+          // Tenta extrair número da geocodificação reversa
+          const houseNo = data.address?.house_number || "";
+          if (houseNo) setPickupNumber(houseNo);
+        } else {
+          setDropoffText(addressShort);
+          const houseNo = data.address?.house_number || "";
+          if (houseNo) setDropoffNumber(houseNo);
+        }
       }
     } catch (err) {
       console.error("Geocodificação reversa falhou:", err);
     }
   };
 
-  // Autocomplete Geocodificação Direta
+  // Autocomplete com Bounding Box estrito de Primavera do Leste - MT
   const searchAddress = (query: string, type: "pickup" | "dropoff") => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (!query.trim()) {
@@ -319,12 +332,14 @@ function TaxiPage() {
 
     searchTimeout.current = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-            query + ", Primavera do Leste, MT"
-          )}&limit=5`
-        );
+        // Usando viewbox e bounded=1 para focar e limitar exclusivamente nas ruas de Primavera do Leste
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query
+        )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
+        
+        const res = await fetch(url);
         const data = await res.json();
+        
         if (type === "pickup") setPickupSuggestions(data);
         else setDropoffSuggestions(data);
       } catch (err) {
@@ -333,37 +348,38 @@ function TaxiPage() {
         setSearchingPickup(false);
         setSearchingDropoff(false);
       }
-    }, 500);
+    }, 400);
   };
 
   const selectSuggestion = (item: any, type: "pickup" | "dropoff") => {
     const lat = parseFloat(item.lat);
     const lon = parseFloat(item.lon);
-    const shortName = item.display_name.split(",").slice(0, 3).join(",");
+    
+    // Simplificar exibição removendo partes redundantes como "Brasil", cep, etc.
+    const parts = item.display_name.split(",");
+    const streetBairro = parts.slice(0, 2).join(", ");
 
     if (type === "pickup") {
       setPickupCoords([lon, lat]);
-      setPickupText(shortName);
+      setPickupText(streetBairro);
       setPickupSuggestions([]);
     } else {
       setDropoffCoords([lon, lat]);
-      setDropoffText(shortName);
+      setDropoffText(streetBairro);
       setDropoffSuggestions([]);
     }
 
     if (mapFull.current) {
-      mapFull.current.flyTo({ center: [lon, lat], zoom: 15, duration: 1500 });
+      mapFull.current.flyTo({ center: [lon, lat], zoom: 16, duration: 1500 });
     }
   };
 
   const handleClear = () => {
-    // Limpar marcadores pequeno
     if (pickupMarkerSmall.current) pickupMarkerSmall.current.remove();
     if (dropoffMarkerSmall.current) dropoffMarkerSmall.current.remove();
     pickupMarkerSmall.current = null;
     dropoffMarkerSmall.current = null;
 
-    // Limpar marcadores full
     if (pickupMarkerFull.current) pickupMarkerFull.current.remove();
     if (dropoffMarkerFull.current) dropoffMarkerFull.current.remove();
     pickupMarkerFull.current = null;
@@ -372,7 +388,9 @@ function TaxiPage() {
     setPickupCoords(null);
     setDropoffCoords(null);
     setPickupText("");
+    setPickupNumber("");
     setDropoffText("");
+    setDropoffNumber("");
     setDistance(0);
     setPrice(15.0);
   };
@@ -385,13 +403,22 @@ function TaxiPage() {
     }
     setLoading(true);
 
+    // Concatena rua + número
+    const finalPickup = pickupNumber.trim() 
+      ? `${pickupText}, nº ${pickupNumber} - Primavera do Leste` 
+      : `${pickupText} - Primavera do Leste`;
+      
+    const finalDropoff = dropoffNumber.trim() 
+      ? `${dropoffText}, nº ${dropoffNumber} - Primavera do Leste` 
+      : `${dropoffText} - Primavera do Leste`;
+
     try {
       const { error } = await supabase.from("ride_requests").insert({
         user_id: user?.id || null,
         customer_name: user?.user_metadata?.full_name || user?.email || "Passageiro",
         customer_phone: user?.user_metadata?.phone || "",
-        pickup_address: pickupText || "Localização A",
-        dropoff_address: dropoffText || "Localização B",
+        pickup_address: finalPickup,
+        dropoff_address: finalDropoff,
         pickup_lat: pickupCoords[1],
         pickup_lng: pickupCoords[0],
         dropoff_lat: dropoffCoords[1],
@@ -418,7 +445,7 @@ function TaxiPage() {
         <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4 animate-bounce" />
         <h2 className="text-2xl font-display font-bold mb-2">Corrida Solicitada!</h2>
         <p className="text-muted-foreground mb-8">
-          Motoristas de Primavera do Leste estão a caminho. Pagamento deve ser feito por fora diretamente a eles.
+          Motoristas de Primavera do Leste estão a caminho. O pagamento deve ser feito por fora diretamente a eles.
         </p>
         <Button onClick={() => navigate({ to: "/marketplace" })} className="w-full max-w-xs h-12 rounded-xl">
           Voltar ao Início
@@ -438,37 +465,48 @@ function TaxiPage() {
         </button>
         <div>
           <h1 className="font-display text-xl font-bold">Táxi & Moto Táxi</h1>
-          <p className="text-xs text-muted-foreground">Preencha os endereços ou posicione no mapa ampliado</p>
+          <p className="text-xs text-muted-foreground">Busque sua rua e adicione o número da residência</p>
         </div>
       </div>
 
-      {/* ── FORMULÁRIO TRADICIONAL (LAYOUT DE ORIGEM) ── */}
       <div className="space-y-4">
-        {/* Endereço de Partida */}
+        {/* Endereço de Partida + Número */}
         <div className="relative z-30">
           <label className="text-xs font-semibold text-muted-foreground mb-1 block">Onde te buscamos?</label>
-          <div className="relative">
-            <input
-              type="text"
-              value={pickupText}
-              onChange={(e) => {
-                setPickupText(e.target.value);
-                searchAddress(e.target.value, "pickup");
-              }}
-              placeholder="Digite o endereço de partida..."
-              className="w-full pl-4 pr-8 h-11 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-            {pickupText && (
-              <button
-                onClick={() => {
-                  setPickupText("");
-                  setPickupCoords(null);
+          <div className="grid grid-cols-4 gap-2">
+            <div className="col-span-3 relative">
+              <input
+                type="text"
+                value={pickupText}
+                onChange={(e) => {
+                  setPickupText(e.target.value);
+                  searchAddress(e.target.value, "pickup");
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            )}
+                placeholder="Rua, Avenida ou Bairro..."
+                className="w-full pl-4 pr-8 h-11 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              {pickupText && (
+                <button
+                  onClick={() => {
+                    setPickupText("");
+                    setPickupCoords(null);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+            
+            <div className="col-span-1">
+              <input
+                type="text"
+                value={pickupNumber}
+                onChange={(e) => setPickupNumber(e.target.value)}
+                placeholder="Nº"
+                className="w-full h-11 text-center rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
           </div>
 
           {pickupSuggestions.length > 0 && (
@@ -487,31 +525,43 @@ function TaxiPage() {
           )}
         </div>
 
-        {/* Endereço de Destino */}
+        {/* Endereço de Destino + Número */}
         <div className="relative z-20">
           <label className="text-xs font-semibold text-muted-foreground mb-1 block">Para onde vamos?</label>
-          <div className="relative">
-            <input
-              type="text"
-              value={dropoffText}
-              onChange={(e) => {
-                setDropoffText(e.target.value);
-                searchAddress(e.target.value, "dropoff");
-              }}
-              placeholder="Digite o endereço de destino..."
-              className="w-full pl-4 pr-8 h-11 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-            {dropoffText && (
-              <button
-                onClick={() => {
-                  setDropoffText("");
-                  setDropoffCoords(null);
+          <div className="grid grid-cols-4 gap-2">
+            <div className="col-span-3 relative">
+              <input
+                type="text"
+                value={dropoffText}
+                onChange={(e) => {
+                  setDropoffText(e.target.value);
+                  searchAddress(e.target.value, "dropoff");
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                <X className="w-4 h-4 text-muted-foreground" />
-              </button>
-            )}
+                placeholder="Rua, Avenida ou Bairro..."
+                className="w-full pl-4 pr-8 h-11 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              {dropoffText && (
+                <button
+                  onClick={() => {
+                    setDropoffText("");
+                    setDropoffCoords(null);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            <div className="col-span-1">
+              <input
+                type="text"
+                value={dropoffNumber}
+                onChange={(e) => setDropoffNumber(e.target.value)}
+                placeholder="Nº"
+                className="w-full h-11 text-center rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
           </div>
 
           {dropoffSuggestions.length > 0 && (
@@ -530,7 +580,7 @@ function TaxiPage() {
           )}
         </div>
 
-        {/* ── MAPA PEQUENO INTERATIVO (CLIQUE PARA EXPANDIR) ── */}
+        {/* Miniatura do Mapa */}
         <div 
           onClick={() => setIsMapFullscreen(true)}
           className="relative h-44 rounded-2xl overflow-hidden border border-border shadow-sm cursor-pointer group hover:opacity-95 transition-all"
@@ -539,12 +589,12 @@ function TaxiPage() {
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/25 flex items-center justify-center transition-all">
             <span className="bg-background/90 backdrop-blur text-foreground px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
               <Maximize2 className="w-3.5 h-3.5 text-primary" />
-              Abrir Mapa Completo
+              Ver Mapa Completo
             </span>
           </div>
         </div>
 
-        {/* Veículo e Valores */}
+        {/* Seleção do Veículo */}
         <div className="flex gap-3">
           <button
             type="button"
@@ -611,10 +661,9 @@ function TaxiPage() {
         </form>
       </div>
 
-      {/* ── MODAL MAPA TELA CHEIA (INTERATIVO) ── */}
+      {/* ── MODAL MAPA TELA CHEIA ── */}
       {isMapFullscreen && (
         <div className="fixed inset-0 bg-background z-50 flex flex-col animate-in fade-in duration-200">
-          {/* Header do Modal */}
           <div className="p-4 border-b border-border flex items-center justify-between shrink-0 bg-card shadow-sm">
             <div>
               <h3 className="font-bold text-base">Posicionar no Mapa</h3>
@@ -628,7 +677,7 @@ function TaxiPage() {
             </button>
           </div>
 
-          {/* Autocomplete flutuante dentro do Modal */}
+          {/* Autocomplete de Endereço dentro do modal de tela cheia */}
           <div className="p-3 bg-card border-b border-border flex flex-col gap-2 shrink-0">
             <div className="relative">
               <input
@@ -687,7 +736,6 @@ function TaxiPage() {
             </div>
           </div>
 
-          {/* Div do Mapa */}
           <div className="flex-1 relative">
             <div ref={mapContainerFull} className="w-full h-full" />
             
@@ -708,7 +756,6 @@ function TaxiPage() {
             )}
           </div>
 
-          {/* Rodapé do Modal */}
           <div className="p-4 bg-card border-t border-border flex gap-3 shrink-0">
             <Button
               variant="outline"
