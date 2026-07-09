@@ -99,7 +99,7 @@ function TaxiPage() {
         const globalLib = (window as any).maplibregl;
         if (globalLib) {
           const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-          setMapLibre(resolved);
+          setMapLibre(() => resolved);
         }
       };
       document.body.appendChild(script);
@@ -108,7 +108,7 @@ function TaxiPage() {
       const globalLib = (window as any).maplibregl;
       if (globalLib) {
         const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-        setMapLibre(resolved);
+        setMapLibre(() => resolved);
       }
     }
   }, []);
