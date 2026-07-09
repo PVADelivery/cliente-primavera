@@ -363,7 +363,7 @@ function TaxiPage() {
     const street = streetName.toLowerCase();
     
     // 1. Regras específicas por nome de rua principal
-    if (street.includes("ari krief") || street.includes("ari kriff")) return "Santa Clara";
+    if (street.includes("ari krief") || street.includes("ari kriff")) return "Jardim Progresso";
     if (street.includes("santo amaro")) {
       if (lon < -54.307) return "Primavera I";
       if (lon < -54.298) return "Jardim Riva";
@@ -403,7 +403,7 @@ function TaxiPage() {
       return "Centro";
     }
     if (lon >= -54.291 && lon < -54.283) {
-      return "Santa Clara";
+      return "Jardim Progresso";
     }
     if (lon >= -54.283) {
       // Divisão Leste Norte/Sul
