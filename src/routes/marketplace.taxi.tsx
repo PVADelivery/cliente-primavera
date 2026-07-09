@@ -358,11 +358,67 @@ function TaxiPage() {
     }
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
+  // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap
+  const getCorrectBairro = (lon: number, lat: number, streetName: string): string => {
+    const street = streetName.toLowerCase();
+    
+    // 1. Regras específicas por nome de rua principal
+    if (street.includes("ari krief") || street.includes("ari kriff")) return "Centro";
+    if (street.includes("santo amaro")) {
+      if (lon < -54.307) return "Primavera I";
+      if (lon < -54.298) return "Jardim Riva";
+      return "Centro";
+    }
+    if (street.includes("david riva") || street.includes("avenida primavera") || street.includes("campo grande")) {
+      if (lon < -54.300) return "Jardim Riva";
+      return "Centro";
+    }
+    if (street.includes("piracicaba") || street.includes("paranatinga") || street.includes("cuiaba") || street.includes("cuiabá") || street.includes("porto alegre")) {
+      return "Centro";
+    }
+    if (street.includes("belo horizonte") || street.includes("curitiba") || street.includes("sao paulo") || street.includes("são paulo")) {
+      return "Centro";
+    }
+    if (street.includes("pion. poncio") || street.includes("poncho verde")) {
+      return "Poncho Verde";
+    }
+    if (street.includes("castelandia") || street.includes("castelândia")) {
+      return "Castelândia";
+    }
+    if (street.includes("são joão") || street.includes("sao joao")) {
+      return "Centro";
+    }
+    
+    // 2. Divisão Geográfica (Geofencing) se cair no "Parque Eldorado" genérico do OSM
+    if (lon < -54.316) {
+      return "Poncho Verde";
+    }
+    if (lon < -54.306) {
+      return "Primavera I";
+    }
+    if (lon < -54.297) {
+      return "Jardim Riva";
+    }
+    if (lon >= -54.297 && lon < -54.283) {
+      return "Centro";
+    }
+    if (lon >= -54.283) {
+      // Divisão Leste Norte/Sul
+      if (lat > -15.555) return "Primavera III";
+      return "Castelândia";
+    }
+    
+    return "Centro";
+  };
+
   // Helper para formatar sugestões com bairro correto
   const formatSuggestionLabel = (item: any) => {
+    const lon = parseFloat(item.lon);
+    const lat = parseFloat(item.lat);
     const addr = item.address || {};
     const street = addr.road || addr.street || item.display_name.split(",")[0] || "";
-    const bairro = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || "";
+    
+    const bairro = getCorrectBairro(lon, lat, street);
     const city = addr.city || addr.town || addr.municipality || "Primavera do Leste";
     return {
       main: bairro ? `${street}, ${bairro}` : street,
@@ -380,7 +436,8 @@ function TaxiPage() {
       if (data && data.address) {
         const addr = data.address;
         const street = addr.road || addr.street || data.display_name.split(",")[0] || "";
-        const bairro = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || "";
+        
+        const bairro = getCorrectBairro(lng, lat, street);
         const addressShort = bairro ? `${street}, ${bairro}` : street;
         
         if (type === "pickup") {
