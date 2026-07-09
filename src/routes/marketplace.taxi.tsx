@@ -7,6 +7,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
+// Resolve importação do MapLibre compatível com empacotadores Vite/Lovable
+const MapLibre = (maplibregl as any).Map ? maplibregl : ((maplibregl as any).default || maplibregl);
+
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — Primavera Delivery" }] }),
   component: TaxiPage,
@@ -36,8 +39,8 @@ function TaxiPage() {
   const mapContainerSmall = useRef<HTMLDivElement>(null);
   const mapContainerFull = useRef<HTMLDivElement>(null);
   
-  const mapSmall = useRef<maplibregl.Map | null>(null);
-  const mapFull = useRef<maplibregl.Map | null>(null);
+  const mapSmall = useRef<any>(null);
+  const mapFull = useRef<any>(null);
 
   const [vehicleType, setVehicleType] = useState<"taxi" | "mototaxi">("mototaxi");
   const [notes, setNotes] = useState("");
@@ -69,11 +72,11 @@ function TaxiPage() {
   const [searchingDropoff, setSearchingDropoff] = useState(false);
 
   // Marcadores do Mapa
-  const pickupMarkerSmall = useRef<maplibregl.Marker | null>(null);
-  const dropoffMarkerSmall = useRef<maplibregl.Marker | null>(null);
+  const pickupMarkerSmall = useRef<any>(null);
+  const dropoffMarkerSmall = useRef<any>(null);
   
-  const pickupMarkerFull = useRef<maplibregl.Marker | null>(null);
-  const dropoffMarkerFull = useRef<maplibregl.Marker | null>(null);
+  const pickupMarkerFull = useRef<any>(null);
+  const dropoffMarkerFull = useRef<any>(null);
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
@@ -104,7 +107,7 @@ function TaxiPage() {
       return;
     }
 
-    mapSmall.current = new maplibregl.Map({
+    mapSmall.current = new MapLibre.Map({
       container: mapContainerSmall.current,
       style: {
         version: 8,
@@ -140,12 +143,11 @@ function TaxiPage() {
       return;
     }
 
-    // Inicializa centralizando na coordenada ativa (se já existir) ou centro da cidade
     const initialCenter = activeSelectType === "pickup" 
       ? (pickupCoords || PVA_CENTER)
       : (dropoffCoords || PVA_CENTER);
 
-    mapFull.current = new maplibregl.Map({
+    mapFull.current = new MapLibre.Map({
       container: mapContainerFull.current,
       style: {
         version: 8,
@@ -181,7 +183,7 @@ function TaxiPage() {
         const el = document.createElement("div");
         el.className = "w-5 h-5 bg-primary rounded-full border-2 border-white shadow flex items-center justify-center text-white font-bold text-[9px]";
         el.innerText = "A";
-        pickupMarkerSmall.current = new maplibregl.Marker({ element: el }).setLngLat(pickupCoords).addTo(m);
+        pickupMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(pickupCoords).addTo(m);
       } else {
         pickupMarkerSmall.current.setLngLat(pickupCoords);
       }
@@ -195,7 +197,7 @@ function TaxiPage() {
         const el = document.createElement("div");
         el.className = "w-5 h-5 bg-emerald-500 rounded-full border-2 border-white shadow flex items-center justify-center text-white font-bold text-[9px]";
         el.innerText = "B";
-        dropoffMarkerSmall.current = new maplibregl.Marker({ element: el }).setLngLat(dropoffCoords).addTo(m);
+        dropoffMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(dropoffCoords).addTo(m);
       } else {
         dropoffMarkerSmall.current.setLngLat(dropoffCoords);
       }
@@ -205,7 +207,7 @@ function TaxiPage() {
     }
 
     if (pickupCoords && dropoffCoords) {
-      const bounds = new maplibregl.LngLatBounds().extend(pickupCoords).extend(dropoffCoords);
+      const bounds = new MapLibre.LngLatBounds().extend(pickupCoords).extend(dropoffCoords);
       m.fitBounds(bounds, { padding: 40 });
     } else if (pickupCoords) {
       m.setCenter(pickupCoords);
@@ -223,7 +225,7 @@ function TaxiPage() {
         const el = document.createElement("div");
         el.className = "w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
         el.innerText = "A";
-        pickupMarkerFull.current = new maplibregl.Marker({ element: el })
+        pickupMarkerFull.current = new MapLibre.Marker({ element: el })
           .setLngLat(pickupCoords)
           .addTo(m);
       } else {
@@ -240,7 +242,7 @@ function TaxiPage() {
         const el = document.createElement("div");
         el.className = "w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
         el.innerText = "B";
-        dropoffMarkerFull.current = new maplibregl.Marker({ element: el })
+        dropoffMarkerFull.current = new MapLibre.Marker({ element: el })
           .setLngLat(dropoffCoords)
           .addTo(m);
       } else {
@@ -352,7 +354,6 @@ function TaxiPage() {
     if (activeSelectType === "pickup") {
       setPickupCoords(coords);
       fetchAddressFromCoords(center.lat, center.lng, "pickup");
-      // Próximo passo sugerido: selecionar o destino
       setActiveSelectType("dropoff");
       if (dropoffCoords) {
         m.flyTo({ center: dropoffCoords, zoom: 15, duration: 800 });
@@ -380,7 +381,8 @@ function TaxiPage() {
     setPickupNumber("");
     setDropoffText("");
     setDropoffNumber("");
-    distance && setDistance(0);
+    setDistance(0);
+    setPrice(15.0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -717,7 +719,6 @@ function TaxiPage() {
               />
               <MapPinned className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               
-              {/* Sugestões de autocomplete */}
               {activeSelectType === "pickup" && pickupSuggestions.length > 0 && (
                 <div className="absolute left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-xl overflow-hidden max-h-40 overflow-y-auto z-50">
                   {pickupSuggestions.map((item, idx) => (
@@ -753,30 +754,26 @@ function TaxiPage() {
           <div className="flex-1 relative overflow-hidden">
             <div ref={mapContainerFull} className="w-full h-full" />
             
-            {/* ── MIRA CENTRAL DE PRECISÃO (PIN FÍSICO NO MEIO) ── */}
+            {/* ── MIRA CENTRAL DE PRECISÃO ── */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full pointer-events-none z-30 flex flex-col items-center">
-              {/* Balão da Mira */}
               <div className={`px-3 py-1.5 rounded-xl shadow-lg text-[10px] font-black text-white whitespace-nowrap mb-1 animate-bounce ${
                 activeSelectType === "pickup" ? "bg-primary" : "bg-emerald-500"
               }`}>
                 {activeSelectType === "pickup" ? "Ponto de Partida" : "Ponto de Destino"}
               </div>
-              {/* Pino/Alfinete físico */}
               <div className={`w-4 h-4 rounded-full border-2 border-white shadow-md ${
                 activeSelectType === "pickup" ? "bg-primary" : "bg-emerald-500"
               }`} />
               <div className="w-0.5 h-6 bg-slate-800 shadow shadow-black/30" />
             </div>
 
-            {/* Balão Informativo de Endereço sob a mira */}
             <div className="absolute bottom-20 left-4 right-4 bg-black/80 backdrop-blur text-white p-3 rounded-2xl text-[11px] text-center pointer-events-none shadow-lg z-20">
-              <span className="font-semibold text-muted">Endereço no centro:</span>
+              <span className="font-semibold text-slate-300">Endereço no centro:</span>
               <p className="font-bold truncate mt-0.5">
                 {activeSelectType === "pickup" ? (pickupText || "Primavera do Leste") : (dropoffText || "Primavera do Leste")}
               </p>
             </div>
 
-            {/* Botão de Gravar Coordenada no Centro */}
             <div className="absolute bottom-4 left-4 right-4 z-20">
               <Button
                 onClick={handleSelectLocationAtCenter}
@@ -789,7 +786,6 @@ function TaxiPage() {
             </div>
           </div>
 
-          {/* Rodapé de Salvar Modal */}
           <div className="p-4 bg-card border-t border-border flex gap-3 shrink-0">
             <Button
               variant="outline"
