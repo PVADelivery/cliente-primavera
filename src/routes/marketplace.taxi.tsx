@@ -31,7 +31,7 @@ function TaxiPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Estado para armazenar o módulo do MapLibre após carregamento dinâmico
+  // Estado para armazenar o objeto maplibregl vindo do script global do navegador
   const [MapLibre, setMapLibre] = useState<any>(null);
 
   const mapContainerSmall = useRef<HTMLDivElement>(null);
@@ -78,9 +78,9 @@ function TaxiPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // Carrega o MapLibre e injeta o CSS dinamicamente apenas no lado do cliente
+  // Carrega dinamicamente via Script CDN para evitar que o bundler SSR acesse o pacote NPM no servidor
   useEffect(() => {
-    // Injeta o arquivo CSS do MapLibre via CDN de forma segura para o SSR
+    // 1. Injeta o CSS do MapLibre
     if (!document.getElementById("maplibre-css")) {
       const link = document.createElement("link");
       link.id = "maplibre-css";
@@ -89,12 +89,28 @@ function TaxiPage() {
       document.head.appendChild(link);
     }
 
-    import("maplibre-gl").then((mod) => {
-      const resolved = (mod as any).Map ? mod : ((mod as any).default || mod);
-      setMapLibre(resolved);
-    }).catch((err) => {
-      console.error("Falha ao carregar MapLibre dinamicamente:", err);
-    });
+    // 2. Injeta o Script JS do MapLibre
+    if (!document.getElementById("maplibre-js")) {
+      const script = document.createElement("script");
+      script.id = "maplibre-js";
+      script.src = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js";
+      script.async = true;
+      script.onload = () => {
+        const globalLib = (window as any).maplibregl;
+        if (globalLib) {
+          const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
+          setMapLibre(resolved);
+        }
+      };
+      document.body.appendChild(script);
+    } else {
+      // Caso já esteja injetado no DOM
+      const globalLib = (window as any).maplibregl;
+      if (globalLib) {
+        const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
+        setMapLibre(resolved);
+      }
+    }
   }, []);
 
   // Carrega tarifas das regiões
