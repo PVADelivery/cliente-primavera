@@ -328,34 +328,112 @@ function ErrandsPage() {
     }
   }, [MapLibre, pickupCoords, dropoffCoords, isMapFullscreen, userLocation]);
 
-  // Preço e Distância
-  useEffect(() => {
-    if (pickupCoords && dropoffCoords) {
-      const dist = calculateDistance(
-        pickupCoords[1],
-        pickupCoords[0],
-        dropoffCoords[1],
-        dropoffCoords[0]
-      );
-      setDistance(dist);
-      
-      // Tarifas por tipo de veículo
-      // Moto: R$ 2.00/KM, min R$ 7.00
-      // Carro: R$ 3.50/KM, min R$ 15.00
-      // Carro Aberto: R$ 5.00/KM, min R$ 30.00
-      let rate = 2.0;
-      let minPrice = 7.0;
-      if (vehicleType === "carro") {
-        rate = 3.5;
-        minPrice = 15.0;
-      } else if (vehicleType === "carro_aberto") {
-        rate = 5.0;
-        minPrice = 30.0;
-      }
-      
-      setPrice(Math.max(minPrice, dist * rate));
+// OSRM Routing API
+async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number) {
+  try {
+    const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`);
+    const data = await res.json();
+    if (data.routes && data.routes.length > 0) {
+      return {
+        distanceKm: Number((data.routes[0].distance / 1000).toFixed(2)),
+        geometry: data.routes[0].geometry
+      };
     }
-  }, [pickupCoords, dropoffCoords, vehicleType]);
+  } catch (err) {
+    console.error("Erro OSRM:", err);
+  }
+  return null;
+}
+
+  // Preço, Distância e Rota no Mapa
+  useEffect(() => {
+    let active = true;
+
+    async function updateRoute() {
+      if (pickupCoords && dropoffCoords) {
+        const routeData = await fetchRoute(pickupCoords[0], pickupCoords[1], dropoffCoords[0], dropoffCoords[1]);
+        if (!active) return;
+
+        let dist = 0;
+        let routeGeoJSON: any = null;
+
+        if (routeData) {
+          dist = routeData.distanceKm;
+          routeGeoJSON = routeData.geometry;
+        } else {
+          dist = calculateDistance(pickupCoords[1], pickupCoords[0], dropoffCoords[1], dropoffCoords[0]);
+        }
+        
+        setDistance(dist);
+        
+        // Tarifas por tipo de veículo
+        // Moto: R$ 2.00/KM, min R$ 7.00
+        // Carro: R$ 3.50/KM, min R$ 15.00
+        // Carro Aberto: R$ 5.00/KM, min R$ 30.00
+        let rate = 2.0;
+        let minPrice = 7.0;
+        if (vehicleType === "carro") {
+          rate = 3.5;
+          minPrice = 15.0;
+        } else if (vehicleType === "carro_aberto") {
+          rate = 5.0;
+          minPrice = 30.0;
+        }
+        
+        setPrice(Math.max(minPrice, dist * rate));
+
+        // Atualizar rota no mapa
+        const drawRoute = (mapRef: any) => {
+          if (!mapRef.current) return;
+          const map = mapRef.current;
+          
+          if (routeGeoJSON) {
+            if (map.getSource("route")) {
+              map.getSource("route").setData(routeGeoJSON);
+            } else {
+              map.addSource("route", { type: "geojson", data: routeGeoJSON });
+              map.addLayer({
+                id: "route",
+                type: "line",
+                source: "route",
+                layout: { "line-join": "round", "line-cap": "round" },
+                paint: { "line-color": "#eab308", "line-width": 4 }
+              }, map.getLayer("pickup-marker") ? "pickup-marker" : undefined);
+            }
+
+            // Centraliza o mapa
+            const coords = routeGeoJSON.coordinates;
+            const bounds = coords.reduce(function(bounds: any, coord: any) {
+              return bounds.extend(coord);
+            }, new MapLibre.LngLatBounds(coords[0], coords[0]));
+            map.fitBounds(bounds, { padding: 40, duration: 800 });
+
+          } else if (map.getSource("route")) {
+            map.getSource("route").setData({ type: "FeatureCollection", features: [] });
+          }
+        };
+
+        if (MapLibre) {
+          drawRoute(mapSmall);
+          drawRoute(mapFull);
+        }
+      } else {
+        setDistance(0);
+        setPrice(0);
+        // Limpar rota
+        const clearRoute = (mapRef: any) => {
+          if (mapRef.current && mapRef.current.getSource("route")) {
+            mapRef.current.getSource("route").setData({ type: "FeatureCollection", features: [] });
+          }
+        };
+        clearRoute(mapSmall);
+        clearRoute(mapFull);
+      }
+    }
+
+    updateRoute();
+    return () => { active = false; };
+  }, [pickupCoords, dropoffCoords, vehicleType, MapLibre]);
 
   // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap
   const getCorrectBairro = (lon: number, lat: number, streetName: string, addr?: any): string => {
