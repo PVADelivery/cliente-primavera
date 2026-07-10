@@ -359,7 +359,14 @@ function TaxiPage() {
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
   // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap
-  const getCorrectBairro = (lon: number, lat: number, streetName: string): string => {
+  const getCorrectBairro = (lon: number, lat: number, streetName: string, addr?: any): string => {
+    if (addr) {
+      const osmBairro = addr.suburb || addr.neighbourhood || addr.city_district || addr.residential;
+      if (osmBairro && osmBairro.toLowerCase() !== "parque eldorado") {
+        return osmBairro;
+      }
+    }
+
     const street = streetName.toLowerCase();
     
     // 1. Regras específicas por nome de rua principal
@@ -421,7 +428,7 @@ function TaxiPage() {
     const addr = item.address || {};
     const street = addr.road || addr.street || item.display_name.split(",")[0] || "";
     
-    const bairro = getCorrectBairro(lon, lat, street);
+    const bairro = getCorrectBairro(lon, lat, street, addr);
     const city = addr.city || addr.town || addr.municipality || "Primavera do Leste";
     return {
       main: bairro ? `${street}, ${bairro}` : street,
@@ -440,7 +447,7 @@ function TaxiPage() {
         const addr = data.address;
         const street = addr.road || addr.street || data.display_name.split(",")[0] || "";
         
-        const bairro = getCorrectBairro(lng, lat, street);
+        const bairro = getCorrectBairro(lng, lat, street, addr);
         const addressShort = bairro ? `${street}, ${bairro}` : street;
         
         if (type === "pickup") {
