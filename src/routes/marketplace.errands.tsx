@@ -394,27 +394,7 @@ function ErrandsPage() {
       return "Centro";
     }
     
-    if (lon < -54.316) {
-      return "Poncho Verde";
-    }
-    if (lon < -54.306) {
-      return "Primavera I";
-    }
-    if (lon < -54.297) {
-      return "Jardim Riva";
-    }
-    if (lon >= -54.297 && lon < -54.291) {
-      return "Centro";
-    }
-    if (lon >= -54.291 && lon < -54.283) {
-      return "Jardim Progresso";
-    }
-    if (lon >= -54.283) {
-      if (lat > -15.555) return "Primavera III";
-      return "Castelândia";
-    }
-    
-    return "Centro";
+    return "";
   };
 
   // Helper para formatar sugestões com bairro correto
