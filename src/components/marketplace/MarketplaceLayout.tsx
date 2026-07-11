@@ -51,20 +51,20 @@ export function MarketplaceLayout() {
       {/* ── Sol global iluminando o app inteiro ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-56 -right-40 w-[700px] h-[700px] rounded-full z-0"
+        className="pointer-events-none fixed -top-[380px] -right-[380px] w-[900px] h-[900px] rounded-full z-0"
         style={{
           background:
-            "radial-gradient(circle, rgba(250,204,21,0.55) 0%, rgba(250,204,21,0.28) 28%, rgba(250,204,21,0.10) 52%, rgba(250,204,21,0) 75%)",
-          filter: "blur(30px)",
+            "radial-gradient(circle at center, rgba(253,224,71,0.35) 0%, rgba(250,204,21,0.18) 30%, rgba(250,204,21,0.06) 55%, rgba(250,204,21,0) 75%)",
+          filter: "blur(40px)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-24 -right-10 w-56 h-56 rounded-full z-0"
+        className="pointer-events-none fixed -top-[220px] -right-[220px] w-[420px] h-[420px] rounded-full z-0"
         style={{
           background:
-            "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.6) 40%, rgba(250,204,21,0) 75%)",
-          filter: "blur(6px)",
+            "radial-gradient(circle at center, rgba(253,224,71,0.55) 0%, rgba(250,204,21,0.25) 45%, rgba(250,204,21,0) 75%)",
+          filter: "blur(24px)",
         }}
       />
       <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
