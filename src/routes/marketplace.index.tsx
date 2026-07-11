@@ -128,14 +128,14 @@ function SmartSearchBar() {
         className="relative"
       >
         <div
-          className={`flex items-center gap-3 bg-white/95 backdrop-blur-md text-slate-900 rounded-2xl px-4 py-3 border transition-all duration-300 ${focused ? "border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.3)] ring-2 ring-blue-500/20" : "border-white/40 shadow-lg"}`}
+          className={`flex items-center gap-3 bg-white/5 backdrop-blur-md text-white rounded-2xl px-4 py-3 border transition-all duration-300 ${focused ? "border-primary shadow-[0_0_25px_rgba(234,179,8,0.2)] ring-1 ring-primary/30" : "border-white/10 hover:bg-white/10"}`}
         >
-          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-blue-600" : "text-slate-500"}`} />
+          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-primary" : "text-white/50"}`} />
           <input
             ref={inputRef}
             type="text"
             placeholder="Buscar lojas, pratos…"
-            className="flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-400 min-w-0"
+            className="flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-white/40 min-w-0"
             onFocus={() => setFocused(true)}
             onKeyDown={e => e.key === "Enter" && handleSearch((e.target as HTMLInputElement).value)}
           />
@@ -147,7 +147,7 @@ function SmartSearchBar() {
                 exit={{ opacity: 0, scale: 0.7 }}
                 transition={{ duration: 0.15 }}
                 onClick={() => { setFocused(false); inputRef.current?.blur(); }}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-white/50 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </motion.button>
@@ -163,13 +163,13 @@ function SmartSearchBar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-white text-slate-900 border border-slate-100 rounded-2xl overflow-hidden z-50 shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
             >
               {recents.length > 0 && (
                 <>
                   <div className="flex items-center gap-2 px-4 pt-3 pb-1.5">
-                    <History className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Buscas recentes</span>
+                    <History className="w-3.5 h-3.5 text-white/50" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Buscas recentes</span>
                   </div>
                   {recents.map((r, i) => (
                     <motion.button
@@ -177,19 +177,19 @@ function SmartSearchBar() {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
                       onClick={() => handleSearch(r)}
                     >
-                      <History className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <History className="w-3.5 h-3.5 text-white/40 shrink-0" />
                       {r}
                     </motion.button>
                   ))}
-                  <div className="h-px bg-slate-100 mx-4 my-1" />
+                  <div className="h-px bg-white/10 mx-4 my-1" />
                 </>
               )}
               <div className="flex items-center gap-2 px-4 pt-2 pb-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Populares</span>
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Populares</span>
               </div>
               {["Pizza", "Hambúrguer", "Japonês", "Mercado", "Farmácia"].map((s, i) => (
                 <motion.button
@@ -197,10 +197,10 @@ function SmartSearchBar() {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
                   onClick={() => handleSearch(s)}
                 >
-                  <TrendingUp className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <TrendingUp className="w-3.5 h-3.5 text-white/40 shrink-0" />
                   {s}
                 </motion.button>
               ))}
@@ -238,7 +238,7 @@ function FilterBar({
             layout
             className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
               active
-                ? "bg-blue-600 text-white border-blue-600 shadow-[0_4px_24px_-4px_rgba(37,99,235,0.4)] ring-2 ring-blue-600/20"
+                ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-1 ring-primary/20"
                 : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             }`}
           >
@@ -354,7 +354,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             <span className={`font-semibold ${freeShip ? "text-emerald-500" : "text-muted-foreground"}`}>
               {freeShip ? "Entrega grátis" : `R$ ${(s.delivery_fee ?? 0).toFixed(2).replace(".", ",")}`}
             </span>
-            <span className="ml-auto flex items-center gap-0.5 text-blue-600 font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
+            <span className="ml-auto flex items-center gap-0.5 text-primary font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
               Abrir <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </div>
@@ -430,20 +430,20 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 sm:p-8 pb-8 text-slate-900 relative overflow-hidden min-h-[220px]"
-        style={{ background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)", boxShadow: "0 20px 40px -15px rgba(234,179,8,0.4)" }}
+        className="rounded-3xl p-6 sm:p-8 pb-8 text-white relative overflow-hidden min-h-[220px]"
+        style={{ background: "linear-gradient(135deg, #18181b 0%, #000000 100%)", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.5)" }}
       >
-        {/* Glow Effects - Blue accents */}
-        <div className="absolute top-0 right-0 w-[70%] h-[150%] bg-blue-600/30 blur-[70px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none mix-blend-multiply" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[100%] bg-blue-500/20 blur-[50px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none mix-blend-multiply" />
+        {/* Glow Effects - Driver App Style */}
+        <div className="absolute top-0 right-0 w-[60%] h-[150%] bg-primary/10 blur-[80px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[40%] h-[100%] bg-white/5 blur-[60px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col h-full justify-between gap-6">
           <div className="max-w-[70%]">
-            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-sm text-slate-900">
+            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-sm text-white">
               Sua cidade,<br />
-              <span className="text-blue-700">em minutos.</span>
+              <span className="text-primary">em minutos.</span>
             </h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-800 max-w-sm font-semibold">
+            <p className="mt-2 text-sm sm:text-base text-white/70 max-w-sm font-medium">
               Tudo o que você precisa, na velocidade que você merece.
             </p>
           </div>
@@ -483,15 +483,13 @@ function MarketplaceHome() {
 
       {/* ── Quick banners ── */}
       <section className="grid grid-cols-2 gap-3">
-        <Link to="/marketplace/errands" className="p-5 rounded-3xl relative overflow-hidden block group bg-gradient-to-br from-zinc-900 to-black text-white border border-white/10" style={{ boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)" }}>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-2xl rounded-full translate-x-1/3 -translate-y-1/3 group-hover:bg-primary/30 transition-colors" />
+        <Link to="/marketplace/errands" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
           <Zap className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
           <p className="font-display font-bold text-base leading-tight">Solicitar<br/>Entrega</p>
-          <p className="text-xs text-white/50 mt-1.5 font-medium">Motoboy rápido</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Motoboy rápido</p>
         </Link>
-        <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/60 hover:border-blue-500/30 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full translate-x-1/3 translate-y-1/3 group-hover:bg-blue-500/20 transition-colors" />
-          <Tag className="w-6 h-6 mb-3 text-blue-500" strokeWidth={1.5} />
+        <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Tag className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
           <p className="font-display font-bold text-base leading-tight">Agenda da<br/>Cidade</p>
           <p className="text-xs text-muted-foreground mt-1.5 font-medium">Telefones úteis</p>
         </Link>
@@ -499,17 +497,17 @@ function MarketplaceHome() {
 
       {/* ── Taxi ── */}
       <section>
-        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl text-white relative overflow-hidden group bg-gradient-to-br from-[#EAB308] to-[#CA8A04] border border-[#FEF08A]/20 shadow-[0_15px_35px_-10px_rgba(234,179,8,0.4)]">
-          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-black/30 to-transparent" />
-          <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] opacity-[0.07] font-black italic tracking-tighter mix-blend-overlay pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl relative overflow-hidden group bg-card border border-border/50 hover:border-primary/50 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] opacity-[0.03] font-black italic tracking-tighter mix-blend-overlay pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md grid place-items-center">
-                <Car className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                <Car className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="font-display font-bold text-2xl leading-tight text-white drop-shadow-sm">Táxi & Moto Táxi</h2>
+              <h2 className="font-display font-bold text-2xl leading-tight drop-shadow-sm text-foreground">Táxi & Moto Táxi</h2>
             </div>
-            <p className="text-sm text-white/90 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-muted-foreground max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
