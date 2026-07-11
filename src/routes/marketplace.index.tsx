@@ -432,38 +432,32 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-5 sm:p-6 pb-7 text-primary-foreground relative overflow-hidden min-h-[230px]"
-        style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
+        className="rounded-3xl p-6 sm:p-8 pb-8 text-white relative overflow-hidden min-h-[220px]"
+        style={{ background: "linear-gradient(135deg, #18181b 0%, #000000 100%)", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.4)" }}
       >
-        <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-mesh)" }} />
-        
-        {/* Fundo preto na direita com borda esquerda arredondada (semi-círculo) */}
-        <div className="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[48%] flex items-center justify-end z-0 pointer-events-none">
-          <div className="w-full h-full bg-black rounded-l-[70px] sm:rounded-l-[130px] flex items-center justify-center pl-6 sm:pl-10 pr-4 sm:pr-6 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
-            <img 
-              src={logoBanner} 
-              alt="Primavera Delivery" 
-              aria-hidden 
-              className="w-[95%] h-[85%] object-contain -translate-x-4 mix-blend-screen" 
-              style={{ filter: "contrast(1.4) brightness(1.1)" }}
-            />
-          </div>
-        </div>
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 w-[80%] h-[150%] bg-primary/20 blur-[100px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[50%] h-[100%] bg-white/5 blur-[80px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none" />
 
-        <div className="relative z-10">
-          <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight drop-shadow-lg">
-            Sua cidade,<br />em minutos.
-          </h1>
-          <p className="mt-2 text-sm sm:text-base text-white/90 max-w-[55%] sm:max-w-[50%] leading-relaxed drop-shadow-md">
-            Delivery, mercado, farmácia e a agenda completa da sua cidade.
-          </p>
-          <SmartSearchBar />
+        <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+          <div className="max-w-[70%]">
+            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-md text-white">
+              Sua cidade,<br />
+              <span className="text-primary">em minutos.</span>
+            </h1>
+            <p className="mt-2 text-sm sm:text-base text-white/70 max-w-sm font-medium">
+              Tudo o que você precisa, na velocidade que você merece.
+            </p>
+          </div>
+          <div className="w-full max-w-lg mt-2 relative">
+            <SmartSearchBar />
+          </div>
         </div>
       </section>
 
       {/* ── Categories ── */}
       <section>
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
@@ -472,16 +466,17 @@ function MarketplaceHome() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center gap-1.5 group"
+                whileTap={{ scale: 0.92 }}
+                className="flex flex-col items-center gap-2 group"
               >
-                <span
-                  className="w-12 h-12 rounded-2xl grid place-items-center bg-card border border-border/60 group-hover:border-primary/50 group-hover:shadow-[0_0_18px_oklch(0.58_0.23_22/0.3)] transition-all duration-300"
+                <div
+                  className="w-14 h-14 rounded-full grid place-items-center bg-card border border-border/50 group-hover:border-primary/40 group-hover:bg-primary/5 transition-all duration-300 relative overflow-hidden"
                   style={{ boxShadow: "var(--shadow-card)" }}
                 >
-                  <Icon className="w-5 h-5 text-primary" />
-                </span>
-                <span className="text-[10px] font-medium text-foreground/70 text-center leading-tight">{c.label}</span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 opacity-50" />
+                  <Icon className="w-6 h-6 text-foreground/80 group-hover:text-primary transition-colors relative z-10" strokeWidth={1.5} />
+                </div>
+                <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
             );
           })}
@@ -490,25 +485,33 @@ function MarketplaceHome() {
 
       {/* ── Quick banners ── */}
       <section className="grid grid-cols-2 gap-3">
-        <Link to="/marketplace/errands" className="p-4 rounded-2xl text-primary-foreground relative overflow-hidden block" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}>
-          <Zap className="w-5 h-5 mb-2" />
-          <p className="font-display font-bold text-sm leading-tight">Solicitar Entrega</p>
-          <p className="text-[11px] opacity-85 mt-0.5">Enviar encomendas</p>
+        <Link to="/marketplace/errands" className="p-5 rounded-3xl relative overflow-hidden block group bg-gradient-to-br from-zinc-900 to-black text-white border border-white/10" style={{ boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)" }}>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-2xl rounded-full translate-x-1/3 -translate-y-1/3 group-hover:bg-primary/30 transition-colors" />
+          <Zap className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Solicitar<br/>Entrega</p>
+          <p className="text-xs text-white/50 mt-1.5 font-medium">Motoboy rápido</p>
         </Link>
-        <Link to="/marketplace/directory" className="p-4 rounded-2xl bg-card border border-border/60 relative overflow-hidden hover:border-primary/40 transition-colors">
-          <Tag className="w-5 h-5 mb-2 text-primary" />
-          <p className="font-display font-bold text-sm leading-tight">Agenda da cidade</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Telefones e contatos</p>
+        <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/60 hover:border-blue-500/30 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full translate-x-1/3 translate-y-1/3 group-hover:bg-blue-500/20 transition-colors" />
+          <Tag className="w-6 h-6 mb-3 text-blue-500" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Agenda da<br/>Cidade</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Telefones úteis</p>
         </Link>
       </section>
 
-      {/* ── Errands / Taxi ── */}
+      {/* ── Taxi ── */}
       <section>
-        <Link to="/marketplace/taxi" className="block p-5 rounded-2xl text-primary-foreground relative overflow-hidden" style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-elegant)" }}>
+        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl text-white relative overflow-hidden group bg-gradient-to-br from-[#EAB308] to-[#CA8A04] border border-[#FEF08A]/20 shadow-[0_15px_35px_-10px_rgba(234,179,8,0.4)]">
+          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-black/30 to-transparent" />
+          <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] opacity-[0.07] font-black italic tracking-tighter mix-blend-overlay pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
-            <Zap className="w-6 h-6 mb-2" />
-            <h2 className="font-display font-bold text-xl leading-tight">Táxi e Moto Táxi</h2>
-            <p className="text-xs opacity-90 mt-1">Solicite um carro ou moto para te buscar agora com segurança.</p>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md grid place-items-center">
+                <Car className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="font-display font-bold text-2xl leading-tight text-white drop-shadow-sm">Táxi & Moto Táxi</h2>
+            </div>
+            <p className="text-sm text-white/90 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
