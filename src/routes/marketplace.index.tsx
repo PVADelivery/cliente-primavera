@@ -436,19 +436,8 @@ function MarketplaceHome() {
   return (
     <div className="space-y-8">
 
-      {/* ── Hero ── */}
-      <section className="group relative px-1 sm:px-2 pt-4 pb-2">
-        {/* Sun glow — irradiando por todo o app, sem card */}
-        <div
-          aria-hidden
-          className="absolute -top-40 -right-24 w-[520px] h-[520px] rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:brightness-110"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(250,204,21,0.55) 0%, rgba(250,204,21,0.28) 30%, rgba(250,204,21,0.1) 55%, rgba(250,204,21,0) 78%)",
-            filter: "blur(24px)",
-          }}
-        />
-
+      {/* ── Hero (sem card, iluminado pelo sol global) ── */}
+      <section className="relative px-1 sm:px-2 pt-6 pb-2">
         <div className="relative z-10 space-y-5">
           <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
             {greeting},<br />
