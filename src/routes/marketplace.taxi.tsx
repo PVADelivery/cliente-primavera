@@ -599,6 +599,11 @@ function TaxiPage() {
       alert("Defina o endereço de partida e destino!");
       return;
     }
+    if (!user) {
+      alert("Você precisa entrar na sua conta para solicitar uma corrida.");
+      navigate({ to: "/login" });
+      return;
+    }
     setLoading(true);
 
     const finalPickup = pickupNumber.trim() 
@@ -628,9 +633,9 @@ function TaxiPage() {
 
       if (error) throw error;
       setSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao solicitar corrida. Tente novamente.");
+      alert(`Erro ao solicitar corrida. ${err?.message || "Tente novamente."}`);
     } finally {
       setLoading(false);
     }
