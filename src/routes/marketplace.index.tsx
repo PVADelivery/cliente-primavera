@@ -491,7 +491,7 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        className="group rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
         style={{
           background: "#000000",
           boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
@@ -499,7 +499,7 @@ function MarketplaceHome() {
       >
         {/* Sun glow — top-right bright yellow radiating outward */}
         <div
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none"
+          className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-125"
           style={{
             background:
               "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
