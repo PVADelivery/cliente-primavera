@@ -499,7 +499,7 @@ function MarketplaceHome() {
       >
         {/* Sun glow — top-right bright yellow radiating outward */}
         <div
-          className="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none"
+          className="absolute -top-44 -right-44 w-80 h-80 rounded-full pointer-events-none"
           style={{
             background:
               "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
