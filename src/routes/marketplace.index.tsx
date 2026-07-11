@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
-  SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine
+  SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
