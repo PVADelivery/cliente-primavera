@@ -475,7 +475,8 @@ function TaxiPage() {
   const fetchAddressFromCoords = async (lat: number, lng: number, type: "pickup" | "dropoff") => {
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`,
+        { headers: { "User-Agent": "Primavera-Delivery/1.0" } }
       );
       const data = await res.json();
       if (data && data.address) {
@@ -517,7 +518,7 @@ function TaxiPage() {
         const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
           query
         )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
-        const res = await fetch(url);
+        const res = await fetch(url, { headers: { "User-Agent": "Primavera-Delivery/1.0" } });
         const data = await res.json();
         if (type === "pickup") setPickupSuggestions(data);
         else setDropoffSuggestions(data);
