@@ -493,13 +493,13 @@ function MarketplaceHome() {
       <section
         className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
         style={{
-          background: "radial-gradient(ellipse at top right, oklch(0.28 0.09 85 / 0.55), transparent 60%), linear-gradient(160deg, #0f0f0f 0%, #000000 100%)",
-          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
+          background: "#000000",
+          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
         }}
       >
-        {/* Glows */}
-        <div className="absolute top-0 right-0 w-[70%] h-[140%] bg-primary/15 blur-[90px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
-        <div className="absolute -bottom-24 -left-16 w-[50%] h-[80%] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
+        {/* Yellow accent glow */}
+        <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-yellow-400/20 blur-[70px] pointer-events-none" />
+        <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-yellow-500/10 blur-[60px] pointer-events-none" />
 
         <div className="relative z-10 space-y-5">
           <div className="flex items-center justify-between">
