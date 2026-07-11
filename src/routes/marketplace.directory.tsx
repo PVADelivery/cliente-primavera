@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser } from "lucide-react";
+import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const Route = createFileRoute("/marketplace/directory")({
@@ -26,6 +26,8 @@ type Business = {
   hours: string | null;
   rating: number | null;
   featured?: boolean;
+  card_image_url?: string | null;
+  card_style?: string | null;
 };
 
 // ─── Mock data removido para produção ──────────────────────────────────────────
@@ -154,47 +156,72 @@ function DirectoryPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.03, 0.3) }}
-              className="p-4 bg-card rounded-2xl border border-border"
+              className="relative overflow-hidden bg-card rounded-[2rem] border border-border/60 group"
               style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <div className="flex items-start gap-3">
-                <div
-                  className="w-12 h-12 rounded-xl shrink-0 grid place-items-center font-display font-bold text-lg text-primary-foreground"
-                  style={{ background: "var(--gradient-primary)" }}
-                >
-                  {b.name.charAt(0)}
+              {/* Business Card Content */}
+              {b.card_image_url ? (
+                <div className="w-full aspect-[1.58] bg-muted relative">
+                   <img src={b.card_image_url} alt={b.name} className="w-full h-full object-cover" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-semibold leading-tight">{b.name}</h3>
-                    {b.rating != null && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground flex items-center gap-1 shrink-0">
-                        <Star className="w-3 h-3 fill-accent text-accent" /> {b.rating.toFixed(1)}
-                      </span>
+              ) : (
+                <div className="w-full aspect-[1.58] relative overflow-hidden text-white flex flex-col justify-between p-5 sm:p-7" style={{ background: b.card_style === 'light' ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' : 'linear-gradient(135deg, #18181b 0%, #000000 100%)', color: b.card_style === 'light' ? '#0f172a' : '#ffffff' }}>
+                  {/* Decorative Elements */}
+                  {b.card_style === 'light' ? (
+                     <>
+                       <div className="absolute top-0 right-0 w-[150%] h-[150%] bg-blue-500/10 blur-[80px] rounded-full translate-x-1/4 -translate-y-1/2 pointer-events-none" />
+                       <div className="absolute bottom-0 right-0 w-64 h-64 bg-blue-600 rounded-full translate-x-1/3 translate-y-1/3 opacity-[0.05] pointer-events-none" />
+                     </>
+                  ) : (
+                     <>
+                       <div className="absolute top-0 right-0 w-[150%] h-[150%] bg-primary/20 blur-[80px] rounded-full translate-x-1/4 -translate-y-1/2 pointer-events-none" />
+                       <div className="absolute inset-y-0 right-0 w-1/3 bg-primary transform -skew-x-12 translate-x-10 pointer-events-none opacity-90 shadow-2xl" />
+                     </>
+                  )}
+                  
+                  <div className="relative z-10 flex items-start justify-between">
+                     <div className="max-w-[70%]">
+                       <h3 className="font-display font-black text-2xl sm:text-3xl leading-none drop-shadow-sm">{b.name}</h3>
+                       <p className={`text-xs font-bold uppercase tracking-wider mt-2 ${b.card_style === 'light' ? 'text-blue-600' : 'text-primary'}`}>{b.category}</p>
+                     </div>
+                     {b.rating != null && (
+                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0 ${b.card_style === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-primary/20 text-primary'}`}>
+                         <Star className={`w-3 h-3 ${b.card_style === 'light' ? 'fill-blue-600 text-blue-600' : 'fill-primary text-primary'}`} /> {b.rating.toFixed(1)}
+                       </span>
+                     )}
+                  </div>
+                  
+                  <div className="relative z-10 space-y-2.5 mt-auto">
+                    {b.address && (
+                      <p className={`text-xs sm:text-sm font-medium flex items-center gap-2.5 ${b.card_style === 'light' ? 'text-slate-600' : 'text-zinc-300'}`}>
+                        <MapPin className={`w-4 h-4 shrink-0 ${b.card_style === 'light' ? 'text-blue-500' : 'text-primary'}`} />
+                        <span className="truncate">{b.address}</span>
+                      </p>
+                    )}
+                    {b.hours && (
+                      <p className={`text-xs sm:text-sm font-medium flex items-center gap-2.5 ${b.card_style === 'light' ? 'text-slate-600' : 'text-zinc-300'}`}>
+                        <Clock className={`w-4 h-4 shrink-0 ${b.card_style === 'light' ? 'text-blue-500' : 'text-primary'}`} />
+                        <span>{b.hours}</span>
+                      </p>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{b.category} · {b.hours ?? "Horário não informado"}</p>
-                  {b.address && (
-                    <p className="mt-1.5 text-xs text-muted-foreground flex items-start gap-1">
-                      <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
-                      <span>{b.address}</span>
-                    </p>
-                  )}
                 </div>
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              )}
+
+              {/* Action Buttons Bar */}
+              <div className="p-3 bg-card border-t border-border/50 grid grid-cols-3 gap-2">
                 {b.phone ? (
-                  <a href={`tel:${b.phone.replace(/\D/g, "")}`} className="inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors">
+                  <a href={`tel:${b.phone.replace(/\D/g, "")}`} className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-secondary/80 transition-colors">
                     <Phone className="w-3.5 h-3.5" /> Ligar
                   </a>
                 ) : <span />}
                 {b.whatsapp ? (
-                  <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+                  <a href={`https://wa.me/${b.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md hover:scale-[1.02] transition-transform" style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }}>
                     <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                   </a>
                 ) : <span />}
                 {b.website ? (
-                  <a href={`https://${b.website}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors">
+                  <a href={`https://${b.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-secondary/80 transition-colors">
                     <Globe className="w-3.5 h-3.5" /> Site
                   </a>
                 ) : (
@@ -203,7 +230,7 @@ function DirectoryPage() {
                       href={`https://maps.google.com/?q=${encodeURIComponent(b.address)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+                      className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-secondary/80 transition-colors"
                     >
                       <MapPin className="w-3.5 h-3.5" /> Mapa
                     </a>
