@@ -13,6 +13,49 @@ export const Route = createFileRoute("/marketplace/taxi")({
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
 const PVA_BOUNDS = "-54.3700,-15.6100,-54.2500,-15.5100";
 
+// OSRM Routing API
+async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number) {
+  try {
+    const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`);
+    const data = await res.json();
+    if (data.routes && data.routes.length > 0) {
+      return {
+        distanceKm: Number((data.routes[0].distance / 1000).toFixed(2)),
+        geometry: data.routes[0].geometry
+      };
+    }
+  } catch (err) {
+    console.error("Erro OSRM:", err);
+  }
+  return null;
+}
+
+// Função para desenhar a rota no mapa
+function drawRoute(mapInst: any, routeGeoJSON: any) {
+  if (!mapInst || !routeGeoJSON) return;
+  if (mapInst.getSource('route')) {
+    mapInst.getSource('route').setData(routeGeoJSON);
+  } else {
+    mapInst.addSource('route', {
+      'type': 'geojson',
+      'data': routeGeoJSON
+    });
+    mapInst.addLayer({
+      'id': 'route',
+      'type': 'line',
+      'source': 'route',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      'paint': {
+        'line-color': '#10b981',
+        'line-width': 4
+      }
+    });
+  }
+}
+
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -345,17 +388,31 @@ function TaxiPage() {
 
   // Preço e Distância
   useEffect(() => {
+    let active = true;
     if (pickupCoords && dropoffCoords) {
-      const dist = calculateDistance(
-        pickupCoords[1],
-        pickupCoords[0],
-        dropoffCoords[1],
-        dropoffCoords[0]
-      );
-      setDistance(dist);
-      const rate = vehicleType === "taxi" ? rates.taxi : rates.mototaxi;
-      setPrice(Math.max(7.0, dist * rate));
+      fetchRoute(pickupCoords[0], pickupCoords[1], dropoffCoords[0], dropoffCoords[1]).then(routeData => {
+        if (!active) return;
+        if (routeData) {
+          setDistance(routeData.distanceKm);
+          if (mapSmall.current) drawRoute(mapSmall.current, routeData.geometry);
+          if (mapFull.current) drawRoute(mapFull.current, routeData.geometry);
+          const rate = vehicleType === "taxi" ? rates.taxi : rates.mototaxi;
+          setPrice(Math.max(7.0, routeData.distanceKm * rate));
+        } else {
+          // Fallback para linha reta se a API do OSRM falhar
+          const dist = calculateDistance(
+            pickupCoords[1],
+            pickupCoords[0],
+            dropoffCoords[1],
+            dropoffCoords[0]
+          );
+          setDistance(dist);
+          const rate = vehicleType === "taxi" ? rates.taxi : rates.mototaxi;
+          setPrice(Math.max(7.0, dist * rate));
+        }
+      });
     }
+    return () => { active = false; };
   }, [pickupCoords, dropoffCoords, vehicleType, rates]);
 
   // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap

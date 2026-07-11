@@ -13,6 +13,32 @@ export const Route = createFileRoute("/marketplace/errands")({
 const PVA_CENTER: [number, number] = [-54.2972, -15.5597];
 const PVA_BOUNDS = "-54.34,-15.60,-54.25,-15.52";
 
+// Função para desenhar a rota no mapa
+function drawRoute(mapInst: any, routeGeoJSON: any) {
+  if (!mapInst || !routeGeoJSON) return;
+  if (mapInst.getSource('route')) {
+    mapInst.getSource('route').setData(routeGeoJSON);
+  } else {
+    mapInst.addSource('route', {
+      'type': 'geojson',
+      'data': routeGeoJSON
+    });
+    mapInst.addLayer({
+      'id': 'route',
+      'type': 'line',
+      'source': 'route',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      'paint': {
+        'line-color': '#10b981',
+        'line-width': 4
+      }
+    });
+  }
+}
+
 // Cálculo de distância simples usando fórmula de Haversine
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Raio da Terra em KM
@@ -360,6 +386,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         if (routeData) {
           dist = routeData.distanceKm;
           routeGeoJSON = routeData.geometry;
+          if (mapSmall.current) drawRoute(mapSmall.current, routeGeoJSON);
+          if (mapFull.current) drawRoute(mapFull.current, routeGeoJSON);
         } else {
           dist = calculateDistance(pickupCoords[1], pickupCoords[0], dropoffCoords[1], dropoffCoords[0]);
         }
