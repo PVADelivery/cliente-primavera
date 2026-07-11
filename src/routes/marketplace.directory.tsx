@@ -63,7 +63,7 @@ function DirectoryPage() {
   const grouped = useMemo(() => {
     const map = new Map<string, Business[]>();
     filtered.forEach((b) => {
-      const firstLetter = b.name.charAt(0).toUpperCase();
+      const firstLetter = (b.name || "E").charAt(0).toUpperCase();
       // Se não for letra de A-Z, agrupa no "#"
       const letter = /[A-Z]/.test(firstLetter) ? firstLetter : "#";
       if (!map.has(letter)) map.set(letter, []);
@@ -208,7 +208,7 @@ function DirectoryPage() {
               <div className="flex items-start gap-3.5">
                 {!b.card_image_url && (
                   <div className="w-12 h-12 rounded-xl grid place-items-center bg-primary text-primary-foreground font-display font-bold text-xl shrink-0 shadow-sm">
-                    {b.name.charAt(0)}
+                    {(b.name || "E").charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -257,18 +257,18 @@ function DirectoryPage() {
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
               </div>
-                  </a>
-                </div>
-              </motion.li>
-            ))}
+            </motion.li>
+          ))}
           </ul>
         </div>
       ))}
+      </div>
       {filtered.length === 0 && (
         <div className="text-center py-12 text-sm text-muted-foreground">
           Nenhuma empresa encontrada.
         </div>
       )}
+      </section>
     </div>
   );
 }
