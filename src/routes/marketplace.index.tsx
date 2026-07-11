@@ -413,6 +413,15 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
 
 // ─── Home ─────────────────────────────────────────────────────────────────────
 function MarketplaceHome() {
+  const { user } = useAuth();
+  const firstName = (
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email?.split("@")[0] ??
+    "visitante"
+  ).split(" ")[0];
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 5 ? "Boa noite" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
   const saved = loadFilters();
   const [sort, setSort] = useState<SortKey>(saved.sort ?? "relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(saved.openOnly ?? false);
@@ -482,26 +491,34 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 sm:p-8 pb-8 text-white relative overflow-hidden min-h-[220px]"
-        style={{ background: "linear-gradient(135deg, #18181b 0%, #000000 100%)", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.5)" }}
+        className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        style={{
+          background: "radial-gradient(ellipse at top right, oklch(0.28 0.09 85 / 0.55), transparent 60%), linear-gradient(160deg, #0f0f0f 0%, #000000 100%)",
+          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
+        }}
       >
-        {/* Glow Effects - Driver App Style */}
-        <div className="absolute top-0 right-0 w-[60%] h-[150%] bg-primary/10 blur-[80px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[40%] h-[100%] bg-white/5 blur-[60px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none" />
+        {/* Glows */}
+        <div className="absolute top-0 right-0 w-[70%] h-[140%] bg-primary/15 blur-[90px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-16 w-[50%] h-[80%] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col h-full justify-between gap-6">
-          <div className="max-w-[70%]">
-            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-sm text-white">
-              Sua cidade,<br />
-              <span className="text-primary">em minutos.</span>
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-white/70 max-w-sm font-medium">
-              Tudo o que você precisa, na velocidade que você merece.
-            </p>
+        <div className="relative z-10 space-y-5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black tracking-[0.25em] text-white/50 uppercase">Bem-vindo</span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Entregando agora
+            </span>
           </div>
-          <div className="w-full max-w-lg mt-2 relative">
-            <SmartSearchBar />
-          </div>
+
+          <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
+            {greeting},<br />
+            <span className="text-primary">{firstName}.</span>
+          </h1>
+
+          <p className="text-sm text-white/60 font-medium max-w-[85%]">
+            O que você quer pedir hoje na sua cidade?
+          </p>
+
+          <SmartSearchBar />
         </div>
       </section>
 
