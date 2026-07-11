@@ -122,14 +122,14 @@ function SmartSearchBar() {
         className="relative"
       >
         <div
-          className={`flex items-center gap-3 bg-white/5 backdrop-blur-md text-white rounded-2xl px-4 py-3 border transition-all duration-300 ${focused ? "border-primary shadow-[0_0_25px_rgba(234,179,8,0.2)] ring-1 ring-primary/30" : "border-white/10 hover:bg-white/10"}`}
+          className={`flex items-center gap-3 bg-black/90 backdrop-blur-md text-white rounded-2xl px-4 py-3.5 border transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] ${focused ? "border-primary ring-2 ring-primary/40" : "border-black/60 hover:bg-black"}`}
         >
-          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-primary" : "text-white/50"}`} />
+          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-primary" : "text-white/70"}`} />
           <input
             ref={inputRef}
             type="text"
             placeholder="Buscar lojas, pratos…"
-            className="flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-white/40 min-w-0"
+            className="flex-1 bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/50 min-w-0"
             onFocus={() => setFocused(true)}
             onKeyDown={e => e.key === "Enter" && handleSearch((e.target as HTMLInputElement).value)}
           />
