@@ -97,193 +97,155 @@ function DirectoryPage() {
   const featured = businesses.filter((b) => b.featured).slice(0, 4);
 
   return (
-    <div className="space-y-6">
-      <section
-        className="rounded-3xl p-6 text-primary-foreground relative overflow-hidden"
-        style={{ background: "var(--gradient-sunset)", boxShadow: "var(--shadow-premium)" }}
-      >
-        <div className="absolute inset-0 opacity-30" style={{ background: "var(--gradient-mesh)" }} />
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 text-xs bg-background/20 backdrop-blur px-3 py-1.5 rounded-full mb-3">
-            <BookUser className="w-3.5 h-3.5" /> Agenda Empresarial
-          </div>
-          <h1 className="font-display text-2xl font-bold leading-tight">
-            Toda a cidade<br />no seu bolso.
+    <div className="min-h-screen bg-[#FDF8E7] text-stone-900 font-serif pb-20 -mx-4 px-4 pt-4 sm:-mx-6 sm:px-6">
+      {/* Texture overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-20 z-0 mix-blend-multiply" 
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
+      />
+
+      <div className="relative z-10 space-y-6">
+        <header className="text-center pb-4 border-b-2 border-stone-800">
+          <h1 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter text-stone-900">
+            Páginas Amarelas
           </h1>
-          <p className="mt-2 text-sm opacity-90 max-w-xs">
-            Telefone, WhatsApp, endereço e horário das empresas locais — tudo a um toque.
-          </p>
+          <p className="font-serif italic text-stone-600 mt-1">Guia Comercial & Telefônico</p>
+        </header>
+
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar empresa ou categoria..."
+            className="w-full pl-11 pr-4 py-3 rounded-none bg-[#FDF8E7] border-2 border-stone-800 focus:outline-none focus:ring-0 focus:border-red-700 text-sm font-sans placeholder:text-stone-500 transition-colors"
+          />
         </div>
-      </section>
 
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar empresa, categoria ou endereço…"
-          className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-card border border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-          style={{ boxShadow: "var(--shadow-card)" }}
-        />
-      </div>
+        <div className="relative z-10">
+          <Select value={cat} onValueChange={setCat}>
+            <SelectTrigger className="w-full bg-[#FDF8E7] border-2 border-stone-800 rounded-none py-6 font-sans font-bold uppercase tracking-wider text-sm">
+              <SelectValue placeholder="Selecione uma categoria" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[300px] rounded-none border-2 border-stone-800 bg-[#FDF8E7]">
+              {dynamicCategories.map((c) => (
+                <SelectItem key={c} value={c} className="font-sans uppercase font-bold text-sm focus:bg-stone-200">
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="relative z-10">
-        <Select value={cat} onValueChange={setCat}>
-          <SelectTrigger className="w-full bg-card border-border rounded-2xl py-6 shadow-[var(--shadow-card)]">
-            <SelectValue placeholder="Selecione uma categoria" />
-          </SelectTrigger>
-          <SelectContent className="max-h-[300px] rounded-2xl">
-            {dynamicCategories.map((c) => (
-              <SelectItem key={c} value={c} className="rounded-xl py-2.5">
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {featured.length > 0 && cat === "Tudo" && !q && (
-        <section>
-          <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
-            <Star className="w-4 h-4 text-accent fill-accent" /> Destaques da cidade
-          </h2>
-          <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-none snap-x">
-            {featured.map((b, i) => (
-              <motion.div
-                key={b.id}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="shrink-0 snap-start w-56 p-4 rounded-2xl text-primary-foreground relative overflow-hidden"
-                style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
-              >
-                <p className="text-[10px] uppercase tracking-wider opacity-80">{b.category}</p>
-                <h3 className="mt-1 font-display font-bold text-base leading-tight">{b.name}</h3>
-                <p className="mt-1 text-xs opacity-90 line-clamp-1">{b.address}</p>
-                <div className="mt-3 flex gap-2">
-                  {b.phone && (
-                    <a href={`tel:${b.phone.replace(/\D/g, "")}`} className="flex-1 inline-flex items-center justify-center gap-1 bg-background/20 backdrop-blur rounded-full py-1.5 text-xs font-medium">
-                      <Phone className="w-3 h-3" /> Ligar
-                    </a>
-                  )}
-                  {b.whatsapp && (
-                    <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer" className="flex-1 inline-flex items-center justify-center gap-1 bg-background text-foreground rounded-full py-1.5 text-xs font-semibold">
-                      <MessageCircle className="w-3 h-3" /> WhatsApp
-                    </a>
-                  )}
+        {/* Destaques - Agora em estilo "Anúncio de Jornal" */}
+        {featured.length > 0 && cat === "Tudo" && !q && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-4 border-b border-stone-400 pb-1">
+              <Star className="w-4 h-4 text-stone-800 fill-stone-800" />
+              <h2 className="font-sans font-black uppercase tracking-widest text-sm text-stone-800">Anunciantes em Destaque</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {featured.map((b) => (
+                <div key={b.id} className="border-4 border-stone-900 p-4 bg-white relative">
+                  <div className="absolute top-0 right-0 bg-red-700 text-white text-[10px] font-bold uppercase px-2 py-0.5 font-sans">
+                    Destaque
+                  </div>
+                  <h3 className="font-black text-xl uppercase tracking-tight text-stone-900 leading-none">{b.name}</h3>
+                  <p className="font-sans text-xs uppercase font-bold text-stone-600 mt-1 mb-3">{b.category}</p>
+                  
+                  {b.address && <p className="font-serif text-sm text-stone-700 leading-snug mb-2">{b.address}</p>}
+                  
+                  <div className="flex flex-col gap-1 mt-auto">
+                    {b.phone && (
+                      <a href={`tel:${b.phone.replace(/\D/g, "")}`} className="font-mono font-bold text-lg text-stone-900 flex items-center gap-2">
+                        <Phone className="w-4 h-4" /> {b.phone}
+                      </a>
+                    )}
+                    {b.whatsapp && (
+                      <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer" className="font-mono font-bold text-stone-900 flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4" /> {b.whatsapp}
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="relative">
-        {/* Barra lateral A-Z */}
-        {grouped.length > 0 && (
-          <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col items-center z-[100] py-2 px-1 bg-background/60 backdrop-blur-md rounded-full border border-border shadow-lg">
-            {grouped.map(g => (
-              <button 
-                key={g.letter} 
-                onClick={() => {
-                  const el = document.getElementById(`letter-${g.letter}`);
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className="text-[11px] font-bold text-primary/70 hover:text-primary hover:scale-125 transition-transform py-0.5 px-1.5"
-              >
-                {g.letter}
-              </button>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         )}
 
-        <div className="space-y-8 pr-6">
-          {grouped.map((g) => (
-            <div key={g.letter} id={`letter-${g.letter}`} className="scroll-mt-24">
-              <h2 className="font-display text-xl font-bold mb-4 text-foreground/90 pl-2">
-                {g.letter}
-              </h2>
-              <ul className="space-y-3">
-                {g.items.map((b, i) => (
-                  <motion.li
-              key={b.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.03, 0.3) }}
-              className="p-4 bg-card rounded-2xl border border-border group transition-all hover:border-primary/30 hover:shadow-md"
-              style={{ boxShadow: "var(--shadow-card)" }}
-            >
-              {b.card_image_url && (
-                <div className="w-full aspect-[16/9] mb-4 rounded-xl overflow-hidden bg-muted border border-border/50 relative">
-                  <img src={b.card_image_url} alt={b.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                </div>
-              )}
-              
-              <div className="flex items-start gap-3.5">
-                {!b.card_image_url && (
-                  <div className="w-12 h-12 rounded-xl grid place-items-center bg-primary text-primary-foreground font-display font-bold text-xl shrink-0 shadow-sm">
-                    {(b.name || "E").charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-base leading-tight text-foreground truncate">{b.name}</h3>
-                    {b.rating != null && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary flex items-center gap-1 shrink-0">
-                        <Star className="w-3 h-3 fill-primary text-primary" /> {b.rating.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] font-bold text-primary uppercase tracking-wider mt-0.5">{b.category || "Empresa"}</p>
-                  
-                  <div className="mt-2.5 space-y-1.5">
-                    {b.address && (
-                      <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-snug">
-                        <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-foreground/40" />
-                        <span className="line-clamp-2">{b.address}</span>
-                      </p>
-                    )}
-                    {b.hours && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 shrink-0 text-foreground/40" />
-                        <span className="truncate">{b.hours}</span>
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+        <section className="relative mt-8">
+          {/* Barra lateral estilo Abas de Papel */}
+          {grouped.length > 0 && (
+            <div className="fixed right-0 top-1/3 flex flex-col z-[100] drop-shadow-md">
+              {grouped.map(g => (
+                <button 
+                  key={g.letter} 
+                  onClick={() => {
+                    const el = document.getElementById(`letter-${g.letter}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="bg-[#F5E6B4] border border-r-0 border-stone-400 text-stone-900 font-sans font-bold text-xs py-1.5 px-2 mb-0.5 rounded-l-md hover:bg-stone-800 hover:text-white transition-colors"
+                >
+                  {g.letter}
+                </button>
+              ))}
+            </div>
+          )}
 
-              <div className="mt-4 pt-4 border-t border-border/60 grid grid-cols-2 gap-2.5">
-                <a 
-                  href={b.phone ? `tel:${String(b.phone).replace(/\D/g, "")}` : '#'} 
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${b.phone ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80' : 'bg-secondary/30 text-muted-foreground cursor-not-allowed'}`}
-                  onClick={e => !b.phone && e.preventDefault()}
-                >
-                  <Phone className="w-4 h-4" /> Ligar
-                </a>
-                <a 
-                  href={b.whatsapp ? `https://wa.me/${String(b.whatsapp).replace(/\D/g, "")}` : '#'} 
-                  target={b.whatsapp ? "_blank" : undefined}
-                  rel="noreferrer"
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${b.whatsapp ? 'bg-[#25D366] text-white shadow-md shadow-[#25D366]/20 hover:bg-[#20bd5a]' : 'bg-secondary/30 text-muted-foreground cursor-not-allowed'}`}
-                  onClick={e => !b.whatsapp && e.preventDefault()}
-                >
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
-                </a>
+          <div className="space-y-10 pr-8">
+            {grouped.map((g) => (
+              <div key={g.letter} id={`letter-${g.letter}`} className="scroll-mt-24">
+                <div className="flex items-center gap-4 mb-4">
+                  <h2 className="font-black text-5xl text-red-700 font-serif leading-none">
+                    {g.letter}
+                  </h2>
+                  <div className="h-0.5 flex-1 bg-stone-900 mt-2" />
+                </div>
+                
+                <ul className="space-y-4">
+                  {g.items.map((b) => (
+                    <li key={b.id} className="group">
+                      <div className="flex items-end justify-between w-full">
+                        <h3 className="font-black text-lg sm:text-xl uppercase tracking-tighter text-stone-900 leading-none whitespace-nowrap overflow-hidden text-ellipsis max-w-[60%]">
+                          {b.name}
+                        </h3>
+                        
+                        {/* Linha pontilhada */}
+                        <div className="flex-1 border-b-[3px] border-dotted border-stone-400 mx-3 mb-1.5 opacity-50" />
+                        
+                        {/* Telefone primário */}
+                        <a 
+                          href={b.phone ? `tel:${b.phone.replace(/\D/g, "")}` : (b.whatsapp ? `https://wa.me/${b.whatsapp}` : '#')} 
+                          className="font-mono font-bold text-sm sm:text-base text-stone-900 whitespace-nowrap"
+                        >
+                          {b.phone || b.whatsapp || "S/ Número"}
+                        </a>
+                      </div>
+                      
+                      {/* Sub-informações em fonte pequena */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs font-sans font-medium text-stone-600 uppercase">
+                        <span className="text-red-700">{b.category}</span>
+                        {b.address && <span>• {b.address}</span>}
+                        {b.phone && b.whatsapp && (
+                          <a href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer" className="text-emerald-700 font-bold ml-auto flex items-center gap-1">
+                            <MessageCircle className="w-3 h-3" /> WPP
+                          </a>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </motion.li>
-          ))}
-          </ul>
-        </div>
-      ))}
+            ))}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center py-16 text-stone-500 font-serif italic text-lg">
+              Nenhuma página encontrada.
+            </div>
+          )}
+        </section>
       </div>
-      {filtered.length === 0 && (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          Nenhuma empresa encontrada.
-        </div>
-      )}
-      </section>
     </div>
   );
 }
