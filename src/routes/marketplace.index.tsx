@@ -10,11 +10,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
 import { useAuth } from "@/contexts/AuthContext";
-import coverItalian from "@/assets/cover-italian.jpg";
-import coverBurger from "@/assets/cover-burger.jpg";
-import coverMarket from "@/assets/cover-market.jpg";
-import coverPharmacy from "@/assets/cover-pharmacy.jpg";
-import logoBanner from "@/assets/logo-banner.png";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -26,54 +21,6 @@ export const Route = createFileRoute("/marketplace/")({
   }),
   component: MarketplaceHome,
 });
-
-// ─── Mock stores (sempre visíveis, mescladas com dados reais do Supabase) ─────
-const MOCK_STORES: Company[] = [
-  {
-    id: "mock-cantina",
-    name: "Cantina da Nona",
-    category: "Italiana",
-    address: "Rua das Flores, 123",
-    is_active: true,
-    is_open: true,
-    rating: 5,
-    delivery_fee: 6.9,
-    cover_url: coverItalian,
-  } as Company,
-  {
-    id: "mock-burger",
-    name: "Burger Hub",
-    category: "Burguer",
-    address: "Av. Central, 500",
-    is_active: true,
-    is_open: true,
-    rating: 5,
-    delivery_fee: 4.9,
-    cover_url: coverBurger,
-  } as Company,
-  {
-    id: "mock-mercado",
-    name: "Mercadinho Bom Preço",
-    category: "Mercado",
-    address: "Praça Velha",
-    is_active: true,
-    is_open: false,
-    rating: 5,
-    delivery_fee: 5.5,
-    cover_url: coverMarket,
-  } as Company,
-  {
-    id: "mock-farmacia",
-    name: "Farmácia Saúde+",
-    category: "Farmácia",
-    address: "Rua Nova, 88",
-    is_active: true,
-    is_open: true,
-    rating: 5,
-    delivery_fee: 0,
-    cover_url: coverPharmacy,
-  } as Company,
-];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Restaurantes", icon: UtensilsCrossed },
@@ -422,9 +369,14 @@ function MarketplaceHome() {
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 5 ? "Boa noite" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
-  const saved = loadFilters();
-  const [sort, setSort] = useState<SortKey>(saved.sort ?? "relevance");
-  const [openOnly, setOpenOnly] = useState<boolean>(saved.openOnly ?? false);
+  const [sort, setSort] = useState<SortKey>("relevance");
+  const [openOnly, setOpenOnly] = useState<boolean>(false);
+
+  useEffect(() => {
+    const saved = loadFilters();
+    if (saved.sort) setSort(saved.sort);
+    if (typeof saved.openOnly === "boolean") setOpenOnly(saved.openOnly);
+  }, []);
 
   const handleSetSort = useCallback((s: SortKey) => {
     setSort(s);
@@ -457,12 +409,7 @@ function MarketplaceHome() {
     },
   });
 
-  const realStores = stores ?? [];
-  const allStores = useMemo(() => {
-    const seen = new Set(realStores.map(s => s.name.toLowerCase()));
-    const extras = MOCK_STORES.filter(m => !seen.has(m.name.toLowerCase()));
-    return [...realStores, ...extras];
-  }, [realStores]);
+  const allStores = stores ?? [];
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
 
   const filtered = useMemo(() => {
@@ -536,11 +483,11 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group"
               >
                 <div
-                  className="w-14 h-14 rounded-full grid place-items-center bg-[#FACC15] border border-[#FACC15] group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
+                  className="w-14 h-14 rounded-full grid place-items-center bg-primary border border-primary group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
                   style={{ boxShadow: "var(--shadow-card)" }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
-                  <Icon className="w-6 h-6 text-black group-hover:text-[#FACC15] transition-colors relative z-10" strokeWidth={2} />
+                  <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
                 </div>
                 <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
