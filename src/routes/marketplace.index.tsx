@@ -502,13 +502,6 @@ function MarketplaceHome() {
         <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-yellow-500/10 blur-[60px] pointer-events-none" />
 
         <div className="relative z-10 space-y-5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black tracking-[0.25em] text-white/50 uppercase">Bem-vindo</span>
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Entregando agora
-            </span>
-          </div>
-
           <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
             {greeting},<br />
             <span className="text-primary">{firstName}.</span>
