@@ -47,7 +47,26 @@ export function MarketplaceLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
+      {/* ── Sol global iluminando o app inteiro ── */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-56 -right-40 w-[700px] h-[700px] rounded-full z-0"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(250,204,21,0.55) 0%, rgba(250,204,21,0.28) 28%, rgba(250,204,21,0.10) 52%, rgba(250,204,21,0) 75%)",
+          filter: "blur(30px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-24 -right-10 w-56 h-56 rounded-full z-0"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.6) 40%, rgba(250,204,21,0) 75%)",
+          filter: "blur(6px)",
+        }}
+      />
       <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
         <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
           <Link to="/marketplace" className="flex items-center gap-2.5">
