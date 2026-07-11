@@ -92,7 +92,7 @@ export function MarketplaceLayout() {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-2xl px-4 pb-24 pt-4">
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 pb-24 pt-4">
         <Outlet />
       </main>
 
