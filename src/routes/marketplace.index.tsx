@@ -497,9 +497,15 @@ function MarketplaceHome() {
           boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
         }}
       >
-        {/* Yellow accent glow */}
-        <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-yellow-400/20 blur-[70px] pointer-events-none" />
-        <div className="absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-yellow-500/10 blur-[60px] pointer-events-none" />
+        {/* Sun glow — top-right bright yellow radiating outward */}
+        <div
+          className="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
+            filter: "blur(20px)",
+          }}
+        />
 
         <div className="relative z-10 space-y-5">
           <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
