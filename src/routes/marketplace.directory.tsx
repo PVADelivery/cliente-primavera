@@ -151,7 +151,7 @@ function DirectoryPage() {
             <SelectTrigger className="w-full bg-card/90 backdrop-blur-md border border-white/20 rounded-[1.5rem] py-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus:outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all font-semibold text-muted-foreground mx-4 sm:mx-6" style={{ width: 'calc(100% - 2rem)' }}>
               <SelectValue placeholder="Selecione uma categoria..." />
             </SelectTrigger>
-            <SelectContent className="max-h-[300px] overflow-y-auto rounded-2xl border-none shadow-xl scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+            <SelectContent position="popper" sideOffset={4} className="max-h-[300px] overflow-y-auto rounded-2xl border-none shadow-xl scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
               {dynamicCategories.map((c) => (
                 <SelectItem key={c} value={c} className="rounded-xl py-3 cursor-pointer font-medium text-[15px]">
                   {c}
