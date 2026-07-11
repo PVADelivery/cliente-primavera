@@ -386,8 +386,6 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         if (routeData) {
           dist = routeData.distanceKm;
           routeGeoJSON = routeData.geometry;
-          if (mapSmall.current) drawRoute(mapSmall.current, routeGeoJSON);
-          if (mapFull.current) drawRoute(mapFull.current, routeGeoJSON);
         } else {
           dist = calculateDistance(pickupCoords[1], pickupCoords[0], dropoffCoords[1], dropoffCoords[0]);
         }
