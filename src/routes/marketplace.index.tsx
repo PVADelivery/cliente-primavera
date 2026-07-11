@@ -128,14 +128,14 @@ function SmartSearchBar() {
         className="relative"
       >
         <div
-          className={`flex items-center gap-3 bg-background/95 backdrop-blur text-foreground rounded-2xl px-4 py-3 border transition-all duration-300 ${focused ? "border-primary/60 shadow-[0_0_20px_oklch(0.58_0.23_22/0.3)]" : "border-white/10"}`}
+          className={`flex items-center gap-3 bg-white/95 backdrop-blur-md text-slate-900 rounded-2xl px-4 py-3 border transition-all duration-300 ${focused ? "border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.3)] ring-2 ring-blue-500/20" : "border-white/40 shadow-lg"}`}
         >
-          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-primary" : "text-muted-foreground"}`} />
+          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-blue-600" : "text-slate-500"}`} />
           <input
             ref={inputRef}
             type="text"
             placeholder="Buscar lojas, pratos…"
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
+            className="flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-400 min-w-0"
             onFocus={() => setFocused(true)}
             onKeyDown={e => e.key === "Enter" && handleSearch((e.target as HTMLInputElement).value)}
           />
@@ -147,7 +147,7 @@ function SmartSearchBar() {
                 exit={{ opacity: 0, scale: 0.7 }}
                 transition={{ duration: 0.15 }}
                 onClick={() => { setFocused(false); inputRef.current?.blur(); }}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-slate-400 hover:text-slate-600"
               >
                 <X className="w-4 h-4" />
               </motion.button>
@@ -163,13 +163,13 @@ function SmartSearchBar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-card border border-border/60 rounded-2xl overflow-hidden z-50 shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 bg-white text-slate-900 border border-slate-100 rounded-2xl overflow-hidden z-50 shadow-2xl"
             >
               {recents.length > 0 && (
                 <>
                   <div className="flex items-center gap-2 px-4 pt-3 pb-1.5">
-                    <History className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Buscas recentes</span>
+                    <History className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Buscas recentes</span>
                   </div>
                   {recents.map((r, i) => (
                     <motion.button
@@ -177,19 +177,19 @@ function SmartSearchBar() {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors text-left"
                       onClick={() => handleSearch(r)}
                     >
-                      <History className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <History className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       {r}
                     </motion.button>
                   ))}
-                  <div className="h-px bg-border/40 mx-4 my-1" />
+                  <div className="h-px bg-slate-100 mx-4 my-1" />
                 </>
               )}
               <div className="flex items-center gap-2 px-4 pt-2 pb-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Populares</span>
+                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Populares</span>
               </div>
               {["Pizza", "Hambúrguer", "Japonês", "Mercado", "Farmácia"].map((s, i) => (
                 <motion.button
@@ -197,10 +197,10 @@ function SmartSearchBar() {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-primary/10 hover:text-primary transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-blue-50 hover:text-blue-600 transition-colors text-left"
                   onClick={() => handleSearch(s)}
                 >
-                  <TrendingUp className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <TrendingUp className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   {s}
                 </motion.button>
               ))}
@@ -238,7 +238,7 @@ function FilterBar({
             layout
             className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
               active
-                ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-2 ring-primary/20"
+                ? "bg-blue-600 text-white border-blue-600 shadow-[0_4px_24px_-4px_rgba(37,99,235,0.4)] ring-2 ring-blue-600/20"
                 : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             }`}
           >
@@ -281,11 +281,9 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           whileHover={{ y: -6, scale: 1.01 }}
           whileTap={{ scale: 0.96 }}
           transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-          className="rounded-3xl overflow-hidden border border-white/5 group-hover:border-primary/50 transition-all duration-400 relative z-0"
+          className="rounded-3xl overflow-hidden border border-border/40 group-hover:border-blue-500/50 transition-all duration-400 relative z-0 bg-card"
           style={{
-            boxShadow: "0 12px 40px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
-            background: "rgba(255,255,255,0.02)",
-            backdropFilter: "blur(20px)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           {/* 16:9 image */}
@@ -298,14 +296,14 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
-              <div className="w-full h-full" style={{ background: "var(--gradient-primary)" }} />
+              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FDE047 0%, #3B82F6 100%)" }} />
             )}
 
             {/* Gradient overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/20 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-br from-black/25 to-transparent" />
-            {/* Red glow on hover */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 bg-gradient-to-t from-primary/25 via-transparent to-transparent pointer-events-none" />
+            {/* Blue glow on hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 bg-gradient-to-t from-blue-500/25 via-transparent to-transparent pointer-events-none" />
 
             {/* Top chips */}
             <div className="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between gap-2">
@@ -316,7 +314,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                   </span>
                 )}
                 {(s.rating ?? 5) >= 4.7 && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FACC15]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     ⭐ Melhor avaliado
                   </span>
                 )}
@@ -329,7 +327,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             {/* Bottom name inside image */}
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-16">
               <div className="flex items-end gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-white shrink-0 grid place-items-center font-display font-black text-2xl text-neutral-900 ring-2 ring-white/25 overflow-hidden shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                <div className="w-14 h-14 rounded-2xl bg-white shrink-0 grid place-items-center font-display font-black text-2xl text-slate-900 ring-2 ring-white/25 overflow-hidden shadow-2xl transition-transform duration-300 group-hover:scale-105">
                   {s.logo_url ? <img src={s.logo_url} alt="" className="w-full h-full object-cover" /> : s.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1 pb-0.5">
@@ -345,7 +343,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           {/* Footer */}
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
             <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
-              <Star className="w-4 h-4 fill-primary text-primary" />
+              <Star className="w-4 h-4 fill-[#FACC15] text-[#FACC15]" />
               {(s.rating ?? 5).toFixed(1)}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
@@ -353,10 +351,10 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
               <Clock className="w-4 h-4" /> {eta}–{eta + 10} min
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-            <span className={`font-semibold ${freeShip ? "text-emerald-400" : "text-muted-foreground"}`}>
+            <span className={`font-semibold ${freeShip ? "text-emerald-500" : "text-muted-foreground"}`}>
               {freeShip ? "Entrega grátis" : `R$ ${(s.delivery_fee ?? 0).toFixed(2).replace(".", ",")}`}
             </span>
-            <span className="ml-auto flex items-center gap-0.5 text-primary font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
+            <span className="ml-auto flex items-center gap-0.5 text-blue-600 font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
               Abrir <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </div>
@@ -432,20 +430,20 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 sm:p-8 pb-8 text-white relative overflow-hidden min-h-[220px]"
-        style={{ background: "linear-gradient(135deg, #18181b 0%, #000000 100%)", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.4)" }}
+        className="rounded-3xl p-6 sm:p-8 pb-8 text-slate-900 relative overflow-hidden min-h-[220px]"
+        style={{ background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)", boxShadow: "0 20px 40px -15px rgba(234,179,8,0.4)" }}
       >
-        {/* Glow Effects */}
-        <div className="absolute top-0 right-0 w-[80%] h-[150%] bg-primary/20 blur-[100px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[100%] bg-white/5 blur-[80px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none" />
+        {/* Glow Effects - Blue accents */}
+        <div className="absolute top-0 right-0 w-[70%] h-[150%] bg-blue-600/30 blur-[70px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none mix-blend-multiply" />
+        <div className="absolute bottom-0 left-0 w-[50%] h-[100%] bg-blue-500/20 blur-[50px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none mix-blend-multiply" />
 
         <div className="relative z-10 flex flex-col h-full justify-between gap-6">
           <div className="max-w-[70%]">
-            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-md text-white">
+            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-sm text-slate-900">
               Sua cidade,<br />
-              <span className="text-primary">em minutos.</span>
+              <span className="text-blue-700">em minutos.</span>
             </h1>
-            <p className="mt-2 text-sm sm:text-base text-white/70 max-w-sm font-medium">
+            <p className="mt-2 text-sm sm:text-base text-slate-800 max-w-sm font-semibold">
               Tudo o que você precisa, na velocidade que você merece.
             </p>
           </div>
