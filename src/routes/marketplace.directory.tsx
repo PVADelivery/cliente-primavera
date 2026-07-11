@@ -60,6 +60,24 @@ function DirectoryPage() {
     });
   }, [businesses, q, cat]);
 
+  const grouped = useMemo(() => {
+    const map = new Map<string, Business[]>();
+    filtered.forEach((b) => {
+      const firstLetter = b.name.charAt(0).toUpperCase();
+      // Se não for letra de A-Z, agrupa no "#"
+      const letter = /[A-Z]/.test(firstLetter) ? firstLetter : "#";
+      if (!map.has(letter)) map.set(letter, []);
+      map.get(letter)!.push(b);
+    });
+    // Ordena as chaves: # vem depois das letras
+    const sortedKeys = Array.from(map.keys()).sort((a, b) => {
+      if (a === "#") return 1;
+      if (b === "#") return -1;
+      return a.localeCompare(b);
+    });
+    return sortedKeys.map(k => ({ letter: k, items: map.get(k)! }));
+  }, [filtered]);
+
   const featured = businesses.filter((b) => b.featured).slice(0, 4);
 
   return (
@@ -145,13 +163,34 @@ function DirectoryPage() {
         </section>
       )}
 
-      <section>
-        <h2 className="font-display text-lg font-bold mb-3">
-          {filtered.length} empresa{filtered.length === 1 ? "" : "s"} {cat !== "Tudo" && `em ${cat}`}
-        </h2>
-        <ul className="space-y-3">
-          {filtered.map((b, i) => (
-            <motion.li
+      <section className="relative">
+        {/* Barra lateral A-Z */}
+        {grouped.length > 0 && (
+          <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col items-center z-[100] py-2 px-1 bg-background/60 backdrop-blur-md rounded-full border border-border shadow-lg">
+            {grouped.map(g => (
+              <button 
+                key={g.letter} 
+                onClick={() => {
+                  const el = document.getElementById(`letter-${g.letter}`);
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className="text-[11px] font-bold text-primary/70 hover:text-primary hover:scale-125 transition-transform py-0.5 px-1.5"
+              >
+                {g.letter}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-8 pr-6">
+          {grouped.map((g) => (
+            <div key={g.letter} id={`letter-${g.letter}`} className="scroll-mt-24">
+              <h2 className="font-display text-xl font-bold mb-4 text-foreground/90 pl-2">
+                {g.letter}
+              </h2>
+              <ul className="space-y-3">
+                {g.items.map((b, i) => (
+                  <motion.li
               key={b.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -218,15 +257,18 @@ function DirectoryPage() {
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
               </div>
-            </motion.li>
-          ))}
-          {filtered.length === 0 && (
-            <li className="text-center py-12 text-sm text-muted-foreground">
-              Nenhuma empresa encontrada.
-            </li>
-          )}
-        </ul>
-      </section>
+                  </a>
+                </div>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      {filtered.length === 0 && (
+        <div className="text-center py-12 text-sm text-muted-foreground">
+          Nenhuma empresa encontrada.
+        </div>
+      )}
     </div>
   );
 }
