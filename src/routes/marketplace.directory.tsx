@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
@@ -32,8 +33,6 @@ type Business = {
 
 // ─── Mock data removido para produção ──────────────────────────────────────────
 
-const CATEGORIES = ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo"];
-
 function DirectoryPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tudo");
@@ -48,6 +47,23 @@ function DirectoryPage() {
         .order("name");
       if (error || !data) return [];
       return data as Business[];
+    },
+  });
+
+  const { data: dynamicCategories = [] } = useQuery<string[]>({
+    queryKey: ["directory_categories"],
+    queryFn: async () => {
+      if (!isSupabaseConfigured) return [];
+      const { data, error } = await (supabase as any)
+        .from("platform_settings")
+        .select("value")
+        .eq("key", "directory_categories")
+        .maybeSingle();
+
+      if (error || !data || !data.value) {
+        return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo"];
+      }
+      return ["Tudo", ...(data.value as string[])];
     },
   });
 
@@ -111,20 +127,19 @@ function DirectoryPage() {
         />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-none">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCat(c)}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${
-              cat === c
-                ? "bg-foreground text-background border-foreground shadow-sm"
-                : "bg-card text-foreground border-border hover:border-primary/40"
-            }`}
-          >
-            {c}
-          </button>
-        ))}
+      <div className="relative z-10">
+        <Select value={cat} onValueChange={setCat}>
+          <SelectTrigger className="w-full bg-card border-border rounded-2xl py-6 shadow-[var(--shadow-card)]">
+            <SelectValue placeholder="Selecione uma categoria" />
+          </SelectTrigger>
+          <SelectContent className="max-h-[300px] rounded-2xl">
+            {dynamicCategories.map((c) => (
+              <SelectItem key={c} value={c} className="rounded-xl py-2.5">
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {featured.length > 0 && cat === "Tudo" && !q && (
