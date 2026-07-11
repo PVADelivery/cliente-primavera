@@ -436,15 +436,31 @@ function MarketplaceHome() {
   return (
     <div className="space-y-8">
 
-      {/* ── Hero (sem card, iluminado pelo sol global) ── */}
-      <section className="relative px-1 sm:px-2 pt-6 pb-2">
+      {/* ── Hero ── */}
+      <section
+        className="group rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        style={{
+          background: "#000000",
+          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
+        }}
+      >
+        {/* Sol interno do card — combina com o sol global do layout */}
+        <div
+          aria-hidden
+          className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-125"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
+            filter: "blur(20px)",
+          }}
+        />
         <div className="relative z-10 space-y-5">
           <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
             {greeting},<br />
             <span className="text-primary">{firstName}.</span>
           </h1>
 
-          <p className="text-sm text-muted-foreground font-medium max-w-[85%]">
+          <p className="text-sm text-white/60 font-medium max-w-[85%]">
             O que você quer pedir hoje na sua cidade?
           </p>
 
