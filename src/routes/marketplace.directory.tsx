@@ -133,30 +133,37 @@ function DirectoryPage() {
       </section>
 
       <div className="px-4 sm:px-6 space-y-6">
-        {/* Search & Filter */}
-        <div className="flex flex-col gap-3 relative z-20">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+        <div className="flex flex-col gap-4 relative z-20 -mt-4">
+          <div className="relative group mx-4 sm:mx-6">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            </div>
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Buscar por nome ou endereço..."
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-card border-2 border-transparent shadow-sm focus:outline-none focus:border-primary/20 focus:ring-4 focus:ring-primary/5 text-sm transition-all"
+              className="w-full pl-12 pr-4 py-4 rounded-[1.5rem] bg-card/90 backdrop-blur-md border border-white/20 shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus:outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/10 text-[15px] transition-all"
             />
           </div>
 
-          <Select value={cat} onValueChange={setCat}>
-            <SelectTrigger className="w-full bg-card border-none rounded-2xl py-6 shadow-sm focus:ring-4 focus:ring-primary/5 transition-all">
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[300px] rounded-2xl border-none shadow-xl">
+          {/* Scrollable Categories List */}
+          <div className="overflow-x-auto scrollbar-none px-4 sm:px-6 pb-2">
+            <div className="flex gap-2 w-max">
               {dynamicCategories.map((c) => (
-                <SelectItem key={c} value={c} className="rounded-xl py-3 cursor-pointer font-medium">
+                <button
+                  key={c}
+                  onClick={() => setCat(c)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
+                    cat === c
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105"
+                      : "bg-card text-muted-foreground border border-border/50 hover:bg-secondary/80 hover:text-foreground"
+                  }`}
+                >
                   {c}
-                </SelectItem>
+                </button>
               ))}
-            </SelectContent>
-          </Select>
+            </div>
+          </div>
         </div>
 
         {/* Featured Section */}
@@ -203,11 +210,10 @@ function DirectoryPage() {
           </section>
         )}
 
-        {/* Directory List */}
-        <section className="relative pt-2">
+        <section className="relative px-4 sm:px-6 pt-4">
           {/* Modern A-Z Sidebar */}
           {grouped.length > 0 && (
-            <div className="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col items-center z-[100] py-3 px-1.5 bg-card/80 backdrop-blur-xl rounded-full shadow-lg border border-border/50">
+            <div className="fixed right-1.5 top-1/2 -translate-y-1/2 flex flex-col items-center z-[100] py-3 px-1 bg-card/60 backdrop-blur-xl rounded-full shadow-lg border border-border/40">
               {grouped.map(g => (
                 <button 
                   key={g.letter} 
@@ -215,7 +221,7 @@ function DirectoryPage() {
                     const el = document.getElementById(`letter-${g.letter}`);
                     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  className="text-[10px] font-bold text-muted-foreground hover:text-primary hover:scale-125 transition-all py-1 px-1 w-6 h-6 flex items-center justify-center rounded-full hover:bg-primary/10"
+                  className="text-[9px] sm:text-[10px] font-bold text-muted-foreground hover:text-primary hover:scale-125 transition-all py-1 px-1 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full hover:bg-primary/10"
                 >
                   {g.letter}
                 </button>
@@ -223,57 +229,64 @@ function DirectoryPage() {
             </div>
           )}
 
-          <div className="space-y-10 pr-10">
+          <div className="space-y-10 pr-6 sm:pr-8">
             {grouped.map((g) => (
-              <div key={g.letter} id={`letter-${g.letter}`} className="scroll-mt-28">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-bold text-sm">
+              <div key={g.letter} id={`letter-${g.letter}`} className="scroll-mt-32">
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="font-display font-black text-2xl text-foreground/80 tracking-tight">
                     {g.letter}
-                  </div>
-                  <div className="h-px flex-1 bg-border/50" />
+                  </h2>
                 </div>
                 
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {g.items.map((b, i) => (
                     <motion.li
                       key={b.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: Math.min(i * 0.05, 0.4) }}
-                      className="group p-4 bg-card rounded-[1.25rem] shadow-sm border border-transparent hover:border-primary/20 hover:shadow-md transition-all relative overflow-hidden"
+                      transition={{ delay: Math.min(i * 0.05, 0.4), type: "spring", stiffness: 100 }}
+                      className="group p-5 bg-card rounded-[1.5rem] shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-border/30 hover:border-primary/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 relative overflow-hidden"
                     >
-                      <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-display font-bold text-base text-foreground leading-tight truncate mb-1">
-                            {b.name}
-                          </h3>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-primary/80 bg-primary/5 px-2 py-0.5 rounded-md">
-                              {b.category}
-                            </span>
-                            {b.rating != null && (
-                              <span className="text-[10px] font-bold flex items-center gap-1 text-amber-500">
-                                <Star className="w-3 h-3 fill-amber-500" /> {b.rating.toFixed(1)}
-                              </span>
-                            )}
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
+                          {/* Modern Avatar */}
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex flex-col items-center justify-center shrink-0 border border-primary/10">
+                            <span className="font-display font-bold text-xl leading-none">{(b.name || "E").charAt(0).toUpperCase()}</span>
                           </div>
                           
-                          {b.address && (
-                            <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-snug">
-                              <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-foreground/30" />
-                              <span className="line-clamp-1">{b.address}</span>
-                            </p>
-                          )}
+                          <div className="min-w-0">
+                            <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate mb-1">
+                              {b.name}
+                            </h3>
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                {b.category}
+                              </span>
+                              {b.rating != null && (
+                                <>
+                                  <span className="w-1 h-1 rounded-full bg-border" />
+                                  <span className="text-[11px] font-bold flex items-center gap-1 text-amber-500">
+                                    <Star className="w-3.5 h-3.5 fill-amber-500" /> {b.rating.toFixed(1)}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                            
+                            {b.address && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5 line-clamp-1">
+                                <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/40" />
+                                <span>{b.address}</span>
+                              </p>
+                            )}
+                          </div>
                         </div>
                         
-                        {/* Quick Actions */}
-                        <div className="flex gap-1.5 shrink-0">
+                        {/* Quick Actions - Vertical on small screens, horizontal on larger */}
+                        <div className="flex flex-col sm:flex-row gap-2 shrink-0">
                           {b.phone && (
                             <a 
                               href={`tel:${b.phone.replace(/\D/g, "")}`}
-                              className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-secondary/80 transition-colors"
+                              className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-secondary/80 hover:scale-105 active:scale-95 transition-all shadow-sm"
                             >
                               <Phone className="w-4 h-4" />
                             </a>
@@ -281,7 +294,7 @@ function DirectoryPage() {
                           {b.whatsapp && (
                             <a 
                               href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer"
-                              className="w-10 h-10 rounded-full bg-[#25D366]/10 text-[#1da851] flex items-center justify-center hover:bg-[#25D366]/20 transition-colors"
+                              className="w-10 h-10 rounded-full bg-[#25D366]/10 text-[#1da851] flex items-center justify-center hover:bg-[#25D366]/20 hover:scale-105 active:scale-95 transition-all shadow-sm"
                             >
                               <MessageCircle className="w-4 h-4" />
                             </a>
