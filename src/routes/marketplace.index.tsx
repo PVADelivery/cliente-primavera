@@ -536,11 +536,11 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group"
               >
                 <div
-                  className="w-14 h-14 rounded-full grid place-items-center bg-primary border border-primary group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
+                  className="w-14 h-14 rounded-full grid place-items-center bg-[#FACC15] border border-[#FACC15] group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
                   style={{ boxShadow: "var(--shadow-card)" }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-50" />
-                  <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
+                  <Icon className="w-6 h-6 text-black group-hover:text-[#FACC15] transition-colors relative z-10" strokeWidth={2} />
                 </div>
                 <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
