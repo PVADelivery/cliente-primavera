@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
+import { useAuth } from "@/contexts/AuthContext";
 import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
@@ -26,7 +27,53 @@ export const Route = createFileRoute("/marketplace/")({
   component: MarketplaceHome,
 });
 
-// ─── Mock data removido para produção ──────────────────────────────────────────
+// ─── Mock stores (sempre visíveis, mescladas com dados reais do Supabase) ─────
+const MOCK_STORES: Company[] = [
+  {
+    id: "mock-cantina",
+    name: "Cantina da Nona",
+    category: "Italiana",
+    address: "Rua das Flores, 123",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 6.9,
+    cover_url: coverItalian,
+  } as Company,
+  {
+    id: "mock-burger",
+    name: "Burger Hub",
+    category: "Burguer",
+    address: "Av. Central, 500",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 4.9,
+    cover_url: coverBurger,
+  } as Company,
+  {
+    id: "mock-mercado",
+    name: "Mercadinho Bom Preço",
+    category: "Mercado",
+    address: "Praça Velha",
+    is_active: true,
+    is_open: false,
+    rating: 5,
+    delivery_fee: 5.5,
+    cover_url: coverMarket,
+  } as Company,
+  {
+    id: "mock-farmacia",
+    name: "Farmácia Saúde+",
+    category: "Farmácia",
+    address: "Rua Nova, 88",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 0,
+    cover_url: coverPharmacy,
+  } as Company,
+];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Restaurantes", icon: UtensilsCrossed },
