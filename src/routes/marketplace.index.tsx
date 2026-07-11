@@ -437,20 +437,15 @@ function MarketplaceHome() {
     <div className="space-y-8">
 
       {/* ── Hero ── */}
-      <section
-        className="group rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
-        style={{
-          background: "#000000",
-          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
-        }}
-      >
-        {/* Sun glow — top-right bright yellow radiating outward */}
+      <section className="group relative px-1 sm:px-2 pt-4 pb-2">
+        {/* Sun glow — irradiando por todo o app, sem card */}
         <div
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-125"
+          aria-hidden
+          className="absolute -top-40 -right-24 w-[520px] h-[520px] rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:brightness-110"
           style={{
             background:
-              "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
-            filter: "blur(20px)",
+              "radial-gradient(circle, rgba(250,204,21,0.55) 0%, rgba(250,204,21,0.28) 30%, rgba(250,204,21,0.1) 55%, rgba(250,204,21,0) 78%)",
+            filter: "blur(24px)",
           }}
         />
 
@@ -460,7 +455,7 @@ function MarketplaceHome() {
             <span className="text-primary">{firstName}.</span>
           </h1>
 
-          <p className="text-sm text-white/60 font-medium max-w-[85%]">
+          <p className="text-sm text-muted-foreground font-medium max-w-[85%]">
             O que você quer pedir hoje na sua cidade?
           </p>
 
