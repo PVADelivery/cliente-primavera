@@ -211,12 +211,12 @@ function DirectoryPage() {
               {/* Action Buttons Bar */}
               <div className="p-3 bg-card border-t border-border/50 grid grid-cols-3 gap-2">
                 {b.phone ? (
-                  <a href={`tel:${b.phone.replace(/\D/g, "")}`} className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-secondary/80 transition-colors">
+                  <a href={`tel:${String(b.phone).replace(/\D/g, "")}`} className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold hover:bg-secondary/80 transition-colors">
                     <Phone className="w-3.5 h-3.5" /> Ligar
                   </a>
                 ) : <span />}
                 {b.whatsapp ? (
-                  <a href={`https://wa.me/${b.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md hover:scale-[1.02] transition-transform" style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }}>
+                  <a href={`https://wa.me/${String(b.whatsapp).replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md hover:scale-[1.02] transition-transform" style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }}>
                     <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                   </a>
                 ) : <span />}
