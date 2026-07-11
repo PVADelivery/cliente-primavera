@@ -448,7 +448,12 @@ function MarketplaceHome() {
     },
   });
 
-  const allStores = stores ?? [];
+  const realStores = stores ?? [];
+  const allStores = useMemo(() => {
+    const seen = new Set(realStores.map(s => s.name.toLowerCase()));
+    const extras = MOCK_STORES.filter(m => !seen.has(m.name.toLowerCase()));
+    return [...realStores, ...extras];
+  }, [realStores]);
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
 
   const filtered = useMemo(() => {
