@@ -210,7 +210,7 @@ function SmartSearchBar() {
 // ─── Filter chips ─────────────────────────────────────────────────────────────
 const SORT_OPTIONS: { key: Exclude<SortKey, "open">; label: string }[] = [
   { key: "relevance", label: "Para você" },
-  { key: "rating", label: "⭐ Melhor avaliado" },
+  { key: "rating", label: "Melhor avaliado" },
   { key: "fee", label: "Menor taxa" },
 ];
 
@@ -309,7 +309,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 )}
                 {(s.rating ?? 5) >= 4.7 && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FACC15]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
-                    ⭐ Melhor avaliado
+                    Melhor avaliado
                   </span>
                 )}
               </div>
