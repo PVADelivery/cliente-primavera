@@ -20,16 +20,17 @@ export function MarketplaceLayout() {
   const router = useRouter();
   const path = router.state.location.pathname;
 
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    } else {
+    // Default to dark to match driver/business apps
+    if (savedTheme === "light") {
       document.documentElement.classList.remove("dark");
       setTheme("light");
+    } else {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
     }
   }, []);
 

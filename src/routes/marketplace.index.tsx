@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
+import { useAuth } from "@/contexts/AuthContext";
 import coverItalian from "@/assets/cover-italian.jpg";
 import coverBurger from "@/assets/cover-burger.jpg";
 import coverMarket from "@/assets/cover-market.jpg";
@@ -26,7 +27,53 @@ export const Route = createFileRoute("/marketplace/")({
   component: MarketplaceHome,
 });
 
-// ─── Mock data removido para produção ──────────────────────────────────────────
+// ─── Mock stores (sempre visíveis, mescladas com dados reais do Supabase) ─────
+const MOCK_STORES: Company[] = [
+  {
+    id: "mock-cantina",
+    name: "Cantina da Nona",
+    category: "Italiana",
+    address: "Rua das Flores, 123",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 6.9,
+    cover_url: coverItalian,
+  } as Company,
+  {
+    id: "mock-burger",
+    name: "Burger Hub",
+    category: "Burguer",
+    address: "Av. Central, 500",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 4.9,
+    cover_url: coverBurger,
+  } as Company,
+  {
+    id: "mock-mercado",
+    name: "Mercadinho Bom Preço",
+    category: "Mercado",
+    address: "Praça Velha",
+    is_active: true,
+    is_open: false,
+    rating: 5,
+    delivery_fee: 5.5,
+    cover_url: coverMarket,
+  } as Company,
+  {
+    id: "mock-farmacia",
+    name: "Farmácia Saúde+",
+    category: "Farmácia",
+    address: "Rua Nova, 88",
+    is_active: true,
+    is_open: true,
+    rating: 5,
+    delivery_fee: 0,
+    cover_url: coverPharmacy,
+  } as Company,
+];
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Restaurantes", icon: UtensilsCrossed },
@@ -366,6 +413,15 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
 
 // ─── Home ─────────────────────────────────────────────────────────────────────
 function MarketplaceHome() {
+  const { user } = useAuth();
+  const firstName = (
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email?.split("@")[0] ??
+    "visitante"
+  ).split(" ")[0];
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 5 ? "Boa noite" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
   const saved = loadFilters();
   const [sort, setSort] = useState<SortKey>(saved.sort ?? "relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(saved.openOnly ?? false);
@@ -401,7 +457,12 @@ function MarketplaceHome() {
     },
   });
 
-  const allStores = stores ?? [];
+  const realStores = stores ?? [];
+  const allStores = useMemo(() => {
+    const seen = new Set(realStores.map(s => s.name.toLowerCase()));
+    const extras = MOCK_STORES.filter(m => !seen.has(m.name.toLowerCase()));
+    return [...realStores, ...extras];
+  }, [realStores]);
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
 
   const filtered = useMemo(() => {
@@ -430,26 +491,34 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="rounded-3xl p-6 sm:p-8 pb-8 text-white relative overflow-hidden min-h-[220px]"
-        style={{ background: "linear-gradient(135deg, #18181b 0%, #000000 100%)", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.5)" }}
+        className="rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        style={{
+          background: "radial-gradient(ellipse at top right, oklch(0.28 0.09 85 / 0.55), transparent 60%), linear-gradient(160deg, #0f0f0f 0%, #000000 100%)",
+          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04)",
+        }}
       >
-        {/* Glow Effects - Driver App Style */}
-        <div className="absolute top-0 right-0 w-[60%] h-[150%] bg-primary/10 blur-[80px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[40%] h-[100%] bg-white/5 blur-[60px] rounded-full -translate-x-1/4 translate-y-1/2 pointer-events-none" />
+        {/* Glows */}
+        <div className="absolute top-0 right-0 w-[70%] h-[140%] bg-primary/15 blur-[90px] rounded-full translate-x-1/3 -translate-y-1/4 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-16 w-[50%] h-[80%] bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col h-full justify-between gap-6">
-          <div className="max-w-[70%]">
-            <h1 className="font-display font-black text-3xl sm:text-4xl leading-tight tracking-tight drop-shadow-sm text-white">
-              Sua cidade,<br />
-              <span className="text-primary">em minutos.</span>
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-white/70 max-w-sm font-medium">
-              Tudo o que você precisa, na velocidade que você merece.
-            </p>
+        <div className="relative z-10 space-y-5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black tracking-[0.25em] text-white/50 uppercase">Bem-vindo</span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-2.5 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Entregando agora
+            </span>
           </div>
-          <div className="w-full max-w-lg mt-2 relative">
-            <SmartSearchBar />
-          </div>
+
+          <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
+            {greeting},<br />
+            <span className="text-primary">{firstName}.</span>
+          </h1>
+
+          <p className="text-sm text-white/60 font-medium max-w-[85%]">
+            O que você quer pedir hoje na sua cidade?
+          </p>
+
+          <SmartSearchBar />
         </div>
       </section>
 
