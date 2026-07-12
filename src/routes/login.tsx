@@ -9,7 +9,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,9 +44,7 @@ function LoginPage() {
             {loading ? "Entrando…" : "Entrar"}
           </button>
         </form>
-        <button onClick={signInWithGoogle} className="w-full py-3 rounded-xl border border-border bg-card font-medium">
-          Continuar com Google
-        </button>
+
         <p className="text-center text-sm text-muted-foreground">
           Não tem conta? <Link to="/signup" className="text-primary font-medium">Criar conta</Link>
         </p>
