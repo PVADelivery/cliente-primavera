@@ -709,7 +709,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
   }
 
   return (
-    <div className="pb-8">
+    <div className="pb-16 overflow-y-auto">
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => window.history.back()}
