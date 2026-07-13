@@ -366,13 +366,13 @@ function MarketplaceHome() {
     user?.email?.split("@")[0] ??
     "visitante"
   ).split(" ")[0];
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 5 ? "Boa noite" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const [greeting, setGreeting] = useState<string>("Olá");
   const [sort, setSort] = useState<SortKey>("relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(false);
 
   useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(hour < 5 ? "Boa noite" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite");
     const saved = loadFilters();
     if (saved.sort) setSort(saved.sort);
     if (typeof saved.openOnly === "boolean") setOpenOnly(saved.openOnly);
