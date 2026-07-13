@@ -438,33 +438,97 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="group rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden"
+        className="group rounded-[28px] p-6 sm:p-10 text-white relative overflow-hidden isolate"
         style={{
-          background: "#000000",
-          boxShadow: "0 24px 48px -18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
+          background:
+            "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
+          boxShadow:
+            "0 30px 60px -24px rgba(0,0,0,0.85), 0 0 0 1px rgba(250,204,21,0.08), inset 0 1px 0 rgba(255,255,255,0.06)",
         }}
       >
-        {/* Sol interno do card — combina com o sol global do layout */}
+        {/* Sol interno — halo suave */}
         <div
           aria-hidden
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-125"
+          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110"
           style={{
             background:
-              "radial-gradient(circle, rgba(250,204,21,0.9) 0%, rgba(250,204,21,0.45) 30%, rgba(250,204,21,0.15) 55%, rgba(250,204,21,0) 75%)",
-            filter: "blur(20px)",
+              "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.55) 25%, rgba(234,179,8,0.15) 55%, rgba(0,0,0,0) 75%)",
+            filter: "blur(28px)",
           }}
         />
-        <div className="relative z-10 space-y-5">
-          <h1 className="font-display font-black text-[34px] sm:text-5xl leading-[1.05] tracking-tight">
+        {/* Núcleo do sol — brilho concentrado */}
+        <div
+          aria-hidden
+          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255,236,153,1) 0%, rgba(250,204,21,0.7) 40%, rgba(250,204,21,0) 70%)",
+            filter: "blur(6px)",
+          }}
+        />
+        {/* Textura de grão sutil */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.07] mix-blend-overlay pointer-events-none"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          }}
+        />
+
+        <div className="relative z-10 space-y-6">
+          {/* Selo superior */}
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/80">
+                Entregando agora
+              </span>
+            </span>
+          </div>
+
+          <h1 className="font-display font-black text-[38px] sm:text-[56px] leading-[0.98] tracking-[-0.02em]">
             {greeting},<br />
-            <span className="text-primary">{firstName}.</span>
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, #fde047 0%, #facc15 45%, #f59e0b 100%)",
+              }}
+            >
+              {firstName}
+            </span>
+            <span className="text-primary">.</span>
           </h1>
 
-          <p className="text-sm text-white/60 font-medium max-w-[85%]">
+          <p className="text-[15px] text-white/70 font-medium max-w-[90%] leading-relaxed">
             O que você quer pedir hoje na sua cidade?
           </p>
 
           <SmartSearchBar />
+
+          {/* Métricas rápidas */}
+          <div className="flex items-center gap-5 pt-1 text-white/75">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full grid place-items-center bg-white/[0.06] border border-white/10">
+                <span className="text-primary text-sm">⚡</span>
+              </div>
+              <div className="leading-tight">
+                <p className="text-[13px] font-bold text-white">30 min</p>
+                <p className="text-[10px] text-white/50 uppercase tracking-wider">entrega média</p>
+              </div>
+            </div>
+            <div className="h-8 w-px bg-white/10" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full grid place-items-center bg-white/[0.06] border border-white/10">
+                <span className="text-primary text-sm">★</span>
+              </div>
+              <div className="leading-tight">
+                <p className="text-[13px] font-bold text-white">{allStores.length}+ lojas</p>
+                <p className="text-[10px] text-white/50 uppercase tracking-wider">na sua cidade</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
