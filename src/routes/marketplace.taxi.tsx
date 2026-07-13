@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPinned, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
@@ -877,8 +878,8 @@ function TaxiPage() {
       </div>
 
       {/* ── MODAL MAPA TELA CHEIA (COM MIRA FIXA CENTRAL) ── */}
-      {isMapFullscreen && (
-        <div className="fixed inset-0 bg-background z-50 flex flex-col animate-in fade-in duration-200">
+      {isMapFullscreen && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 bg-background z-[999] flex flex-col animate-in fade-in duration-200">
           <div className="p-4 border-b border-border flex items-center justify-between shrink-0 bg-card shadow-sm">
             <div>
               <h3 className="font-bold text-base">Arrastar Mapa sob a Mira</h3>
@@ -1041,7 +1042,8 @@ function TaxiPage() {
               Confirmar e Voltar
             </Button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

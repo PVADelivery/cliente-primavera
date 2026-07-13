@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeft, MapPin, Package, CheckCircle2, X, MapPinned, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
@@ -961,8 +962,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       </form>
 
       {/* ── MODAL MAPA TELA CHEIA (COM MIRA FIXA CENTRAL) ── */}
-      {isMapFullscreen && (
-        <div className="fixed inset-0 bg-background z-50 flex flex-col animate-in fade-in duration-200">
+      {isMapFullscreen && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 bg-background z-[999] flex flex-col animate-in fade-in duration-200">
           <div className="p-4 border-b border-border flex items-center justify-between shrink-0 bg-card shadow-sm">
             <div>
               <h3 className="font-bold text-base">Arrastar Mapa sob a Mira</h3>
@@ -1109,7 +1110,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
               {activeSelectType === "pickup" ? "Fixar Coleta (A)" : "Fixar Entrega (B)"}
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
