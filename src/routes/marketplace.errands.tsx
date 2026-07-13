@@ -686,9 +686,9 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
 
       if (error) throw error;
       setSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao solicitar entregador. Tente novamente.");
+      alert(`Erro ao solicitar entregador: ${err?.message || err?.error_description || JSON.stringify(err)}`);
     } finally {
       setLoading(false);
     }
