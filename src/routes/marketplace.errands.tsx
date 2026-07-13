@@ -188,6 +188,7 @@ function ErrandsPage() {
       center: pickupCoords || userLocation || PVA_CENTER,
       zoom: 12,
       interactive: false,
+      attributionControl: false,
     });
 
     return () => {
@@ -221,13 +222,13 @@ function ErrandsPage() {
             type: "raster",
             tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
             tileSize: 256,
-            attribution: "© OpenStreetMap contributors",
           },
         },
         layers: [{ id: "osm-layer", type: "raster", source: "osm-tiles" }],
       },
       center: initialCenter,
       zoom: 15,
+      attributionControl: false,
     });
 
     return () => {
