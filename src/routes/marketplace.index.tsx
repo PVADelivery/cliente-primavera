@@ -477,16 +477,6 @@ function MarketplaceHome() {
         />
 
         <div className="relative z-10 space-y-6">
-          {/* Selo superior */}
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/80">
-                Entregando agora
-              </span>
-            </span>
-          </div>
-
           <h1 className="font-display font-black text-[38px] sm:text-[56px] leading-[0.98] tracking-[-0.02em]">
             {greeting},<br />
             <span
@@ -506,29 +496,6 @@ function MarketplaceHome() {
           </p>
 
           <SmartSearchBar />
-
-          {/* Métricas rápidas */}
-          <div className="flex items-center gap-5 pt-1 text-white/75">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full grid place-items-center bg-white/[0.06] border border-white/10">
-                <span className="text-primary text-sm">⚡</span>
-              </div>
-              <div className="leading-tight">
-                <p className="text-[13px] font-bold text-white">30 min</p>
-                <p className="text-[10px] text-white/50 uppercase tracking-wider">entrega média</p>
-              </div>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full grid place-items-center bg-white/[0.06] border border-white/10">
-                <span className="text-primary text-sm">★</span>
-              </div>
-              <div className="leading-tight">
-                <p className="text-[13px] font-bold text-white">{allStores.length}+ lojas</p>
-                <p className="text-[10px] text-white/50 uppercase tracking-wider">na sua cidade</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
