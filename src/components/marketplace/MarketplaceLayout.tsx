@@ -48,23 +48,39 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Sol global iluminando o app inteiro ── */}
+      {/* ── Sol global iluminando o app (responsivo, sem flicker) ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-[380px] -right-[380px] w-[900px] h-[900px] rounded-full z-0"
+        className="pointer-events-none fixed top-0 right-0 rounded-full z-0 sun-breathe"
         style={{
+          width: "clamp(420px, 55vw, 900px)",
+          height: "clamp(420px, 55vw, 900px)",
+          transform: "translate(30%, -30%)",
           background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.35) 0%, rgba(250,204,21,0.18) 30%, rgba(250,204,21,0.06) 55%, rgba(250,204,21,0) 75%)",
+            "radial-gradient(circle at center, rgba(253,224,71,0.22) 0%, rgba(250,204,21,0.10) 32%, rgba(250,204,21,0.03) 50%, rgba(250,204,21,0) 62%)",
           filter: "blur(40px)",
+          willChange: "opacity",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-[220px] -right-[220px] w-[420px] h-[420px] rounded-full z-0"
+        className="pointer-events-none fixed top-0 right-0 rounded-full z-0"
+        style={{
+          width: "clamp(220px, 28vw, 520px)",
+          height: "clamp(220px, 28vw, 520px)",
+          transform: "translate(35%, -35%)",
+          background:
+            "radial-gradient(circle at center, rgba(253,224,71,0.38) 0%, rgba(250,204,21,0.15) 42%, rgba(250,204,21,0) 65%)",
+          filter: "blur(24px)",
+        }}
+      />
+      {/* Vinheta escura sutil (canto inferior-esquerdo) para preservar contraste */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.55) 0%, rgba(250,204,21,0.25) 45%, rgba(250,204,21,0) 75%)",
-          filter: "blur(24px)",
+            "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
         }}
       />
       <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
