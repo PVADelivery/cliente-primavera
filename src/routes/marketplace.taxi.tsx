@@ -99,7 +99,7 @@ function TaxiPage() {
   const [dropoffCoords, setDropoffCoords] = useState<[number, number] | null>(null);
   const [distance, setDistance] = useState<number>(0);
   const [price, setPrice] = useState<number>(15.0);
-  const [rates, setRates] = useState({ taxi: 3.5, mototaxi: 2.0 });
+  const [rates, setRates] = useState({ taxi: 3.0, mototaxi: 2.0 });
 
   // Endereços, Números e Autocomplete
   const [pickupText, setPickupText] = useState("");
@@ -171,7 +171,7 @@ function TaxiPage() {
       .then(({ data }: any) => {
         if (data) {
           setRates({
-            taxi: Number(data.taxi_rate_per_km) || 3.5,
+            taxi: Number(data.taxi_rate_per_km) || 3.0,
             mototaxi: Number(data.mototaxi_rate_per_km) || 2.0,
           });
         }
@@ -636,10 +636,6 @@ function TaxiPage() {
         customer_phone: user?.user_metadata?.phone || "",
         pickup_address: finalPickup,
         dropoff_address: finalDropoff,
-        pickup_lat: pickupCoords[1],
-        pickup_lng: pickupCoords[0],
-        dropoff_lat: dropoffCoords[1],
-        dropoff_lng: dropoffCoords[0],
         vehicle_type: vehicleType,
         notes: notes,
         price: price,
@@ -836,7 +832,7 @@ function TaxiPage() {
           >
             <Bike className="w-6 h-6 mb-1" />
             <span className="font-bold text-xs">Moto Táxi</span>
-            <span className="text-[10px] opacity-80 mt-0.5">R$ {rates.mototaxi.toFixed(2)}/KM</span>
+            <span className="text-[10px] opacity-80 mt-0.5">R$ 6,99 + R$ {rates.mototaxi.toFixed(2).replace('.', ',')}/km</span>
           </button>
 
           <button
@@ -850,7 +846,7 @@ function TaxiPage() {
           >
             <Car className="w-6 h-6 mb-1" />
             <span className="font-bold text-xs">Táxi (Carro)</span>
-            <span className="text-[10px] opacity-80 mt-0.5">R$ {rates.taxi.toFixed(2)}/KM</span>
+            <span className="text-[10px] opacity-80 mt-0.5">R$ 9,99 + R$ {rates.taxi.toFixed(2).replace('.', ',')}/km</span>
           </button>
         </div>
 
