@@ -367,6 +367,7 @@ function MarketplaceHome() {
     "visitante"
   ).split(" ")[0];
   const [greeting, setGreeting] = useState<string>("Olá");
+  const [heroReady, setHeroReady] = useState(false);
   const [sort, setSort] = useState<SortKey>("relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(false);
 
@@ -376,6 +377,7 @@ function MarketplaceHome() {
     const saved = loadFilters();
     if (saved.sort) setSort(saved.sort);
     if (typeof saved.openOnly === "boolean") setOpenOnly(saved.openOnly);
+    setHeroReady(true);
   }, []);
 
   const handleSetSort = useCallback((s: SortKey) => {
@@ -438,18 +440,18 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="group rounded-[28px] p-6 sm:p-10 text-white relative overflow-hidden isolate"
+        className="group rounded-[28px] p-7 sm:p-10 lg:p-14 text-white relative overflow-hidden isolate"
         style={{
           background:
             "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
           boxShadow:
-            "0 30px 60px -24px rgba(0,0,0,0.85), 0 0 0 1px rgba(250,204,21,0.08), inset 0 1px 0 rgba(255,255,255,0.06)",
+            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(250,204,21,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
         {/* Sol interno — halo suave */}
         <div
           aria-hidden
-          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-all duration-700 ease-out group-hover:scale-110"
+          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
           style={{
             background:
               "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.55) 25%, rgba(234,179,8,0.15) 55%, rgba(0,0,0,0) 75%)",
@@ -459,7 +461,7 @@ function MarketplaceHome() {
         {/* Núcleo do sol — brilho concentrado */}
         <div
           aria-hidden
-          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80"
+          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
               "radial-gradient(circle, rgba(255,236,153,1) 0%, rgba(250,204,21,0.7) 40%, rgba(250,204,21,0) 70%)",
@@ -469,18 +471,23 @@ function MarketplaceHome() {
         {/* Textura de grão sutil */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-[0.07] mix-blend-overlay pointer-events-none"
+          className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
           }}
         />
 
-        <div className="relative z-10 space-y-6">
-          <h1 className="font-display font-black text-[38px] sm:text-[56px] leading-[0.98] tracking-[-0.02em]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative z-10 space-y-5 sm:space-y-6 max-w-2xl"
+        >
+          <h1 className="font-display font-black text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.025em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
             {greeting},<br />
             <span
-              className="bg-clip-text text-transparent"
+              className={`bg-clip-text text-transparent inline-block transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #fde047 0%, #facc15 45%, #f59e0b 100%)",
@@ -491,12 +498,12 @@ function MarketplaceHome() {
             <span className="text-primary">.</span>
           </h1>
 
-          <p className="text-[15px] text-white/70 font-medium max-w-[90%] leading-relaxed">
+          <p className="text-[15px] sm:text-base text-white/80 font-medium max-w-md leading-relaxed">
             O que você quer pedir hoje na sua cidade?
           </p>
 
           <SmartSearchBar />
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Categories ── */}
