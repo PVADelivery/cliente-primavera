@@ -211,3 +211,15 @@ lovable-badge,
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Sol global — respiração muito sutil (só opacity, sem repaint de blur) */
+@keyframes sun-breathe-kf {
+  0%, 100% { opacity: 0.92; }
+  50%      { opacity: 1; }
+}
+@utility sun-breathe {
+  animation: sun-breathe-kf 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sun-breathe { animation: none; }
+}
