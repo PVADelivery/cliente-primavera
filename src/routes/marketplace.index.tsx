@@ -367,6 +367,7 @@ function MarketplaceHome() {
     "visitante"
   ).split(" ")[0];
   const [greeting, setGreeting] = useState<string>("Olá");
+  const [heroReady, setHeroReady] = useState(false);
   const [sort, setSort] = useState<SortKey>("relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(false);
 
@@ -376,6 +377,7 @@ function MarketplaceHome() {
     const saved = loadFilters();
     if (saved.sort) setSort(saved.sort);
     if (typeof saved.openOnly === "boolean") setOpenOnly(saved.openOnly);
+    setHeroReady(true);
   }, []);
 
   const handleSetSort = useCallback((s: SortKey) => {
