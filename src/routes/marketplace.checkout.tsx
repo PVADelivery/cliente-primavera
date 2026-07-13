@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -37,7 +37,22 @@ function Checkout() {
   const isSubmittingRef = useRef(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const deliveryFee = 6.9;
+  const [deliveryFee, setDeliveryFee] = useState<number>(4.99);
+
+  useEffect(() => {
+    if (companyId) {
+      sb.from("companies")
+        .select("delivery_fee")
+        .eq("id", companyId)
+        .maybeSingle()
+        .then(({ data, error }: any) => {
+          if (!error && data && data.delivery_fee !== null) {
+            setDeliveryFee(Number(data.delivery_fee));
+          }
+        });
+    }
+  }, [companyId]);
+
   const grandTotal = total + deliveryFee;
 
   const handleSubmit = async () => {

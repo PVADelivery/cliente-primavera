@@ -394,21 +394,21 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         
         setDistance(dist);
         
-        // Tarifas por tipo de veículo
-        // Moto: R$ 2.00/KM, min R$ 7.00
-        // Carro: R$ 3.50/KM, min R$ 15.00
-        // Carro Aberto: R$ 5.00/KM, min R$ 30.00
+        // Tarifas por tipo de veículo (Avulso Errands)
+        // Moto: R$ 5.99 base + R$ 2.00/KM
+        // Carro: R$ 9.99 base + R$ 3.00/KM
+        // Carro Aberto: R$ 30.00 base + R$ 5.00/KM
+        let baseFee = 5.99;
         let rate = 2.0;
-        let minPrice = 7.0;
         if (vehicleType === "carro") {
-          rate = 3.5;
-          minPrice = 15.0;
+          baseFee = 9.99;
+          rate = 3.0;
         } else if (vehicleType === "carro_aberto") {
+          baseFee = 30.0;
           rate = 5.0;
-          minPrice = 30.0;
         }
         
-        setPrice(Math.max(minPrice, dist * rate));
+        setPrice(baseFee + dist * rate);
 
         // Atualizar rota no mapa
         const drawRoute = (mapRef: any) => {

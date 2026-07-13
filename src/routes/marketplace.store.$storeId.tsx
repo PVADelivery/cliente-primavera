@@ -180,7 +180,7 @@ function StoreDetail() {
 
   const rating = reviewStats.avg.toFixed(1);
   const reviewCount = reviewStats.count;
-  const deliveryFee = store?.delivery_fee ?? 6.9;
+  const deliveryFee = store?.delivery_fee ?? 4.99;
 
   return (
     <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen">

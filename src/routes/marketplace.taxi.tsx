@@ -398,8 +398,14 @@ function TaxiPage() {
           setDistance(routeData.distanceKm);
           if (mapSmall.current) drawRoute(mapSmall.current, routeData.geometry);
           if (mapFull.current) drawRoute(mapFull.current, routeData.geometry);
-          const rate = vehicleType === "taxi" ? rates.taxi : rates.mototaxi;
-          setPrice(Math.max(7.0, routeData.distanceKm * rate));
+          
+          let baseFee = 6.99;
+          let rate = 2.0;
+          if (vehicleType === "taxi") {
+            baseFee = 9.99;
+            rate = 3.0;
+          }
+          setPrice(baseFee + routeData.distanceKm * rate);
         } else {
           // Fallback para linha reta se a API do OSRM falhar
           const dist = calculateDistance(
@@ -409,13 +415,19 @@ function TaxiPage() {
             dropoffCoords[0]
           );
           setDistance(dist);
-          const rate = vehicleType === "taxi" ? rates.taxi : rates.mototaxi;
-          setPrice(Math.max(7.0, dist * rate));
+          
+          let baseFee = 6.99;
+          let rate = 2.0;
+          if (vehicleType === "taxi") {
+            baseFee = 9.99;
+            rate = 3.0;
+          }
+          setPrice(baseFee + dist * rate);
         }
       });
     }
     return () => { active = false; };
-  }, [pickupCoords, dropoffCoords, vehicleType, rates]);
+  }, [pickupCoords, dropoffCoords, vehicleType]);
 
   // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap
   const getCorrectBairro = (lon: number, lat: number, streetName: string, addr?: any): string => {
