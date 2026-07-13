@@ -879,7 +879,7 @@ function TaxiPage() {
 
       {/* ── MODAL MAPA TELA CHEIA (COM MIRA FIXA CENTRAL) ── */}
       {isMapFullscreen && typeof document !== "undefined" && createPortal(
-        <div className="fixed inset-0 bg-background z-[999] flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 h-[100dvh] w-screen bg-background z-[9999] flex flex-col overflow-hidden animate-in fade-in duration-200">
           <div className="p-4 border-b border-border flex items-center justify-between shrink-0 bg-card shadow-sm">
             <div>
               <h3 className="font-bold text-base">Arrastar Mapa sob a Mira</h3>
@@ -990,7 +990,7 @@ function TaxiPage() {
           </div>
 
           {/* Div do Mapa com Alvo Central Fixo */}
-          <div className="flex-1 relative overflow-hidden">
+          <div className="flex-1 min-h-0 relative overflow-hidden">
             <div ref={mapContainerFull} className="w-full h-full" />
             
             {/* ── MIRA CENTRAL DE PRECISÃO ── */}
