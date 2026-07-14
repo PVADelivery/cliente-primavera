@@ -316,10 +316,17 @@ function StoreDetail() {
               {reviewCount > 0 ? `(${reviewCount})` : "· Novo"}
             </span>
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-sm font-bold border border-emerald-500/20">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Aberto agora
-          </span>
+          {store?.is_open ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-sm font-bold border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Aberto agora
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-destructive/15 text-destructive text-sm font-bold border border-destructive/20">
+              <span className="w-2 h-2 rounded-full bg-destructive" />
+              Fechado agora
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-sm font-semibold border border-border">
             1.2 km
           </span>
