@@ -375,10 +375,11 @@ function StoreDetail() {
           >
             <h2 className="font-display text-2xl font-black tracking-tight mb-4">{cat}</h2>
             {/* 5. Grid de Produtos e Animações de Entrada */}
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {grouped[cat].map((p, i) => {
                 const hasPromo = p.promo && p.promo > 0;
                 const finalPrice = hasPromo ? p.price * (1 - (p.promo as number) / 100) : p.price;
+                const displayImage = p.image_url || (p.image_urls && p.image_urls.length > 0 ? p.image_urls[0] : null);
                 return (
                   <motion.li
                     key={p.id}
@@ -408,7 +409,7 @@ function StoreDetail() {
                           <Button
                             size="sm"
                             className="h-8 rounded-lg px-3 font-bold bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                            onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: p.image_url })}
+                            onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined })}
                           >
                             <Plus className="w-4 h-4 mr-1" /> Adicionar
                           </Button>
@@ -418,9 +419,9 @@ function StoreDetail() {
                     
                     <div className="relative shrink-0 sm:self-center mt-3 sm:mt-0">
                       <div className="w-full h-36 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted grid place-items-center">
-                        {p.image_url ? (
+                        {displayImage ? (
                           <img
-                            src={p.image_url}
+                            src={displayImage}
                             alt={p.name}
                             loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -436,7 +437,7 @@ function StoreDetail() {
                       )}
                       {/* Mobile add button */}
                       <button
-                        onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: p.image_url })}
+                        onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined })}
                         className="sm:hidden absolute -bottom-3 right-2 w-10 h-10 rounded-xl bg-primary text-primary-foreground grid place-items-center active:scale-95 transition-transform shadow-md"
                         aria-label={`Adicionar ${p.name}`}
                       >
