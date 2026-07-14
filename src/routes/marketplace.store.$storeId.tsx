@@ -44,6 +44,17 @@ const MOCK_PRODUCTS: (Product & { promo?: number })[] = [
   { id: "p4", company_id: "m1", name: "Refrigerante Cola", price: 6.0, description: "Lata 350ml bem gelada.", category: "Bebidas", image_url: null, image_urls: null, is_active: true },
 ];
 
+function parseImages(imageUrl: string | null): string[] {
+  if (!imageUrl) return [];
+  try {
+    const parsed = JSON.parse(imageUrl);
+    if (Array.isArray(parsed)) return parsed.filter((u: any) => typeof u === "string" && u.startsWith("http"));
+  } catch {
+    if (imageUrl.startsWith("http") || imageUrl.startsWith("/")) return [imageUrl];
+  }
+  return [];
+}
+
 function StoreDetail() {
   const { storeId } = useParams({ from: "/marketplace/store/$storeId" });
   const navigate = useNavigate();
@@ -379,7 +390,8 @@ function StoreDetail() {
               {grouped[cat].map((p, i) => {
                 const hasPromo = p.promo && p.promo > 0;
                 const finalPrice = hasPromo ? p.price * (1 - (p.promo as number) / 100) : p.price;
-                const displayImage = p.image_url || (p.image_urls && p.image_urls.length > 0 ? p.image_urls[0] : null);
+                const parsedImages = parseImages(p.image_url);
+                const displayImage = parsedImages.length > 0 ? parsedImages[0] : (p.image_urls && p.image_urls.length > 0 ? p.image_urls[0] : null);
                 return (
                   <motion.li
                     key={p.id}
