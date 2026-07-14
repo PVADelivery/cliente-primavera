@@ -115,7 +115,7 @@ export function MarketplaceLayout() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
-        <ul className="mx-auto max-w-2xl grid grid-cols-5">
+        <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
             const Icon = t.icon;
