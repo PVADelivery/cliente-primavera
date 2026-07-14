@@ -321,15 +321,7 @@ function StoreDetail() {
           </span>
         </div>
 
-        {/* 3. Região do Card de Pedido Restruturada */}
-        <div
-          className="grid grid-cols-3 rounded-2xl border border-border bg-card overflow-hidden divide-x divide-border/50"
-          style={{ boxShadow: "var(--shadow-elegant)" }}
-        >
-          <InfoCell icon={<Bike className="w-5 h-5" />} label="Entrega" value={deliveryFee === 0 ? "Grátis" : `R$ ${deliveryFee.toFixed(2).replace(".", ",")}`} />
-          <InfoCell icon={<Clock className="w-5 h-5" />} label="Tempo" value="25-35 min" />
-          <InfoCell icon={<ShoppingBag className="w-5 h-5" />} label="Pedido Mín." value="R$ 20,00" />
-        </div>
+
 
         {/* Search */}
         <div className="relative">
