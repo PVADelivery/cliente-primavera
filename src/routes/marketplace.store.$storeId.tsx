@@ -399,38 +399,30 @@ function StoreDetail() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.4, delay: i * 0.05, ease: "easeOut" }}
-                    className="group flex flex-col sm:flex-row items-stretch gap-0 sm:gap-3 p-3 bg-card rounded-2xl border border-border hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden"
+                    className="group relative flex flex-row items-stretch gap-3 p-3 sm:p-4 bg-card rounded-2xl border border-border/40 hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden"
                     style={{ boxShadow: "var(--shadow-elegant)" }}
                   >
-                    <div className="flex-1 min-w-0 flex flex-col p-1 sm:p-2">
-                      <p className="text-base font-bold leading-tight">{p.name}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1 mb-3 flex-1">{p.description}</p>
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="flex flex-col">
-                          {hasPromo && (
-                            <span className="text-xs text-muted-foreground line-through">
-                              R$ {p.price.toFixed(2).replace(".", ",")}
-                            </span>
-                          )}
-                          <span className="text-lg font-black text-primary">
-                            R$ {finalPrice.toFixed(2).replace(".", ",")}
+                    {/* Coluna de Texto */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <p className="text-base sm:text-lg font-bold leading-tight text-foreground">{p.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1.5">{p.description}</p>
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="text-base sm:text-lg font-black text-primary whitespace-nowrap">
+                          R$ {finalPrice.toFixed(2).replace(".", ",")}
+                        </span>
+                        {hasPromo && (
+                          <span className="text-xs text-muted-foreground line-through whitespace-nowrap">
+                            R$ {p.price.toFixed(2).replace(".", ",")}
                           </span>
-                        </div>
-                        {/* CTA Destacado "Adicionar" (Desktop) ou ícone Plus (Mobile) */}
-                        <div className="hidden sm:block">
-                          <Button
-                            size="sm"
-                            className="h-8 rounded-lg px-3 font-bold bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                            onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined })}
-                          >
-                            <Plus className="w-4 h-4 mr-1" /> Adicionar
-                          </Button>
-                        </div>
+                        )}
                       </div>
                     </div>
                     
-                    <div className="relative shrink-0 sm:self-center mt-3 sm:mt-0">
-                      <div className="w-full h-36 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted grid place-items-center">
+                    {/* Coluna de Imagem e Botão */}
+                    <div className="relative shrink-0 ml-1 sm:ml-2">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted/30 grid place-items-center shadow-sm">
                         {displayImage ? (
                           <img
                             src={displayImage}
@@ -439,21 +431,25 @@ function StoreDetail() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <UtensilsCrossed className="w-8 h-8 text-muted-foreground/30" />
+                          <UtensilsCrossed className="w-8 h-8 text-muted-foreground/20" />
                         )}
                       </div>
+                      
                       {hasPromo && (
-                        <span className="absolute top-2 left-2 sm:-top-2 sm:-left-2 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-red-500 text-white text-[10px] sm:text-xs font-black shadow-sm">
+                        <span className="absolute -top-2 -left-2 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-red-500 text-white text-[10px] sm:text-xs font-black shadow-sm z-10">
                           <BadgePercent className="w-3 h-3" />-{p.promo}%
                         </span>
                       )}
-                      {/* Mobile add button */}
+
                       <button
-                        onClick={() => add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined })}
-                        className="sm:hidden absolute -bottom-3 right-2 w-10 h-10 rounded-xl bg-primary text-primary-foreground grid place-items-center active:scale-95 transition-transform shadow-md"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined });
+                        }}
+                        className="absolute -bottom-2 -right-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground grid place-items-center hover:scale-105 active:scale-95 transition-transform shadow-md z-10"
                         aria-label={`Adicionar ${p.name}`}
                       >
-                        <Plus className="w-5 h-5" strokeWidth={3} />
+                        <Plus className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
                       </button>
                     </div>
                   </motion.li>
