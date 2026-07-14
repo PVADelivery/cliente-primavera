@@ -255,34 +255,34 @@ function Profile() {
         <div className="pt-6 pb-4">
           <button
             onClick={() => signOut()}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-red-500 font-semibold hover:bg-red-500/10 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-secondary/50 text-foreground font-black text-sm hover:bg-secondary transition-colors border border-border/40"
           >
             <LogOut className="w-5 h-5" /> Sair da minha conta
           </button>
           
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-muted-foreground font-semibold hover:bg-muted/50 transition-colors mt-2">
-                Excluir minha conta
+              <button className="w-full flex items-center justify-center gap-2 py-4 mt-3 rounded-[1.5rem] bg-rose-500/10 text-rose-500 font-black text-sm hover:bg-rose-500/20 transition-colors border border-rose-500/20">
+                <XCircle className="w-5 h-5" /> Excluir minha conta
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="w-[90vw] rounded-3xl">
+            <AlertDialogContent className="rounded-[32px] max-w-[90vw] sm:max-w-lg border-0 shadow-2xl">
               <AlertDialogHeader>
-                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="text-xl font-black">Você tem certeza absoluta?</AlertDialogTitle>
+                <AlertDialogDescription className="text-sm font-medium">
                   Esta ação não pode ser desfeita. Isso excluirá permanentemente sua conta e removerá seus dados de nossos servidores.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter className="gap-2">
-                <AlertDialogCancel className="rounded-xl border-none shadow-none">Cancelar</AlertDialogCancel>
+              <AlertDialogFooter className="flex-col gap-3 mt-4">
+                <AlertDialogCancel className="rounded-xl font-bold h-12 m-0 bg-slate-100 border-none hover:bg-slate-200">Cancelar</AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={() => {
                     toast.success('Solicitação de exclusão enviada com sucesso. Nossa equipe processará em até 48h.');
                     signOut();
                   }}
-                  className="rounded-xl bg-red-500 text-white hover:bg-red-600"
+                  className="bg-rose-500 text-white hover:bg-rose-600 rounded-xl font-black h-12 m-0 shadow-lg shadow-rose-500/30"
                 >
-                  Sim, excluir conta
+                  Sim, Excluir Minha Conta
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
