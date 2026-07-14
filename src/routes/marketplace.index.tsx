@@ -261,7 +261,7 @@ function FilterBar({
 // ─── Store card (16:9 premium) ────────────────────────────────────────────────
 function StoreCard({ s, i }: { s: Company; i: number }) {
   const eta = 20 + ((i * 7) % 25);
-  const freeShip = (s.delivery_fee ?? 0) === 0;
+  const freeShip = s.delivery_fee === 0;
   return (
     <motion.li
       layout
@@ -346,7 +346,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
             <span className={`font-semibold ${freeShip ? "text-emerald-500" : "text-muted-foreground"}`}>
-              {freeShip ? "Entrega grátis" : `R$ ${(s.delivery_fee ?? 0).toFixed(2).replace(".", ",")}`}
+              {freeShip ? "Entrega grátis" : s.delivery_fee != null ? `R$ ${s.delivery_fee.toFixed(2).replace(".", ",")}` : "Taxa a calcular"}
             </span>
             <span className="ml-auto flex items-center gap-0.5 text-primary font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
               Abrir <ChevronRight className="w-3.5 h-3.5" />
@@ -584,7 +584,7 @@ function MarketplaceHome() {
                 </div>
               ))
             : top.map((s, i) => {
-                const freeShip = (s.delivery_fee ?? 0) === 0;
+                const freeShip = s.delivery_fee === 0;
                 return (
                   <motion.div
                     key={s.id}
