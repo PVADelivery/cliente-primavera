@@ -124,7 +124,13 @@ function Profile() {
     finally { setSaving(false); }
   };
 
-  if (!user) { navigate('/marketplace/login'); return null; }
+  useEffect(() => {
+    if (!user) {
+      navigate({ to: '/login' });
+    }
+  }, [user, navigate]);
+
+  if (!user) { return null; }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
@@ -209,7 +215,7 @@ function Profile() {
         {/* LIST OPTIONS */}
         <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border/50">
           {[
-            { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => navigate('/marketplace/addresses') },
+            { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => navigate({ to: '/marketplace/addresses' }) },
             { icon: Wallet, color: 'text-violet-500', bg: 'bg-violet-500/10', title: 'Carteira Virtual', subtitle: 'Saldo de cashback e pagamentos', onClick: () => toast('Em breve!') },
             { icon: theme === 'dark' ? Sun : Moon, color: 'text-yellow-500', bg: 'bg-yellow-500/10', title: 'Tema do App', subtitle: theme === 'dark' ? 'Modo Escuro' : 'Modo Claro', onClick: toggleTheme },
           ].map((item, idx) => (
@@ -232,8 +238,8 @@ function Profile() {
           {[
             { icon: HelpCircle, title: 'Central de Ajuda', onClick: () => setSupportType('support') },
             { icon: Bike, title: 'Quero ser Entregador', onClick: () => setSupportType('driver_application') },
-            { icon: FileText, title: 'Termos de Uso', onClick: () => navigate('/marketplace/terms') },
-            { icon: ShieldCheck, title: 'Política de Privacidade', onClick: () => navigate('/marketplace/privacy') },
+            { icon: FileText, title: 'Termos de Uso', onClick: () => navigate({ to: '/marketplace/terms' }) },
+            { icon: ShieldCheck, title: 'Política de Privacidade', onClick: () => navigate({ to: '/marketplace/privacy' }) },
           ].map((item, idx) => (
             <button key={idx} onClick={item.onClick} className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
               <div className="flex items-center gap-3">
@@ -245,14 +251,42 @@ function Profile() {
           ))}
         </div>
 
-        {/* LOGOUT */}
-        <div className="pt-6">
+        {/* LOGOUT E EXCLUSÃO */}
+        <div className="pt-6 pb-4">
           <button
             onClick={() => signOut()}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-red-500 font-semibold hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="w-5 h-5" /> Sair da minha conta
           </button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-muted-foreground font-semibold hover:bg-muted/50 transition-colors mt-2">
+                Excluir minha conta
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="w-[90vw] rounded-3xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. Isso excluirá permanentemente sua conta e removerá seus dados de nossos servidores.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="gap-2">
+                <AlertDialogCancel className="rounded-xl border-none shadow-none">Cancelar</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => {
+                    toast.success('Solicitação de exclusão enviada com sucesso. Nossa equipe processará em até 48h.');
+                    signOut();
+                  }}
+                  className="rounded-xl bg-red-500 text-white hover:bg-red-600"
+                >
+                  Sim, excluir conta
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 

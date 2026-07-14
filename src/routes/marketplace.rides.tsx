@@ -245,7 +245,14 @@ function RidesPage() {
 
       {/* Histórico */}
       <div className="flex flex-col gap-3 mt-4">
-        <h2 className="font-display font-bold text-lg">Histórico de Corridas</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-display font-bold text-lg">Histórico de Corridas</h2>
+          {rides.length > 0 && (
+            <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>
+              Nova Corrida
+            </Button>
+          )}
+        </div>
         {rides.length === 0 ? (
           <div className="text-center py-10 bg-card rounded-2xl border border-border">
             <Car className="w-8 h-8 mx-auto text-muted-foreground opacity-50 mb-3" />
