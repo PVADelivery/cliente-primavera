@@ -38,10 +38,10 @@ export const Route = createFileRoute("/marketplace/store/$storeId")({
 });
 
 const MOCK_PRODUCTS: (Product & { promo?: number })[] = [
-  { id: "p1", company_id: "m1", name: "Lasanha à Bolonhesa", price: 42.9, description: "Massa fresca, molho da casa, queijo gratinado por 40min no forno a lenha.", category: "Pratos Principais", image_url: dishLasagna, image_urls: null, active: true, promo: 20 },
-  { id: "p2", company_id: "m1", name: "Nhoque ao Sugo", price: 36.0, description: "Receita tradicional da nona, molho de tomate San Marzano e manjericão fresco.", category: "Pratos Principais", image_url: dishGnocchi, image_urls: null, active: true },
-  { id: "p3", company_id: "m1", name: "Tiramisu", price: 18.0, description: "Sobremesa italiana clássica com mascarpone, café espresso e cacau em pó.", category: "Sobremesas", image_url: dishTiramisu, image_urls: null, active: true },
-  { id: "p4", company_id: "m1", name: "Refrigerante Cola", price: 6.0, description: "Lata 350ml bem gelada.", category: "Bebidas", image_url: null, image_urls: null, active: true },
+  { id: "p1", company_id: "m1", name: "Lasanha à Bolonhesa", price: 42.9, description: "Massa fresca, molho da casa, queijo gratinado por 40min no forno a lenha.", category: "Pratos Principais", image_url: dishLasagna, image_urls: null, is_active: true, promo: 20 },
+  { id: "p2", company_id: "m1", name: "Nhoque ao Sugo", price: 36.0, description: "Receita tradicional da nona, molho de tomate San Marzano e manjericão fresco.", category: "Pratos Principais", image_url: dishGnocchi, image_urls: null, is_active: true },
+  { id: "p3", company_id: "m1", name: "Tiramisu", price: 18.0, description: "Sobremesa italiana clássica com mascarpone, café espresso e cacau em pó.", category: "Sobremesas", image_url: dishTiramisu, image_urls: null, is_active: true },
+  { id: "p4", company_id: "m1", name: "Refrigerante Cola", price: 6.0, description: "Lata 350ml bem gelada.", category: "Bebidas", image_url: null, image_urls: null, is_active: true },
 ];
 
 function StoreDetail() {
@@ -116,7 +116,7 @@ function StoreDetail() {
       if (!isSupabaseConfigured) return MOCK_PRODUCTS;
       try {
         const result = await Promise.race([
-          supabase.from("products").select("*").eq("company_id", storeId).eq("active", true),
+          supabase.from("products").select("*").eq("company_id", storeId).eq("is_active", true),
           new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
         ]);
         const data = (result as { data: Product[] | null }).data;

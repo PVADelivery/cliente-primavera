@@ -65,7 +65,7 @@ export interface Product {
   category: string | null;
   image_url: string | null;
   image_urls: string[] | null;
-  active: boolean;
+  is_active: boolean;
 }
 
 export interface Order {
