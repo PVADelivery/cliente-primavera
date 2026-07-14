@@ -1,7 +1,18 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Address } from '@/types/database';
+export interface Address {
+  id: string;
+  user_id: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  created_at: string;
+}
 
 interface AddressContextType {
   addresses: Address[];
@@ -26,7 +37,7 @@ export function AddressProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
-    const list = data || [];
+    const list = (data as Address[]) || [];
     setAddresses(list);
     if (!selectedId && list.length > 0) {
       setSelectedId(list[0].id);

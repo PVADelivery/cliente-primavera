@@ -43,7 +43,8 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
         const storageKey = `epraja_chat_${topic}_${user.id}_v2`;
         const storedConvId = localStorage.getItem(storageKey);
         
-        let conversation = null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let conversation: any = null;
 
         // Se já temos um chat salvo para esse tópico, tenta buscar ele
         if (storedConvId) {
@@ -61,10 +62,10 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
         // Se não encontrou, cria um nãovo chat limpo para esse tópico!
         if (!conversation) {
           const { data: newConv, error: createError } = await supabase
-            .from('conversations')
+            .from('conversations' as any)
             .insert({ 
               participants: [user.id]
-            })
+            } as any)
             .select();
           
           if (createError) {
@@ -74,21 +75,21 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
              localStorage.setItem(storageKey, conversation.id);
              
              // Envia a mensagem de assunto para o Admin saber do que se trata
-             await supabase.from('messages').insert({
+             await supabase.from('messages' as any).insert({
                conversation_id: conversation.id,
                sender_id: user.id,
                content: `[Assunto: ${title}]`
-             });
+             } as any);
           }
         }
 
         if (conversation) {
           setConversationId(conversation.id);
-          const { data: history } = await supabase
-            .from('messages')
+          const { data: history } = await (supabase
+            .from('messages' as any)
             .select('*')
             .eq('conversation_id', conversation.id)
-            .order('created_at', { ascending: true });
+            .order('created_at', { ascending: true }) as any);
 
           if (history) setMessages(history);
 
@@ -145,12 +146,12 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
     // Libera a UI imediatamente
     setSending(false);
 
-    supabase.from('messages').insert({
+    supabase.from('messages' as any).insert({
       id: optimisticMsg.id,
       conversation_id: conversationId,
       sender_id: user.id,
       content: msgText
-    }).then(({ error }) => {
+    } as any).then(({ error }: any) => {
       if (error) {
         console.error("[SupportChat] Erro ao enviar:", error);
         toast.error("Falha ao enviar mensagem");
@@ -160,6 +161,7 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
   };
 
   const handleEndChat = () => {
+    if (!user) return;
     if (window.confirm("Deseja encerrar este chat e começar um nãovo?")) {
       const storageKey = `epraja_chat_${topic}_${user.id}_v2`;
       localStorage.removeItem(storageKey);

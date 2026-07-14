@@ -28,14 +28,14 @@ function RidesPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if (window.maplibregl) {
-        setMapLibre(window.maplibregl);
+      if ((window as any).maplibregl) {
+        setMapLibre((window as any).maplibregl);
       } else {
         const script = document.createElement("script");
         script.src = "https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js";
         script.async = true;
         script.onload = () => {
-          if (window.maplibregl) setMapLibre(window.maplibregl);
+          if ((window as any).maplibregl) setMapLibre((window as any).maplibregl);
         };
         document.head.appendChild(script);
 
@@ -65,7 +65,7 @@ function RidesPage() {
         if (error) throw error;
         setRides(data || []);
         
-        const active = data?.find(r => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
+        const active = (data as any[])?.find(r => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
         if (active) setActiveRide(active);
 
       } catch (err) {
