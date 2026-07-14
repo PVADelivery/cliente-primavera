@@ -872,7 +872,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           >
             <span className="text-xl mb-1">🏍️</span>
             <span className="text-xs font-bold block">Moto</span>
-            <span className="text-[10px] opacity-75 mt-0.5">R$ 2.00/KM</span>
+            <span className="text-[9px] opacity-75 mt-0.5 whitespace-nowrap">R$ 5,99 + 2,00/KM</span>
           </button>
 
           <button
@@ -886,7 +886,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           >
             <span className="text-xl mb-1">🚗</span>
             <span className="text-xs font-bold block">Carro</span>
-            <span className="text-[10px] opacity-75 mt-0.5">R$ 3.00/KM</span>
+            <span className="text-[9px] opacity-75 mt-0.5 whitespace-nowrap">R$ 9,99 + 3,00/KM</span>
           </button>
 
           <button
@@ -900,7 +900,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           >
             <span className="text-xl mb-1">🛻</span>
             <span className="text-xs font-bold block">Carro Aberto</span>
-            <span className="text-[10px] opacity-75 mt-0.5">R$ 3.00/KM</span>
+            <span className="text-[9px] opacity-75 mt-0.5 whitespace-nowrap">R$ 9,99 + 3,00/KM</span>
           </button>
         </div>
 
