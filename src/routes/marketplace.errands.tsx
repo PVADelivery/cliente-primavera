@@ -396,16 +396,12 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         
         // Tarifas por tipo de veículo (Avulso Errands)
         // Moto: R$ 5.99 base + R$ 2.00/KM
-        // Carro: R$ 9.99 base + R$ 3.00/KM
-        // Carro Aberto: R$ 30.00 base + R$ 5.00/KM
+        // Carro / Carro Aberto: R$ 9.99 base + R$ 3.00/KM
         let baseFee = 5.99;
         let rate = 2.0;
-        if (vehicleType === "carro") {
+        if (vehicleType === "carro" || vehicleType === "carro_aberto") {
           baseFee = 9.99;
           rate = 3.0;
-        } else if (vehicleType === "carro_aberto") {
-          baseFee = 30.0;
-          rate = 5.0;
         }
         
         setPrice(baseFee + dist * rate);
@@ -890,7 +886,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           >
             <span className="text-xl mb-1">🚗</span>
             <span className="text-xs font-bold block">Carro</span>
-            <span className="text-[10px] opacity-75 mt-0.5">R$ 3.50/KM</span>
+            <span className="text-[10px] opacity-75 mt-0.5">R$ 3.00/KM</span>
           </button>
 
           <button
@@ -904,7 +900,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           >
             <span className="text-xl mb-1">🛻</span>
             <span className="text-xs font-bold block">Carro Aberto</span>
-            <span className="text-[10px] opacity-75 mt-0.5">R$ 5.00/KM</span>
+            <span className="text-[10px] opacity-75 mt-0.5">R$ 3.00/KM</span>
           </button>
         </div>
 
