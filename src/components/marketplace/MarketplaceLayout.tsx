@@ -5,12 +5,14 @@ import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
 import { useState, useEffect } from "react";
+import { Car } from "lucide-react";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
   { to: "/marketplace", label: "Início", icon: Home, exact: true },
   { to: "/marketplace/directory", label: "Agenda", icon: BookUser },
   { to: "/marketplace/cart", label: "Carrinho", icon: ShoppingBag },
   { to: "/marketplace/orders", label: "Pedidos", icon: ClipboardList },
+  { to: "/marketplace/rides", label: "Corridas", icon: Car },
   { to: "/marketplace/profile", label: "Perfil", icon: User },
 ];
 
