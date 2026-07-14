@@ -215,7 +215,7 @@ function Profile() {
         {/* LIST OPTIONS */}
         <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border/50">
           {[
-            { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => navigate({ to: '/marketplace/addresses' }) },
+            { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => toast('Em breve!') },
             { icon: Wallet, color: 'text-violet-500', bg: 'bg-violet-500/10', title: 'Carteira Virtual', subtitle: 'Saldo de cashback e pagamentos', onClick: () => toast('Em breve!') },
             { icon: theme === 'dark' ? Sun : Moon, color: 'text-yellow-500', bg: 'bg-yellow-500/10', title: 'Tema do App', subtitle: theme === 'dark' ? 'Modo Escuro' : 'Modo Claro', onClick: toggleTheme },
           ].map((item, idx) => (
