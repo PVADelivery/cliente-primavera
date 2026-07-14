@@ -224,7 +224,7 @@ function StoreDetail() {
         {!coverFailed && (
           <motion.img
             ref={coverImgRef}
-            src={coverItalian}
+            src={store?.cover_url || coverItalian}
             alt={name}
             decoding="async"
             fetchPriority="high"
@@ -278,12 +278,16 @@ function StoreDetail() {
             className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl bg-card border-2 border-background grid place-items-center overflow-hidden"
             style={{ boxShadow: "var(--shadow-premium)" }}
           >
-            <div
-              className="w-full h-full grid place-items-center text-3xl sm:text-4xl font-display font-black text-primary-foreground"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              {name.charAt(0)}
-            </div>
+            {store?.logo_url ? (
+              <img src={store.logo_url} alt={name} className="w-full h-full object-cover" />
+            ) : (
+              <div
+                className="w-full h-full grid place-items-center text-3xl sm:text-4xl font-display font-black text-primary-foreground"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                {name.charAt(0)}
+              </div>
+            )}
           </motion.div>
           <div className="flex-1 min-w-0 pb-1">
             <h1
