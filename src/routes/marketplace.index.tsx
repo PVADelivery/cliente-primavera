@@ -613,8 +613,8 @@ function MarketplaceHome() {
                         style={{ boxShadow: "var(--shadow-card)" }}
                       >
                         {s.cover_url
-                          ? <img src={s.cover_url} alt={s.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07]" />
-                          : <div className="w-full h-full" style={{ background: "var(--gradient-primary)" }} />
+                          ? <img src={s.cover_url} alt={s.name} loading="lazy" className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`} />
+                          : <div className={`w-full h-full ${!s.is_open ? "grayscale" : ""}`} style={{ background: "var(--gradient-primary)" }} />
                         }
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
