@@ -1,15 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { FileText, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/terms")({
   head: () => ({ meta: [{ title: "Termos — Primavera Delivery" }] }),
-  component: () => (
+  component: TermsPage,
+});
+
+function TermsPage() {
+  const navigate = useNavigate();
+  
+  return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center gap-3 bg-card p-6 rounded-3xl border border-border/40 shadow-sm">
+      <div className="flex items-start sm:items-center gap-3 bg-card p-6 rounded-3xl border border-border/40 shadow-sm relative">
+        <button 
+          onClick={() => navigate({ to: '/marketplace/profile' })}
+          className="absolute top-4 right-4 sm:static sm:mr-2 p-2 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground rounded-full transition-colors"
+          aria-label="Voltar"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
           <FileText className="w-6 h-6" />
         </div>
-        <div>
+        <div className="pr-10 sm:pr-0">
           <h1 className="font-display text-2xl font-black">Termos de Uso</h1>
           <p className="text-sm text-muted-foreground mt-1">Regras e condições de uso da plataforma.</p>
         </div>
