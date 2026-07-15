@@ -58,5 +58,5 @@ function TermsPage() {
         </section>
       </div>
     </div>
-  ),
-});
+  );
+}

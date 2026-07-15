@@ -58,5 +58,5 @@ function PrivacyPage() {
         </section>
       </div>
     </div>
-  ),
-});
+  );
+}
