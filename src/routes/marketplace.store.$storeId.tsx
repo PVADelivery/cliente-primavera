@@ -477,9 +477,9 @@ function StoreDetail() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 inset-x-0 z-40 p-4 bg-gradient-to-t from-background via-background to-transparent"
+            className="fixed bottom-[64px] inset-x-0 z-40 p-4 pb-6 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"
           >
-            <div className="max-w-xl mx-auto w-full">
+            <div className="max-w-xl mx-auto w-full pointer-events-auto">
               <Drawer open={cartOpen} onOpenChange={setCartOpen}>
                 <DrawerTrigger asChild>
                   <button className="w-full h-14 bg-primary text-primary-foreground rounded-2xl flex items-center justify-between px-5 font-bold shadow-lg hover:bg-primary/90 transition-colors">
