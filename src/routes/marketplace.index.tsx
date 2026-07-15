@@ -299,6 +299,18 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             {/* Blue glow on hover */}
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 bg-gradient-to-t from-blue-500/25 via-transparent to-transparent pointer-events-none" />
 
+            {/* Corner bracket lines on hover */}
+            <div className="absolute inset-0 pointer-events-none">
+              {/* Top-left */}
+              <span className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-white/80 rounded-tl-sm opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:top-2 group-hover:left-2" />
+              {/* Top-right */}
+              <span className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-white/80 rounded-tr-sm opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:top-2 group-hover:right-2" />
+              {/* Bottom-left */}
+              <span className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-white/80 rounded-bl-sm opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-2 group-hover:left-2" />
+              {/* Bottom-right */}
+              <span className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-white/80 rounded-br-sm opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bottom-2 group-hover:right-2" />
+            </div>
+
             {/* Top chips */}
             <div className="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">

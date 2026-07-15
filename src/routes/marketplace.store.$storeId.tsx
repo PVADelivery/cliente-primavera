@@ -425,7 +425,7 @@ function StoreDetail() {
                     
                     {/* Coluna de Imagem e Botão */}
                     <div className="relative shrink-0 ml-1 sm:ml-2">
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted/30 grid place-items-center shadow-sm">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-muted/30 grid place-items-center shadow-sm relative group/imgcard">
                         {displayImage ? (
                           <img
                             src={displayImage}
@@ -436,6 +436,13 @@ function StoreDetail() {
                         ) : (
                           <UtensilsCrossed className="w-8 h-8 text-muted-foreground/20" />
                         )}
+                        {/* Corner bracket lines on hover */}
+                        <div className="absolute inset-0 pointer-events-none">
+                          <span className="absolute top-1.5 left-1.5 w-3.5 h-3.5 border-t-2 border-l-2 border-white/80 rounded-tl-sm opacity-0 group-hover/imgcard:opacity-100 transition-all duration-300" />
+                          <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 border-t-2 border-r-2 border-white/80 rounded-tr-sm opacity-0 group-hover/imgcard:opacity-100 transition-all duration-300" />
+                          <span className="absolute bottom-1.5 left-1.5 w-3.5 h-3.5 border-b-2 border-l-2 border-white/80 rounded-bl-sm opacity-0 group-hover/imgcard:opacity-100 transition-all duration-300" />
+                          <span className="absolute bottom-1.5 right-1.5 w-3.5 h-3.5 border-b-2 border-r-2 border-white/80 rounded-br-sm opacity-0 group-hover/imgcard:opacity-100 transition-all duration-300" />
+                        </div>
                       </div>
                       
                       {hasPromo && (
