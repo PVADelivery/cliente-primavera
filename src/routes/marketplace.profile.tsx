@@ -143,126 +143,142 @@ function Profile() {
     : { name: 'Bronze', progress: (ordersCount / 5) * 100, color: 'text-orange-700 bg-orange-700/10' };
 
   return (
-    <div className="min-h-screen bg-background pb-32">
-      {/* HEADER SECTION (Primavera Style) */}
-      <div className="bg-card border-b border-border px-6 pt-10 pb-6 rounded-b-[2rem] shadow-sm">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pb-32">
+      {/* HEADER SECTION (Premium Design) */}
+      <div className="relative overflow-hidden bg-white dark:bg-zinc-900 border-b border-border/40 px-6 pt-12 pb-8 rounded-b-[2.5rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_40px_-15px_rgba(0,0,0,0.3)]">
+        {/* Background Decorative Blob */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/10 rounded-full blur-[60px] -ml-10 -mb-10 pointer-events-none"></div>
+
+        <div className="relative flex items-center gap-5 z-10">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-primary/20 shadow-inner"
+            className="group relative h-24 w-24 rounded-[2rem] overflow-hidden border-4 border-white dark:border-zinc-800 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 bg-gradient-to-br from-primary/20 to-primary/5"
           >
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} className="w-full h-full object-cover" alt="" />
             ) : (
-              <div className="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-bold">
+              <div className="w-full h-full flex items-center justify-center text-primary text-4xl font-black">
                 {initial}
               </div>
             )}
+            
+            {/* Hover overlay for camera */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+              <Camera className="w-8 h-8 text-white drop-shadow-md" />
+            </div>
+
             {uploading && (
-              <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="absolute inset-0 bg-background/80 flex items-center justify-center backdrop-blur-sm">
+                <Loader2 className="w-7 h-7 animate-spin text-primary" />
               </div>
             )}
           </button>
           
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-            <div className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full mt-2 text-xs font-semibold", tier.color)}>
-              <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+            <h1 className="text-2xl font-black text-foreground tracking-tight drop-shadow-sm">{displayName}</h1>
+            <p className="text-sm font-medium text-muted-foreground mt-0.5">{user.email}</p>
+            <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl mt-3 text-[11px] font-black uppercase tracking-wider shadow-sm", tier.color)}>
+              <span className="w-2 h-2 rounded-full bg-current shadow-[0_0_8px_currentColor]"></span>
               Nível {tier.name}
             </div>
           </div>
 
-          <button onClick={() => setEditing(true)} className="p-3 bg-muted rounded-full hover:bg-muted/80 transition-colors">
-            <Settings className="w-5 h-5 text-foreground" />
+          <button onClick={() => setEditing(true)} className="p-3.5 bg-slate-100 dark:bg-zinc-800 rounded-2xl hover:bg-slate-200 dark:hover:bg-zinc-700 transition-all hover:scale-110 active:scale-95 shadow-sm text-foreground">
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      <div className="px-5 mt-6 space-y-5 max-w-md mx-auto">
+      <div className="px-5 mt-8 space-y-6 max-w-md mx-auto">
         
         {/* QUICK STATS */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <button 
-            onClick={() => navigate('/marketplace/orders')}
-            className="flex items-center gap-3 p-4 bg-card border border-border/50 rounded-2xl shadow-sm hover:border-primary/30 transition-all"
+            onClick={() => navigate({ to: '/marketplace/orders' })}
+            className="group relative overflow-hidden flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
-              <History className="w-5 h-5" />
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="p-3 bg-primary/10 rounded-[1.2rem] text-primary w-fit ring-4 ring-white dark:ring-zinc-900 shadow-sm relative z-10">
+              <History className="w-6 h-6" />
             </div>
-            <div className="text-left">
-              <p className="text-2xl font-bold leading-none">{ordersCount}</p>
-              <p className="text-[11px] font-medium text-muted-foreground uppercase">Pedidos</p>
+            <div className="text-left relative z-10 mt-1">
+              <p className="text-3xl font-black leading-none tracking-tight">{ordersCount}</p>
+              <p className="text-[12px] font-bold text-muted-foreground/80 uppercase mt-1">Pedidos</p>
             </div>
           </button>
           
           <button 
             onClick={() => fetchCoupons(true)}
-            className="flex items-center gap-3 p-4 bg-card border border-border/50 rounded-2xl shadow-sm hover:border-primary/30 transition-all"
+            className="group relative overflow-hidden flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-500">
-              <Ticket className="w-5 h-5" />
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="p-3 bg-emerald-500/10 rounded-[1.2rem] text-emerald-500 w-fit ring-4 ring-white dark:ring-zinc-900 shadow-sm relative z-10">
+              <Ticket className="w-6 h-6" />
             </div>
-            <div className="text-left">
-              <p className="text-2xl font-bold leading-none">{coupons.length}</p>
-              <p className="text-[11px] font-medium text-muted-foreground uppercase">Cupons</p>
+            <div className="text-left relative z-10 mt-1">
+              <p className="text-3xl font-black leading-none tracking-tight">{coupons.length}</p>
+              <p className="text-[12px] font-bold text-muted-foreground/80 uppercase mt-1">Cupons</p>
             </div>
           </button>
         </div>
 
         {/* LIST OPTIONS */}
-        <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border/50">
+        <div className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-zinc-800/50 p-1">
           {[
             { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => toast('Em breve!') },
             { icon: Wallet, color: 'text-violet-500', bg: 'bg-violet-500/10', title: 'Carteira Virtual', subtitle: 'Saldo de cashback e pagamentos', onClick: () => toast('Em breve!') },
             { icon: theme === 'dark' ? Sun : Moon, color: 'text-yellow-500', bg: 'bg-yellow-500/10', title: 'Tema do App', subtitle: theme === 'dark' ? 'Modo Escuro' : 'Modo Claro', onClick: toggleTheme },
           ].map((item, idx) => (
-            <button key={idx} onClick={item.onClick} className="w-full flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
-              <div className={cn("p-2.5 rounded-xl", item.bg, item.color)}>
+            <button key={idx} onClick={item.onClick} className="group w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors rounded-2xl">
+              <div className={cn("p-3 rounded-2xl shadow-sm", item.bg, item.color)}>
                 <item.icon className="w-5 h-5" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-semibold text-[15px]">{item.title}</p>
-                <p className="text-[12px] text-muted-foreground">{item.subtitle}</p>
+                <p className="font-bold text-[15px] text-foreground">{item.title}</p>
+                <p className="text-[12px] font-medium text-muted-foreground">{item.subtitle}</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground/40" />
+              <div className="p-2 bg-slate-50 dark:bg-zinc-800 rounded-xl group-hover:bg-white dark:group-hover:bg-zinc-700 transition-colors group-hover:shadow-sm">
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors group-hover:translate-x-0.5 duration-300" />
+              </div>
             </button>
           ))}
         </div>
 
         {/* HELP & SETTINGS */}
-        <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider ml-2 mt-6 mb-2">Suporte e Ajuda</h3>
-        <div className="bg-card border border-border/50 rounded-2xl shadow-sm overflow-hidden divide-y divide-border/50">
+        <h3 className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-widest ml-3 mt-8 mb-3">Suporte e Configurações</h3>
+        <div className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-zinc-800/50 p-1">
           {[
             { icon: HelpCircle, title: 'Central de Ajuda', onClick: () => setSupportType('support') },
             { icon: Bike, title: 'Quero ser Entregador', onClick: () => setSupportType('driver_application') },
             { icon: FileText, title: 'Termos de Uso', onClick: () => navigate({ to: '/marketplace/terms' }) },
             { icon: ShieldCheck, title: 'Política de Privacidade', onClick: () => navigate({ to: '/marketplace/privacy' }) },
           ].map((item, idx) => (
-            <button key={idx} onClick={item.onClick} className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <item.icon className="w-5 h-5 text-muted-foreground" />
-                <span className="font-medium text-sm">{item.title}</span>
+            <button key={idx} onClick={item.onClick} className="group w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors rounded-2xl">
+              <div className="flex items-center gap-3.5">
+                <div className="p-2.5 bg-slate-100 dark:bg-zinc-800 rounded-xl text-muted-foreground group-hover:text-foreground group-hover:shadow-sm transition-all">
+                  <item.icon className="w-4 h-4" />
+                </div>
+                <span className="font-bold text-[14px] text-foreground">{item.title}</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all duration-300" />
             </button>
           ))}
         </div>
 
         {/* LOGOUT E EXCLUSÃO */}
-        <div className="pt-6 pb-4">
+        <div className="pt-8 pb-4">
           <button
             onClick={() => signOut()}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-secondary/50 text-foreground font-black text-sm hover:bg-secondary transition-colors border border-border/40"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-[1.5rem] bg-slate-100 dark:bg-zinc-800/50 text-foreground font-black text-sm hover:bg-slate-200 dark:hover:bg-zinc-800 transition-all hover:scale-[1.02] active:scale-95 shadow-sm"
           >
             <LogOut className="w-5 h-5" /> Sair da minha conta
           </button>
           
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="w-full flex items-center justify-center gap-2 py-4 mt-3 rounded-[1.5rem] bg-rose-500/10 text-rose-500 font-black text-sm hover:bg-rose-500/20 transition-colors border border-rose-500/20">
+              <button className="w-full flex items-center justify-center gap-2 py-4 mt-3 rounded-[1.5rem] bg-rose-500/10 text-rose-500 font-black text-sm hover:bg-rose-500 hover:text-white transition-all hover:scale-[1.02] active:scale-95 shadow-sm">
                 <XCircle className="w-5 h-5" /> Excluir minha conta
               </button>
             </AlertDialogTrigger>
