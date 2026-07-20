@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 export const Route = createFileRoute("/marketplace/cart")({
-  head: () => ({ meta: [{ title: "Carrinho — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Carrinho — MT Express" }] }),
   component: CartPage,
 });
 

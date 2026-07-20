@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,7 @@ import { RequireAuth } from "@/components/marketplace/RequireAuth";
 import type { Customer } from "@/types/database";
 
 export const Route = createFileRoute("/marketplace/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Checkout — MT Express" }] }),
   component: () => (
     <RequireAuth>
       <Checkout />

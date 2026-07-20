@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FileText, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/terms")({
-  head: () => ({ meta: [{ title: "Termos — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Termos — MT Express" }] }),
   component: TermsPage,
 });
 
@@ -32,14 +32,14 @@ function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground">1. Aceitação dos Termos</h2>
           <p>
-            Ao utilizar o aplicativo Primavera Delivery, você concorda com estes termos. Se não concordar com alguma regra, por favor, não utilize nossos serviços.
+            Ao utilizar o aplicativo MT Express, você concorda com estes termos. Se não concordar com alguma regra, por favor, não utilize nossos serviços.
           </p>
         </section>
         
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground">2. Uso da Plataforma</h2>
           <p>
-            O Primavera Delivery atua como um intermediador entre clientes e estabelecimentos locais. O preparo e a qualidade dos produtos são de total responsabilidade de cada restaurante parceiro.
+            O MT Express atua como um intermediador entre clientes e estabelecimentos locais. O preparo e a qualidade dos produtos são de total responsabilidade de cada restaurante parceiro.
           </p>
         </section>
         

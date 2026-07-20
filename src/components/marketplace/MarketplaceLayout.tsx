@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouter } from "@tanstack/react-router";
+﻿import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { Home, BookUser, ShoppingBag, ClipboardList, User, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -91,7 +91,7 @@ export function MarketplaceLayout() {
             <span className="flex items-center justify-center w-8 h-8">
               <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
             </span>
-            <span className="font-display font-bold tracking-tight text-sm text-white">Primavera Delivery</span>
+            <span className="font-display font-bold tracking-tight text-sm text-white">MT Express</span>
           </Link>
           <div className="flex items-center gap-4">
             <button

@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/search")({
-  head: () => ({ meta: [{ title: "Buscar — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Buscar — MT Express" }] }),
   component: () => {
     const [q, setQ] = useState("");
     return (

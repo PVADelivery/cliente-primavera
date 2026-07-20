@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+﻿import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -74,15 +74,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Primavera Delivery — Peça em minutos" },
+      { title: "MT Express — Peça em minutos" },
       { name: "description", content: "Marketplace de delivery multi-loja: restaurantes, mercados e farmácias da sua cidade em um só app." },
-      { name: "author", content: "Primavera Delivery" },
-      { property: "og:title", content: "Primavera Delivery — Peça em minutos" },
+      { name: "author", content: "MT Express" },
+      { property: "og:title", content: "MT Express — Peça em minutos" },
       { property: "og:description", content: "Marketplace de delivery multi-loja: restaurantes, mercados e farmácias da sua cidade em um só app." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@PrimaveraDelivery" },
-      { name: "twitter:title", content: "Primavera Delivery — Peça em minutos" },
+      { name: "twitter:title", content: "MT Express — Peça em minutos" },
       { name: "twitter:description", content: "Marketplace de delivery multi-loja: restaurantes, mercados e farmácias da sua cidade em um só app." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ca0f3c3-443a-48e8-97bf-d8c0a58c56c6/id-preview-a0eeeedb--420d9c69-b801-4c4c-a6f6-428bb97562ca.lovable.app-1780489500407.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ca0f3c3-443a-48e8-97bf-d8c0a58c56c6/id-preview-a0eeeedb--420d9c69-b801-4c4c-a6f6-428bb97562ca.lovable.app-1780489500407.png" },

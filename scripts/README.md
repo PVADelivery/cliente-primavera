@@ -1,4 +1,4 @@
-# Scripts SQL — Primavera Delivery (Marketplace)
+﻿# Scripts SQL — MT Express (Marketplace)
 
 Rodar no SQL Editor do Supabase, em ordem:
 

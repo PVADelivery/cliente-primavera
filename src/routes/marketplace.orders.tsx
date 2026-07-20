@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 
 export const Route = createFileRoute("/marketplace/orders")({
-  head: () => ({ meta: [{ title: "Meus pedidos — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Meus pedidos — MT Express" }] }),
   component: () => (
     <RequireAuth>
       <OrdersList />

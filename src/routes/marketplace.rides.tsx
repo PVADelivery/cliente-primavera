@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck } from "lucide-react";
@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/marketplace/rides")({
-  head: () => ({ meta: [{ title: "Corridas — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Corridas — MT Express" }] }),
   component: RidesPage,
 });
 

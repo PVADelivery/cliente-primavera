@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/privacy")({
-  head: () => ({ meta: [{ title: "Privacidade — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Privacidade — MT Express" }] }),
   component: PrivacyPage,
 });
 

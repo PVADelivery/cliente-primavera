@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import logoIcon from "@/assets/logo-icon-v3.png";
 import { Eye, EyeOff, Check, X } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Criar conta — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Criar conta — MT Express" }] }),
   component: SignupPage,
 });
 
@@ -63,7 +63,7 @@ function SignupPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
           <span className="inline-flex items-center justify-center w-20 h-20 rounded-2xl overflow-hidden mx-auto shadow-2xl ring-2 ring-white/10 bg-white">
-            <img src={logoIcon} alt="Primavera Delivery" className="w-full h-full object-cover scale-[2.2]" />
+            <img src={logoIcon} alt="MT Express" className="w-full h-full object-cover scale-[2.2]" />
           </span>
           <h1 className="font-display text-2xl font-bold">Crie sua conta</h1>
           <p className="text-sm text-muted-foreground">Leva menos de 1 minuto</p>

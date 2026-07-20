@@ -1,8 +1,8 @@
-import type { CapacitorConfig } from "@capacitor/cli";
+﻿import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.primavera.cliente",
-  appName: "Primavera Delivery",
+  appName: "MT Express",
   webDir: "dist",
   server: {
     // Em desenvolvimento, aponte para o preview Lovable, ex.:

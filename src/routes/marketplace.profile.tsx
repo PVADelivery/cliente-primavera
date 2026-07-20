@@ -1,9 +1,9 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/marketplace/profile')({
-  head: () => ({ meta: [{ title: 'Perfil — Primavera Delivery' }] }),
+  head: () => ({ meta: [{ title: 'Perfil — MT Express' }] }),
   component: Profile,
 });
 

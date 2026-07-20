@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export const Route = createFileRoute("/marketplace/")({
   head: () => ({
     meta: [
-      { title: "Primavera Delivery — Comida, mercado e farmácia na sua porta" },
+      { title: "MT Express — Comida, mercado e farmácia na sua porta" },
       { name: "description", content: "Descubra restaurantes, mercados e farmácias da sua cidade." },
     ],
   }),

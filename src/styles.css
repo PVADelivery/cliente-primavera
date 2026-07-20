@@ -1,11 +1,11 @@
-@import "tailwindcss" source(none);
+﻿@import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Primavera Delivery — Design System
+ * MT Express — Design System
  * Modelo: Medal.tv (preto quase puro, cards escuros, vermelho como acento)
  * Regra 60/30/10 → preto / grafite / vermelho-moto
  */

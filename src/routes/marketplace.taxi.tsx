@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPinned, Maximize2 } from "lucide-react";
@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/marketplace/taxi")({
-  head: () => ({ meta: [{ title: "Solicitar Corrida — Primavera Delivery" }] }),
+  head: () => ({ meta: [{ title: "Solicitar Corrida — MT Express" }] }),
   component: TaxiPage,
 });
 
