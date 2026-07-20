@@ -663,8 +663,12 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       : `[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}]`;
 
     try {
+      // Busca a primeira empresa disponível para usar como fallback
+      const { data: companies } = await supabase.from('companies').select('id').limit(1);
+      const fallbackCompanyId = companies && companies.length > 0 ? companies[0].id : null;
+
       const { error } = await supabase.from("deliveries").insert({
-        company_id: null,
+        company_id: fallbackCompanyId,
         customer_name: user?.user_metadata?.full_name || user?.email || "Cliente",
         pickup_address: finalPickup,
         address: finalDropoff,
