@@ -85,7 +85,7 @@ export function MarketplaceLayout() {
             "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
         }}
       />
-      {path !== '/marketplace/checkout' && (
+      {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
         <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
           <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
             <Link to="/marketplace" className="flex items-center gap-2.5">
@@ -112,11 +112,11 @@ export function MarketplaceLayout() {
         </header>
       )}
 
-      <main className={`relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 ${path === '/marketplace/checkout' ? '' : 'pb-24 pt-4'}`}>
+      <main className={`relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 ${['/marketplace/checkout', '/marketplace/addresses'].includes(path) ? '' : 'pb-24 pt-4'}`}>
         <Outlet />
       </main>
 
-      {path !== '/marketplace/checkout' && (
+      {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
         <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
