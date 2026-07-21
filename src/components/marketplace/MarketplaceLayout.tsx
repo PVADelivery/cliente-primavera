@@ -1,4 +1,4 @@
-﻿import { Link, Outlet, useRouter } from "@tanstack/react-router";
+import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { Home, BookUser, ShoppingBag, ClipboardList, User, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -85,36 +85,39 @@ export function MarketplaceLayout() {
             "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
         }}
       />
-      <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
-        <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
-          <Link to="/marketplace" className="flex items-center gap-2.5">
-            <span className="flex items-center justify-center w-8 h-8">
-              <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
-            </span>
-            <span className="font-display font-bold tracking-tight text-sm text-white">MT Express</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={toggleTheme}
-              className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
-              aria-label="Alternar tema"
-            >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            {!user ? (
-              <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
-            ) : (
-              <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>
-            )}
+      {path !== '/marketplace/checkout' && (
+        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
+          <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
+            <Link to="/marketplace" className="flex items-center gap-2.5">
+              <span className="flex items-center justify-center w-8 h-8">
+                <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
+              </span>
+              <span className="font-display font-bold tracking-tight text-sm text-white">MT Express</span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleTheme}
+                className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+                aria-label="Alternar tema"
+              >
+                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+              {!user ? (
+                <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
+              ) : (
+                <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 pb-24 pt-4">
+      <main className={`relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 ${path === '/marketplace/checkout' ? '' : 'pb-24 pt-4'}`}>
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
+      {path !== '/marketplace/checkout' && (
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
@@ -148,6 +151,7 @@ export function MarketplaceLayout() {
           })}
         </ul>
       </nav>
+      )}
     </div>
   );
 }

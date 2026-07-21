@@ -1,12 +1,11 @@
 // VERSION: 2026-05-21-CHECKOUT-MODAL
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, createFileRoute } from '@tanstack/react-router';
+import { useNavigate, createFileRoute, Navigate, useRouter } from '@tanstack/react-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Address } from '@/types/database';
-import { MarketplaceLayout } from '@/components/marketplace/MarketplaceLayout';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -88,6 +87,7 @@ export const Route = createFileRoute('/marketplace/checkout')({
 
 function Checkout() {
   const navigate = useNavigate();
+  const router = useRouter();
   const { user, profile, refreshProfile } = useAuth();
   const { items, company, clearCart, appliedCoupon, discountAmount, subtotal } = useCart();
   const { isLocked, acquireLock, releaseLock, generateIdempotencyKey, resetIdempotencyKey } = useOrderLock();
@@ -445,7 +445,7 @@ function Checkout() {
       resetIdempotencyKey();
       toast.success('Pedido realizado!');
       setShowReviewModal(false);
-      navigate(`/marketplace/orders/${orderId}`);
+      navigate({ to: `/marketplace/orders/${orderId}` });
     } catch (err: any) {
       const message = err?.message || 'Erro ao criar pedido';
       const retriable = err?.retriable !== false;
@@ -474,15 +474,15 @@ function Checkout() {
     } finally { setLoading(false); releaseLock(); }
   };
 
-  if (!user) { navigate('/marketplace/login'); return null; }
-  if (items.length === 0) { navigate('/marketplace/cart'); return null; }
+  if (!user) { return <Navigate to="/login" />; }
+  if (items.length === 0) { return <Navigate to="/marketplace/cart" />; }
 
   const selAddrObj = addresses.find(a => a.id === selectedAddress);
 
   return (
-    <MarketplaceLayout hideNav>
+    <>
       <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background px-4 pb-3 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]">
-        <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-full">
+        <button onClick={() => router.history.back()} className="flex h-9 w-9 items-center justify-center rounded-full">
           <ArrowLeft className="h-5 w-5 text-primary" />
         </button>
         <div className="flex-1 text-center pr-9">
@@ -519,7 +519,7 @@ function Checkout() {
               ) : addresses.length === 0 ? (
                 <div className="text-center py-4 border border-border rounded-xl">
                   <p className="text-sm text-muted-foreground">Nenhum endereço cadastrado</p>
-                  <Button size="sm" className="mt-2 rounded-lg" onClick={() => navigate('/marketplace/addresses')}>Adicionar</Button>
+                  <Button size="sm" className="mt-2 rounded-lg" onClick={() => navigate({ to: '/marketplace/addresses' })}>Adicionar</Button>
                 </div>
               ) : (
                 <div className="flex items-start justify-between gap-3 bg-background">
@@ -741,7 +741,7 @@ function Checkout() {
                 className="w-full rounded-xl border-dashed" 
                 onClick={() => {
                   setShowAddressModal(false);
-                  setTimeout(() => navigate('/marketplace/addresses', { state: { returnTo: '/marketplace/checkout' } }), 100);
+                  setTimeout(() => navigate({ to: '/marketplace/addresses', search: { returnTo: '/marketplace/checkout' } as any }), 100);
                 }}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -848,6 +848,6 @@ function Checkout() {
         onSubmit={handlePhoneSubmit}
         isSubmitting={isSubmittingPhone}
       />
-    </MarketplaceLayout>
+    </>
   );
 }
