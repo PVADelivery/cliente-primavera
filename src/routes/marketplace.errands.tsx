@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/marketplace/errands")({
-  head: () => ({ meta: [{ title: "Enviar Encomenda — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Enviar Encomenda — MT 24horas express" }] }),
   component: ErrandsPage,
 });
 

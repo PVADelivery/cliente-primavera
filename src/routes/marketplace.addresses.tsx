@@ -32,9 +32,8 @@ function Addresses() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>(() => localStorage.getItem('@epraja_selected_address') || '');
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [regions, setRegions] = useState<any[]>([]);
   const [form, setForm] = useState({
-    street: '', number: '', neighborhood: '', region_id: '', city: 'Primavera do Leste - MT',
+    street: '', number: '', neighborhood: '', city: 'Primavera do Leste - MT',
     complement: '', reference: '', label: '',
   });
   const [selectedLabel, setSelectedLabel] = useState<string>('Casa');
@@ -52,11 +51,6 @@ function Addresses() {
       setAddresses(data || []);
     }
 
-    const { data: regionsData } = await supabase.from('regions').select('*').order('name');
-    if (regionsData) {
-      setRegions(regionsData);
-    }
-
     setLoading(false);
   };
 
@@ -68,7 +62,7 @@ function Addresses() {
 
   const openNew = () => {
     setEditing(null);
-    setForm({ street: '', number: '', neighborhood: '', region_id: '', city: 'Primavera do Leste - MT', complement: '', reference: '', label: 'Casa' });
+    setForm({ street: '', number: '', neighborhood: '', city: 'Primavera do Leste - MT', complement: '', reference: '', label: 'Casa' });
     setSelectedLabel('Casa');
     setShowForm(true);
   };
@@ -76,7 +70,7 @@ function Addresses() {
   const openEdit = (addr: any) => {
     setEditing(addr);
     setForm({
-      street: addr.street, number: addr.number, neighborhood: addr.neighborhood, region_id: addr.region_id || '',
+      street: addr.street, number: addr.number, neighborhood: addr.neighborhood || '',
       city: addr.city, complement: addr.complement || '', reference: addr.reference || '',
       label: addr.label || '',
     });
@@ -95,15 +89,14 @@ function Addresses() {
     if (!user) {
       toast.error('Usuário não identificado. Faça login novamente.'); return;
     }
-    if (!form.street || !form.number || !form.region_id || !form.city) {
-      toast.error('Preencha os campos obrigatórios (Rua, Nº, Região, Cidade)'); return;
+    if (!form.street || !form.number || !form.neighborhood || !form.city) {
+      toast.error('Preencha os campos obrigatórios (Rua, Nº, Bairro, Cidade)'); return;
     }
 
     const payload = {
       user_id: user.id,
       street: form.street, number: form.number,
       neighborhood: form.neighborhood, 
-      region_id: form.region_id,
       city: form.city,
       complement: form.complement || null, reference: form.reference || null,
       label: form.label || null,
@@ -302,20 +295,8 @@ function Addresses() {
                 </div>
                 
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Região/Bairro *</Label>
-                  <select
-                    value={form.region_id}
-                    onChange={e => {
-                      const selectedRegion = regions.find(r => r.id === e.target.value);
-                      setForm(f => ({ ...f, region_id: e.target.value, neighborhood: selectedRegion ? selectedRegion.name : '' }));
-                    }}
-                    className="flex h-12 w-full rounded-xl border border-white/10 bg-background/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary appearance-none"
-                  >
-                    <option value="" disabled>Selecione sua Região</option>
-                    {regions.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
+                  <Label className="text-xs text-muted-foreground">Bairro *</Label>
+                  <Input value={form.neighborhood} onChange={e => setForm(f => ({ ...f, neighborhood: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
                 </div>
                 
                 <div className="space-y-1.5">

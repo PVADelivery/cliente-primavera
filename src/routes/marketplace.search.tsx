@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/search")({
-  head: () => ({ meta: [{ title: "Buscar — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Buscar — MT 24horas express" }] }),
   component: () => {
     const [q, setQ] = useState("");
     return (

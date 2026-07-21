@@ -2,7 +2,7 @@
 
 const config: CapacitorConfig = {
   appId: "com.primavera.cliente",
-  appName: "MT Express",
+  appName: "MT 24horas express",
   webDir: "dist",
   server: {
     // Em desenvolvimento, aponte para o preview Lovable, ex.:

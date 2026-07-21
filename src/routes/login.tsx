@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import logoIcon from "@/assets/logo-icon-v3.png";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Entrar — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Entrar — MT 24horas express" }] }),
   component: LoginPage,
 });
 
@@ -33,7 +33,7 @@ function LoginPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-1">
           <span className="inline-flex items-center justify-center w-20 h-20 rounded-2xl overflow-hidden mx-auto shadow-2xl ring-2 ring-white/10 bg-white">
-            <img src={logoIcon} alt="MT Express" className="w-full h-full object-cover scale-[2.2]" />
+            <img src={logoIcon} alt="MT 24horas express" className="w-full h-full object-cover scale-[2.2]" />
           </span>
           <h1 className="font-display text-2xl font-bold">Bem-vindo de volta</h1>
           <p className="text-sm text-muted-foreground">Entre para continuar pedindo</p>

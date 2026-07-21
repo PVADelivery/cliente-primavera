@@ -3,7 +3,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 export const Route = createFileRoute("/marketplace/cart")({
-  head: () => ({ meta: [{ title: "Carrinho — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Carrinho — MT 24horas express" }] }),
   component: CartPage,
 });
 

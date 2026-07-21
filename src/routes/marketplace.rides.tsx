@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/marketplace/rides")({
-  head: () => ({ meta: [{ title: "Corridas — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Corridas — MT 24horas express" }] }),
   component: RidesPage,
 });
 

@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export const Route = createFileRoute("/marketplace/")({
   head: () => ({
     meta: [
-      { title: "MT Express — Comida, mercado e farmácia na sua porta" },
+      { title: "MT 24horas express — Comida, mercado e farmácia na sua porta" },
       { name: "description", content: "Descubra restaurantes, mercados e farmácias da sua cidade." },
     ],
   }),

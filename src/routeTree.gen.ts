@@ -25,6 +25,7 @@ import { Route as MarketplaceErrandsRouteImport } from './routes/marketplace.err
 import { Route as MarketplaceDirectoryRouteImport } from './routes/marketplace.directory'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceCartRouteImport } from './routes/marketplace.cart'
+import { Route as MarketplaceAddressesRouteImport } from './routes/marketplace.addresses'
 import { Route as MarketplaceStoreStoreIdRouteImport } from './routes/marketplace.store.$storeId'
 import { Route as MarketplaceOrdersOrderIdRouteImport } from './routes/marketplace.orders.$orderId'
 
@@ -108,6 +109,11 @@ const MarketplaceCartRoute = MarketplaceCartRouteImport.update({
   path: '/cart',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceAddressesRoute = MarketplaceAddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const MarketplaceStoreStoreIdRoute = MarketplaceStoreStoreIdRouteImport.update({
   id: '/store/$storeId',
   path: '/store/$storeId',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/signup': typeof SignupRoute
+  '/marketplace/addresses': typeof MarketplaceAddressesRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/marketplace/addresses': typeof MarketplaceAddressesRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/signup': typeof SignupRoute
+  '/marketplace/addresses': typeof MarketplaceAddressesRoute
   '/marketplace/cart': typeof MarketplaceCartRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/marketplace'
     | '/signup'
+    | '/marketplace/addresses'
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/marketplace/addresses'
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/marketplace'
     | '/signup'
+    | '/marketplace/addresses'
     | '/marketplace/cart'
     | '/marketplace/checkout'
     | '/marketplace/directory'
@@ -363,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceCartRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/addresses': {
+      id: '/marketplace/addresses'
+      path: '/addresses'
+      fullPath: '/marketplace/addresses'
+      preLoaderRoute: typeof MarketplaceAddressesRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/store/$storeId': {
       id: '/marketplace/store/$storeId'
       path: '/store/$storeId'
@@ -392,6 +411,7 @@ const MarketplaceOrdersRouteWithChildren =
   MarketplaceOrdersRoute._addFileChildren(MarketplaceOrdersRouteChildren)
 
 interface MarketplaceRouteChildren {
+  MarketplaceAddressesRoute: typeof MarketplaceAddressesRoute
   MarketplaceCartRoute: typeof MarketplaceCartRoute
   MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
   MarketplaceDirectoryRoute: typeof MarketplaceDirectoryRoute
@@ -408,6 +428,7 @@ interface MarketplaceRouteChildren {
 }
 
 const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceAddressesRoute: MarketplaceAddressesRoute,
   MarketplaceCartRoute: MarketplaceCartRoute,
   MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
   MarketplaceDirectoryRoute: MarketplaceDirectoryRoute,

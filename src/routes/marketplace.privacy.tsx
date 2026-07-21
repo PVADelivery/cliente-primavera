@@ -2,7 +2,7 @@
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/privacy")({
-  head: () => ({ meta: [{ title: "Privacidade — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Privacidade — MT 24horas express" }] }),
   component: PrivacyPage,
 });
 

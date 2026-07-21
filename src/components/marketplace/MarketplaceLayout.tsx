@@ -92,7 +92,7 @@ export function MarketplaceLayout() {
               <span className="flex items-center justify-center w-8 h-8">
                 <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
               </span>
-              <span className="font-display font-bold tracking-tight text-sm text-white">MT Express</span>
+              <span className="font-display font-bold tracking-tight text-sm text-white">MT 24horas express</span>
             </Link>
             <div className="flex items-center gap-4">
               <button

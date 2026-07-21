@@ -1,4 +1,4 @@
-﻿# Scripts SQL — MT Express (Marketplace)
+﻿# Scripts SQL — MT 24horas express (Marketplace)
 
 Rodar no SQL Editor do Supabase, em ordem:
 

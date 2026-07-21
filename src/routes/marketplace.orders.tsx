@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 
 export const Route = createFileRoute("/marketplace/orders")({
-  head: () => ({ meta: [{ title: "Meus pedidos — MT Express" }] }),
+  head: () => ({ meta: [{ title: "Meus pedidos — MT 24horas express" }] }),
   component: () => (
     <RequireAuth>
       <OrdersList />

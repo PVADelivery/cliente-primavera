@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
     meta: [
-      { title: "Agenda Empresarial — MT Express" },
+      { title: "Agenda Empresarial — MT 24horas express" },
       { name: "description", content: "Agenda telefônica das empresas da cidade: endereço, telefone, WhatsApp e horário." },
     ],
   }),
