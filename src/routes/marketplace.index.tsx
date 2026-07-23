@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
@@ -409,7 +409,7 @@ function MarketplaceHome() {
       if (!isSupabaseConfigured) return [];
       try {
         const result = await Promise.race([
-          supabase.from("companies").select("*").eq("is_active", true).limit(40),
+          supabase.from("companies").select("*").or("is_active.eq.true,is_active.is.null").limit(40),
           new Promise<{ data: null; error: Error }>((resolve) =>
             setTimeout(() => resolve({ data: null, error: new Error("timeout") }), 4000),
           ),
