@@ -408,16 +408,14 @@ function MarketplaceHome() {
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
       try {
-        const result = await Promise.race([
-          supabase.from("companies").select("*").or("is_active.eq.true,is_active.is.null").limit(40),
-          new Promise<{ data: null; error: Error }>((resolve) =>
-            setTimeout(() => resolve({ data: null, error: new Error("timeout") }), 4000),
-          ),
-        ]);
-        const { data, error } = result as { data: Company[] | null; error: unknown };
-        if (error || !data) return [];
-        return data;
-      } catch {
+        const { data, error } = await supabase.from("companies").select("*");
+        if (error) {
+          console.error("Error fetching companies:", error);
+          return [];
+        }
+        return data || [];
+      } catch (err) {
+        console.error("Exception fetching companies:", err);
         return [];
       }
     },
