@@ -381,32 +381,42 @@ function RidesPage() {
             {rides.filter(r => r.id !== activeRide?.id).map((ride) => {
               const dateStr = ride.created_at ? new Date(ride.created_at).toLocaleDateString('pt-BR') : '';
               return (
-                <div key={ride.id} className="bg-card border border-border rounded-xl p-4 shadow-sm flex flex-col gap-3">
+                <div key={ride.id} className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5 hover:border-primary/40 transition-all">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {ride.vehicle_type === "taxi" ? <Car className="w-4 h-4 text-primary" /> : <Bike className="w-4 h-4 text-primary" />}
-                      <span className="font-bold text-sm">{ride.vehicle_type === "taxi" ? "Táxi" : "Moto"}</span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        {ride.vehicle_type === "taxi" ? <Car className="w-4 h-4 text-primary" /> : <Bike className="w-4 h-4 text-primary" />}
+                      </div>
+                      <div>
+                        <span className="font-bold text-sm text-foreground block">
+                          {ride.vehicle_type === "taxi" ? "Táxi (Carro)" : "Moto Táxi"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{dateStr}</span>
+                      </div>
                     </div>
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${
-                      ride.status === "completed" ? "bg-emerald-100 text-emerald-800" :
-                      ride.status === "cancelled" ? "bg-rose-100 text-rose-800" : "bg-secondary text-foreground"
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                      ride.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                      ride.status === "cancelled" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" : 
+                      ride.status === "pending" ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" : "bg-primary/10 text-primary border border-primary/20"
                     }`}>
                       {ride.status ? (statusLabels[ride.status] || ride.status) : ""}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                      <p className="text-xs text-muted-foreground truncate">{ride.pickup_address}</p>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-muted-foreground truncate">{ride.pickup_address}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-                      <p className="text-xs text-muted-foreground truncate">{ride.dropoff_address}</p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                      <span className="text-muted-foreground truncate">{ride.dropoff_address}</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-1 pt-3 border-t border-border">
-                    <span className="text-xs font-medium">{dateStr}</span>
-                    <span className="font-bold text-sm">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
+
+                  <div className="flex items-center justify-between mt-1 pt-3 border-t border-border/50">
+                    <span className="text-xs text-muted-foreground font-medium">Valor Total</span>
+                    <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
                   </div>
                 </div>
               );
