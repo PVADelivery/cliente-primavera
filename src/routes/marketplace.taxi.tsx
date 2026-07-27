@@ -1,4 +1,4 @@
-﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPinned, Maximize2 } from "lucide-react";
@@ -72,6 +72,9 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 function TaxiPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const navigate = useNavigate();
   const { user } = useAuth();
   
@@ -84,6 +87,15 @@ function TaxiPage() {
   
   const mapSmall = useRef<any>(null);
   const mapFull = useRef<any>(null);
+
+  if (!mounted) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground font-medium">Carregando mapa de táxi...</p>
+      </div>
+    );
+  }
 
   const [vehicleType, setVehicleType] = useState<"taxi" | "mototaxi">("mototaxi");
   const [notes, setNotes] = useState("");

@@ -19,6 +19,11 @@ export const Route = createFileRoute("/marketplace/rides")({
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
 
 function RidesPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -30,6 +35,15 @@ function RidesPage() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const driverMarkerRef = useRef<any>(null);
+
+  if (!mounted) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground font-medium">Carregando suas corridas...</p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
