@@ -425,17 +425,23 @@ function MarketplaceHome() {
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
 
   const filtered = useMemo(() => {
-    let list = openOnly ? allStores.filter(s => s.is_open) : [...allStores];
+    const isStoreActive = (s: Company) => s.is_active !== false;
+    const isStoreOpen = (s: Company) => s.is_open ?? true;
+
+    let list = allStores.filter(isStoreActive);
+    if (openOnly) {
+      list = list.filter(isStoreOpen);
+    }
+
     if (sort === "fee") {
       list.sort((a, b) => {
-        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        const openDiff = (isStoreOpen(b) ? 1 : 0) - (isStoreOpen(a) ? 1 : 0);
         if (openDiff !== 0) return openDiff;
         return (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99);
       });
     } else {
-      // default: abertas primeiro, ordenadas por avaliação; fechadas no fim
       list.sort((a, b) => {
-        const openDiff = (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0);
+        const openDiff = (isStoreOpen(b) ? 1 : 0) - (isStoreOpen(a) ? 1 : 0);
         if (openDiff !== 0) return openDiff;
         return (b.rating ?? 0) - (a.rating ?? 0);
       });
@@ -672,7 +678,13 @@ function MarketplaceHome() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-16 text-center">
                   <p className="text-5xl mb-3">😴</p>
                   <p className="font-display font-bold text-foreground">Nenhuma loja encontrada</p>
-                  <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros.</p>
+                  <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros ou veja todas as lojas.</p>
+                  <button
+                    onClick={() => { setOpenOnly(false); setSort("relevance"); saveFilters({}); }}
+                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+                  >
+                    Ver todas as lojas
+                  </button>
                 </motion.div>
               )}
 
