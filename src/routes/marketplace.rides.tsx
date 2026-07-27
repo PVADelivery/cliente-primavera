@@ -1,4 +1,3 @@
-﻿"use client";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck } from "lucide-react";
