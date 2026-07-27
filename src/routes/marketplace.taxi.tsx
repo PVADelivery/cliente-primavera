@@ -619,7 +619,22 @@ function TaxiPage() {
       : `${dropoffText} - Primavera do Leste`;
 
     try {
-      const { data, error } = await supabase.from("ride_requests").insert({
+      const rideId = typeof crypto !== "undefined" && crypto.randomUUID 
+        ? crypto.randomUUID() 
+        : `ride_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+      if (typeof window !== "undefined") {
+        try {
+          const existing = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
+          if (!existing.includes(rideId)) {
+            existing.unshift(rideId);
+            localStorage.setItem("pva_my_ride_ids", JSON.stringify(existing.slice(0, 20)));
+          }
+        } catch (e) {}
+      }
+
+      const { error } = await supabase.from("ride_requests").insert({
+        id: rideId,
         user_id: user?.id || null,
         customer_name: user?.user_metadata?.full_name || user?.email || "Passageiro",
         customer_phone: user?.user_metadata?.phone || "",
@@ -629,20 +644,9 @@ function TaxiPage() {
         notes: notes,
         price: price,
         status: "pending",
-      } as any).select();
+      } as any);
 
       if (error) throw error;
-
-      if (data && data[0]?.id && typeof window !== "undefined") {
-        try {
-          const existing = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
-          if (!existing.includes(data[0].id)) {
-            existing.unshift(data[0].id);
-            localStorage.setItem("pva_my_ride_ids", JSON.stringify(existing.slice(0, 20)));
-          }
-        } catch (e) {}
-      }
-
       setSuccess(true);
     } catch (err: any) {
       console.error(err);

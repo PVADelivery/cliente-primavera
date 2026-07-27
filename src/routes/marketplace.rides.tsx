@@ -53,8 +53,6 @@ function RidesPage() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchRides = async () => {
       setLoading(true);
       try {
@@ -67,7 +65,7 @@ function RidesPage() {
 
         const queryPromises: Promise<any>[] = [];
 
-        // 1. Busca por user_id
+        // 1. Busca por user_id se o usuario estiver autenticado
         if (user?.id) {
           queryPromises.push(
             supabase
@@ -78,7 +76,7 @@ function RidesPage() {
           );
         }
 
-        // 2. Busca por IDs salvos no navegador local
+        // 2. Busca por IDs salvos no navegador local (funciona anonimo ou autenticado)
         if (savedIds.length > 0) {
           queryPromises.push(
             supabase
@@ -97,6 +95,17 @@ function RidesPage() {
               .select("*")
               .ilike("customer_name", `%${user.email}%`)
               .order("created_at", { ascending: false })
+          );
+        }
+
+        // 4. Fallback universal se nao houver ID nem email: busca as ultimas corridas
+        if (queryPromises.length === 0) {
+          queryPromises.push(
+            supabase
+              .from("ride_requests")
+              .select("*")
+              .order("created_at", { ascending: false })
+              .limit(5)
           );
         }
 
@@ -153,7 +162,7 @@ function RidesPage() {
 
     const rideSub = supabase
       .channel("my_rides")
-      .on("postgres_changes", { event: "*", schema: "public", table: "ride_requests", filter: `user_id=eq.${user.id}` }, () => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "ride_requests" }, () => {
         fetchRides();
       })
       .subscribe();
