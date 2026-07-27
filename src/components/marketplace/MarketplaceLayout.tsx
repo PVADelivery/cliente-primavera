@@ -2,6 +2,7 @@ import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { Home, BookUser, ShoppingBag, ClipboardList, User, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
 import { useState, useEffect } from "react";
@@ -23,6 +24,8 @@ export function MarketplaceLayout() {
   const path = router.state.location.pathname;
 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [activeOrdersCount, setActiveOrdersCount] = useState(0);
+  const [activeRidesCount, setActiveRidesCount] = useState(0);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -35,6 +38,62 @@ export function MarketplaceLayout() {
       setTheme("dark");
     }
   }, []);
+
+  useEffect(() => {
+    if (!user || typeof window === "undefined") {
+      setActiveOrdersCount(0);
+      setActiveRidesCount(0);
+      return;
+    }
+
+    const fetchActiveCounts = async () => {
+      try {
+        // Pedidos ativos
+        const { count: ordersCount, error: ordersErr } = await supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .in("status", ["pending", "accepted", "preparing", "ready", "out_for_delivery"]);
+
+        if (!ordersErr && typeof ordersCount === "number") {
+          setActiveOrdersCount(ordersCount);
+        }
+
+        // Corridas ativas
+        const { count: ridesCount, error: ridesErr } = await supabase
+          .from("ride_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .in("status", ["pending", "accepted", "in_progress"]);
+
+        if (!ridesErr && typeof ridesCount === "number") {
+          setActiveRidesCount(ridesCount);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar contadores ativos:", err);
+      }
+    };
+
+    fetchActiveCounts();
+
+    const channel = supabase
+      .channel(`active_badges_${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
+        () => fetchActiveCounts()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "ride_requests", filter: `user_id=eq.${user.id}` },
+        () => fetchActiveCounts()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const toggleTheme = () => {
     if (theme === "light") {
@@ -133,8 +192,18 @@ export function MarketplaceLayout() {
                   <span className="relative">
                     <Icon className="w-5 h-5" />
                     {t.to === "/marketplace/cart" && count > 0 && (
-                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
+                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
                         {count}
+                      </span>
+                    )}
+                    {t.to === "/marketplace/orders" && activeOrdersCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-4 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center shadow-md animate-pulse">
+                        {activeOrdersCount}
+                      </span>
+                    )}
+                    {t.to === "/marketplace/rides" && activeRidesCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-4 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center shadow-md animate-pulse">
+                        {activeRidesCount}
                       </span>
                     )}
                   </span>
