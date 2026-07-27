@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, CheckCircle2, Car, Bike, Navigation, X, Check, MapPi
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
@@ -129,39 +130,15 @@ function TaxiPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Carrega dinamicamente via Script CDN para evitar que o bundler SSR acesse o pacote NPM no servidor
   useEffect(() => {
-    // 1. Injeta o CSS do MapLibre
-    if (!document.getElementById("maplibre-css")) {
-      const link = document.createElement("link");
-      link.id = "maplibre-css";
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css";
-      document.head.appendChild(link);
-    }
-
-    // 2. Injeta o Script JS do MapLibre
-    if (!document.getElementById("maplibre-js")) {
-      const script = document.createElement("script");
-      script.id = "maplibre-js";
-      script.src = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js";
-      script.async = true;
-      script.onload = () => {
-        const globalLib = (window as any).maplibregl;
-        if (globalLib) {
-          const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-          setMapLibre(() => resolved);
-        }
-      };
-      document.body.appendChild(script);
-    } else {
-      // Caso já esteja injetado no DOM
-      const globalLib = (window as any).maplibregl;
-      if (globalLib) {
-        const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-        setMapLibre(() => resolved);
+    if (typeof window === "undefined") return;
+    let isMounted = true;
+    import("maplibre-gl").then((mod) => {
+      if (isMounted) {
+        setMapLibre(mod.default || mod);
       }
-    }
+    });
+    return () => { isMounted = false; };
   }, []);
 
   // Carrega tarifas das regiões

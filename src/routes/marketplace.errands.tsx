@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Package, CheckCircle2, X, MapPinned, Maximize2 } fro
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 export const Route = createFileRoute("/marketplace/errands")({
   head: () => ({ meta: [{ title: "Enviar Encomenda — MT 24horas express" }] }),
@@ -112,41 +113,16 @@ function ErrandsPage() {
   
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Carrega dinamicamente via Script CDN para evitar que o bundler SSR acesse o pacote NPM no servidor
+  // Carrega dinamicamente via dynamic import para evitar que o bundler SSR acesse o pacote NPM no servidor
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const cssId = "maplibre-css";
-    const scriptId = "maplibre-js";
-
-    if (!document.getElementById(cssId)) {
-      const link = document.createElement("link");
-      link.id = cssId;
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css";
-      document.head.appendChild(link);
-    }
-
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.type = "text/javascript";
-      script.src = "https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js";
-      script.onload = () => {
-        const globalLib = (window as any).maplibregl;
-        if (globalLib) {
-          const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-          setMapLibre(() => resolved);
-        }
-      };
-      document.body.appendChild(script);
-    } else {
-      const globalLib = (window as any).maplibregl;
-      if (globalLib) {
-        const resolved = globalLib.Map ? globalLib : (globalLib.default || globalLib);
-        setMapLibre(() => resolved);
+    let isMounted = true;
+    import("maplibre-gl").then((mod) => {
+      if (isMounted) {
+        setMapLibre(mod.default || mod);
       }
-    }
+    });
+    return () => { isMounted = false; };
   }, []);
 
   // Obtém a geolocalização exata do usuário ao montar o componente

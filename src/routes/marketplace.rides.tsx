@@ -4,6 +4,7 @@ import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck } from "
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 
@@ -41,24 +42,14 @@ function RidesPage() {
   const driverMarkerRef = useRef<any>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if ((window as any).maplibregl) {
-        setMapLibre((window as any).maplibregl);
-      } else {
-        const script = document.createElement("script");
-        script.src = "https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js";
-        script.async = true;
-        script.onload = () => {
-          if ((window as any).maplibregl) setMapLibre((window as any).maplibregl);
-        };
-        document.head.appendChild(script);
-
-        const link = document.createElement("link");
-        link.href = "https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css";
-        link.rel = "stylesheet";
-        document.head.appendChild(link);
+    if (typeof window === "undefined") return;
+    let isMounted = true;
+    import("maplibre-gl").then((mod) => {
+      if (isMounted) {
+        setMapLibre(mod.default || mod);
       }
-    }
+    });
+    return () => { isMounted = false; };
   }, []);
 
   useEffect(() => {
