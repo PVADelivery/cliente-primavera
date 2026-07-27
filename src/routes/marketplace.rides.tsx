@@ -58,15 +58,25 @@ function RidesPage() {
     const fetchRides = async () => {
       setLoading(true);
       try {
+        let savedIds: string[] = [];
+        if (typeof window !== "undefined") {
+          try {
+            savedIds = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
+          } catch (e) {}
+        }
+
         let query = supabase
           .from("ride_requests")
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (user?.email) {
-          query = query.or(`user_id.eq.${user.id},customer_name.eq.${user.email}`);
-        } else {
-          query = query.eq("user_id", user.id);
+        const conditions: string[] = [];
+        if (user?.id) conditions.push(`user_id.eq.${user.id}`);
+        if (user?.email) conditions.push(`customer_name.ilike.%${user.email}%`);
+        if (savedIds.length > 0) conditions.push(`id.in.(${savedIds.join(",")})`);
+
+        if (conditions.length > 0) {
+          query = query.or(conditions.join(","));
         }
 
         const { data, error } = await query;
