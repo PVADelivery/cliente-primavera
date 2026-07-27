@@ -88,15 +88,6 @@ function TaxiPage() {
   const mapSmall = useRef<any>(null);
   const mapFull = useRef<any>(null);
 
-  if (!mounted) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground font-medium">Carregando mapa de táxi...</p>
-      </div>
-    );
-  }
-
   const [vehicleType, setVehicleType] = useState<"taxi" | "mototaxi">("mototaxi");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -440,6 +431,15 @@ function TaxiPage() {
     }
     return () => { active = false; };
   }, [pickupCoords, dropoffCoords, vehicleType]);
+
+  if (!mounted) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground font-medium">Carregando mapa de táxi...</p>
+      </div>
+    );
+  }
 
   // Função algorítmica de geofencing e regras de rua para corrigir os bairros do OpenStreetMap
   const getCorrectBairro = (lon: number, lat: number, streetName: string, addr?: any): string => {

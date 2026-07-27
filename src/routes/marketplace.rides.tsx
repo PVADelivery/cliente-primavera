@@ -40,15 +40,6 @@ function RidesPage() {
   const mapRef = useRef<any>(null);
   const driverMarkerRef = useRef<any>(null);
 
-  if (!mounted) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground font-medium">Carregando suas corridas...</p>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       if ((window as any).maplibregl) {
@@ -165,6 +156,15 @@ function RidesPage() {
       supabase.removeChannel(locSub);
     };
   }, [activeRide?.driver_id, MapLibre]);
+
+  if (!mounted) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground font-medium">Carregando suas corridas...</p>
+      </div>
+    );
+  }
 
   const statusLabels: Record<string, string> = {
     pending: "Procurando motorista",
