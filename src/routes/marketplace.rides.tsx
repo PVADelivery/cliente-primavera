@@ -58,16 +58,46 @@ function RidesPage() {
     const fetchRides = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("ride_requests")
-          .select("*, driver:delivery_drivers(id, full_name, vehicle, vehicle_type, license_plate, latitude, longitude)")
-          .eq("user_id", user.id)
+          .select("*")
           .order("created_at", { ascending: false });
 
-        if (error) throw error;
-        setRides(data || []);
+        if (user?.email) {
+          query = query.or(`user_id.eq.${user.id},customer_name.eq.${user.email}`);
+        } else {
+          query = query.eq("user_id", user.id);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error("Erro ao buscar ride_requests:", error);
+          throw error;
+        }
+
+        let formattedRides = data || [];
+
+        // Buscar motoristas vinculados para exibir informacoes do motorista
+        const driverIds = Array.from(new Set(formattedRides.map((r: any) => r.driver_id).filter(Boolean)));
+        if (driverIds.length > 0) {
+          const { data: driversData } = await supabase
+            .from("delivery_drivers")
+            .select("id, full_name, vehicle, vehicle_type, license_plate, latitude, longitude, phone")
+            .in("id", driverIds);
+          
+          if (driversData) {
+            const driverMap = new Map(driversData.map((d: any) => [d.id, d]));
+            formattedRides = formattedRides.map((r: any) => ({
+              ...r,
+              driver: r.driver_id ? driverMap.get(r.driver_id) : null
+            }));
+          }
+        }
+
+        setRides(formattedRides);
         
-        const active = (data as any[])?.find(r => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
+        const active = formattedRides?.find((r: any) => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
         if (active) setActiveRide(active);
 
       } catch (err) {

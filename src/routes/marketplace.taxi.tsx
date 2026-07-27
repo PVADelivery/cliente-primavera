@@ -649,9 +649,14 @@ function TaxiPage() {
         <p className="text-muted-foreground mb-8">
           Motoristas de Primavera do Leste estão a caminho. O pagamento deve ser feito por fora diretamente a eles.
         </p>
-        <Button onClick={() => navigate({ to: "/marketplace" })} className="w-full max-w-xs h-12 rounded-xl">
-          Voltar ao Início
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+          <Button onClick={() => navigate({ to: "/marketplace/rides" })} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold">
+            Ver Minha Corrida
+          </Button>
+          <Button variant="outline" onClick={() => navigate({ to: "/marketplace" })} className="w-full h-12 rounded-xl">
+            Voltar ao Início
+          </Button>
+        </div>
       </div>
     );
   }
