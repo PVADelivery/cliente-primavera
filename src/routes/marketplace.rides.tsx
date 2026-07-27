@@ -65,28 +65,60 @@ function RidesPage() {
           } catch (e) {}
         }
 
-        let query = supabase
-          .from("ride_requests")
-          .select("*")
-          .order("created_at", { ascending: false });
+        const queryPromises: Promise<any>[] = [];
 
-        const conditions: string[] = [];
-        if (user?.id) conditions.push(`user_id.eq.${user.id}`);
-        if (user?.email) conditions.push(`customer_name.ilike.%${user.email}%`);
-        if (savedIds.length > 0) conditions.push(`id.in.(${savedIds.join(",")})`);
-
-        if (conditions.length > 0) {
-          query = query.or(conditions.join(","));
+        // 1. Busca por user_id
+        if (user?.id) {
+          queryPromises.push(
+            supabase
+              .from("ride_requests")
+              .select("*")
+              .eq("user_id", user.id)
+              .order("created_at", { ascending: false })
+          );
         }
 
-        const { data, error } = await query;
-
-        if (error) {
-          console.error("Erro ao buscar ride_requests:", error);
-          throw error;
+        // 2. Busca por IDs salvos no navegador local
+        if (savedIds.length > 0) {
+          queryPromises.push(
+            supabase
+              .from("ride_requests")
+              .select("*")
+              .in("id", savedIds)
+              .order("created_at", { ascending: false })
+          );
         }
 
-        let formattedRides = data || [];
+        // 3. Busca por customer_name (e-mail do cliente)
+        if (user?.email) {
+          queryPromises.push(
+            supabase
+              .from("ride_requests")
+              .select("*")
+              .ilike("customer_name", `%${user.email}%`)
+              .order("created_at", { ascending: false })
+          );
+        }
+
+        const results = await Promise.all(queryPromises);
+        const combinedRides: any[] = [];
+        const seenIds = new Set<string>();
+
+        for (const res of results) {
+          if (res.data) {
+            for (const item of res.data) {
+              if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                combinedRides.push(item);
+              }
+            }
+          }
+        }
+
+        // Ordenar do mais recente para o mais antigo
+        combinedRides.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+
+        let formattedRides = combinedRides;
 
         // Buscar motoristas vinculados para exibir informacoes do motorista
         const driverIds = Array.from(new Set(formattedRides.map((r: any) => r.driver_id).filter(Boolean)));
