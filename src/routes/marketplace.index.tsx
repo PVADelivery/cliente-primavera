@@ -39,17 +39,21 @@ const LS_FILTER = "pva_store_filters";
 const LS_RECENTS = "pva_recent_searches";
 
 function loadFilters() {
+  if (typeof window === "undefined") return {};
   try { return JSON.parse(localStorage.getItem(LS_FILTER) || "{}"); } catch { return {}; }
 }
 function saveFilters(v: object) {
+  if (typeof window === "undefined") return;
   try { localStorage.setItem(LS_FILTER, JSON.stringify(v)); } catch {}
 }
 function loadRecents(): string[] {
+  if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(LS_RECENTS) || "[]"); } catch { return []; }
 }
 function pushRecent(term: string) {
+  if (typeof window === "undefined") return;
   const prev = loadRecents().filter(s => s !== term);
-  localStorage.setItem(LS_RECENTS, JSON.stringify([term, ...prev].slice(0, 5)));
+  try { localStorage.setItem(LS_RECENTS, JSON.stringify([term, ...prev].slice(0, 5))); } catch {}
 }
 
 // ─── Skeleton components ──────────────────────────────────────────────────────
