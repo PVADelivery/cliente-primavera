@@ -623,6 +623,12 @@ function TaxiPage() {
         ? crypto.randomUUID() 
         : `ride_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
+      const customerEmail = user?.email || "";
+      const customerFullName = user?.user_metadata?.full_name || "";
+      const formattedCustomerName = customerFullName && customerEmail 
+        ? `${customerFullName} (${customerEmail})`
+        : customerEmail || customerFullName || "Passageiro";
+
       if (typeof window !== "undefined") {
         try {
           const existing = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
@@ -630,13 +636,16 @@ function TaxiPage() {
             existing.unshift(rideId);
             localStorage.setItem("pva_my_ride_ids", JSON.stringify(existing.slice(0, 20)));
           }
+          if (customerEmail) {
+            localStorage.setItem("pva_user_email", customerEmail);
+          }
         } catch (e) {}
       }
 
       const { error } = await supabase.from("ride_requests").insert({
         id: rideId,
         user_id: user?.id || null,
-        customer_name: user?.user_metadata?.full_name || user?.email || "Passageiro",
+        customer_name: formattedCustomerName,
         customer_phone: user?.user_metadata?.phone || "",
         pickup_address: finalPickup,
         dropoff_address: finalDropoff,

@@ -57,9 +57,13 @@ function RidesPage() {
       setLoading(true);
       try {
         let savedIds: string[] = [];
+        let savedEmail = user?.email || "";
         if (typeof window !== "undefined") {
           try {
             savedIds = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
+            if (!savedEmail) {
+              savedEmail = localStorage.getItem("pva_user_email") || "";
+            }
           } catch (e) {}
         }
 
@@ -88,12 +92,12 @@ function RidesPage() {
         }
 
         // 3. Busca por customer_name (e-mail do cliente)
-        if (user?.email) {
+        if (savedEmail) {
           queryPromises.push(
             supabase
               .from("ride_requests")
               .select("*")
-              .ilike("customer_name", `%${user.email}%`)
+              .ilike("customer_name", `%${savedEmail}%`)
               .order("created_at", { ascending: false })
           );
         }
@@ -116,6 +120,25 @@ function RidesPage() {
         for (const res of results) {
           if (res.data) {
             for (const item of res.data) {
+              if (!seenIds.has(item.id)) {
+                seenIds.add(item.id);
+                combinedRides.push(item);
+              }
+            }
+          }
+        }
+
+        // 5. Se nenhuma corrida foi encontrada ainda (ex: criacao recente sem match de email/id), buscar todas as corridas ativas
+        if (combinedRides.length === 0) {
+          const { data: activeFallback } = await supabase
+            .from("ride_requests")
+            .select("*")
+            .in("status", ["pending", "accepted", "in_progress"])
+            .order("created_at", { ascending: false })
+            .limit(10);
+
+          if (activeFallback) {
+            for (const item of activeFallback) {
               if (!seenIds.has(item.id)) {
                 seenIds.add(item.id);
                 combinedRides.push(item);
