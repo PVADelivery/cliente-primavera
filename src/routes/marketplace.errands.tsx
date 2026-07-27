@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, MapPin, Package, CheckCircle2, X, MapPinned, Maximize2 } from "lucide-react";
+import { ArrowLeft, MapPin, Package, CheckCircle2, X, MapPinned, Maximize2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
