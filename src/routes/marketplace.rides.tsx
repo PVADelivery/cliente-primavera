@@ -5,9 +5,15 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 
+import { RequireAuth } from "@/components/marketplace/RequireAuth";
+
 export const Route = createFileRoute("/marketplace/rides")({
   head: () => ({ meta: [{ title: "Corridas — MT 24horas express" }] }),
-  component: RidesPage,
+  component: () => (
+    <RequireAuth>
+      <RidesPage />
+    </RequireAuth>
+  ),
 });
 
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
@@ -47,10 +53,7 @@ function RidesPage() {
   }, []);
 
   useEffect(() => {
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
+    if (!user) return;
 
     const fetchRides = async () => {
       setLoading(true);
