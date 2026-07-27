@@ -7,13 +7,17 @@ import { Button } from "@/components/ui/button";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 
-export const Route = createFileRoute("/marketplace/rides")({
-  head: () => ({ meta: [{ title: "Corridas — MT 24horas express" }] }),
-  component: () => (
+function RidesRouteComponent() {
+  return (
     <RequireAuth>
       <RidesPage />
     </RequireAuth>
-  ),
+  );
+}
+
+export const Route = createFileRoute("/marketplace/rides")({
+  head: () => ({ meta: [{ title: "Corridas — MT 24horas express" }] }),
+  component: RidesRouteComponent,
 });
 
 const PVA_CENTER: [number, number] = [-54.3075, -15.5606];
