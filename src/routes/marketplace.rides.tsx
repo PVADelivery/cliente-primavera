@@ -151,7 +151,7 @@ function RidesPage() {
         setRides(formattedRides);
         
         const active = formattedRides?.find((r: any) => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
-        if (active) setActiveRide(active);
+        setActiveRide(active || null);
 
       } catch (err) {
         console.error("Erro ao buscar corridas:", err);
@@ -340,121 +340,69 @@ function RidesPage() {
         </div>
       )}
 
-      {/* Outras Corridas em Andamento */}
-      {rides.filter((r) => (r.status === "pending" || r.status === "accepted" || r.status === "in_progress") && r.id !== activeRide?.id).length > 0 && (
-        <div className="flex flex-col gap-3 mt-2">
-          <h2 className="font-display font-bold text-base text-muted-foreground uppercase tracking-wider text-[11px]">Outras Corridas em Andamento</h2>
-          <div className="flex flex-col gap-3">
-            {rides
-              .filter((r) => (r.status === "pending" || r.status === "accepted" || r.status === "in_progress") && r.id !== activeRide?.id)
-              .map((ride) => {
-                const dateStr = ride.created_at ? new Date(ride.created_at).toLocaleDateString('pt-BR') : '';
-                return (
-                  <div key={ride.id} className="bg-card border border-amber-500/30 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5 hover:border-primary/40 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          {ride.vehicle_type === "taxi" ? <Car className="w-4 h-4 text-primary" /> : <Bike className="w-4 h-4 text-primary" />}
-                        </div>
-                        <div>
-                          <span className="font-bold text-sm text-foreground block">
-                            {ride.vehicle_type === "taxi" ? "Táxi (Carro)" : "Moto Táxi"}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">{dateStr}</span>
-                        </div>
-                      </div>
-                      <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                        ride.status === "accepted" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
-                        "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                      }`}>
-                        {ride.status ? (statusLabels[ride.status] || ride.status) : ""}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                        <span className="text-muted-foreground truncate">{ride.pickup_address}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                        <span className="text-muted-foreground truncate">{ride.dropoff_address}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-1 pt-3 border-t border-border/50">
-                      <span className="text-xs text-muted-foreground font-medium">Valor Total</span>
-                      <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
-      {/* Histórico de Corridas Finalizadas / Canceladas */}
-      <div className="flex flex-col gap-3 mt-4">
+      {/* Lista Completa de Corridas */}
+      <div className="flex flex-col gap-3 mt-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-lg">Histórico de Corridas</h2>
+          <h2 className="font-display font-bold text-lg">Todas as Corridas</h2>
           <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>
             Nova Corrida
           </Button>
         </div>
-        {rides.filter((r) => r.status === "completed" || r.status === "cancelled").length === 0 ? (
+        {rides.length === 0 ? (
           <div className="text-center py-10 bg-card rounded-2xl border border-border">
             <Car className="w-8 h-8 mx-auto text-muted-foreground opacity-50 mb-3" />
-            <p className="text-muted-foreground text-sm">Você ainda não possui corridas concluídas no histórico.</p>
+            <p className="text-muted-foreground text-sm">Você ainda não solicitou nenhuma corrida.</p>
             <Button variant="outline" className="mt-4" onClick={() => navigate({ to: "/marketplace/taxi" })}>
               Solicitar Agora
             </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {rides
-              .filter((r) => r.status === "completed" || r.status === "cancelled")
-              .map((ride) => {
-                const dateStr = ride.created_at ? new Date(ride.created_at).toLocaleDateString('pt-BR') : '';
-                return (
-                  <div key={ride.id} className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5 hover:border-primary/40 transition-all opacity-80">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          {ride.vehicle_type === "taxi" ? <Car className="w-4 h-4 text-primary" /> : <Bike className="w-4 h-4 text-primary" />}
-                        </div>
-                        <div>
-                          <span className="font-bold text-sm text-foreground block">
-                            {ride.vehicle_type === "taxi" ? "Táxi (Carro)" : "Moto Táxi"}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">{dateStr}</span>
-                        </div>
+            {rides.map((ride) => {
+              const dateStr = ride.created_at ? new Date(ride.created_at).toLocaleDateString('pt-BR') : '';
+              return (
+                <div key={ride.id} className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5 hover:border-primary/40 transition-all">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        {ride.vehicle_type === "taxi" ? <Car className="w-4 h-4 text-primary" /> : <Bike className="w-4 h-4 text-primary" />}
                       </div>
-                      <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                        ride.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
-                        "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                      }`}>
-                        {ride.status ? (statusLabels[ride.status] || ride.status) : ""}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                        <span className="text-muted-foreground truncate">{ride.pickup_address}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                        <span className="text-muted-foreground truncate">{ride.dropoff_address}</span>
+                      <div>
+                        <span className="font-bold text-sm text-foreground block">
+                          {ride.vehicle_type === "taxi" ? "Táxi (Carro)" : "Moto Táxi"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{dateStr}</span>
                       </div>
                     </div>
+                    <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                      ride.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                      ride.status === "cancelled" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" : 
+                      ride.status === "accepted" ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" :
+                      ride.status === "in_progress" ? "bg-purple-500/10 text-purple-500 border border-purple-500/20" :
+                      "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                    }`}>
+                      {ride.status ? (statusLabels[ride.status] || ride.status) : ""}
+                    </span>
+                  </div>
 
-                    <div className="flex items-center justify-between mt-1 pt-3 border-t border-border/50">
-                      <span className="text-xs text-muted-foreground font-medium">Valor Total</span>
-                      <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="text-muted-foreground truncate">{ride.pickup_address}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                      <span className="text-muted-foreground truncate">{ride.dropoff_address}</span>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="flex items-center justify-between mt-1 pt-3 border-t border-border/50">
+                    <span className="text-xs text-muted-foreground font-medium">Valor Total</span>
+                    <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
