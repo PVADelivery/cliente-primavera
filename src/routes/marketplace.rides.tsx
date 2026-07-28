@@ -353,10 +353,10 @@ function RidesPage() {
         </div>
       )}
 
-      {/* Lista Completa de Corridas */}
+      {/* Lista de Corridas / Histórico */}
       <div className="flex flex-col gap-3 mt-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-lg">Todas as Corridas</h2>
+          <h2 className="font-display font-bold text-lg">Histórico de Corridas</h2>
           <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>
             Nova Corrida
           </Button>
@@ -364,7 +364,7 @@ function RidesPage() {
         {rides.length === 0 ? (
           <div className="text-center py-10 bg-card rounded-2xl border border-border">
             <Car className="w-8 h-8 mx-auto text-muted-foreground opacity-50 mb-3" />
-            <p className="text-muted-foreground text-sm">Você ainda não solicitou nenhuma corrida.</p>
+            <p className="text-muted-foreground text-sm">Você ainda não possui corridas no histórico.</p>
             <Button variant="outline" className="mt-4" onClick={() => navigate({ to: "/marketplace/taxi" })}>
               Solicitar Agora
             </Button>
