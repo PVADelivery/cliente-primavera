@@ -102,16 +102,14 @@ function RidesPage() {
           );
         }
 
-        // 4. Fallback universal se nao houver ID nem email: busca as ultimas corridas
-        if (queryPromises.length === 0) {
-          queryPromises.push(
-            supabase
-              .from("ride_requests")
-              .select("*")
-              .order("created_at", { ascending: false })
-              .limit(5)
-          );
-        }
+        // 4. Fallback universal permanente: sempre incluir a busca das últimas corridas do sistema
+        queryPromises.push(
+          supabase
+            .from("ride_requests")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(30)
+        );
 
         const results = await Promise.all(queryPromises);
         const combinedRides: any[] = [];
@@ -120,25 +118,6 @@ function RidesPage() {
         for (const res of results) {
           if (res.data) {
             for (const item of res.data) {
-              if (!seenIds.has(item.id)) {
-                seenIds.add(item.id);
-                combinedRides.push(item);
-              }
-            }
-          }
-        }
-
-        // 5. Se nenhuma corrida foi encontrada ainda (ex: criacao recente sem match de email/id), buscar todas as corridas ativas
-        if (combinedRides.length === 0) {
-          const { data: activeFallback } = await supabase
-            .from("ride_requests")
-            .select("*")
-            .in("status", ["pending", "accepted", "in_progress"])
-            .order("created_at", { ascending: false })
-            .limit(10);
-
-          if (activeFallback) {
-            for (const item of activeFallback) {
               if (!seenIds.has(item.id)) {
                 seenIds.add(item.id);
                 combinedRides.push(item);
