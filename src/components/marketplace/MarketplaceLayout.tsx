@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
+import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 
@@ -109,42 +110,19 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Sol global iluminando o app (astro fotográfico, responsivo) ── */}
+      {/* ── Fundo: céu estrelado com constelações, montanhas e lago ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-bloom sun-breathe"
-        style={{
-          width: "clamp(520px, 70vw, 1100px)",
-          height: "clamp(520px, 70vw, 1100px)",
-          transform: "translate(32%, -34%)",
-          willChange: "opacity",
-        }}
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${nightSkyBg})` }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-corona"
-        style={{
-          width: "clamp(260px, 34vw, 560px)",
-          height: "clamp(260px, 34vw, 560px)",
-          transform: "translate(34%, -36%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-core sun-pulse"
-        style={{
-          width: "clamp(112px, 15vw, 230px)",
-          height: "clamp(112px, 15vw, 230px)",
-          transform: "translate(38%, -40%)",
-        }}
-      />
-      {/* Vinheta escura sutil (canto inferior-esquerdo) para preservar contraste */}
+      {/* Véu para legibilidade do conteúdo */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.68) 45%, rgba(0,0,0,0.80) 100%)",
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
