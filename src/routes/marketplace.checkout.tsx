@@ -198,7 +198,7 @@ function Checkout() {
   const finalTotal = Math.max(0, subtotal) + (fulfillmentMode === 'pickup' ? 0 : (deliveryFee || 0));
 
   const handleSubmit = async () => {
-    const numericPhoneInput = phoneInput.replace(/\D/g, '');
+    const numericPhoneInput = (phoneInput ?? '').replace(/\D/g, '');
     if (!profile?.phone || profile.phone.replace(/\D/g, '').length < 10) {
       if (numericPhoneInput.length < 10 || numericPhoneInput.length > 11) {
         toast.error('Por favor, informe um número de WhatsApp/Telefone válido com DDD.');

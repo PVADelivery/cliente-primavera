@@ -67,7 +67,7 @@ function RidesPage() {
           } catch (e) {}
         }
 
-        const queryPromises: Promise<any>[] = [];
+        const queryPromises: PromiseLike<any>[] = [];
 
         // 1. Busca por user_id se o usuario estiver autenticado
         if (user?.id) {
