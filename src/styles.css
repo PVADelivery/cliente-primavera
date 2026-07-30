@@ -83,7 +83,7 @@
 
   /* ── Muted ── */
   --muted:            oklch(0.96 0 0);
-  --muted-foreground: oklch(0.55 0 0);
+  --muted-foreground: oklch(0.42 0 0);
 
   /* ── Accent ── */
   --accent:            oklch(0.94 0 0);
@@ -144,7 +144,7 @@
   --secondary:            oklch(0.26 0 0);
   --secondary-foreground: oklch(0.90 0 0);
   --muted:            oklch(0.26 0 0);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted-foreground: oklch(0.78 0 0);
   --accent:            oklch(0.30 0 0);
   --accent-foreground: oklch(0.98 0 0);
   --border: oklch(1 0 0 / 12%);
@@ -160,6 +160,37 @@
   --sidebar-accent-foreground:  oklch(0.98 0 0);
   --sidebar-border:             oklch(1 0 0 / 10%);
   --sidebar-ring:               oklch(0.75 0.17 80);
+}
+
+/* O cenário não muda com o tema; apenas o véu, os cards e a tipografia mudam. */
+.scenic-backdrop {
+  background: linear-gradient(
+    to bottom,
+    oklch(0.08 0.03 255 / 0.08) 0%,
+    oklch(0.08 0.03 255 / 0.22) 48%,
+    oklch(0.05 0.02 255 / 0.48) 100%
+  );
+}
+
+.scenic-chrome {
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  box-shadow: 0 8px 28px oklch(0 0 0 / 0.14);
+}
+
+.scenic-label {
+  background: color-mix(in oklab, var(--card) 90%, transparent);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  box-shadow: 0 3px 12px oklch(0 0 0 / 0.16);
+}
+
+.dark .scenic-backdrop {
+  background: linear-gradient(
+    to bottom,
+    oklch(0.03 0.015 255 / 0.18) 0%,
+    oklch(0.02 0.01 255 / 0.42) 48%,
+    oklch(0.01 0.005 255 / 0.68) 100%
+  );
 }
 
 @layer base {
