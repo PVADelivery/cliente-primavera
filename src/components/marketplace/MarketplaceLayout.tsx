@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
+import nightSkyBg from "@/assets/night-sky-bg.jpg";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 
@@ -109,46 +110,23 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Sol global iluminando o app (astro fotográfico, responsivo) ── */}
+      {/* ── Fundo: céu estrelado com constelações, montanhas e lago ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-bloom sun-breathe"
-        style={{
-          width: "clamp(520px, 70vw, 1100px)",
-          height: "clamp(520px, 70vw, 1100px)",
-          transform: "translate(32%, -34%)",
-          willChange: "opacity",
-        }}
+        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${nightSkyBg})` }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-corona"
-        style={{
-          width: "clamp(260px, 34vw, 560px)",
-          height: "clamp(260px, 34vw, 560px)",
-          transform: "translate(34%, -36%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed top-0 right-0 z-0 sun-core sun-pulse"
-        style={{
-          width: "clamp(112px, 15vw, 230px)",
-          height: "clamp(112px, 15vw, 230px)",
-          transform: "translate(38%, -40%)",
-        }}
-      />
-      {/* Vinheta escura sutil (canto inferior-esquerdo) para preservar contraste */}
+      {/* Véu para legibilidade do conteúdo */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.55) 100%)",
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
+        <header className="sticky top-0 z-40 bg-black/45 backdrop-blur-xl border-b border-white/[0.07]">
           <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
             <Link to="/marketplace" className="flex items-center gap-2.5">
               <span className="flex items-center justify-center w-8 h-8">
@@ -179,7 +157,7 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/60 backdrop-blur-xl">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
