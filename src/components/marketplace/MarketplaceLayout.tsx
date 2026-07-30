@@ -5,7 +5,6 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
-import nightSkyBg from "@/assets/night-sky-bg-v3.jpg";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 
@@ -110,26 +109,54 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Cenário permanente: o tema altera apenas superfícies e tipografia ── */}
+      {/* ── Sol global iluminando o app (responsivo, sem flicker) ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${nightSkyBg})` }}
+        className="pointer-events-none fixed top-0 right-0 rounded-full z-0 sun-breathe"
+        style={{
+          width: "clamp(420px, 55vw, 900px)",
+          height: "clamp(420px, 55vw, 900px)",
+          transform: "translate(30%, -30%)",
+          background:
+            "radial-gradient(circle at center, rgba(253,224,71,0.22) 0%, rgba(250,204,21,0.10) 32%, rgba(250,204,21,0.03) 50%, rgba(250,204,21,0) 62%)",
+          filter: "blur(40px)",
+          willChange: "opacity",
+        }}
       />
-      <div aria-hidden className="scenic-backdrop pointer-events-none fixed inset-0 z-0" />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed top-0 right-0 rounded-full z-0"
+        style={{
+          width: "clamp(220px, 28vw, 520px)",
+          height: "clamp(220px, 28vw, 520px)",
+          transform: "translate(35%, -35%)",
+          background:
+            "radial-gradient(circle at center, rgba(253,224,71,0.38) 0%, rgba(250,204,21,0.15) 42%, rgba(250,204,21,0) 65%)",
+          filter: "blur(24px)",
+        }}
+      />
+      {/* Vinheta escura sutil (canto inferior-esquerdo) para preservar contraste */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 60%)",
+        }}
+      />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="scenic-chrome sticky top-0 z-40 backdrop-blur-xl border-b border-border/70">
+        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
           <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
             <Link to="/marketplace" className="flex items-center gap-2.5">
               <span className="flex items-center justify-center w-8 h-8">
                 <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
               </span>
-              <span className="font-display font-bold tracking-tight text-sm text-foreground">MT 24horas express</span>
+              <span className="font-display font-bold tracking-tight text-sm text-white">MT 24horas express</span>
             </Link>
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border transition-colors"
+                className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
                 aria-label="Alternar tema"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -149,7 +176,7 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="scenic-chrome fixed bottom-0 left-0 right-0 z-40 border-t border-border/70 backdrop-blur-xl">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);

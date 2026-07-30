@@ -237,7 +237,7 @@ function FilterBar({
             className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
               active
                 ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-1 ring-primary/20"
-                : "bg-card/90 border-border text-card-foreground hover:bg-accent hover:text-accent-foreground shadow-sm"
+                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
             }`}
           >
             {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
@@ -252,7 +252,7 @@ function FilterBar({
         className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
           openOnly
             ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-emerald-500/40 ring-2 ring-emerald-500/20"
-            : "bg-card/90 border-border text-card-foreground hover:bg-accent hover:text-accent-foreground shadow-sm"
+            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
         }`}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
@@ -468,20 +468,25 @@ function MarketplaceHome() {
             "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(250,204,21,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
-        {/* Sol interno — bloom atmosférico */}
+        {/* Sol interno — halo suave */}
         <div
           aria-hidden
-          className="sun-bloom absolute -top-52 -right-40 w-[560px] h-[560px] opacity-95 transition-opacity duration-700 ease-out group-hover:opacity-100"
+          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.55) 25%, rgba(234,179,8,0.15) 55%, rgba(0,0,0,0) 75%)",
+            filter: "blur(28px)",
+          }}
         />
-        {/* Corona dourada */}
+        {/* Núcleo do sol — brilho concentrado */}
         <div
           aria-hidden
-          className="sun-corona absolute -top-32 -right-20 w-[300px] h-[300px] opacity-90 transition-opacity duration-700 group-hover:opacity-100"
-        />
-        {/* Núcleo branco-quente (o astro) */}
-        <div
-          aria-hidden
-          className="sun-core sun-pulse absolute -top-14 -right-6 w-[132px] h-[132px] sm:w-[164px] sm:h-[164px]"
+          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255,236,153,1) 0%, rgba(250,204,21,0.7) 40%, rgba(250,204,21,0) 70%)",
+            filter: "blur(6px)",
+          }}
         />
         {/* Textura de grão sutil */}
         <div
@@ -542,7 +547,7 @@ function MarketplaceHome() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
                   <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
                 </div>
-                <span className="scenic-label rounded-full px-2.5 py-1 text-[11px] font-bold text-center leading-tight">{c.label}</span>
+                <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
             );
           })}
