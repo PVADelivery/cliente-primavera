@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { CartItem } from '@/types/database';
+import type { CartItem } from '@/types/database';
 
 export function useOrderLock() {
   const [isLocked, setIsLocked] = useState(false);
@@ -9,7 +9,7 @@ export function useOrderLock() {
 
   const generateIdempotencyKey = useCallback((userId: string, items: CartItem[], extra?: string) => {
     const cartFingerprint = `${userId}|${extra ?? ''}|${items
-      .map(i => `${i.product.id}:${i.quantity}`)
+      .map(i => `${i.productId}:${i.quantity}`)
       .sort()
       .join('|')}`;
 

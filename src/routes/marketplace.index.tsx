@@ -468,25 +468,20 @@ function MarketplaceHome() {
             "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(250,204,21,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
-        {/* Sol interno — halo suave */}
+        {/* Sol interno — bloom atmosférico */}
         <div
           aria-hidden
-          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.55) 25%, rgba(234,179,8,0.15) 55%, rgba(0,0,0,0) 75%)",
-            filter: "blur(28px)",
-          }}
+          className="sun-bloom absolute -top-52 -right-40 w-[560px] h-[560px] opacity-95 transition-opacity duration-700 ease-out group-hover:opacity-100"
         />
-        {/* Núcleo do sol — brilho concentrado */}
+        {/* Corona dourada */}
         <div
           aria-hidden
-          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,236,153,1) 0%, rgba(250,204,21,0.7) 40%, rgba(250,204,21,0) 70%)",
-            filter: "blur(6px)",
-          }}
+          className="sun-corona absolute -top-32 -right-20 w-[300px] h-[300px] opacity-90 transition-opacity duration-700 group-hover:opacity-100"
+        />
+        {/* Núcleo branco-quente (o astro) */}
+        <div
+          aria-hidden
+          className="sun-core sun-pulse absolute -top-14 -right-6 w-[132px] h-[132px] sm:w-[164px] sm:h-[164px]"
         />
         {/* Textura de grão sutil */}
         <div

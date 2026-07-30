@@ -114,3 +114,24 @@ export interface Database {
     Enums: { app_role: AppRole };
   };
 }
+
+export interface Address {
+  id: string;
+  user_id: string;
+  label: string | null;
+  street: string;
+  number: string | null;
+  complement: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  reference: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  region_id?: string | null;
+  is_default?: boolean | null;
+  created_at?: string;
+}
+
+export type { CartItem } from "@/contexts/CartContext";

@@ -8,7 +8,7 @@ export function useRequirePhone() {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [phoneInput, setPhoneInput] = useState(() => {
     const numeric = profile?.phone?.replace(/\D/g, '') || '';
-    return numeric.length >= 10 ? profile.phone : '';
+    return numeric.length >= 10 ? (profile?.phone ?? '') : '';
   });
   const [isSubmittingPhone, setIsSubmittingPhone] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -17,7 +17,7 @@ export function useRequirePhone() {
     if (profile?.phone) {
       const numeric = profile.phone.replace(/\D/g, '');
       if (numeric.length >= 10) {
-        setPhoneInput(profile.phone);
+        setPhoneInput(profile.phone ?? '');
       } else {
         setPhoneInput('');
       }
@@ -30,7 +30,7 @@ export function useRequirePhone() {
     const numericPhone = profile?.phone?.replace(/\D/g, '') || '';
     if (!profile?.phone || numericPhone.length < 10) {
       const numeric = profile?.phone?.replace(/\D/g, '') || '';
-      setPhoneInput(numeric.length >= 10 ? profile.phone : '');
+      setPhoneInput(numeric.length >= 10 ? (profile?.phone ?? '') : '');
       setPendingAction(() => action);
       setShowPhoneModal(true);
       return false;
@@ -43,7 +43,7 @@ export function useRequirePhone() {
     e.preventDefault();
     if (!user) return;
     
-    const numericPhone = phoneInput.replace(/\D/g, '');
+    const numericPhone = (phoneInput ?? '').replace(/\D/g, '');
     if (numericPhone.length < 10) {
       toast.error('Por favor, informe um número de telefone válido com DDD.');
       return;

@@ -223,3 +223,91 @@ lovable-badge,
 @media (prefers-reduced-motion: reduce) {
   .sun-breathe { animation: none; }
 }
+
+/* ══════════════════════════════════════════════
+   Sol — astro fotográfico (núcleo branco-quente,
+   corona dourada e bloom atmosférico)
+   ══════════════════════════════════════════════ */
+.sun-bloom,
+.sun-corona,
+.sun-core {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+/* Camada 1 — atmosfera larga que tinge o app inteiro */
+.sun-bloom {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 214, 120, 0.20) 0%,
+    rgba(255, 190, 90, 0.11) 26%,
+    rgba(255, 170, 70, 0.045) 45%,
+    rgba(255, 160, 60, 0) 66%
+  );
+  filter: blur(46px);
+}
+
+/* Camada 2 — corona dourada em volta do disco */
+.sun-corona {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 246, 214, 0.75) 0%,
+    rgba(253, 216, 120, 0.42) 30%,
+    rgba(250, 186, 70, 0.16) 52%,
+    rgba(250, 176, 60, 0) 72%
+  );
+  filter: blur(22px);
+}
+
+/* Camada 3 — disco branco-quente (o "astro") */
+.sun-core {
+  background: radial-gradient(
+    circle at 42% 40%,
+    #ffffff 0%,
+    #fffaf0 26%,
+    rgba(255, 234, 170, 0.92) 46%,
+    rgba(253, 205, 96, 0.45) 66%,
+    rgba(250, 190, 70, 0) 82%
+  );
+  filter: blur(9px);
+  box-shadow: 0 0 90px 26px rgba(255, 212, 120, 0.22);
+}
+
+/* Tema claro — céu diurno: sol mais suave, sem estourar o branco */
+html:not(.dark) .sun-bloom {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 196, 84, 0.16) 0%,
+    rgba(255, 176, 66, 0.08) 30%,
+    rgba(255, 160, 60, 0) 62%
+  );
+}
+html:not(.dark) .sun-corona {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 226, 150, 0.55) 0%,
+    rgba(252, 196, 84, 0.30) 34%,
+    rgba(250, 176, 60, 0) 70%
+  );
+}
+html:not(.dark) .sun-core {
+  background: radial-gradient(
+    circle at 42% 40%,
+    #ffffff 0%,
+    #fff6dc 30%,
+    rgba(255, 216, 128, 0.75) 54%,
+    rgba(252, 196, 84, 0) 80%
+  );
+  box-shadow: 0 0 70px 18px rgba(255, 196, 84, 0.18);
+}
+
+/* Pulsação lenta do núcleo (só opacity — sem repaint pesado) */
+@keyframes sun-pulse-kf {
+  0%, 100% { opacity: 0.88; }
+  50%      { opacity: 1; }
+}
+.sun-pulse { animation: sun-pulse-kf 9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sun-pulse { animation: none; }
+}

@@ -109,30 +109,33 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Sol global iluminando o app (responsivo, sem flicker) ── */}
+      {/* ── Sol global iluminando o app (astro fotográfico, responsivo) ── */}
       <div
         aria-hidden
-        className="pointer-events-none fixed top-0 right-0 rounded-full z-0 sun-breathe"
+        className="pointer-events-none fixed top-0 right-0 z-0 sun-bloom sun-breathe"
         style={{
-          width: "clamp(420px, 55vw, 900px)",
-          height: "clamp(420px, 55vw, 900px)",
-          transform: "translate(30%, -30%)",
-          background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.22) 0%, rgba(250,204,21,0.10) 32%, rgba(250,204,21,0.03) 50%, rgba(250,204,21,0) 62%)",
-          filter: "blur(40px)",
+          width: "clamp(520px, 70vw, 1100px)",
+          height: "clamp(520px, 70vw, 1100px)",
+          transform: "translate(32%, -34%)",
           willChange: "opacity",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed top-0 right-0 rounded-full z-0"
+        className="pointer-events-none fixed top-0 right-0 z-0 sun-corona"
         style={{
-          width: "clamp(220px, 28vw, 520px)",
-          height: "clamp(220px, 28vw, 520px)",
-          transform: "translate(35%, -35%)",
-          background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.38) 0%, rgba(250,204,21,0.15) 42%, rgba(250,204,21,0) 65%)",
-          filter: "blur(24px)",
+          width: "clamp(260px, 34vw, 560px)",
+          height: "clamp(260px, 34vw, 560px)",
+          transform: "translate(34%, -36%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed top-0 right-0 z-0 sun-core sun-pulse"
+        style={{
+          width: "clamp(112px, 15vw, 230px)",
+          height: "clamp(112px, 15vw, 230px)",
+          transform: "translate(38%, -40%)",
         }}
       />
       {/* Vinheta escura sutil (canto inferior-esquerdo) para preservar contraste */}
