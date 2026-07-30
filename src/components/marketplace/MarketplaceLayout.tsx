@@ -126,7 +126,7 @@ export function MarketplaceLayout() {
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
+        <header className="sticky top-0 z-40 bg-black/45 backdrop-blur-xl border-b border-white/[0.07]">
           <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
             <Link to="/marketplace" className="flex items-center gap-2.5">
               <span className="flex items-center justify-center w-8 h-8">
@@ -157,7 +157,7 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/60 backdrop-blur-xl">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
