@@ -237,7 +237,7 @@ function FilterBar({
             className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
               active
                 ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-1 ring-primary/20"
-                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                : "bg-card/90 border-border text-card-foreground hover:bg-accent hover:text-accent-foreground shadow-sm"
             }`}
           >
             {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
@@ -252,7 +252,7 @@ function FilterBar({
         className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
           openOnly
             ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-emerald-500/40 ring-2 ring-emerald-500/20"
-            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+            : "bg-card/90 border-border text-card-foreground hover:bg-accent hover:text-accent-foreground shadow-sm"
         }`}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
@@ -542,7 +542,7 @@ function MarketplaceHome() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
                   <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
                 </div>
-                <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
+                <span className="scenic-label rounded-full px-2.5 py-1 text-[11px] font-bold text-center leading-tight">{c.label}</span>
               </motion.button>
             );
           })}

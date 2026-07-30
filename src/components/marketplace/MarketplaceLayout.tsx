@@ -5,7 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
-import nightSkyBg from "@/assets/night-sky-bg.jpg";
+import nightSkyBg from "@/assets/night-sky-bg-v2.jpg";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 
@@ -110,34 +110,26 @@ export function MarketplaceLayout() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden">
-      {/* ── Fundo: céu estrelado com constelações, montanhas e lago ── */}
+      {/* ── Cenário permanente: o tema altera apenas superfícies e tipografia ── */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${nightSkyBg})` }}
       />
-      {/* Véu para legibilidade do conteúdo */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.55) 100%)",
-        }}
-      />
+      <div aria-hidden className="scenic-backdrop pointer-events-none fixed inset-0 z-0" />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="sticky top-0 z-40 bg-black/45 backdrop-blur-xl border-b border-white/[0.07]">
+        <header className="scenic-chrome sticky top-0 z-40 backdrop-blur-xl border-b border-border/70">
           <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
             <Link to="/marketplace" className="flex items-center gap-2.5">
               <span className="flex items-center justify-center w-8 h-8">
                 <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
               </span>
-              <span className="font-display font-bold tracking-tight text-sm text-white">MT 24horas express</span>
+              <span className="font-display font-bold tracking-tight text-sm text-foreground">MT 24horas express</span>
             </Link>
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleTheme}
-                className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+                className="p-2 rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground border border-border transition-colors"
                 aria-label="Alternar tema"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -157,7 +149,7 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/60 backdrop-blur-xl">
+        <nav className="scenic-chrome fixed bottom-0 left-0 right-0 z-40 border-t border-border/70 backdrop-blur-xl">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
