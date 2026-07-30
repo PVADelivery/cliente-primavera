@@ -519,7 +519,7 @@ function Checkout() {
               </div>
               <input
                 type="tel"
-                value={phoneInput}
+                value={phoneInput ?? ''}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="(11) 99999-9999"
                 className="w-full h-11 bg-background/50 border border-white/10 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
@@ -620,7 +620,7 @@ function Checkout() {
       <RequirePhoneModal
         isOpen={showPhoneModal}
         onClose={() => setShowPhoneModal(false)}
-        phoneInput={phoneInput}
+        phoneInput={phoneInput ?? ''}
         setPhoneInput={setPhoneInput}
         onSubmit={handlePhoneSubmit}
         isSubmitting={isSubmittingPhone}
