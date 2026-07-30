@@ -122,7 +122,7 @@ export function MarketplaceLayout() {
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.68) 45%, rgba(0,0,0,0.80) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.55) 100%)",
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
