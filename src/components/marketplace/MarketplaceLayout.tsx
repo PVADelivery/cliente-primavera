@@ -5,7 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
-import nightSkyBg from "@/assets/night-sky-bg-v2.jpg";
+import nightSkyBg from "@/assets/night-sky-bg-v3.jpg";
 import { useState, useEffect } from "react";
 import { Car } from "lucide-react";
 
