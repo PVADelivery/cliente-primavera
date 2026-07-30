@@ -1,7 +1,7 @@
 ﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import logoIcon from "@/assets/logo-icon-v3.png";
 
 export const Route = createFileRoute("/login")({
@@ -29,7 +29,16 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center px-6 bg-background">
+    <div className="min-h-screen grid place-items-center px-6 bg-background relative">
+      <button
+        type="button"
+        onClick={() => (window.history.length > 1 ? window.history.back() : navigate({ to: "/marketplace" }))}
+        className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground hover:bg-muted transition-colors"
+        aria-label="Voltar"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Voltar
+      </button>
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-1">
           <span className="inline-flex items-center justify-center w-20 h-20 rounded-2xl overflow-hidden mx-auto shadow-2xl ring-2 ring-white/10 bg-white">
