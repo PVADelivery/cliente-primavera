@@ -188,6 +188,7 @@ function BusinessPage() {
 
       <div className="relative">
         <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+</div>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
