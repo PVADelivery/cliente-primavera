@@ -186,6 +186,18 @@ function BusinessPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-2">
+        <span className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-primary text-primary-foreground border border-primary">
+          Imóveis
+        </span>
+        <Link
+          to="/marketplace/business/vehicles"
+          className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground"
+        >
+          Veículos
+        </Link>
+      </div>
+
       <div className="relative">
         <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input

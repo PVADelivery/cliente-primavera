@@ -107,6 +107,7 @@ export interface Database {
       order_items: { Row: OrderItem; Insert: Partial<OrderItem> & { order_id: string; product_id: string; quantity: number; price: number; product_name: string }; Update: Partial<OrderItem> };
       audit_logs: { Row: { id: string; request_id: string; user_id: string | null; event: string; source: string | null; http_status: number | null; error_code: string | null; error_message: string | null; payload: unknown; context: unknown; created_at: string }; Insert: { request_id: string; event: string; user_id?: string | null; source?: string | null; http_status?: number | null; error_code?: string | null; error_message?: string | null; payload?: unknown; context?: unknown }; Update: never };
       properties: { Row: Property; Insert: Partial<Property> & { deal_type: PropertyDeal; property_type: PropertyType }; Update: Partial<Property> };
+      vehicles: { Row: Vehicle; Insert: Partial<Vehicle> & { model: string; vehicle_type: VehicleType }; Update: Partial<Vehicle> };
       social_posts: { Row: SocialPost; Insert: Partial<SocialPost> & { user_id: string; category: SocialCategory; title: string }; Update: Partial<SocialPost> };
     };
     Views: {
@@ -163,6 +164,31 @@ export interface Property {
 }
 
 export type SocialCategory = "vagas" | "achados" | "doacoes" | "servicos";
+
+export type VehicleType = "carro" | "moto" | "caminhao" | "utilitario" | "outro";
+
+export interface Vehicle {
+  id: string;
+  owner_id: string | null;
+  seller_name: string | null;
+  vehicle_type: VehicleType;
+  brand: string | null;
+  model: string;
+  year: number | null;
+  km: number | null;
+  fuel: string | null;
+  transmission: string | null;
+  color: string | null;
+  city: string | null;
+  state: string | null;
+  description: string | null;
+  price: number | null;
+  contact_phone: string | null;
+  images: string[] | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface SocialPost {
   id: string;
