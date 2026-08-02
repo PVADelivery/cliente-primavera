@@ -227,6 +227,28 @@ function BusinessPage() {
         </select>
       </div>
 
+      {activeChips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {activeChips.map((chip) => (
+            <button
+              key={chip.key}
+              onClick={chip.clear}
+              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full bg-primary/15 text-primary border border-primary/30 text-[11px] font-semibold"
+              aria-label={`Remover filtro ${chip.label}`}
+            >
+              {chip.label}
+              <X className="w-3 h-3" />
+            </button>
+          ))}
+          <button
+            onClick={clearAll}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/60 text-[11px] font-semibold text-muted-foreground"
+          >
+            Limpar tudo
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-3">
         <p className="text-[11px] font-semibold text-muted-foreground">
           {list.length} {list.length === 1 ? "imóvel" : "imóveis"}
