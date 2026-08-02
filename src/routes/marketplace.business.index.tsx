@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X } from "lucide-react";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
+import { usePropertyFavorites } from "@/hooks/usePropertyFavorites";
 
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
@@ -62,6 +63,8 @@ function BusinessPage() {
   const [neighborhood, setNeighborhood] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("price_asc");
   const [page, setPage] = useState(1);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const { favorites, isFavorite, toggleFavorite, hydrated } = usePropertyFavorites();
 
   const { data: properties = [], isLoading } = useQuery({
     queryKey: ["properties"],
@@ -100,6 +103,7 @@ function BusinessPage() {
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
     return properties
+      .filter((p) => (onlyFavorites ? favorites.includes(p.id) : true))
       .filter((p) => (deal === "all" ? true : p.deal_type === deal))
       .filter((p) => (type === "all" ? true : p.property_type === type))
       .filter((p) => (city === "all" ? true : p.city === city))
@@ -120,7 +124,7 @@ function BusinessPage() {
         if (b.price == null) return -1;
         return sort === "price_desc" ? b.price - a.price : a.price - b.price;
       });
-  }, [properties, deal, type, q, city, neighborhood, sort]);
+  }, [properties, deal, type, q, city, neighborhood, sort, onlyFavorites, favorites]);
 
   const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
 
@@ -137,6 +141,8 @@ function BusinessPage() {
   if (neighborhood !== "all")
     activeChips.push({ key: "hood", label: neighborhood, clear: () => setNeighborhood("all") });
   if (q.trim()) activeChips.push({ key: "q", label: `"${q.trim()}"`, clear: () => setQ("") });
+  if (onlyFavorites)
+    activeChips.push({ key: "fav", label: "Favoritos", clear: () => setOnlyFavorites(false) });
 
   const clearAll = () => {
     setDeal("all");
@@ -144,6 +150,7 @@ function BusinessPage() {
     setCity("all");
     setNeighborhood("all");
     setQ("");
+    setOnlyFavorites(false);
   };
 
   const pageItems = useMemo(
@@ -153,7 +160,7 @@ function BusinessPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [deal, type, q, city, neighborhood, sort]);
+  }, [deal, type, q, city, neighborhood, sort, onlyFavorites]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -203,6 +210,18 @@ function BusinessPage() {
             {d.label}
           </button>
         ))}
+        <button
+          onClick={() => setOnlyFavorites((v) => !v)}
+          aria-pressed={onlyFavorites}
+          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+            onlyFavorites
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-card text-muted-foreground border-border/60"
+          }`}
+        >
+          <Heart className={`w-3.5 h-3.5 ${onlyFavorites ? "fill-current" : ""}`} />
+          Favoritos{hydrated && favorites.length > 0 ? ` (${favorites.length})` : ""}
+        </button>
       </div>
 
       <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
@@ -301,21 +320,37 @@ function BusinessPage() {
         </div>
       ) : list.length === 0 ? (
         <div className="rounded-3xl border border-border/50 bg-card p-8 text-center">
-          <p className="font-display font-bold text-base">Nenhum imóvel encontrado</p>
-          <p className="text-xs text-muted-foreground mt-1.5">Ajuste os filtros ou tente outro bairro.</p>
+          <p className="font-display font-bold text-base">
+            {onlyFavorites ? "Nenhum favorito ainda" : "Nenhum imóvel encontrado"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            {onlyFavorites
+              ? "Toque no coração de um imóvel para salvá-lo na sua lista de interesse."
+              : "Ajuste os filtros ou tente outro bairro."}
+          </p>
         </div>
       ) : (
         <>
         <ul className="space-y-3">
           {pageItems.map((p) => (
-            <li key={p.id}>
+            <li key={p.id} className="relative">
+              <button
+                onClick={() => toggleFavorite(p.id)}
+                aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
+                aria-pressed={isFavorite(p.id)}
+                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
+              >
+                <Heart
+                  className={`w-4 h-4 ${isFavorite(p.id) ? "text-primary fill-current" : "text-muted-foreground"}`}
+                />
+              </button>
               <Link
                 to="/marketplace/business/$propertyId"
                 params={{ propertyId: p.id }}
                 className="block rounded-3xl border border-border/50 bg-card p-5 hover:border-primary/50 transition-colors"
                 style={{ boxShadow: "var(--shadow-card)" }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 pr-10">
                   <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
                     {p.deal_type === "venda" ? "Venda" : "Locação"}
                   </span>
