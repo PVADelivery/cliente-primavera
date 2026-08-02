@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Heart } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/database";
 import { formatPrice } from "@/lib/property";
 import { PropertyAttrs } from "./marketplace.business.index";
+import { usePropertyFavorites } from "@/hooks/usePropertyFavorites";
 
 export const Route = createFileRoute("/marketplace/business/$propertyId")({
   head: () => ({
@@ -31,6 +32,7 @@ const TYPE_LABEL: Record<string, string> = {
 function PropertyDetail() {
   const { propertyId } = useParams({ from: "/marketplace/business/$propertyId" });
   const navigate = useNavigate();
+  const { isFavorite, toggleFavorite } = usePropertyFavorites();
 
   const { data: property, isLoading } = useQuery({
     queryKey: ["property", propertyId],
@@ -59,6 +61,16 @@ function PropertyDetail() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <h1 className="font-display text-lg font-bold leading-tight">Detalhes do imóvel</h1>
+        <button
+          onClick={() => toggleFavorite(propertyId)}
+          aria-label={isFavorite(propertyId) ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          aria-pressed={isFavorite(propertyId)}
+          className="ml-auto w-9 h-9 rounded-full grid place-items-center bg-card border border-border/50"
+        >
+          <Heart
+            className={`w-4 h-4 ${isFavorite(propertyId) ? "text-primary fill-current" : "text-muted-foreground"}`}
+          />
+        </button>
       </div>
 
       {isLoading ? (
