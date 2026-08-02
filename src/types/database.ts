@@ -134,4 +134,63 @@ export interface Address {
   created_at?: string;
 }
 
+export type PropertyDeal = "locacao" | "venda";
+export type PropertyType = "casa" | "apartamento" | "sala" | "kitnet" | "terreno";
+
+export interface Property {
+  id: string;
+  owner_id: string | null;
+  agency_name: string | null;
+  deal_type: PropertyDeal;
+  property_type: PropertyType;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  description: string | null;
+  total_area: number | null;
+  built_area: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  parking: number | null;
+  price: number | null;
+  contact_phone: string | null;
+  images: string[] | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SocialCategory = "vagas" | "achados" | "doacoes" | "servicos";
+
+export interface SocialPost {
+  id: string;
+  user_id: string;
+  category: SocialCategory;
+  title: string;
+  body: string | null;
+  contact: string | null;
+  images: string[] | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+interface LegacyAddressPlaceholder {
+  id: string;
+  user_id: string;
+  label: string | null;
+  street: string;
+  number: string | null;
+  complement: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state?: string | null;
+  zip_code?: string | null;
+  reference: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  region_id?: string | null;
+  is_default?: boolean | null;
+  created_at?: string;
+}
+
 export type { CartItem } from "@/contexts/CartContext";
