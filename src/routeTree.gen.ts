@@ -30,6 +30,7 @@ import { Route as MarketplaceAddressesRouteImport } from './routes/marketplace.a
 import { Route as MarketplaceBusinessIndexRouteImport } from './routes/marketplace.business.index'
 import { Route as MarketplaceStoreStoreIdRouteImport } from './routes/marketplace.store.$storeId'
 import { Route as MarketplaceOrdersOrderIdRouteImport } from './routes/marketplace.orders.$orderId'
+import { Route as MarketplaceBusinessVehiclesRouteImport } from './routes/marketplace.business.vehicles'
 import { Route as MarketplaceBusinessPropertyIdRouteImport } from './routes/marketplace.business.$propertyId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -139,6 +140,12 @@ const MarketplaceOrdersOrderIdRoute =
     path: '/$orderId',
     getParentRoute: () => MarketplaceOrdersRoute,
   } as any)
+const MarketplaceBusinessVehiclesRoute =
+  MarketplaceBusinessVehiclesRouteImport.update({
+    id: '/business/vehicles',
+    path: '/business/vehicles',
+    getParentRoute: () => MarketplaceRoute,
+  } as any)
 const MarketplaceBusinessPropertyIdRoute =
   MarketplaceBusinessPropertyIdRouteImport.update({
     id: '/business/$propertyId',
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/marketplace/business/$propertyId': typeof MarketplaceBusinessPropertyIdRoute
+  '/marketplace/business/vehicles': typeof MarketplaceBusinessVehiclesRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business/': typeof MarketplaceBusinessIndexRoute
@@ -189,6 +197,7 @@ export interface FileRoutesByTo {
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/marketplace/business/$propertyId': typeof MarketplaceBusinessPropertyIdRoute
+  '/marketplace/business/vehicles': typeof MarketplaceBusinessVehiclesRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business': typeof MarketplaceBusinessIndexRoute
@@ -214,6 +223,7 @@ export interface FileRoutesById {
   '/marketplace/terms': typeof MarketplaceTermsRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/marketplace/business/$propertyId': typeof MarketplaceBusinessPropertyIdRoute
+  '/marketplace/business/vehicles': typeof MarketplaceBusinessVehiclesRoute
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business/': typeof MarketplaceBusinessIndexRoute
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/marketplace/terms'
     | '/marketplace/'
     | '/marketplace/business/$propertyId'
+    | '/marketplace/business/vehicles'
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business/'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/marketplace/terms'
     | '/marketplace'
     | '/marketplace/business/$propertyId'
+    | '/marketplace/business/vehicles'
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business'
@@ -287,6 +299,7 @@ export interface FileRouteTypes {
     | '/marketplace/terms'
     | '/marketplace/'
     | '/marketplace/business/$propertyId'
+    | '/marketplace/business/vehicles'
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business/'
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceOrdersOrderIdRouteImport
       parentRoute: typeof MarketplaceOrdersRoute
     }
+    '/marketplace/business/vehicles': {
+      id: '/marketplace/business/vehicles'
+      path: '/business/vehicles'
+      fullPath: '/marketplace/business/vehicles'
+      preLoaderRoute: typeof MarketplaceBusinessVehiclesRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/business/$propertyId': {
       id: '/marketplace/business/$propertyId'
       path: '/business/$propertyId'
@@ -485,6 +505,7 @@ interface MarketplaceRouteChildren {
   MarketplaceTermsRoute: typeof MarketplaceTermsRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   MarketplaceBusinessPropertyIdRoute: typeof MarketplaceBusinessPropertyIdRoute
+  MarketplaceBusinessVehiclesRoute: typeof MarketplaceBusinessVehiclesRoute
   MarketplaceStoreStoreIdRoute: typeof MarketplaceStoreStoreIdRoute
   MarketplaceBusinessIndexRoute: typeof MarketplaceBusinessIndexRoute
 }
@@ -505,6 +526,7 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceTermsRoute: MarketplaceTermsRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   MarketplaceBusinessPropertyIdRoute: MarketplaceBusinessPropertyIdRoute,
+  MarketplaceBusinessVehiclesRoute: MarketplaceBusinessVehiclesRoute,
   MarketplaceStoreStoreIdRoute: MarketplaceStoreStoreIdRoute,
   MarketplaceBusinessIndexRoute: MarketplaceBusinessIndexRoute,
 }
