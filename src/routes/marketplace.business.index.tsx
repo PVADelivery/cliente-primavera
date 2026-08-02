@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight } from "lucide-react";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
@@ -43,11 +43,25 @@ const TYPE_LABEL: Record<PropertyType, string> = {
   terreno: "Terreno",
 };
 
+type SortKey = "price_asc" | "price_desc" | "recent";
+
+const SORTS: Array<{ key: SortKey; label: string }> = [
+  { key: "price_asc", label: "Menor valor" },
+  { key: "price_desc", label: "Maior valor" },
+  { key: "recent", label: "Atualizados recentemente" },
+];
+
+const PAGE_SIZE = 8;
+
 function BusinessPage() {
   const navigate = useNavigate();
   const [deal, setDeal] = useState<"all" | "locacao" | "venda">("all");
   const [type, setType] = useState<PropertyType | "all">("all");
   const [q, setQ] = useState("");
+  const [city, setCity] = useState<string>("all");
+  const [neighborhood, setNeighborhood] = useState<string>("all");
+  const [sort, setSort] = useState<SortKey>("price_asc");
+  const [page, setPage] = useState(1);
 
   const { data: properties = [], isLoading } = useQuery({
     queryKey: ["properties"],
@@ -65,23 +79,66 @@ function BusinessPage() {
     },
   });
 
+  const cities = useMemo(
+    () => Array.from(new Set(properties.map((p) => p.city).filter(Boolean) as string[])).sort(),
+    [properties]
+  );
+
+  const neighborhoods = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          properties
+            .filter((p) => (city === "all" ? true : p.city === city))
+            .map((p) => p.neighborhood)
+            .filter(Boolean) as string[]
+        )
+      ).sort(),
+    [properties, city]
+  );
+
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
     return properties
       .filter((p) => (deal === "all" ? true : p.deal_type === deal))
       .filter((p) => (type === "all" ? true : p.property_type === type))
+      .filter((p) => (city === "all" ? true : p.city === city))
+      .filter((p) => (neighborhood === "all" ? true : p.neighborhood === neighborhood))
       .filter((p) =>
         term
           ? `${p.neighborhood ?? ""} ${p.city ?? ""} ${p.description ?? ""}`.toLowerCase().includes(term)
           : true
       )
       .sort((a, b) => {
+        if (sort === "recent") {
+          const ad = new Date(a.updated_at ?? a.created_at ?? 0).getTime();
+          const bd = new Date(b.updated_at ?? b.created_at ?? 0).getTime();
+          return bd - ad;
+        }
         if (a.price == null && b.price == null) return 0;
         if (a.price == null) return 1;
         if (b.price == null) return -1;
-        return a.price - b.price;
+        return sort === "price_desc" ? b.price - a.price : a.price - b.price;
       });
-  }, [properties, deal, type, q]);
+  }, [properties, deal, type, q, city, neighborhood, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const pageItems = useMemo(
+    () => list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [list, page]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [deal, type, q, city, neighborhood, sort]);
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  useEffect(() => {
+    if (city !== "all" && !neighborhoods.includes(neighborhood)) setNeighborhood("all");
+  }, [city, neighborhoods, neighborhood]);
 
   return (
     <div className="space-y-5 pb-6">
@@ -141,6 +198,56 @@ function BusinessPage() {
         ))}
       </div>
 
+      <div className="grid grid-cols-2 gap-2">
+        <select
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          aria-label="Filtrar por cidade"
+          className="h-11 px-3 rounded-2xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+        >
+          <option value="all">Todas as cidades</option>
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <select
+          value={neighborhood}
+          onChange={(e) => setNeighborhood(e.target.value)}
+          aria-label="Filtrar por bairro"
+          className="h-11 px-3 rounded-2xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+        >
+          <option value="all">Todos os bairros</option>
+          {neighborhoods.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[11px] font-semibold text-muted-foreground">
+          {list.length} {list.length === 1 ? "imóvel" : "imóveis"}
+        </p>
+        <label className="inline-flex items-center gap-2">
+          <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Ordenar imóveis"
+            className="h-9 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+          >
+            {SORTS.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       {isLoading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
@@ -153,8 +260,9 @@ function BusinessPage() {
           <p className="text-xs text-muted-foreground mt-1.5">Ajuste os filtros ou tente outro bairro.</p>
         </div>
       ) : (
+        <>
         <ul className="space-y-3">
-          {list.map((p) => (
+          {pageItems.map((p) => (
             <li key={p.id}>
               <Link
                 to="/marketplace/business/$propertyId"
@@ -190,6 +298,29 @@ function BusinessPage() {
             </li>
           ))}
         </ul>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <button
+              onClick={() => setPage((v) => Math.max(1, v - 1))}
+              disabled={page === 1}
+              className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+            >
+              Anterior
+            </button>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Página {page} de {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
+              disabled={page === totalPages}
+              className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+            >
+              Próxima
+            </button>
+          </div>
+        )}
+        </>
       )}
     </div>
   );
