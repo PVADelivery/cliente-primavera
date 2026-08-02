@@ -123,6 +123,29 @@ function BusinessPage() {
   }, [properties, deal, type, q, city, neighborhood, sort]);
 
   const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+
+  const activeChips: Array<{ key: string; label: string; clear: () => void }> = [];
+  if (deal !== "all")
+    activeChips.push({
+      key: "deal",
+      label: deal === "venda" ? "Venda" : "Locação",
+      clear: () => setDeal("all"),
+    });
+  if (type !== "all")
+    activeChips.push({ key: "type", label: TYPE_LABEL[type], clear: () => setType("all") });
+  if (city !== "all") activeChips.push({ key: "city", label: city, clear: () => setCity("all") });
+  if (neighborhood !== "all")
+    activeChips.push({ key: "hood", label: neighborhood, clear: () => setNeighborhood("all") });
+  if (q.trim()) activeChips.push({ key: "q", label: `"${q.trim()}"`, clear: () => setQ("") });
+
+  const clearAll = () => {
+    setDeal("all");
+    setType("all");
+    setCity("all");
+    setNeighborhood("all");
+    setQ("");
+  };
+
   const pageItems = useMemo(
     () => list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [list, page]
