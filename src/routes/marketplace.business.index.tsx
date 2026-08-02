@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown } from "lucide-react";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
