@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
-  SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car
+  SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car,
+  Users, Building2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -582,6 +583,20 @@ function MarketplaceHome() {
             </div>
             <p className="text-sm text-muted-foreground max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
+        </Link>
+      </section>
+
+      {/* ── Espaço Social & Central de Negócios ── */}
+      <section className="grid grid-cols-2 gap-3">
+        <Link to="/marketplace/social" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Users className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Espaço<br/>Social</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Classificados da cidade</p>
+        </Link>
+        <Link to="/marketplace/business" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Building2 className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Central de<br/>Negócios</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Imóveis e locação</p>
         </Link>
       </section>
 
