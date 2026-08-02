@@ -106,6 +106,8 @@ export interface Database {
       orders: { Row: Order; Insert: Partial<Order> & { company_id: string; total: number; idempotency_key: string }; Update: Partial<Order> };
       order_items: { Row: OrderItem; Insert: Partial<OrderItem> & { order_id: string; product_id: string; quantity: number; price: number; product_name: string }; Update: Partial<OrderItem> };
       audit_logs: { Row: { id: string; request_id: string; user_id: string | null; event: string; source: string | null; http_status: number | null; error_code: string | null; error_message: string | null; payload: unknown; context: unknown; created_at: string }; Insert: { request_id: string; event: string; user_id?: string | null; source?: string | null; http_status?: number | null; error_code?: string | null; error_message?: string | null; payload?: unknown; context?: unknown }; Update: never };
+      properties: { Row: Property; Insert: Partial<Property> & { deal_type: PropertyDeal; property_type: PropertyType }; Update: Partial<Property> };
+      social_posts: { Row: SocialPost; Insert: Partial<SocialPost> & { user_id: string; category: SocialCategory; title: string }; Update: Partial<SocialPost> };
     };
     Views: {
       customer_orders_view: { Row: Order & { company: { name: string; logo_url: string | null; category: string | null } | null } };
@@ -132,6 +134,46 @@ export interface Address {
   region_id?: string | null;
   is_default?: boolean | null;
   created_at?: string;
+}
+
+export type PropertyDeal = "locacao" | "venda";
+export type PropertyType = "casa" | "apartamento" | "sala" | "kitnet" | "terreno";
+
+export interface Property {
+  id: string;
+  owner_id: string | null;
+  agency_name: string | null;
+  deal_type: PropertyDeal;
+  property_type: PropertyType;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  description: string | null;
+  total_area: number | null;
+  built_area: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  parking: number | null;
+  price: number | null;
+  contact_phone: string | null;
+  images: string[] | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SocialCategory = "vagas" | "achados" | "doacoes" | "servicos";
+
+export interface SocialPost {
+  id: string;
+  user_id: string;
+  category: SocialCategory;
+  title: string;
+  body: string | null;
+  contact: string | null;
+  images: string[] | null;
+  is_active: boolean;
+  created_at: string;
 }
 
 export type { CartItem } from "@/contexts/CartContext";
