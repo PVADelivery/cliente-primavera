@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock } from "lucide-react";
+import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock, Mail, Navigation, Copy, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -23,6 +23,7 @@ type Business = {
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
+  email?: string | null;
   website: string | null;
   hours: string | null;
   rating: number | null;
@@ -30,6 +31,76 @@ type Business = {
   card_image_url?: string | null;
   card_style?: string | null;
 };
+
+const onlyDigits = (v: string) => v.replace(/\D/g, "");
+const waLink = (v: string) => {
+  const d = onlyDigits(v);
+  return `https://wa.me/${d.startsWith("55") ? d : `55${d}`}`;
+};
+const mapsLink = (addr: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+  external,
+  accent,
+  copyValue,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+  accent?: string;
+  copyValue?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const content = (
+    <>
+      <span
+        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${accent ?? "bg-secondary text-secondary-foreground"}`}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <span className="block text-sm font-medium text-foreground truncate">{value}</span>
+      </span>
+    </>
+  );
+  return (
+    <div className="flex items-center gap-3 rounded-2xl px-2 py-1.5 hover:bg-secondary/50 transition-colors">
+      {href ? (
+        <a
+          href={href}
+          {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+          className="flex items-center gap-3 min-w-0 flex-1"
+        >
+          {content}
+        </a>
+      ) : (
+        <div className="flex items-center gap-3 min-w-0 flex-1">{content}</div>
+      )}
+      {copyValue && (
+        <button
+          type="button"
+          aria-label={`Copiar ${label}`}
+          onClick={() => {
+            navigator.clipboard?.writeText(copyValue);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          }}
+          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+        >
+          {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+        </button>
+      )}
+    </div>
+  );
+}
 
 // ─── Mock data removido para produção ──────────────────────────────────────────
 
