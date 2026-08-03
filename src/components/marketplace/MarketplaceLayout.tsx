@@ -163,9 +163,7 @@ export function MarketplaceLayout() {
               </button>
               {!user ? (
                 <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
-              ) : (
-                <span className="text-xs text-muted-foreground truncate max-w-[150px]">{user.email}</span>
-              )}
+              ) : null}
             </div>
           </div>
         </header>
