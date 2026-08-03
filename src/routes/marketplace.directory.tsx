@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock } from "lucide-react";
+import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock, Mail, Navigation, Copy, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -23,6 +23,7 @@ type Business = {
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
+  email?: string | null;
   website: string | null;
   hours: string | null;
   rating: number | null;
@@ -30,6 +31,76 @@ type Business = {
   card_image_url?: string | null;
   card_style?: string | null;
 };
+
+const onlyDigits = (v: string) => v.replace(/\D/g, "");
+const waLink = (v: string) => {
+  const d = onlyDigits(v);
+  return `https://wa.me/${d.startsWith("55") ? d : `55${d}`}`;
+};
+const mapsLink = (addr: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+
+function ContactRow({
+  icon,
+  label,
+  value,
+  href,
+  external,
+  accent,
+  copyValue,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+  accent?: string;
+  copyValue?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const content = (
+    <>
+      <span
+        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${accent ?? "bg-secondary text-secondary-foreground"}`}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <span className="block text-sm font-medium text-foreground truncate">{value}</span>
+      </span>
+    </>
+  );
+  return (
+    <div className="flex items-center gap-3 rounded-2xl px-2 py-1.5 hover:bg-secondary/50 transition-colors">
+      {href ? (
+        <a
+          href={href}
+          {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+          className="flex items-center gap-3 min-w-0 flex-1"
+        >
+          {content}
+        </a>
+      ) : (
+        <div className="flex items-center gap-3 min-w-0 flex-1">{content}</div>
+      )}
+      {copyValue && (
+        <button
+          type="button"
+          aria-label={`Copiar ${label}`}
+          onClick={() => {
+            navigator.clipboard?.writeText(copyValue);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          }}
+          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+        >
+          {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+        </button>
+      )}
+    </div>
+  );
+}
 
 // ─── Mock data removido para produção ──────────────────────────────────────────
 
@@ -240,61 +311,117 @@ function DirectoryPage() {
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(i * 0.05, 0.4), type: "spring", stiffness: 100 }}
-                      className="group p-5 bg-card rounded-[1.5rem] shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-border/30 hover:border-primary/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 relative overflow-hidden"
+                      className="group bg-card rounded-[1.75rem] shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-border/40 hover:border-primary/25 hover:shadow-[0_12px_40px_rgb(0,0,0,0.07)] transition-all duration-300 relative overflow-hidden"
                     >
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4 min-w-0">
-                          {/* Modern Avatar */}
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex flex-col items-center justify-center shrink-0 border border-primary/10">
-                            <span className="font-display font-bold text-xl leading-none">{(b.name || "E").charAt(0).toUpperCase()}</span>
-                          </div>
-                          
-                          <div className="min-w-0">
-                            <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate mb-1">
-                              {b.name}
-                            </h3>
-                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                {b.category}
+                      {/* Cabeçalho */}
+                      <div className="p-5 pb-4 grid grid-cols-[auto_minmax(0,1fr)] gap-4 items-center border-b border-border/40">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary flex items-center justify-center shrink-0 border border-primary/10">
+                          <span className="font-display font-bold text-xl leading-none">{(b.name || "E").charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate">{b.name}</h3>
+                          <div className="flex items-center gap-2 flex-wrap mt-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+                              {b.category}
+                            </span>
+                            {b.rating != null && (
+                              <span className="text-[11px] font-bold flex items-center gap-1 text-amber-500">
+                                <Star className="w-3.5 h-3.5 fill-amber-500" /> {b.rating.toFixed(1)}
                               </span>
-                              {b.rating != null && (
-                                <>
-                                  <span className="w-1 h-1 rounded-full bg-border" />
-                                  <span className="text-[11px] font-bold flex items-center gap-1 text-amber-500">
-                                    <Star className="w-3.5 h-3.5 fill-amber-500" /> {b.rating.toFixed(1)}
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                            
-                            {b.address && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1.5 line-clamp-1">
-                                <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/40" />
-                                <span>{b.address}</span>
-                              </p>
+                            )}
+                            {b.hours && (
+                              <span className="text-[11px] font-medium flex items-center gap-1 text-muted-foreground">
+                                <Clock className="w-3.5 h-3.5" /> {b.hours}
+                              </span>
                             )}
                           </div>
                         </div>
-                        
-                        {/* Quick Actions - Vertical on small screens, horizontal on larger */}
-                        <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                          {b.phone && (
-                            <a 
-                              href={`tel:${b.phone.replace(/\D/g, "")}`}
-                              className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-secondary/80 hover:scale-105 active:scale-95 transition-all shadow-sm"
-                            >
-                              <Phone className="w-4 h-4" />
-                            </a>
-                          )}
-                          {b.whatsapp && (
-                            <a 
-                              href={`https://wa.me/${b.whatsapp}`} target="_blank" rel="noreferrer"
-                              className="w-10 h-10 rounded-full bg-[#25D366]/10 text-[#1da851] flex items-center justify-center hover:bg-[#25D366]/20 hover:scale-105 active:scale-95 transition-all shadow-sm"
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                            </a>
-                          )}
-                        </div>
+                      </div>
+
+                      {/* Dados de contato */}
+                      <div className="p-3 space-y-0.5">
+                        {b.whatsapp && (
+                          <ContactRow
+                            icon={<MessageCircle className="w-4 h-4" />}
+                            label="WhatsApp"
+                            value={b.whatsapp}
+                            href={waLink(b.whatsapp)}
+                            external
+                            accent="bg-[#25D366]/15 text-[#1da851]"
+                            copyValue={b.whatsapp}
+                          />
+                        )}
+                        {b.phone && (
+                          <ContactRow
+                            icon={<Phone className="w-4 h-4" />}
+                            label="Telefone"
+                            value={b.phone}
+                            href={`tel:${onlyDigits(b.phone)}`}
+                            copyValue={b.phone}
+                          />
+                        )}
+                        {b.address && (
+                          <ContactRow
+                            icon={<MapPin className="w-4 h-4" />}
+                            label="Endereço"
+                            value={b.address}
+                            href={mapsLink(b.address)}
+                            external
+                            accent="bg-primary/10 text-primary"
+                            copyValue={b.address}
+                          />
+                        )}
+                        {b.email && (
+                          <ContactRow
+                            icon={<Mail className="w-4 h-4" />}
+                            label="E-mail"
+                            value={b.email}
+                            href={`mailto:${b.email}`}
+                            copyValue={b.email}
+                          />
+                        )}
+                        {b.website && (
+                          <ContactRow
+                            icon={<Globe className="w-4 h-4" />}
+                            label="Site"
+                            value={b.website.replace(/^https?:\/\//, "")}
+                            href={b.website.startsWith("http") ? b.website : `https://${b.website}`}
+                            external
+                          />
+                        )}
+                        {!b.phone && !b.whatsapp && !b.address && !b.email && !b.website && (
+                          <p className="px-2 py-3 text-sm text-muted-foreground">Nenhum dado de contato cadastrado.</p>
+                        )}
+                      </div>
+
+                      {/* Ações principais */}
+                      <div className="grid grid-cols-2 gap-2 p-3 pt-0">
+                        <a
+                          href={b.whatsapp ? waLink(b.whatsapp) : b.phone ? `tel:${onlyDigits(b.phone)}` : "#"}
+                          {...(b.whatsapp ? { target: "_blank", rel: "noreferrer" } : {})}
+                          aria-disabled={!b.whatsapp && !b.phone}
+                          className={`inline-flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-bold transition-all active:scale-95 ${
+                            b.whatsapp || b.phone
+                              ? "bg-[#25D366]/15 text-[#1da851] hover:bg-[#25D366]/25"
+                              : "bg-secondary text-muted-foreground pointer-events-none opacity-50"
+                          }`}
+                        >
+                          {b.whatsapp ? <MessageCircle className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+                          {b.whatsapp ? "WhatsApp" : "Ligar"}
+                        </a>
+                        <a
+                          href={b.address ? mapsLink(b.address) : "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-disabled={!b.address}
+                          className={`inline-flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-bold transition-all active:scale-95 ${
+                            b.address
+                              ? "bg-primary/10 text-primary hover:bg-primary/20"
+                              : "bg-secondary text-muted-foreground pointer-events-none opacity-50"
+                          }`}
+                        >
+                          <Navigation className="w-4 h-4" /> Rota
+                        </a>
                       </div>
                     </motion.li>
                   ))}
