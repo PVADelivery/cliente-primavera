@@ -311,12 +311,14 @@ function DirectoryPage() {
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(i * 0.05, 0.4), type: "spring", stiffness: 100 }}
-                      className="group bg-card rounded-[1.75rem] shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-border/40 hover:border-primary/25 hover:shadow-[0_12px_40px_rgb(0,0,0,0.07)] transition-all duration-300 relative overflow-hidden"
+                      className="group bg-card rounded-[1.75rem] shadow-[0_2px_10px_rgb(0,0,0,0.03)] border border-border/40 hover:border-primary/30 hover:shadow-[0_14px_46px_rgb(0,0,0,0.09)] transition-all duration-300 relative overflow-hidden"
                     >
+                      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-primary/10 blur-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/70 via-amber-400/60 to-transparent" />
                       {/* Cabeçalho */}
-                      <div className="p-5 pb-4 grid grid-cols-[auto_minmax(0,1fr)] gap-4 items-center border-b border-border/40">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary flex items-center justify-center shrink-0 border border-primary/10">
-                          <span className="font-display font-bold text-xl leading-none">{(b.name || "E").charAt(0).toUpperCase()}</span>
+                      <div className="p-5 pb-4 grid grid-cols-[auto_minmax(0,1fr)] gap-4 items-center border-b border-border/40 relative z-10">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent text-primary flex items-center justify-center shrink-0 border border-primary/20 shadow-inner">
+                          <span className="font-display font-black text-2xl leading-none">{(b.name || "E").charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="min-w-0">
                           <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate">{b.name}</h3>
@@ -339,7 +341,7 @@ function DirectoryPage() {
                       </div>
 
                       {/* Dados de contato */}
-                      <div className="p-3 space-y-0.5">
+                      <div className="p-3 space-y-0.5 relative z-10">
                         {b.whatsapp && (
                           <ContactRow
                             icon={<MessageCircle className="w-4 h-4" />}
@@ -390,12 +392,20 @@ function DirectoryPage() {
                           />
                         )}
                         {!b.phone && !b.whatsapp && !b.address && !b.email && !b.website && (
-                          <p className="px-2 py-3 text-sm text-muted-foreground">Nenhum dado de contato cadastrado.</p>
+                          <div className="m-1 rounded-2xl border border-dashed border-border bg-secondary/40 px-5 py-8 text-center">
+                            <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-background text-muted-foreground shadow-sm">
+                              <BookUser className="h-5 w-5" />
+                            </span>
+                            <p className="text-sm font-bold text-foreground">Nenhum dado de contato cadastrado</p>
+                            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                              Telefone, WhatsApp, endereço, e-mail e site aparecem aqui assim que a empresa preencher a ficha.
+                            </p>
+                          </div>
                         )}
                       </div>
 
                       {/* Ações principais */}
-                      <div className="grid grid-cols-2 gap-2 p-3 pt-0">
+                      <div className="grid grid-cols-2 gap-2 p-3 pt-0 relative z-10">
                         <a
                           href={b.whatsapp ? waLink(b.whatsapp) : b.phone ? `tel:${onlyDigits(b.phone)}` : "#"}
                           {...(b.whatsapp ? { target: "_blank", rel: "noreferrer" } : {})}
