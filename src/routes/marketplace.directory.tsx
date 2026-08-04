@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
     meta: [
-      { title: "Agenda Empresarial — MT 24horas express" },
-      { name: "description", content: "Agenda telefônica das empresas da cidade: endereço, telefone, WhatsApp e horário." },
+      { title: "PPP — Painel Profissional Prestador de Serviços | MT 24horas express" },
+      { name: "description", content: "Painel Profissional Prestador de Serviços: endereço, telefone, WhatsApp e horário das empresas da cidade." },
     ],
   }),
   component: DirectoryPage,
@@ -182,7 +182,7 @@ function DirectoryPage() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest bg-white/20 text-white backdrop-blur-md px-4 py-1.5 rounded-full mb-4 shadow-sm"
           >
-            <BookUser className="w-3.5 h-3.5" /> Agenda Digital
+            <BookUser className="w-3.5 h-3.5" /> Painel Profissional Prestador de Serviços
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 10 }}
