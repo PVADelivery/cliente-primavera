@@ -564,8 +564,8 @@ function MarketplaceHome() {
         </Link>
         <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
           <Tag className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-          <p className="font-display font-bold text-base leading-tight">Agenda da<br/>Cidade</p>
-          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Telefones úteis</p>
+          <p className="font-display font-bold text-base leading-tight">PPP</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Painel Profissional Prestador de Serviços</p>
         </Link>
       </section>
 
