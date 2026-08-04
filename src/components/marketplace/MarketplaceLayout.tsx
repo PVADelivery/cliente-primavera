@@ -10,10 +10,10 @@ import { Car } from "lucide-react";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
   { to: "/marketplace", label: "Início", icon: Home, exact: true },
-  { to: "/marketplace/directory", label: "PPP", icon: BookUser },
+  { to: "/marketplace/rides", label: "Corridas", icon: Car },
   { to: "/marketplace/cart", label: "Carrinho", icon: ShoppingBag },
   { to: "/marketplace/orders", label: "Pedidos", icon: ClipboardList },
-  { to: "/marketplace/rides", label: "Corridas", icon: Car },
+  { to: "/marketplace/directory", label: "PPP", icon: BookUser },
   { to: "/marketplace/profile", label: "Perfil", icon: User },
 ];
 
