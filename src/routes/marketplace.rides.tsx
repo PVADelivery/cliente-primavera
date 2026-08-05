@@ -56,14 +56,12 @@ function RidesPage() {
     const fetchRides = async () => {
       setLoading(true);
       try {
+        // Somente corridas do próprio usuário. Nunca listar corridas do sistema.
         let savedIds: string[] = [];
-        let savedEmail = user?.email || "";
+        const savedEmail = user?.email || "";
         if (typeof window !== "undefined") {
           try {
             savedIds = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
-            if (!savedEmail) {
-              savedEmail = localStorage.getItem("pva_user_email") || "";
-            }
           } catch (e) {}
         }
 
@@ -80,7 +78,7 @@ function RidesPage() {
           );
         }
 
-        // 2. Busca por IDs salvos no navegador local (funciona anonimo ou autenticado)
+        // 2. Busca por IDs de corridas criadas neste dispositivo (RLS ainda se aplica)
         if (savedIds.length > 0) {
           queryPromises.push(
             supabase
@@ -91,8 +89,8 @@ function RidesPage() {
           );
         }
 
-        // 3. Busca por customer_name (e-mail do cliente)
-        if (savedEmail) {
+        // 3. Busca pelo e-mail do usuário autenticado
+        if (user?.id && savedEmail) {
           queryPromises.push(
             supabase
               .from("ride_requests")
@@ -102,16 +100,7 @@ function RidesPage() {
           );
         }
 
-        // 4. Fallback universal permanente: sempre incluir a busca das últimas corridas do sistema
-        queryPromises.push(
-          supabase
-            .from("ride_requests")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(30)
-        );
-
-        const results = await Promise.all(queryPromises);
+        const results = queryPromises.length > 0 ? await Promise.all(queryPromises) : [];
         const combinedRides: any[] = [];
         const seenIds = new Set<string>();
 
