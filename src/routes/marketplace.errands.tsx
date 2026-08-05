@@ -661,10 +661,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         pickup_address: finalPickup,
         address: finalDropoff,
         notes: finalNotes,
-        value: price,
         is_customer_errand: true,
         status: "pending",
-        commission: price * 0.8, // 80% do valor vai para o entregador
         vehicle_type: vehicleType,
         distance_km: distance,
         pickup_latitude: pickupCoords[1],

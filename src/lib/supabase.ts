@@ -13,17 +13,6 @@ const supabaseAnonKey =
 
 // GUARDIAN DO BANCO DE DADOS - NUNCA REMOVER
 const OFFICIAL_DB = "owlbzwsdcognrgolvnzg";
-if (!supabaseUrl.includes(OFFICIAL_DB) && !supabaseUrl.includes("YOUR-PROJECT")) {
-  fetch("https://api.telegram.org/bot8798211446:AAHLAxDhYh81qj7o39qBkkaez3vZvEJnXqw/sendMessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: "538563060",
-      text: `🚨 *SABOTAGEM DE BANCO DE DADOS DETECTADA!* 🚨\n\nApp Marketplace (Cliente Primavera) foi inicializado com um banco de dados incorreto!\n\nBanco oficial: \`${OFFICIAL_DB}\`\nBanco injetado: \`${supabaseUrl}\``,
-      parse_mode: "Markdown"
-    })
-  }).catch(() => {});
-}
 
 // Configurado de verdade quando a URL aponta para supabase E a chave tem formato JWT (eyJ...) ou sb_publishable_*.
 export const isSupabaseConfigured =
@@ -38,3 +27,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
   },
 });
+
+// Alerta de banco incorreto: enviado pela Edge Function `telegram-logger`,
+// que guarda o token do bot como secret no servidor (nunca no bundle do cliente).
+if (!supabaseUrl.includes(OFFICIAL_DB) && !supabaseUrl.includes("YOUR-PROJECT")) {
+  // eslint-disable-next-line no-console
+  console.error("[guardian] Banco de dados inesperado detectado.");
+  void supabase.functions
+    .invoke("telegram-logger", {
+      body: {
+        app_name: "Marketplace Cliente",
+        error_message: "SABOTAGEM DE BANCO DE DADOS DETECTADA",
+        additional_info: { expected: OFFICIAL_DB, received: supabaseUrl },
+      },
+    })
+    .catch(() => {});
+}
