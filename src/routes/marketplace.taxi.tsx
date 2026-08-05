@@ -651,7 +651,9 @@ function TaxiPage() {
         dropoff_address: finalDropoff,
         vehicle_type: vehicleType,
         notes: notes,
-        price: price,
+        // O preço NÃO é enviado pelo cliente: o trigger `set_ride_price`
+        // recalcula o valor no servidor a partir de distance_km/vehicle_type.
+        distance_km: distance,
         status: "pending",
         created_at: new Date().toISOString(),
       };
