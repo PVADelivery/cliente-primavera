@@ -430,10 +430,15 @@ function MarketplaceHome() {
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
 
   const filtered = useMemo(() => {
-    const isStoreActive = (s: Company) => s.is_active !== false;
+    const isStoreActive = (s: Company) => s.is_active !== false && (s as any).status !== 'inactive' && (s as any).status !== 'disabled';
     const isStoreOpen = (s: Company) => s.is_open ?? true;
 
     let list = allStores.filter(isStoreActive);
+    // Se a busca resultar vazia devido ao is_active, exibe todas as lojas cadastradas
+    if (list.length === 0 && allStores.length > 0) {
+      list = allStores;
+    }
+
     if (openOnly) {
       list = list.filter(isStoreOpen);
     }
