@@ -5,6 +5,7 @@ export type OrderStatus =
   | "accepted"
   | "preparing"
   | "ready"
+  | "in_route"
   | "out_for_delivery"
   | "delivered"
   | "cancelled";

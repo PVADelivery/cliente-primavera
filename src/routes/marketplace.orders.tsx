@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ const STATUS_LABEL: Record<string, string> = {
   accepted: "Aceito",
   preparing: "Preparando",
   ready: "Pronto",
+  in_route: "Saiu para entrega",
   out_for_delivery: "Saiu para entrega",
   delivered: "Entregue",
   cancelled: "Cancelado",

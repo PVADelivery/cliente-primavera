@@ -48,12 +48,12 @@ export function MarketplaceLayout() {
 
     const fetchActiveCounts = async () => {
       try {
-        // Pedidos ativos
+        // Pedidos ativos (usa apenas valores válidos do enum order_status)
         const { count: ordersCount, error: ordersErr } = await supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id)
-          .in("status", ["pending", "accepted", "preparing", "ready", "out_for_delivery"]);
+          .in("status", ["pending", "preparing", "ready", "in_route"]);
 
         if (!ordersErr && typeof ordersCount === "number") {
           setActiveOrdersCount(ordersCount);

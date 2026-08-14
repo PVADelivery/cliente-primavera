@@ -12,11 +12,13 @@ export const Route = createFileRoute("/marketplace/orders/$orderId")({
   ),
 });
 
-const TIMELINE = ["pending", "accepted", "preparing", "out_for_delivery", "delivered"] as const;
+const TIMELINE = ["pending", "preparing", "ready", "in_route", "delivered"] as const;
 const LABEL: Record<string, string> = {
   pending: "Pedido recebido",
   accepted: "Aceito pela loja",
   preparing: "Em preparo",
+  ready: "Pronto para retirada/envio",
+  in_route: "Saiu para entrega",
   out_for_delivery: "Saiu para entrega",
   delivered: "Entregue",
 };
@@ -32,8 +34,10 @@ function OrderDetailPage() {
     },
   });
 
-  const status = (order as { status?: string } | undefined)?.status ?? "pending";
-  const currentIdx = TIMELINE.indexOf(status as (typeof TIMELINE)[number]);
+  let rawStatus = (order as { status?: string } | undefined)?.status ?? "pending";
+  if (rawStatus === "out_for_delivery") rawStatus = "in_route";
+  if (rawStatus === "accepted") rawStatus = "preparing";
+  const currentIdx = TIMELINE.indexOf(rawStatus as any);
 
   return (
     <div className="space-y-5">
