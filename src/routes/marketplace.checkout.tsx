@@ -15,7 +15,7 @@ import { reportErrorToTelegram } from '@/services/logger';
 import { MapPin, Banknote, AlertCircle, ArrowLeft, Loader2, FileText, Smartphone, Bike, CreditCard, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useOrderLock } from '@/hooks/useOrderLock';
-import { calculateDeliveryFee } from '@/utils/freight';
+import { calculateDeliveryFee, calculateDeliveryFeeByNeighborhood } from '@/utils/freight';
 import { isStoreOpenNow } from '@/lib/storeHours';
 import { useRequirePhone } from '@/hooks/useRequirePhone';
 import { RequirePhoneModal } from '@/components/marketplace/RequirePhoneModal';
@@ -114,13 +114,11 @@ function Checkout() {
         if (!destRegionId && addr.latitude && addr.longitude) {
            const result = await calculateDeliveryFee(addr.latitude, addr.longitude, supabase, []);
            if (result.regionId) destRegionId = result.regionId;
-           if (result.isOutOfRange && !result.regionId) {
-             setDeliveryFee(null);
-             setUnavailable(true);
-             toast.warning('Este endereço está fora da área de atendimento.');
-             setLoadingFee(false);
-             return;
-           }
+        }
+
+        if (!destRegionId && addr.neighborhood) {
+           const hoodResult = await calculateDeliveryFeeByNeighborhood(addr.neighborhood, supabase);
+           if (hoodResult.regionId) destRegionId = hoodResult.regionId;
         }
 
         if (destRegionId) {

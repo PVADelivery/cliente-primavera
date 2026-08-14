@@ -118,9 +118,14 @@ export async function calculateDeliveryFee(
             isOutOfRange: false,
           };
         }
-        // Lojista NÃO configurou preço para essa região → não entrega aqui
-        console.warn(`[freight] Lojista sem preço configurado para a região: ${region.name}`);
-        return { fee: null, regionId: region.id, regionName: region.name, isOutOfRange: true };
+        // Fallback para o valor padrão da Região definido pelo Admin
+        const defaultFee = Number(region.price ?? region.delivery_fee ?? 0);
+        return {
+          fee: defaultFee,
+          regionId: region.id,
+          regionName: region.name,
+          isOutOfRange: false,
+        };
       }
     }
 
@@ -131,6 +136,51 @@ export async function calculateDeliveryFee(
     console.error('[freight] Erro inesperado:', err?.message);
     return { fee: null, regionId: null, regionName: null, isOutOfRange: false };
   }
+}
+
+/**
+ * Busca frete e região diretamente pelo nome do bairro cadastrado pelo Admin na tabela region_neighborhoods.
+ */
+export async function calculateDeliveryFeeByNeighborhood(
+  neighborhoodName: string,
+  supabase: any,
+  deliveryRegionsPricing?: any[]
+): Promise<FreightResult> {
+  if (!neighborhoodName || !neighborhoodName.trim()) {
+    return { fee: null, regionId: null, regionName: null, isOutOfRange: false };
+  }
+  try {
+    const { data: hoods } = await supabase
+      .from('region_neighborhoods')
+      .select('region_id, name, regions(id, name, price, delivery_fee)')
+      .ilike('name', `%${neighborhoodName.trim()}%`)
+      .limit(1);
+
+    if (hoods && hoods.length > 0 && hoods[0].regions) {
+      const r: any = hoods[0].regions;
+      let fee = Number(r.price ?? r.delivery_fee ?? 0);
+
+      if (Array.isArray(deliveryRegionsPricing) && deliveryRegionsPricing.length > 0) {
+        const match = deliveryRegionsPricing.find((m: any) => m.region_id === r.id || m.to === r.id);
+        if (match) {
+          const rawPrice = match.customer_price ?? match.price;
+          if (rawPrice != null && String(rawPrice).trim() !== '') {
+            fee = Number(String(rawPrice).replace(',', '.'));
+          }
+        }
+      }
+
+      return {
+        fee,
+        regionId: r.id,
+        regionName: r.name,
+        isOutOfRange: false,
+      };
+    }
+  } catch (err: any) {
+    console.error('[freight] Erro ao buscar por bairro:', err?.message);
+  }
+  return { fee: null, regionId: null, regionName: null, isOutOfRange: false };
 }
 
 /**

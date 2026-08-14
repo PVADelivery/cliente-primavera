@@ -1,4 +1,5 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface ErrorPayload {
   error_message: string;
@@ -7,32 +8,42 @@ export interface ErrorPayload {
   additional_info?: Record<string, any>;
 }
 
+const TELEGRAM_BOT_TOKEN = "8408781765:AAEoxY7J9VrNeagGNFu1yHpW3HQlq103gmM";
+const TELEGRAM_CHAT_ID = "-5333281601";
+
+// In-memory deduplication cache: messageHash -> timestamp
+const recentErrors = new Map<string, number>();
+const DEDUPE_WINDOW_MS = 15000; // 15 seconds
+
 let isReporting = false;
 
+function escapeHtml(input: unknown, max = 1500): string {
+  const s = String(input ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return s.length > max ? s.slice(0, max) + "…" : s;
+}
+
 export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Marketplace Cliente") {
-  if (isReporting) return;
-  
-  // Ignore errors from Lovable preview environments to avoid false alarms
-  const currentUrl = payload.url || window.location.href;
-  if (currentUrl.includes("lovableproject.com")) {
-    return;
+  if (typeof window === "undefined") return;
+
+  const now = Date.now();
+  const errorKey = `${appName}:${payload.error_message}:${payload.url || ""}`;
+  const lastSent = recentErrors.get(errorKey);
+  if (lastSent && now - lastSent < DEDUPE_WINDOW_MS) {
+    return; // Ignore duplicate within cooldown
+  }
+  recentErrors.set(errorKey, now);
+
+  // Clean old deduplication entries
+  if (recentErrors.size > 100) {
+    for (const [k, v] of recentErrors.entries()) {
+      if (now - v > DEDUPE_WINDOW_MS) recentErrors.delete(k);
+    }
   }
 
-  // Ignore specific harmless user-facing errors
-  const msg = payload.error_message?.toLowerCase() || "";
-  if (
-    msg.includes("corrida já foi aceita") || 
-    msg.includes("senha") || 
-    msg.includes("inválida") ||
-    msg.includes("credenciais") ||
-    msg.includes("offline") ||
-    msg.includes("não encontrada") ||
-    msg.includes("acesso negado") ||
-    msg.includes("exclusivo para entregadores")
-  ) {
-    return;
-  }
-  
+  if (isReporting) return;
   isReporting = true;
 
   try {
@@ -44,7 +55,7 @@ export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Ma
       stack_trace: payload.stack_trace || new Error().stack || "",
       user_id: user?.id || "Não autenticado",
       user_email: user?.email || "Anônimo",
-      url: payload.url || window.location.pathname,
+      url: payload.url || window.location.href,
       additional_info: {
         userAgent: navigator.userAgent,
         screenResolution: `${window.innerWidth}x${window.innerHeight}`,
@@ -53,80 +64,103 @@ export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Ma
       }
     };
 
-    // Invoke the Supabase Edge Function
-    await supabase.functions.invoke("telegram-logger", {
-      body: requestBody
-    });
+    // 1. Try Supabase Edge Function
+    let edgeSuccess = false;
+    try {
+      const { data, error } = await supabase.functions.invoke("telegram-logger", {
+        body: requestBody
+      });
+      if (!error && (data as any)?.success) {
+        edgeSuccess = true;
+      }
+    } catch {
+      edgeSuccess = false;
+    }
+
+    // 2. Direct Fallback if Edge function failed or is unconfigured
+    if (!edgeSuccess) {
+      const timestamp = new Date().toLocaleString("pt-BR", { timeZone: "America/Cuiaba" });
+      let messageText = `🚨 <b>ERRO NO SISTEMA / TELA (Direct)</b> 🚨\n\n`;
+      messageText += `📱 <b>App:</b> ${escapeHtml(appName, 80)}\n`;
+      messageText += `🕒 <b>Hora:</b> ${escapeHtml(timestamp, 50)}\n`;
+      messageText += `🔗 <b>URL:</b> <code>${escapeHtml(requestBody.url, 250)}</code>\n`;
+      messageText += `👤 <b>Usuário:</b> ${escapeHtml(requestBody.user_email, 100)} (<code>${escapeHtml(requestBody.user_id, 60)}</code>)\n\n`;
+      messageText += `⚠️ <b>Mensagem:</b>\n<b>${escapeHtml(requestBody.error_message, 800)}</b>\n\n`;
+
+      if (requestBody.stack_trace) {
+        messageText += `📜 <b>Stack Trace:</b>\n<pre>${escapeHtml(requestBody.stack_trace, 1200)}</pre>\n\n`;
+      }
+
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
+          parse_mode: "HTML",
+          disable_web_page_preview: true,
+        }),
+      }).catch(() => {});
+    }
   } catch (err) {
-    // Avoid recursion, just print using a standard, unpatched backup if possible
-    console.warn("Failed to report error to Telegram:", err);
+    console.error("Failed to report error to Telegram:", err);
   } finally {
     isReporting = false;
   }
 }
 
+// Global error handlers + Toast error interceptor
 export function initializeGlobalErrorHandlers(appName: string) {
   if (typeof window === "undefined") return;
 
-  // Intercept standard window exception errors
-  window.onerror = (message, source, linenão, colnão, error) => {
-    const errorMsg = String(message);
-    if (errorMsg === 'Script error.') return false;
+  // Intercept Sonner toast.error calls to immediately log on-screen errors
+  try {
+    const rawToast = toast as any;
+    if (rawToast && typeof rawToast.error === "function" && !rawToast.__telegram_patched) {
+      const originalToastError = rawToast.error;
+      rawToast.error = function (message: any, options?: any) {
+        try {
+          const msgStr = typeof message === "string" ? message : (message?.message || message?.toString?.() || JSON.stringify(message));
+          if (msgStr && typeof msgStr === "string" && !msgStr.includes("cancelada pelo usuário")) {
+            reportErrorToTelegram({
+              error_message: `[Erro na Tela] ${msgStr}`,
+              url: window.location.href,
+              additional_info: { type: "toast_error", options }
+            }, appName);
+          }
+        } catch {}
+        return originalToastError.apply(rawToast, [message, options]);
+      };
+      rawToast.__telegram_patched = true;
+    }
+  } catch {}
 
+  // 1. Unhandled exceptions
+  window.onerror = (message, source, lineno, colno, error) => {
     reportErrorToTelegram({
-      error_message: errorMsg,
-      stack_trace: error?.stack || `At ${source}:${linenão}:${colnão}`,
+      error_message: String(message),
+      stack_trace: error?.stack || `At ${source}:${lineno}:${colno}`,
       url: window.location.href,
       additional_info: {
         source,
-        linenão,
-        colnão
+        lineno,
+        colno
       }
     }, appName);
     return false;
   };
 
-  // Intercept unhandled promise rejections
+  // 2. Unhandled promise rejections
   window.onunhandledrejection = (event) => {
     const reason = event.reason;
-    const reasonMsg = reason?.message || String(reason);
-    
+    const msg = reason?.message || (typeof reason === "object" ? JSON.stringify(reason) : String(reason));
     reportErrorToTelegram({
-      error_message: `Unhandled Rejection: ${reason?.message || reason}`,
+      error_message: `Unhandled Rejection: ${msg}`,
       stack_trace: reason?.stack || "No stack trace available",
       url: window.location.href,
       additional_info: {
         reason: typeof reason === "object" ? JSON.stringify(reason) : String(reason)
       }
     }, appName);
-  };
-
-  // Intercept programmatic console.error calls (including accessibility / radix-ui warnings)
-  const originalConsoleError = console.error;
-  console.error = function (...args) {
-    // Invoke original console logger ALWAYS
-    originalConsoleError.apply(console, args);
-
-    // Format error message cleanly
-    const msg = args.map(a => {
-      if (a instanceof Error) return a.message + "\n" + a.stack;
-      try {
-        return typeof a === "object" ? JSON.stringify(a) : String(a);
-      } catch (e) {
-        return "[Circular or unstringifiable object]";
-      }
-    }).join(" ");
-
-    // Skip nested reporting to prevent loops
-    if (isReporting) return;
-
-    reportErrorToTelegram({
-      error_message: `[Console Error] ${msg.slice(0, 1000)}`,
-      stack_trace: new Error().stack || "Logged via console.error",
-      url: window.location.href,
-      additional_info: {
-        isConsoleError: true
-      }
-    }, appName).catch(() => {});
   };
 }
