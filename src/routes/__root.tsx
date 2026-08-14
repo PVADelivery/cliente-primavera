@@ -135,8 +135,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useCustomerNotifications();
 
   useEffect(() => {
     initializeGlobalErrorHandlers("Marketplace Cliente");
