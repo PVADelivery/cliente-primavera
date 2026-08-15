@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck } from "lucide-react";
+import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck, XCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
@@ -264,6 +265,27 @@ function RidesPage() {
     return Array.isArray(ride.driver) ? ride.driver[0] : ride.driver;
   };
 
+  const handleCancelRide = async (rideId: string) => {
+    if (!confirm("Deseja realmente cancelar esta corrida?")) return;
+    try {
+      const { error } = await supabase
+        .from("ride_requests")
+        .update({ status: "cancelled", updated_at: new Date().toISOString() })
+        .eq("id", rideId);
+
+      if (error) throw error;
+      toast.success("Corrida cancelada com sucesso.");
+      
+      // Atualiza localmente
+      setRides(prev => prev.map(r => r.id === rideId ? { ...r, status: "cancelled" } : r));
+      if (activeRide?.id === rideId) {
+        setActiveRide(null);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao cancelar corrida.");
+    }
+  };
+
   const drv = getDriver(activeRide);
 
   return (
@@ -337,6 +359,19 @@ function RidesPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Botão de Cancelar Corrida Ativa */}
+              {["pending", "accepted"].includes(activeRide.status) && (
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => handleCancelRide(activeRide.id)}
+                  className="w-full h-11 rounded-xl border-rose-500/30 text-rose-500 hover:bg-rose-500/10 font-bold transition-all mt-1"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Cancelar Corrida
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -399,8 +434,23 @@ function RidesPage() {
                   </div>
 
                   <div className="flex items-center justify-between mt-1 pt-3 border-t border-border/50">
-                    <span className="text-xs text-muted-foreground font-medium">Valor Total</span>
-                    <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
+                    <div>
+                      <span className="text-xs text-muted-foreground font-medium block">Valor Total</span>
+                      <span className="font-bold text-base text-foreground">R$ {Number(ride.price || 0).toFixed(2).replace('.', ',')}</span>
+                    </div>
+
+                    {["pending", "accepted"].includes(ride.status) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        type="button"
+                        onClick={() => handleCancelRide(ride.id)}
+                        className="h-8 px-3 rounded-lg text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 font-bold text-xs"
+                      >
+                        <XCircle className="w-3.5 h-3.5 mr-1" />
+                        Cancelar
+                      </Button>
+                    )}
                   </div>
                 </div>
               );
