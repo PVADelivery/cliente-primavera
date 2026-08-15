@@ -50,6 +50,9 @@ function Profile() {
   const [uploading, setUploading] = useState(false);
   const [supportType, setSupportType] = useState<'support' | 'driver_application' | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
+  const [rides, setRides] = useState<any[]>([]);
+  const [showOrdersHistory, setShowOrdersHistory] = useState(false);
+  const [showRidesHistory, setShowRidesHistory] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [coupons, setCoupons] = useState<any[]>([]);
 
@@ -61,6 +64,7 @@ function Profile() {
   useEffect(() => {
     if (!user) return;
     fetchOrders();
+    fetchRides();
     fetchCoupons(false);
   }, [user]);
 
@@ -85,11 +89,21 @@ function Profile() {
     try {
       const { data } = await supabase
         .from('orders')
-        .select(`id, status, total, created_at, companies ( name, logo_url )`)
-        .or(`customer_id.eq.${user.id},user_id.eq.${user.id}`)
-        .order('created_at', { ascending: false })
-        .limit(30);
+        .select(`id, status, total, created_at, company:companies(name, logo_url)`)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
       setOrders(data || []);
+    } catch { /* silent */ }
+  };
+
+  const fetchRides = async () => {
+    try {
+      const { data } = await supabase
+        .from('ride_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      setRides(data || []);
     } catch { /* silent */ }
   };
 
@@ -194,33 +208,44 @@ function Profile() {
 
       <div className="px-5 mt-8 space-y-6 max-w-md mx-auto">
         
-        {/* QUICK STATS */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* QUICK STATS & HISTÓRICOS */}
+        <div className="grid grid-cols-3 gap-3">
           <button 
-            onClick={() => navigate({ to: '/marketplace/orders' })}
-            className="group relative overflow-hidden flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            onClick={() => setShowOrdersHistory(true)}
+            className="group relative overflow-hidden flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[1.8rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="p-3 bg-primary/10 rounded-[1.2rem] text-primary w-fit ring-4 ring-white dark:ring-zinc-900 shadow-sm relative z-10">
-              <History className="w-6 h-6" />
+            <div className="p-2.5 bg-primary/10 rounded-[1rem] text-primary w-fit ring-2 ring-white dark:ring-zinc-900 shadow-sm">
+              <Package className="w-5 h-5" />
             </div>
-            <div className="text-left relative z-10 mt-1">
-              <p className="text-3xl font-black leading-none tracking-tight">{ordersCount}</p>
-              <p className="text-[12px] font-bold text-muted-foreground/80 uppercase mt-1">Pedidos</p>
+            <div className="text-left mt-0.5">
+              <p className="text-2xl font-black leading-none tracking-tight">{orders.length}</p>
+              <p className="text-[10px] font-bold text-muted-foreground/80 uppercase mt-1">Pedidos</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setShowRidesHistory(true)}
+            className="group relative overflow-hidden flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[1.8rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="p-2.5 bg-blue-500/10 rounded-[1rem] text-blue-500 w-fit ring-2 ring-white dark:ring-zinc-900 shadow-sm">
+              <Bike className="w-5 h-5" />
+            </div>
+            <div className="text-left mt-0.5">
+              <p className="text-2xl font-black leading-none tracking-tight">{rides.length}</p>
+              <p className="text-[10px] font-bold text-muted-foreground/80 uppercase mt-1">Corridas</p>
             </div>
           </button>
           
           <button 
             onClick={() => fetchCoupons(true)}
-            className="group relative overflow-hidden flex flex-col gap-3 p-5 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            className="group relative overflow-hidden flex flex-col gap-2 p-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[1.8rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="p-3 bg-emerald-500/10 rounded-[1.2rem] text-emerald-500 w-fit ring-4 ring-white dark:ring-zinc-900 shadow-sm relative z-10">
-              <Ticket className="w-6 h-6" />
+            <div className="p-2.5 bg-emerald-500/10 rounded-[1rem] text-emerald-500 w-fit ring-2 ring-white dark:ring-zinc-900 shadow-sm">
+              <Ticket className="w-5 h-5" />
             </div>
-            <div className="text-left relative z-10 mt-1">
-              <p className="text-3xl font-black leading-none tracking-tight">{coupons.length}</p>
-              <p className="text-[12px] font-bold text-muted-foreground/80 uppercase mt-1">Cupons</p>
+            <div className="text-left mt-0.5">
+              <p className="text-2xl font-black leading-none tracking-tight">{coupons.length}</p>
+              <p className="text-[10px] font-bold text-muted-foreground/80 uppercase mt-1">Cupons</p>
             </div>
           </button>
         </div>
@@ -228,8 +253,8 @@ function Profile() {
         {/* LIST OPTIONS */}
         <div className="bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2rem] shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-zinc-800/50 p-1">
           {[
-            { icon: MapPin, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Endereços Salvos', subtitle: 'Gerencie seus locais de entrega', onClick: () => toast('Em breve!') },
-            { icon: Wallet, color: 'text-violet-500', bg: 'bg-violet-500/10', title: 'Carteira Virtual', subtitle: 'Saldo de cashback e pagamentos', onClick: () => toast('Em breve!') },
+            { icon: History, color: 'text-amber-500', bg: 'bg-amber-500/10', title: 'Histórico de Pedidos', subtitle: 'Ver compras e lanches anteriores', onClick: () => setShowOrdersHistory(true) },
+            { icon: Bike, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Histórico de Corridas', subtitle: 'Ver táxis e mototáxis solicitados', onClick: () => setShowRidesHistory(true) },
             { icon: theme === 'dark' ? Sun : Moon, color: 'text-yellow-500', bg: 'bg-yellow-500/10', title: 'Tema do App', subtitle: theme === 'dark' ? 'Modo Escuro' : 'Modo Claro', onClick: toggleTheme },
           ].map((item, idx) => (
             <button key={idx} onClick={item.onClick} className="group w-full flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors rounded-2xl">
@@ -384,6 +409,110 @@ function Profile() {
                     <button onClick={() => handleCopyCode(coupon.code)} className="p-2.5 text-primary hover:bg-primary/10 rounded-xl font-semibold text-xs transition-colors">
                       COPIAR
                     </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* MODAL HISTÓRICO DE PEDIDOS */}
+      <Sheet open={showOrdersHistory} onOpenChange={setShowOrdersHistory}>
+        <SheetContent side="bottom" hideClose className="h-[85vh] rounded-t-[2rem] border-none p-0">
+          <div className="h-full flex flex-col bg-background">
+            <div className="p-6 border-b border-border/50 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-black">Histórico de Pedidos</h2>
+                <p className="text-xs text-muted-foreground">Todos os seus lanches e compras</p>
+              </div>
+              <button onClick={() => setShowOrdersHistory(false)} className="p-2 bg-muted rounded-full"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-3 flex-1">
+              {orders.length === 0 ? (
+                <div className="py-20 text-center text-muted-foreground flex flex-col items-center">
+                  <Package className="w-16 h-16 mb-4 opacity-20" />
+                  <p className="font-bold">Nenhum pedido no histórico.</p>
+                </div>
+              ) : (
+                orders.map((o) => (
+                  <Link 
+                    key={o.id} 
+                    to="/marketplace/orders/$orderId" 
+                    params={{ orderId: o.id }} 
+                    onClick={() => setShowOrdersHistory(false)}
+                    className="border border-border bg-card rounded-2xl p-4 flex flex-col gap-2.5 shadow-sm hover:border-primary/50 transition-all block"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="font-bold text-sm text-foreground truncate">{o.company?.name || "Restaurante"}</p>
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        o.status === "delivered" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                        o.status === "cancelled" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
+                        "bg-primary/10 text-primary border border-primary/20"
+                      }`}>
+                        {o.status === "delivered" ? "Entregue" : o.status === "cancelled" ? "Cancelado" : o.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{new Date(o.created_at).toLocaleDateString('pt-BR')} às {new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* MODAL HISTÓRICO DE CORRIDAS */}
+      <Sheet open={showRidesHistory} onOpenChange={setShowRidesHistory}>
+        <SheetContent side="bottom" hideClose className="h-[85vh] rounded-t-[2rem] border-none p-0">
+          <div className="h-full flex flex-col bg-background">
+            <div className="p-6 border-b border-border/50 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-black">Histórico de Corridas</h2>
+                <p className="text-xs text-muted-foreground">Todas as suas solicitações de Táxi e Moto Táxi</p>
+              </div>
+              <button onClick={() => setShowRidesHistory(false)} className="p-2 bg-muted rounded-full"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-3 flex-1">
+              {rides.length === 0 ? (
+                <div className="py-20 text-center text-muted-foreground flex flex-col items-center">
+                  <Bike className="w-16 h-16 mb-4 opacity-20" />
+                  <p className="font-bold">Nenhuma corrida no histórico.</p>
+                </div>
+              ) : (
+                rides.map((r) => (
+                  <div key={r.id} className="border border-border bg-card rounded-2xl p-4 flex flex-col gap-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                          {r.vehicle_type === "taxi" ? "🚗" : "🏍️"}
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">{r.vehicle_type === "taxi" ? "Táxi (Carro)" : "Moto Táxi"}</p>
+                          <p className="text-[10px] text-muted-foreground">{new Date(r.created_at).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                        r.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                        r.status === "cancelled" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
+                        "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                      }`}>
+                        {r.status === "completed" ? "Concluída" : r.status === "cancelled" ? "Cancelada" : r.status}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <p className="truncate">📍 <strong>Origem:</strong> {r.pickup_address}</p>
+                      <p className="truncate">🏁 <strong>Destino:</strong> {r.dropoff_address}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+                      <span>Valor Total</span>
+                      <span className="font-black text-sm text-foreground">R$ {Number(r.price || 0).toFixed(2).replace('.', ',')}</span>
+                    </div>
                   </div>
                 ))
               )}

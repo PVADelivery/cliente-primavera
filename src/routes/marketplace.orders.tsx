@@ -27,43 +27,73 @@ const STATUS_LABEL: Record<string, string> = {
 function OrdersList() {
   const { user } = useAuth();
   const { data: orders = [] } = useQuery({
-    queryKey: ["orders", user?.id],
+    queryKey: ["active-orders", user?.id],
     enabled: !!user,
     queryFn: async () => {
       if (!isSupabaseConfigured || !user) return [];
-      // Tenta a view segura primeiro
-      const fromView = await supabase.from("customer_orders_view").select("*").order("created_at", { ascending: false });
-      if (!fromView.error && fromView.data) return fromView.data;
-      // Fallback: tabela direta
-      const fromTable = await supabase.from("orders").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
-      return fromTable.data ?? [];
+      // Filtra estritamente pedidos ATIVOS (em andamento)
+      const { data, error } = await supabase
+        .from("orders")
+        .select(`id, status, total, created_at, company:companies(name, logo_url)`)
+        .eq("user_id", user.id)
+        .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching active orders:", error);
+        return [];
+      }
+      return data ?? [];
     },
   });
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="text-center py-16 space-y-2">
-        <h1 className="font-display text-2xl font-bold">Sem pedidos ainda</h1>
-        <p className="text-sm text-muted-foreground">Quando você fizer um pedido, ele aparece aqui.</p>
-        <Link to="/marketplace" className="inline-block mt-3 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium">Explorar</Link>
+      <div className="text-center py-16 space-y-3">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2 text-primary">
+          🍔
+        </div>
+        <h1 className="font-display text-2xl font-bold">Nenhum pedido ativo no momento</h1>
+        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+          Seus pedidos em preparo ou a caminho aparecem aqui. Para ver pedidos anteriores, acesse seu Perfil.
+        </p>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <Link to="/marketplace" className="inline-block px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm">
+            Fazer um Pedido
+          </Link>
+          <Link to="/marketplace/profile" className="inline-block px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm">
+            Ver Histórico
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h1 className="font-display text-2xl font-bold">Meus pedidos</h1>
-      <ul className="space-y-2">
-        {orders.map((o: { id: string; status: string; total: number; created_at: string; company?: { name?: string } | null }) => (
+    <div className="space-y-4 max-w-2xl mx-auto pb-20 pt-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-black tracking-tight">Pedidos Ativos</h1>
+          <p className="text-xs text-muted-foreground">Acompanhe seus pedidos em andamento</p>
+        </div>
+        <Link to="/marketplace/profile" className="text-xs font-bold text-primary hover:underline">
+          Ver Histórico
+        </Link>
+      </div>
+
+      <ul className="space-y-3">
+        {orders.map((o: any) => (
           <li key={o.id}>
-            <Link to="/marketplace/orders/$orderId" params={{ orderId: o.id }} className="block p-3 bg-card rounded-2xl border border-border">
+            <Link to="/marketplace/orders/$orderId" params={{ orderId: o.id }} className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 transition-all">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold truncate">{o.company?.name ?? "Pedido"}</p>
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">{STATUS_LABEL[o.status] ?? o.status}</span>
+                <p className="text-sm font-bold truncate text-foreground">{o.company?.name ?? "Restaurante"}</p>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/15 text-primary border border-primary/20 animate-pulse">
+                  {STATUS_LABEL[o.status] ?? o.status}
+                </span>
               </div>
-              <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{new Date(o.created_at).toLocaleString("pt-BR")}</span>
-                <span>R$ {Number(o.total).toFixed(2).replace(".", ",")}</span>
+              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                <span>{new Date(o.created_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace(".", ",")}</span>
               </div>
             </Link>
           </li>

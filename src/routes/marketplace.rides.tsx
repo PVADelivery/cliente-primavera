@@ -380,22 +380,28 @@ function RidesPage() {
       {/* Lista de Corridas / Histórico */}
       <div className="flex flex-col gap-3 mt-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-lg">Histórico de Corridas</h2>
+          <h2 className="font-display font-bold text-lg">Corridas Ativas</h2>
           <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>
             Nova Corrida
           </Button>
         </div>
-        {rides.length === 0 ? (
+        {(!activeRide && rides.filter(r => ["pending", "accepted", "in_progress"].includes(r.status)).length === 0) ? (
           <div className="text-center py-10 bg-card rounded-2xl border border-border">
             <Car className="w-8 h-8 mx-auto text-muted-foreground opacity-50 mb-3" />
-            <p className="text-muted-foreground text-sm">Você ainda não possui corridas no histórico.</p>
-            <Button variant="outline" className="mt-4" onClick={() => navigate({ to: "/marketplace/taxi" })}>
-              Solicitar Agora
-            </Button>
+            <p className="font-bold text-foreground">Nenhuma corrida em andamento</p>
+            <p className="text-muted-foreground text-xs mt-1">Para consultar corridas anteriores, acesse a aba Perfil.</p>
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>
+                Solicitar Agora
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => navigate({ to: "/marketplace/profile" })}>
+                Ver Histórico no Perfil
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {rides.map((ride) => {
+            {rides.filter(r => ["pending", "accepted", "in_progress"].includes(r.status)).map((ride) => {
               const dateStr = ride.created_at ? new Date(ride.created_at).toLocaleDateString('pt-BR') : '';
               return (
                 <div key={ride.id} className="bg-card border border-border/80 rounded-2xl p-4 shadow-sm flex flex-col gap-3.5 hover:border-primary/40 transition-all">
@@ -412,11 +418,9 @@ function RidesPage() {
                       </div>
                     </div>
                     <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full ${
-                      ride.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
-                      ride.status === "cancelled" ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" : 
                       ride.status === "accepted" ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" :
                       ride.status === "in_progress" ? "bg-purple-500/10 text-purple-500 border border-purple-500/20" :
-                      "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                      "bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse"
                     }`}>
                       {ride.status ? (statusLabels[ride.status] || ride.status) : ""}
                     </span>

@@ -413,7 +413,10 @@ function MarketplaceHome() {
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
       try {
-        const { data, error } = await supabase.from("companies").select("*");
+        const { data, error } = await supabase
+          .from("companies")
+          .select("*")
+          .order("name", { ascending: true });
         if (error) {
           console.error("Error fetching companies:", error);
           return [];
@@ -427,34 +430,23 @@ function MarketplaceHome() {
   });
 
   const allStores = stores ?? [];
-  const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 6), [allStores]);
+  const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 8), [allStores]);
 
   const filtered = useMemo(() => {
-    const isStoreActive = (s: Company) => s.is_active !== false && (s as any).status !== 'inactive' && (s as any).status !== 'disabled';
-    const isStoreOpen = (s: Company) => s.is_open ?? true;
-
-    let list = allStores.filter(isStoreActive);
-    // Se a busca resultar vazia devido ao is_active, exibe todas as lojas cadastradas
+    // Lista todas as lojas registradas (se is_active for explicitamente false, oculta; caso contrário exibe)
+    let list = allStores.filter(s => s.is_active !== false && (s as any).status !== 'suspended');
     if (list.length === 0 && allStores.length > 0) {
       list = allStores;
     }
 
     if (openOnly) {
-      list = list.filter(isStoreOpen);
+      list = list.filter(s => s.is_open ?? true);
     }
 
     if (sort === "fee") {
-      list.sort((a, b) => {
-        const openDiff = (isStoreOpen(b) ? 1 : 0) - (isStoreOpen(a) ? 1 : 0);
-        if (openDiff !== 0) return openDiff;
-        return (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99);
-      });
-    } else {
-      list.sort((a, b) => {
-        const openDiff = (isStoreOpen(b) ? 1 : 0) - (isStoreOpen(a) ? 1 : 0);
-        if (openDiff !== 0) return openDiff;
-        return (b.rating ?? 0) - (a.rating ?? 0);
-      });
+      list.sort((a, b) => (a.delivery_fee ?? 99) - (b.delivery_fee ?? 99));
+    } else if (sort === "rating") {
+      list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
     return list;
   }, [allStores, sort, openOnly]);
