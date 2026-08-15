@@ -139,7 +139,6 @@ import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  useCustomerNotifications();
 
   useEffect(() => {
     initializeGlobalErrorHandlers("Marketplace Cliente");
@@ -149,9 +148,15 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
+          <NotificationsBridge />
           <Outlet />
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+function NotificationsBridge() {
+  useCustomerNotifications();
+  return null;
 }
