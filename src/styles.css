@@ -1,4 +1,4 @@
-﻿@import "tailwindcss" source(none);
+@import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
 
@@ -195,15 +195,30 @@
 ::-webkit-scrollbar-thumb { background: oklch(1 0 0 / 18%); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: oklch(0.85 0.18 95 / 70%); }
 
-/* Ocultar badge Lovable */
+/* ── BLOQUEIO TOTAL E REMOÇÃO DA MARCA LOVABLE ── */
+#lovable-badge-container,
+.lovable-badge-container,
 #lovable-badge,
 .lovable-badge,
 lovable-badge,
-[id^="lovable-"],
-[class*="lovable-"] {
+div[id*="lovable" i],
+div[class*="lovable" i],
+span[class*="lovable" i],
+a[href*="lovable" i],
+iframe[src*="lovable" i],
+button:has(svg + span:contains("Lovable")),
+[data-lovable-badge],
+[data-component-tag] {
   display: none !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -9999 !important;
 }
 
 /* Hero cover shimmer — discreto, sem flash branco */
