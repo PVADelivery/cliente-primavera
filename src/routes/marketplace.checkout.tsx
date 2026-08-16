@@ -305,27 +305,27 @@ function Checkout() {
   const selAddrObj = addresses.find(a => a.id === selectedAddress);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-32">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* ── HEADER GLASSMORPHISM ── */}
-      <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
           <button 
             onClick={() => router.history.back()} 
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors border border-border"
           >
             <ArrowLeft className="w-5 h-5 text-primary" />
           </button>
-          <h1 className="font-display font-bold text-lg tracking-tight bg-gradient-to-r from-primary to-white bg-clip-text text-transparent">
+          <h1 className="font-display font-bold text-lg tracking-tight text-foreground">
             Finalizar Pedido
           </h1>
           <div className="w-10" /> {/* Spacer */}
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 pt-6 space-y-6">
+      <main className="w-full max-w-2xl mx-auto px-4 pt-6 pb-6 space-y-6 flex-1">
         
         {/* ── FULFILLMENT TOGGLE ── */}
-        <div className="relative flex p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
+        <div className="relative flex p-1 bg-card border border-border rounded-2xl">
           <button
             onClick={() => setFulfillmentMode('delivery')}
             className={cn("flex-1 relative z-10 py-3 text-sm font-bold rounded-xl transition-colors", fulfillmentMode === 'delivery' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}
@@ -356,9 +356,9 @@ function Checkout() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Local de Entrega</h2>
               
               {loadingAddresses ? (
-                <div className="h-20 animate-pulse bg-white/5 rounded-2xl border border-white/5" />
+                <div className="h-20 animate-pulse bg-secondary rounded-2xl border border-border" />
               ) : addresses.length === 0 ? (
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center">
+                <div className="bg-card border border-border rounded-2xl p-6 text-center">
                   <MapPin className="w-8 h-8 mx-auto text-muted-foreground mb-3 opacity-50" />
                   <p className="text-sm text-foreground font-medium mb-1">Nenhum endereço cadastrado</p>
                   <p className="text-xs text-muted-foreground mb-4">Adicione um endereço para continuar</p>
@@ -369,7 +369,7 @@ function Checkout() {
               ) : (
                 <div 
                   onClick={() => setShowAddressModal(true)}
-                  className="group bg-gradient-to-br from-white/[0.07] to-transparent backdrop-blur-md border border-white/10 hover:border-primary/50 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all"
+                  className="group bg-gradient-to-br from-secondary to-card border border-border hover:border-primary/50 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -393,7 +393,7 @@ function Checkout() {
               className="space-y-3"
             >
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Retirada na Loja</h2>
-              <div className="bg-gradient-to-br from-white/[0.07] to-transparent backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+              <div className="bg-gradient-to-br from-secondary to-card border border-border rounded-2xl p-4 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <Bike className="w-5 h-5 text-primary" />
                 </div>
@@ -413,7 +413,7 @@ function Checkout() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setPaymentMethod('card')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'card' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(250,204,21,0.15)]" : "bg-white/5 border-white/10 hover:border-white/20")}
+              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'card' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(250,204,21,0.15)]" : "bg-card border-border hover:border-primary/40")}
             >
               {paymentMethod === 'card' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
               <CreditCard className={cn("w-6 h-6", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
@@ -425,7 +425,7 @@ function Checkout() {
             
             <button
               onClick={() => setPaymentMethod('money')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'money' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(250,204,21,0.15)]" : "bg-white/5 border-white/10 hover:border-white/20")}
+              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'money' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(250,204,21,0.15)]" : "bg-card border-border hover:border-primary/40")}
             >
               {paymentMethod === 'money' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
               <Banknote className={cn("w-6 h-6", paymentMethod === 'money' ? "text-primary" : "text-muted-foreground")} />
@@ -444,7 +444,7 @@ function Checkout() {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-3 space-y-4">
+                <div className="bg-card border border-border rounded-2xl p-4 mt-3 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">Precisa de troco?</p>
@@ -452,12 +452,12 @@ function Checkout() {
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" checked={needsChange} onChange={(e) => setNeedsChange(e.target.checked)} />
-                      <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
                     </label>
                   </div>
                   
                   {needsChange && (
-                    <div className="pt-2 border-t border-white/5">
+                    <div className="pt-2 border-t border-border">
                       <p className="text-xs text-muted-foreground mb-2">Troco para quanto?</p>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">R$</span>
@@ -466,7 +466,7 @@ function Checkout() {
                           value={changeFor}
                           onChange={(e) => setChangeFor(e.target.value)}
                           placeholder="Ex: 50"
-                          className="w-full h-11 bg-background/50 border border-white/10 rounded-xl pl-9 pr-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                          className="w-full h-11 bg-background border border-border rounded-xl pl-9 pr-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                         />
                       </div>
                     </div>
@@ -480,7 +480,7 @@ function Checkout() {
         {/* ── ADDITIONAL INFO ── */}
         <div className="space-y-3 pt-2">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Detalhes do Pedido</h2>
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden divide-y divide-white/5">
+          <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <FileText className="w-5 h-5 text-muted-foreground" />
@@ -493,14 +493,14 @@ function Checkout() {
             
             <AnimatePresence>
               {showCpfInput && (
-                <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-black/20">
+                <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-secondary/60">
                   <div className="p-4">
                     <input
                       type="text"
                       value={cpf}
                       onChange={(e) => setCpf(e.target.value)}
                       placeholder="000.000.000-00"
-                      className="w-full h-11 bg-background/50 border border-white/10 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                      className="w-full h-11 bg-background border border-border rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                     />
                   </div>
                 </motion.div>
@@ -520,7 +520,7 @@ function Checkout() {
                 value={phoneInput ?? ''}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="(11) 99999-9999"
-                className="w-full h-11 bg-background/50 border border-white/10 rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className="w-full h-11 bg-background border border-border rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                 required
               />
             </div>
@@ -530,11 +530,11 @@ function Checkout() {
       </main>
 
       {/* ── STICKY FOOTER TICKET ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-safe bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
-        <div className="max-w-lg mx-auto pointer-events-auto">
-          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 shadow-2xl relative overflow-hidden">
+      <div className="sticky bottom-0 z-40 px-4 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-card/95 backdrop-blur-2xl border border-border rounded-3xl p-5 shadow-2xl relative overflow-hidden">
             {/* Glossy highlight */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-50 pointer-events-none" />
+            
             
             <div className="relative z-10 space-y-3 mb-4">
               <div className="flex justify-between items-center text-sm">
@@ -551,7 +551,7 @@ function Checkout() {
                 </div>
               )}
               
-              <div className="h-px w-full bg-white/10 my-2" />
+              <div className="h-px w-full bg-border my-2" />
               
               <div className="flex justify-between items-end">
                 <span className="text-base font-medium">Total</span>
@@ -573,13 +573,13 @@ function Checkout() {
       {/* ── ADDRESS SELECTION MODAL ── */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
         <DialogContent className="max-w-md w-[95vw] rounded-3xl bg-background/95 backdrop-blur-2xl border border-white/10 p-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-4 border-b border-white/5">
+          <DialogHeader className="p-6 pb-4 border-b border-border">
             <DialogTitle className="text-xl font-bold">Onde entregar?</DialogTitle>
           </DialogHeader>
-          <div className="p-4 max-h-[60vh] overflow-y-auto">
+          <div className="p-4 max-h-[65vh] overflow-y-auto">
             <RadioGroup value={selectedAddress ?? ''} onValueChange={(val) => { setSelectedAddress(val); setShowAddressModal(false); }} className="space-y-3">
               {addresses.map(addr => (
-                <div key={addr.id} className={cn("relative flex items-start gap-4 border rounded-2xl p-4 transition-colors cursor-pointer", selectedAddress === addr.id ? "bg-primary/10 border-primary" : "bg-white/5 border-white/10")}>
+                <div key={addr.id} className={cn("relative flex items-start gap-4 border rounded-2xl p-4 transition-colors cursor-pointer", selectedAddress === addr.id ? "bg-primary/10 border-primary" : "bg-card border-border")}>
                   <RadioGroupItem value={addr.id} id={`addr-${addr.id}`} className="mt-1" />
                   <label htmlFor={`addr-${addr.id}`} className="flex-1 cursor-pointer">
                     <p className="font-bold text-sm text-foreground mb-1">{addr.street}, {addr.number}</p>
@@ -593,7 +593,7 @@ function Checkout() {
               <Button 
                 type="button"
                 variant="outline" 
-                className="w-full h-12 rounded-xl border-dashed border-white/20 bg-transparent hover:bg-white/5" 
+                className="w-full h-12 rounded-xl border-dashed border-border bg-transparent hover:bg-accent" 
                 onClick={() => {
                   setShowAddressModal(false);
                   setTimeout(() => navigate({ to: '/marketplace/addresses', search: { returnTo: '/marketplace/checkout' } as any }), 100);
@@ -605,7 +605,7 @@ function Checkout() {
               <Button 
                 type="button"
                 variant="ghost" 
-                className="w-full h-12 rounded-xl text-muted-foreground hover:bg-white/5" 
+                className="w-full h-12 rounded-xl text-muted-foreground hover:bg-accent" 
                 onClick={() => setShowAddressModal(false)}
               >
                 Cancelar
