@@ -572,7 +572,7 @@ function Checkout() {
 
       {/* ── ADDRESS SELECTION MODAL ── */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
-        <DialogContent className="max-w-md w-[95vw] rounded-3xl bg-background/95 backdrop-blur-2xl border border-white/10 p-0 overflow-hidden">
+        <DialogContent className="max-w-md w-[95vw] rounded-3xl bg-background/95 backdrop-blur-2xl border border-border p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-4 border-b border-border">
             <DialogTitle className="text-xl font-bold">Onde entregar?</DialogTitle>
           </DialogHeader>
