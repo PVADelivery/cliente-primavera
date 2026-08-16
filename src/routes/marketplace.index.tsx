@@ -411,7 +411,6 @@ function MarketplaceHome() {
     queryKey: ["companies"],
     placeholderData: [],
     queryFn: async () => {
-      if (!isSupabaseConfigured) return [];
       try {
         const { data, error } = await supabase
           .from("companies")
@@ -433,14 +432,11 @@ function MarketplaceHome() {
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 8), [allStores]);
 
   const filtered = useMemo(() => {
-    // Lista todas as lojas registradas (se is_active for explicitamente false, oculta; caso contrário exibe)
-    let list = allStores.filter(s => s.is_active !== false && (s as any).status !== 'suspended');
-    if (list.length === 0 && allStores.length > 0) {
-      list = allStores;
-    }
+    // Exibe todas as empresas cadastradas
+    let list = [...allStores];
 
     if (openOnly) {
-      list = list.filter(s => s.is_open ?? true);
+      list = list.filter(s => s.is_open === true || s.is_open === null || s.is_open === undefined);
     }
 
     if (sort === "fee") {
