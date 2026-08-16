@@ -142,6 +142,9 @@ function RootComponent() {
 
   useEffect(() => {
     initializeGlobalErrorHandlers("Marketplace Cliente");
+    if (typeof window !== "undefined" && window.location.hostname.includes("lovable.app")) {
+      window.location.replace(`https://app.mt24horasexpress.com${window.location.pathname}${window.location.search}`);
+    }
   }, []);
 
   return (
