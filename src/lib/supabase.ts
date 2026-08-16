@@ -3,22 +3,18 @@ import { createClient } from "@supabase/supabase-js";
 // Supabase externo (compartilhado com /admin, /business e /driver).
 // Aceita tanto o nome legado VITE_SUPABASE_ANON_KEY quanto o novo VITE_SUPABASE_PUBLISHABLE_KEY.
 const supabaseUrl =
-  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ??
-  "https://YOUR-PROJECT.supabase.co";
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ||
+  "https://owlbzwsdcognrgolvnzg.supabase.co";
 
 const supabaseAnonKey =
-  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) ??
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ??
-  "YOUR-ANON-KEY";
+  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) ||
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93bGJ6d3NkY29nbnJnb2x2bnpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTQ1NTMsImV4cCI6MjA5NTU3MDU1M30.R6-FUqubIr3uABzv1CS7jiS5cwygrNiIqk4oNbq7O44";
 
 // GUARDIAN DO BANCO DE DADOS - NUNCA REMOVER
 const OFFICIAL_DB = "owlbzwsdcognrgolvnzg";
 
-// Configurado de verdade quando a URL aponta para supabase E a chave tem formato JWT (eyJ...) ou sb_publishable_*.
-export const isSupabaseConfigured =
-  supabaseUrl.includes("supabase.") &&
-  !supabaseUrl.includes("YOUR-PROJECT") &&
-  (supabaseAnonKey.startsWith("eyJ") || supabaseAnonKey.startsWith("sb_publishable_"));
+export const isSupabaseConfigured = true;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
