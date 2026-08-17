@@ -194,7 +194,7 @@ export function MarketplaceLayout() {
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
         <nav aria-label="Navegação principal" className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
-          {tabs.map((t) => {
+          {tabs.map((t, index) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
             const Icon = t.icon;
             return (
@@ -212,6 +212,10 @@ export function MarketplaceLayout() {
                 <Link
                   to={t.to as "/marketplace"}
                   aria-current={active ? "page" : undefined}
+                  aria-label={t.label}
+                  ref={(el) => { tabRefs.current[index] = el as HTMLAnchorElement | null; }}
+                  tabIndex={index === activeIndex ? 0 : -1}
+                  onKeyDown={(e) => handleTabKeyDown(e, index)}
                   onClick={() => {
                     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(8);
                   }}
