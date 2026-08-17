@@ -473,7 +473,7 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="group rounded-[28px] p-7 sm:p-10 lg:p-14 text-white relative overflow-hidden isolate"
+        className="group rounded-[24px] p-5 sm:p-7 lg:p-9 text-white relative overflow-hidden isolate"
         style={{
           background:
             "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
@@ -484,7 +484,7 @@ function MarketplaceHome() {
         {/* Sol interno — halo suave */}
         <div
           aria-hidden
-          className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
+          className="absolute -top-32 -right-20 w-[320px] h-[320px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
           style={{
             background:
               "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
@@ -494,7 +494,7 @@ function MarketplaceHome() {
         {/* Núcleo do sol — brilho concentrado */}
         <div
           aria-hidden
-          className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+          className="absolute -top-14 -right-4 w-32 h-32 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
               "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
@@ -510,12 +510,12 @@ function MarketplaceHome() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 space-y-5 sm:space-y-6 max-w-2xl"
+          className="relative z-10 space-y-3.5 sm:space-y-4 max-w-2xl"
         >
-          <h1 className="font-display font-black italic text-[36px] sm:text-[54px] lg:text-[64px] leading-[1.12] pb-1 tracking-[-0.035em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+          <h1 className="font-display font-black italic text-[28px] sm:text-[38px] lg:text-[46px] leading-[1.22] pb-1 tracking-[-0.03em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
             {greeting},<br />
             <span
-              className={`bg-clip-text text-transparent inline-block pb-[0.12em] pr-[0.06em] transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
+              className={`bg-clip-text text-transparent inline-block leading-[1.3] pb-[0.18em] pr-[0.12em] transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #ffbe5a 0%, #f9a03f 45%, #e8892b 100%)",
@@ -526,7 +526,7 @@ function MarketplaceHome() {
             <span className="text-primary">.</span>
           </h1>
 
-          <p className="text-[15px] sm:text-base text-white/80 font-medium max-w-md leading-relaxed">
+          <p className="text-[14px] sm:text-[15px] text-white/80 font-medium max-w-md leading-relaxed">
             O que você quer pedir hoje na sua cidade?
           </p>
 
