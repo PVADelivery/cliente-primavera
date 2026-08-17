@@ -109,7 +109,7 @@ function DirectoryPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tudo");
 
-  const { data: businesses = [] } = useQuery<Business[]>({
+  const { data: businesses = [], isLoading } = useQuery<Business[]>({
     queryKey: ["directory"],
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
