@@ -5,7 +5,7 @@ import { ArrowLeft, Plus, Loader2, Phone, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { SocialCategory, SocialPost } from "@/types/database";
-import { AeroPageHeader } from "@/components/aero";
+import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/social")({
   head: () => ({
@@ -96,16 +96,12 @@ function SocialPage() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-28 rounded-3xl bg-card border border-border/40 animate-pulse" />
-          ))}
-        </div>
+        <AeroSkeletonList count={3} lines={3} label="Carregando classificados" />
       ) : list.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card p-8 text-center">
-          <p className="font-display font-bold text-base">Nenhum classificado por aqui</p>
-          <p className="text-xs text-muted-foreground mt-1.5">Seja o primeiro a publicar nesta categoria.</p>
-        </div>
+        <AeroEmptyState
+          title="Nenhum classificado por aqui"
+          description="Seja o primeiro a publicar nesta categoria."
+        />
       ) : (
         <ul className="space-y-3">
           {list.map((p) => (

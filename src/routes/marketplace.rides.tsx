@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
+import { AeroSkeletonList } from "@/components/aero";
 
 function RidesRouteComponent() {
   return (
@@ -253,9 +254,9 @@ function RidesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] py-20 px-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground font-medium">Buscando suas corridas...</p>
+      <div className="pb-24 pt-4 px-4 max-w-2xl mx-auto flex flex-col gap-6">
+        <h1 className="text-2xl font-display font-black italic tracking-tight">Suas Corridas</h1>
+        <AeroSkeletonList count={2} lines={4} label="Buscando suas corridas" />
       </div>
     );
   }

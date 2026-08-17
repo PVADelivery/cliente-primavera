@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
 import { usePropertyFavorites } from "@/hooks/usePropertyFavorites";
-import { AeroPageHeader } from "@/components/aero";
+import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
@@ -206,7 +206,7 @@ function BusinessPage() {
           <button
             key={d.key}
             onClick={() => setDeal(d.key)}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+            className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
               deal === d.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
@@ -218,7 +218,7 @@ function BusinessPage() {
         <button
           onClick={() => setOnlyFavorites((v) => !v)}
           aria-pressed={onlyFavorites}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+          className={`shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${
             onlyFavorites
               ? "bg-primary text-primary-foreground border-primary"
               : "bg-card text-muted-foreground border-border/60"
@@ -234,7 +234,7 @@ function BusinessPage() {
           <button
             key={t.key}
             onClick={() => setType(t.key)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+            className={`shrink-0 px-3.5 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
               type === t.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
@@ -306,7 +306,7 @@ function BusinessPage() {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             aria-label="Ordenar imóveis"
-            className="h-9 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+            className="h-11 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
           >
             {SORTS.map((s) => (
               <option key={s.key} value={s.key}>
@@ -318,22 +318,16 @@ function BusinessPage() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-36 rounded-3xl bg-card border border-border/40 animate-pulse" />
-          ))}
-        </div>
+        <AeroSkeletonList count={3} lines={4} label="Carregando imóveis" />
       ) : list.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card p-8 text-center">
-          <p className="font-display font-bold text-base">
-            {onlyFavorites ? "Nenhum favorito ainda" : "Nenhum imóvel encontrado"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1.5">
-            {onlyFavorites
+        <AeroEmptyState
+          title={onlyFavorites ? "Nenhum favorito ainda" : "Nenhum imóvel encontrado"}
+          description={
+            onlyFavorites
               ? "Toque no coração de um imóvel para salvá-lo na sua lista de interesse."
-              : "Ajuste os filtros ou tente outro bairro."}
-          </p>
-        </div>
+              : "Ajuste os filtros ou tente outro bairro."
+          }
+        />
       ) : (
         <>
         <ul className="space-y-3">
@@ -343,7 +337,7 @@ function BusinessPage() {
                 onClick={() => toggleFavorite(p.id)}
                 aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
                 aria-pressed={isFavorite(p.id)}
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
+                className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
               >
                 <Heart
                   className={`w-4 h-4 ${isFavorite(p.id) ? "text-primary fill-current" : "text-muted-foreground"}`}

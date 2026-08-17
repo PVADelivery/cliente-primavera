@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/property";
 import type { Vehicle, VehicleType } from "@/types/database";
+import { AeroSkeletonList, AeroEmptyState, AeroPageHeader } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/business/vehicles")({
   head: () => ({
@@ -156,16 +157,12 @@ function VehiclesPage() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-32 rounded-3xl bg-card border border-border/40 animate-pulse" />
-          ))}
-        </div>
+        <AeroSkeletonList count={3} lines={3} label="Carregando veículos" />
       ) : list.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card p-8 text-center">
-          <p className="font-display font-bold text-base">Nenhum veículo anunciado</p>
-          <p className="text-xs text-muted-foreground mt-1.5">Toque em “Anunciar” para publicar o seu veículo à venda.</p>
-        </div>
+        <AeroEmptyState
+          title="Nenhum veículo anunciado"
+          description="Toque em “Anunciar” para publicar o seu veículo à venda."
+        />
       ) : (
         <ul className="space-y-3">
           {list.map((v) => (

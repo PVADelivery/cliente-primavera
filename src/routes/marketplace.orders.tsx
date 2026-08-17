@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
+import { AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/orders")({
   head: () => ({ meta: [{ title: "Meus pedidos — MT 24horas express" }] }),
@@ -26,7 +27,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 function OrdersList() {
   const { user } = useAuth();
-  const { data: orders = [] } = useQuery({
+  const { data: orders = [], isLoading } = useQuery({
     queryKey: ["active-orders", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -46,6 +47,15 @@ function OrdersList() {
       return data ?? [];
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto pb-20 pt-2">
+        <h1 className="font-display text-2xl font-black italic tracking-tight">Pedidos Ativos</h1>
+        <AeroSkeletonList count={3} lines={3} label="Carregando pedidos" />
+      </div>
+    );
+  }
 
   if (!orders || orders.length === 0) {
     return (

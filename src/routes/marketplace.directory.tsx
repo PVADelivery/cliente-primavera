@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock, Mail, Navigation, Copy, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AeroHero } from "@/components/aero";
+import { AeroHero, AeroSkeletonList, AeroEmptyState, AeroChip } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
@@ -109,7 +109,7 @@ function DirectoryPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tudo");
 
-  const { data: businesses = [] } = useQuery<Business[]>({
+  const { data: businesses = [], isLoading } = useQuery<Business[]>({
     queryKey: ["directory"],
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
@@ -206,6 +206,22 @@ function DirectoryPage() {
             </SelectContent>
           </Select>
         </div>
+
+        {(q || cat !== "Tudo") && (
+          <div className="flex flex-wrap items-center gap-2">
+            {q && <AeroChip onRemove={() => setQ("")} removeLabel="Limpar busca">Busca: {q}</AeroChip>}
+            {cat !== "Tudo" && (
+              <AeroChip onRemove={() => setCat("Tudo")} removeLabel="Limpar categoria">{cat}</AeroChip>
+            )}
+            <button
+              type="button"
+              onClick={() => { setQ(""); setCat("Tudo"); }}
+              className="aero-focus text-[12px] font-bold text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              Limpar tudo
+            </button>
+          </div>
+        )}
 
         {/* Featured Section */}
         {featured.length > 0 && cat === "Tudo" && !q && (
@@ -415,14 +431,14 @@ function DirectoryPage() {
             ))}
           </div>
 
-          {filtered.length === 0 && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
-                <Search className="w-8 h-8 opacity-50" />
-              </div>
-              <p className="text-lg font-display font-bold text-foreground">Nada encontrado</p>
-              <p className="text-sm text-muted-foreground mt-1">Tente remover ou alterar seus filtros.</p>
-            </div>
+          {isLoading && <AeroSkeletonList count={4} lines={4} label="Carregando contatos" />}
+
+          {!isLoading && filtered.length === 0 && (
+            <AeroEmptyState
+              icon={Search}
+              title="Nada encontrado"
+              description="Tente remover ou alterar seus filtros para ver mais estabelecimentos."
+            />
           )}
         </section>
       </div>
