@@ -415,14 +415,14 @@ function DirectoryPage() {
             ))}
           </div>
 
-          {filtered.length === 0 && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
-                <Search className="w-8 h-8 opacity-50" />
-              </div>
-              <p className="text-lg font-display font-bold text-foreground">Nada encontrado</p>
-              <p className="text-sm text-muted-foreground mt-1">Tente remover ou alterar seus filtros.</p>
-            </div>
+          {isLoading && <AeroSkeletonList count={4} lines={4} label="Carregando contatos" />}
+
+          {!isLoading && filtered.length === 0 && (
+            <AeroEmptyState
+              icon={Search}
+              title="Nada encontrado"
+              description="Tente remover ou alterar seus filtros para ver mais estabelecimentos."
+            />
           )}
         </section>
       </div>
