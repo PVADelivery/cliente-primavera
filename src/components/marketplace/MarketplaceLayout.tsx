@@ -5,7 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Car } from "lucide-react";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
@@ -24,6 +24,23 @@ export function MarketplaceLayout() {
   const path = router.state.location.pathname;
 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const tabRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((t) => (t.exact ? path === t.to : path.startsWith(t.to)))
+  );
+
+  const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
+    const last = tabs.length - 1;
+    let next: number | null = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = index === last ? 0 : index + 1;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = index === 0 ? last : index - 1;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = last;
+    if (next === null) return;
+    e.preventDefault();
+    tabRefs.current[next]?.focus();
+  };
   const [activeOrdersCount, setActiveOrdersCount] = useState(0);
   const [activeRidesCount, setActiveRidesCount] = useState(0);
 
