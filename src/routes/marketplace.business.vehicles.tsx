@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/property";
 import type { Vehicle, VehicleType } from "@/types/database";
+import { AeroSkeletonList, AeroEmptyState, AeroPageHeader } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/business/vehicles")({
   head: () => ({
