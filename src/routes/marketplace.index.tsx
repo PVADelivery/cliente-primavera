@@ -527,9 +527,9 @@ function MarketplaceHome() {
         {/* Verniz — reflexo de lataria */}
         <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
         {/* Etiqueta técnica */}
-        <div aria-hidden className="absolute left-6 sm:left-10 bottom-5 flex items-center gap-2 pointer-events-none">
-          <span className="h-px w-8 bg-primary/60" />
-          <span className="text-[10px] font-mono tracking-[0.35em] text-white/40 uppercase">MT-24</span>
+        <div aria-hidden className="absolute right-5 sm:right-8 bottom-4 flex items-center gap-2 pointer-events-none">
+          <span className="h-px w-6 bg-primary/50" />
+          <span className="text-[9px] font-mono tracking-[0.35em] text-white/35 uppercase">MT-24</span>
         </div>
 
         <motion.div
