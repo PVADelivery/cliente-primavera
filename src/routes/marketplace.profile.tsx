@@ -56,17 +56,30 @@ function Profile() {
   const [showRidesHistory, setShowRidesHistory] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [coupons, setCoupons] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
 
   useEffect(() => {
     setFullName(profile?.full_name || '');
     setPhone(profile?.phone || '');
   }, [profile]);
 
+  const loadProfileData = async () => {
+    if (!user) return;
+    setDataLoading(true);
+    setDataError(null);
+    try {
+      await Promise.all([fetchOrders(), fetchRides(), fetchCoupons(false), refreshProfile?.()]);
+    } catch (err: any) {
+      setDataError(err?.message || 'Não foi possível carregar seus dados.');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-    fetchOrders();
-    fetchRides();
-    fetchCoupons(false);
+    loadProfileData();
   }, [user]);
 
   const fetchCoupons = async (show = true) => {
@@ -87,25 +100,23 @@ function Profile() {
   };
 
   const fetchOrders = async () => {
-    try {
-      const { data } = await supabase
+    const { data, error } = await supabase
         .from('orders')
         .select(`id, status, total, created_at, company:companies(name, logo_url)`)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      setOrders(data || []);
-    } catch { /* silent */ }
+    if (error) throw error;
+    setOrders(data || []);
   };
 
   const fetchRides = async () => {
-    try {
-      const { data } = await supabase
+    const { data, error } = await supabase
         .from('ride_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      setRides(data || []);
-    } catch { /* silent */ }
+    if (error) throw error;
+    setRides(data || []);
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +158,8 @@ function Profile() {
   }, [user, authLoading, navigate]);
 
   if (authLoading || !user) { return <ProfileSkeleton />; }
+  if (dataError) { return <ProfileError message={dataError} onRetry={loadProfileData} />; }
+  if (dataLoading) { return <ProfileSkeleton />; }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
@@ -557,6 +570,26 @@ function ProfileSkeleton() {
       </div>
       <div className="px-6 mt-6">
         <AeroSkeletonList count={4} lines={2} />
+      </div>
+    </div>
+  );
+}
+
+function ProfileError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="min-h-[60vh] bg-slate-50 dark:bg-zinc-950 pb-32 px-6 pt-16" role="alert">
+      <div className="mx-auto max-w-md rounded-3xl border border-destructive/30 bg-card/80 p-6 text-center shadow-lg">
+        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-destructive/10 text-destructive">
+          <XCircle className="h-7 w-7" />
+        </div>
+        <h2 className="text-lg font-black italic tracking-tight text-foreground">Não foi possível carregar o perfil</h2>
+        <p className="mt-2 text-sm text-muted-foreground break-words">{message}</p>
+        <button
+          onClick={onRetry}
+          className="aero-focus mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground transition-transform active:scale-95"
+        >
+          Tentar novamente
+        </button>
       </div>
     </div>
   );
