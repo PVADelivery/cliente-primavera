@@ -216,3 +216,57 @@ export function AeroSection({
     </section>
   );
 }
+
+/** Hero padronizado das seções (mesmo acabamento da home) */
+export function AeroHero({
+  eyebrow,
+  title,
+  subtitle,
+  children,
+  className,
+}: {
+  eyebrow?: React.ReactNode;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={cx("group relative overflow-hidden isolate rounded-[28px] p-7 sm:p-10 text-white", className)}
+      style={{
+        background: "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
+        boxShadow:
+          "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
+      }}
+    >
+      <span
+        aria-hidden
+        className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none opacity-95"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
+          filter: "blur(28px)",
+        }}
+      />
+      <AeroTexture sheen={false} />
+      <div className="relative z-10 max-w-2xl space-y-4">
+        {eyebrow && (
+          <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
+            <span aria-hidden className="h-px w-5 bg-primary/60" />
+            {eyebrow}
+          </span>
+        )}
+        <h1 className="font-display font-black italic text-[30px] sm:text-[42px] leading-[0.98] tracking-[-0.03em]">
+          {title}
+        </h1>
+        {subtitle && <p className="text-[15px] text-white/80 font-medium max-w-md leading-relaxed">{subtitle}</p>}
+        {children}
+      </div>
+      <span aria-hidden className="absolute right-5 bottom-4 flex items-center gap-2 pointer-events-none">
+        <span className="h-px w-6 bg-primary/50" />
+        <span className="text-[9px] font-mono tracking-[0.35em] text-white/35 uppercase">MT-24</span>
+      </span>
+    </section>
+  );
+}
