@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
+import { AeroSkeletonList } from "@/components/aero";
 
 function RidesRouteComponent() {
   return (
