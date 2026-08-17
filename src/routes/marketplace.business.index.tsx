@@ -318,22 +318,16 @@ function BusinessPage() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-36 rounded-3xl bg-card border border-border/40 animate-pulse" />
-          ))}
-        </div>
+        <AeroSkeletonList count={3} lines={4} label="Carregando imóveis" />
       ) : list.length === 0 ? (
-        <div className="rounded-3xl border border-border/50 bg-card p-8 text-center">
-          <p className="font-display font-bold text-base">
-            {onlyFavorites ? "Nenhum favorito ainda" : "Nenhum imóvel encontrado"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1.5">
-            {onlyFavorites
+        <AeroEmptyState
+          title={onlyFavorites ? "Nenhum favorito ainda" : "Nenhum imóvel encontrado"}
+          description={
+            onlyFavorites
               ? "Toque no coração de um imóvel para salvá-lo na sua lista de interesse."
-              : "Ajuste os filtros ou tente outro bairro."}
-          </p>
-        </div>
+              : "Ajuste os filtros ou tente outro bairro."
+          }
+        />
       ) : (
         <>
         <ul className="space-y-3">
