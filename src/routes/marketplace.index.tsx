@@ -507,22 +507,24 @@ function MarketplaceHome() {
       </section>
 
       {/* ── Categories ── */}
-      <section>
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+      <AeroSection title="Categorias" tag="MT-24 / 01" subtitle="Escolha por onde começar">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(74px,1fr))] gap-3">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
               <motion.button
                 key={c.label}
+                type="button"
+                aria-label={c.label}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl"
               >
                 <div
-                  className="aero-plate w-full aspect-square max-w-[68px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
+                  className="aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
                   style={{
                     background:
                       "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
@@ -536,18 +538,22 @@ function MarketplaceHome() {
                   <span aria-hidden className="spec-sheen" />
                   <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
                 </div>
-                <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
+                <span className="text-[12px] font-semibold text-foreground text-center leading-tight">{c.label}</span>
               </motion.button>
             );
           })}
         </div>
-      </section>
+      </AeroSection>
 
-      {/* ── Quick banners ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroTile to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
-        <AeroTile to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
-      </section>
+      {/* ── Atalhos ── */}
+      <AeroSection title="Serviços da cidade" tag="MT-24 / 02" subtitle="Tudo em um só lugar">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+          <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
+          <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
+          <AeroTile index={2} to="/marketplace/social" icon={Users} title={<>Espaço Social</>} subtitle="Classificados da cidade" />
+          <AeroTile index={3} to="/marketplace/business" icon={Building2} title={<>Central de Negócios</>} subtitle="Imóveis e locação" />
+        </div>
+      </AeroSection>
 
       {/* ── Taxi ── */}
       <section>
@@ -569,12 +575,6 @@ function MarketplaceHome() {
             <p className="text-sm text-white/60 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
-      </section>
-
-      {/* ── Espaço Social & Central de Negócios ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroTile to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
-        <AeroTile to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e locação" />
       </section>
 
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
