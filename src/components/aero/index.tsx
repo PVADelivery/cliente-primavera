@@ -270,3 +270,45 @@ export function AeroHero({
     </section>
   );
 }
+
+/** Cabeçalho de página com botão voltar padronizado */
+export function AeroPageHeader({
+  title,
+  subtitle,
+  onBack,
+  action,
+  className,
+}: {
+  title: string;
+  subtitle?: string;
+  onBack?: () => void;
+  action?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cx("grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3", className)}>
+      {onBack ? (
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.92 }}
+          onClick={onBack}
+          aria-label="Voltar"
+          className="tap-target aero-focus w-11 h-11 rounded-full grid place-items-center bg-card border border-border text-foreground hover:border-primary/50 transition-colors"
+        >
+          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </motion.button>
+      ) : (
+        <span />
+      )}
+      <div className="min-w-0">
+        <h1 className="font-display text-xl sm:text-2xl font-black italic tracking-tight leading-tight truncate">
+          {title}
+        </h1>
+        {subtitle && <p className="text-[13px] text-muted-foreground truncate">{subtitle}</p>}
+      </div>
+      <div className="shrink-0">{action}</div>
+    </div>
+  );
+}
