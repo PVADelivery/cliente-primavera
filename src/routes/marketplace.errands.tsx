@@ -698,18 +698,12 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
 
   return (
     <div className="pb-16 overflow-y-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => window.history.back()}
-          className="w-10 h-10 rounded-full bg-secondary grid place-items-center text-muted-foreground active:scale-95 transition-transform"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold">Solicitar Entregador</h1>
-          <p className="text-xs text-muted-foreground">Envios rápidos na cidade</p>
-        </div>
-      </div>
+      <AeroPageHeader
+        className="mb-6"
+        title="Solicitar Entregador"
+        subtitle="Envios rápidos na cidade"
+        onBack={() => window.history.back()}
+      />
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-4">
