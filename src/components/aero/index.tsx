@@ -125,29 +125,46 @@ export function AeroPlate({
 /** Botão padronizado */
 export function AeroButton({
   variant = "primary",
+  loading = false,
+  loadingLabel = "Carregando…",
   className,
   children,
   ...rest
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "ghost" | "danger";
+  loading?: boolean;
+  loadingLabel?: string;
+}) {
   const styles: Record<string, string> = {
     primary:
       "bg-primary text-primary-foreground hover:brightness-110 shadow-[0_14px_34px_-16px_rgba(249,160,63,0.9)]",
     ghost: "bg-card/70 text-foreground border border-border hover:border-primary/50",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
   };
+  const disabled = loading || rest.disabled;
   return (
     <motion.button
-      whileTap={{ scale: 0.97 }}
-      whileHover={{ y: -1 }}
+      whileTap={disabled ? undefined : { scale: 0.97 }}
+      whileHover={disabled ? undefined : { y: -1 }}
+      aria-busy={loading || undefined}
       className={cx(
-        "tap-target aero-focus relative overflow-hidden group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:pointer-events-none",
+        "tap-target aero-focus relative overflow-hidden group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:pointer-events-none",
         styles[variant],
         className,
       )}
       {...(rest as Record<string, unknown>)}
+      disabled={disabled}
     >
-      <span aria-hidden className="spec-sheen" />
-      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      {!disabled && <span aria-hidden className="spec-sheen" />}
+      <span className="relative z-10 inline-flex items-center gap-2">
+        {loading && (
+          <span
+            aria-hidden
+            className="w-4 h-4 rounded-full border-2 border-current border-r-transparent animate-spin"
+          />
+        )}
+        {loading ? loadingLabel : children}
+      </span>
     </motion.button>
   );
 }
@@ -171,13 +188,26 @@ export function AeroField({
       <span className="text-[13px] font-bold text-foreground/85">{label}</span>
       {children}
       {hint && !error && <span className="block text-xs text-muted-foreground">{hint}</span>}
-      {error && <span className="block text-xs font-semibold text-rose-400">{error}</span>}
+      {error && (
+        <span role="alert" className="flex items-center gap-1.5 text-xs font-semibold text-destructive">
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v5M12 16h.01" strokeLinecap="round" />
+          </svg>
+          {error}
+        </span>
+      )}
     </label>
   );
 }
 
 export const aeroInputClass =
-  "w-full rounded-2xl bg-card border border-border px-4 py-3 text-sm font-medium text-foreground placeholder:text-muted-foreground aero-focus focus:border-primary transition-colors min-h-[46px]";
+  "w-full rounded-2xl bg-card border border-border px-4 py-3 text-sm font-medium text-foreground placeholder:text-muted-foreground aero-focus focus:border-primary transition-colors min-h-[46px] disabled:opacity-50 disabled:cursor-not-allowed";
+
+/** Classe de input com estado de erro */
+export function aeroInput(error?: boolean, extra?: string) {
+  return cx(aeroInputClass, error && "border-destructive focus:border-destructive", extra);
+}
 
 /** Cabeçalho de seção com etiqueta técnica */
 export function AeroSection({
