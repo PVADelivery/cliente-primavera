@@ -295,7 +295,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
-              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FDE047 0%, #3B82F6 100%)" }} />
+              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFBE5A 0%, #3B82F6 100%)" }} />
             )}
 
             {/* Gradient overlays */}
@@ -325,7 +325,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                   </span>
                 )}
                 {(s.rating ?? 5) >= 4.7 && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FACC15]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F9A03F]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     Melhor avaliado
                   </span>
                 )}
@@ -354,7 +354,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           {/* Footer */}
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
             <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
-              <Star className="w-4 h-4 fill-[#FACC15] text-[#FACC15]" />
+              <Star className="w-4 h-4 fill-[#F9A03F] text-[#F9A03F]" />
               {(s.rating ?? 5).toFixed(1)}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
@@ -459,7 +459,7 @@ function MarketplaceHome() {
           background:
             "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
           boxShadow:
-            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(250,204,21,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
+            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
         {/* Sol interno — halo suave */}
@@ -468,7 +468,7 @@ function MarketplaceHome() {
           className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
           style={{
             background:
-              "radial-gradient(circle, rgba(253,224,71,0.95) 0%, rgba(250,204,21,0.55) 25%, rgba(234,179,8,0.15) 55%, rgba(0,0,0,0) 75%)",
+              "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
             filter: "blur(28px)",
           }}
         />
@@ -478,7 +478,7 @@ function MarketplaceHome() {
           className="absolute -top-16 -right-4 w-40 h-40 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,236,153,1) 0%, rgba(250,204,21,0.7) 40%, rgba(250,204,21,0) 70%)",
+              "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
             filter: "blur(6px)",
           }}
         />
@@ -504,7 +504,7 @@ function MarketplaceHome() {
               className={`bg-clip-text text-transparent inline-block transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #fde047 0%, #facc15 45%, #f59e0b 100%)",
+                  "linear-gradient(135deg, #ffbe5a 0%, #f9a03f 45%, #e8892b 100%)",
               }}
             >
               {firstName}

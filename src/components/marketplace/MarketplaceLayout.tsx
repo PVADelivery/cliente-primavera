@@ -118,7 +118,7 @@ export function MarketplaceLayout() {
           height: "clamp(420px, 55vw, 900px)",
           transform: "translate(30%, -30%)",
           background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.22) 0%, rgba(250,204,21,0.10) 32%, rgba(250,204,21,0.03) 50%, rgba(250,204,21,0) 62%)",
+            "radial-gradient(circle at center, rgba(255,190,90,0.22) 0%, rgba(249,160,63,0.10) 32%, rgba(249,160,63,0.03) 50%, rgba(249,160,63,0) 62%)",
           filter: "blur(40px)",
           willChange: "opacity",
         }}
@@ -131,7 +131,7 @@ export function MarketplaceLayout() {
           height: "clamp(220px, 28vw, 520px)",
           transform: "translate(35%, -35%)",
           background:
-            "radial-gradient(circle at center, rgba(253,224,71,0.38) 0%, rgba(250,204,21,0.15) 42%, rgba(250,204,21,0) 65%)",
+            "radial-gradient(circle at center, rgba(255,190,90,0.38) 0%, rgba(249,160,63,0.15) 42%, rgba(249,160,63,0) 65%)",
           filter: "blur(24px)",
         }}
       />
