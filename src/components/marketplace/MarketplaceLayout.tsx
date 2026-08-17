@@ -175,22 +175,39 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+        <nav aria-label="Navegação principal" className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
             const Icon = t.icon;
             return (
               <li key={t.to} className="relative">
+                {active && (
+                  <motion.span
+                    aria-hidden
+                    layoutId="tab-active-pill"
+                    transition={{ type: "spring", stiffness: 480, damping: 34, mass: 0.7 }}
+                    className="absolute inset-x-1.5 inset-y-1 rounded-2xl bg-primary/12 border border-primary/30 shadow-[0_0_18px_-6px_hsl(var(--primary)/0.55)] overflow-hidden"
+                  >
+                    <span aria-hidden className="absolute inset-0 nav-sweep" />
+                  </motion.span>
+                )}
                 <Link
                   to={t.to as "/marketplace"}
                   aria-current={active ? "page" : undefined}
-                  className={`aero-focus flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold transition-colors ${
+                  onClick={() => {
+                    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(8);
+                  }}
+                  className={`aero-focus relative z-10 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold transition-all duration-200 active:scale-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                     active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span className="relative">
-                    <Icon className="w-5 h-5" />
+                    <Icon
+                      className={`w-5 h-5 transition-transform duration-300 ${
+                        active ? "-translate-y-0.5 scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" : ""
+                      }`}
+                    />
                     {t.to === "/marketplace/cart" && count > 0 && (
                       <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
                         {count}
@@ -211,8 +228,10 @@ export function MarketplaceLayout() {
                 </Link>
                 {active && (
                   <motion.div
+                    aria-hidden
                     layoutId="tab-indicator"
-                    className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 480, damping: 34 }}
+                    className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]"
                   />
                 )}
               </li>
