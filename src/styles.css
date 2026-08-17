@@ -237,3 +237,60 @@ iframe[src*="lovable"],
 @media (prefers-reduced-motion: reduce) {
   .sun-breathe { animation: none; }
 }
+
+/* ── Linguagem automotiva: carbono, verniz e aerodinâmica ───────────────── */
+
+/* Trama de fibra de carbono */
+@utility carbon-weave {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,0.55) 0 1px, transparent 1px 4px);
+  background-size: 8px 8px, 8px 8px;
+}
+
+/* Reflexo de lataria (highlight especular diagonal) */
+@utility clearcoat {
+  background-image: linear-gradient(
+    118deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 36%,
+    rgba(255,255,255,0.14) 44%,
+    rgba(255,255,255,0.03) 52%,
+    transparent 70%
+  );
+}
+
+/* Placa aerodinâmica — chanfro tipo aerofólio */
+@utility aero-plate {
+  clip-path: polygon(14% 0, 100% 0, 100% 78%, 86% 100%, 0 100%, 0 22%);
+}
+
+/* Varredura de luz no hover */
+@keyframes sheen-sweep-kf {
+  0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+  25%  { opacity: 1; }
+  100% { transform: translateX(240%) skewX(-18deg); opacity: 0; }
+}
+@utility spec-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    width: 38%;
+    background: linear-gradient(90deg, transparent, rgba(255,214,150,0.28), transparent);
+    transform: translateX(-140%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+.group:hover .spec-sheen::after,
+.group:active .spec-sheen::after {
+  animation: sheen-sweep-kf 0.9s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .spec-sheen::after { animation: none; }
+}
