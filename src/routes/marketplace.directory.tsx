@@ -207,6 +207,22 @@ function DirectoryPage() {
           </Select>
         </div>
 
+        {(q || cat !== "Tudo") && (
+          <div className="flex flex-wrap items-center gap-2">
+            {q && <AeroChip onRemove={() => setQ("")} removeLabel="Limpar busca">Busca: {q}</AeroChip>}
+            {cat !== "Tudo" && (
+              <AeroChip onRemove={() => setCat("Tudo")} removeLabel="Limpar categoria">{cat}</AeroChip>
+            )}
+            <button
+              type="button"
+              onClick={() => { setQ(""); setCat("Tudo"); }}
+              className="aero-focus text-[12px] font-bold text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              Limpar tudo
+            </button>
+          </div>
+        )}
+
         {/* Featured Section */}
         {featured.length > 0 && cat === "Tudo" && !q && (
           <section className="pt-2">
