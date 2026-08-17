@@ -473,21 +473,16 @@ function MarketplaceHome() {
         {/* Verniz — reflexo de lataria */}
         <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
         {/* Etiqueta técnica */}
-        <div aria-hidden className="absolute right-5 sm:right-8 bottom-4 flex items-center gap-2 pointer-events-none">
-          <span className="h-px w-6 bg-primary/50" />
-          <span className="text-[9px] font-mono tracking-[0.35em] text-white/35 uppercase">MT-24</span>
-        </div>
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="relative z-10 space-y-5 sm:space-y-6 max-w-2xl"
         >
-          <h1 className="font-display font-black italic text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.035em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+          <h1 className="font-display font-black italic text-[36px] sm:text-[54px] lg:text-[64px] leading-[1.12] pb-1 tracking-[-0.035em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
             {greeting},<br />
             <span
-              className={`bg-clip-text text-transparent inline-block transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
+              className={`bg-clip-text text-transparent inline-block pb-[0.12em] pr-[0.06em] transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #ffbe5a 0%, #f9a03f 45%, #e8892b 100%)",
@@ -507,8 +502,8 @@ function MarketplaceHome() {
       </section>
 
       {/* ── Categories ── */}
-      <AeroSection title="Categorias" tag="MT-24 / 01" subtitle="Escolha por onde começar">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(74px,1fr))] gap-3">
+      <AeroSection title="Categorias" subtitle="Escolha por onde começar">
+        <div className="flex gap-2.5 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:mx-0 sm:px-0">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
@@ -521,7 +516,7 @@ function MarketplaceHome() {
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto"
               >
                 <div
                   className="aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
@@ -546,7 +541,7 @@ function MarketplaceHome() {
       </AeroSection>
 
       {/* ── Atalhos ── */}
-      <AeroSection title="Serviços da cidade" tag="MT-24 / 02" subtitle="Tudo em um só lugar">
+      <AeroSection title="Serviços da cidade" subtitle="Tudo em um só lugar">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
           <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
           <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
@@ -580,7 +575,7 @@ function MarketplaceHome() {
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
       <AeroSection
         title="Em destaque"
-        tag="MT-24 / 03"
+       
         subtitle="Os mais bem avaliados agora"
         action={
           <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
@@ -646,7 +641,7 @@ function MarketplaceHome() {
       {/* ── Lojas próximas com filtros ── */}
       <AeroSection
         title="Lojas próximas"
-        tag="MT-24 / 04"
+       
         subtitle="Selecionadas para você"
         action={
           <span className="flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/25">
