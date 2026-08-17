@@ -574,3 +574,23 @@ function ProfileSkeleton() {
     </div>
   );
 }
+
+function ProfileError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="min-h-[60vh] bg-slate-50 dark:bg-zinc-950 pb-32 px-6 pt-16" role="alert">
+      <div className="mx-auto max-w-md rounded-3xl border border-destructive/30 bg-card/80 p-6 text-center shadow-lg">
+        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-destructive/10 text-destructive">
+          <XCircle className="h-7 w-7" />
+        </div>
+        <h2 className="text-lg font-black italic tracking-tight text-foreground">Não foi possível carregar o perfil</h2>
+        <p className="mt-2 text-sm text-muted-foreground break-words">{message}</p>
+        <button
+          onClick={onRetry}
+          className="aero-focus mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground transition-transform active:scale-95"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    </div>
+  );
+}
