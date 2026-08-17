@@ -547,7 +547,7 @@ function MarketplaceHome() {
 
       {/* ── Atalhos ── */}
       <AeroSection title="Serviços da cidade" tag="MT-24 / 02" subtitle="Tudo em um só lugar">
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
           <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
           <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
           <AeroTile index={2} to="/marketplace/social" icon={Users} title={<>Espaço Social</>} subtitle="Classificados da cidade" />
