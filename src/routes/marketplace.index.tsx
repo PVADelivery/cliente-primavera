@@ -58,6 +58,46 @@ function pushRecent(term: string) {
 }
 
 // ─── Skeleton components ──────────────────────────────────────────────────────
+function AeroTile({
+  to,
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  to: string;
+  icon: typeof Zap;
+  title: React.ReactNode;
+  subtitle: string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="p-5 rounded-3xl relative overflow-hidden block group border border-border/50 hover:border-primary/50 transition-colors text-white"
+      style={{
+        background: "linear-gradient(145deg, #17130c 0%, #0a0806 55%, #000 100%)",
+        boxShadow: "0 22px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)",
+      }}
+    >
+      <div aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
+      <div aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
+      {/* faixa de velocidade */}
+      <div
+        aria-hidden
+        className="absolute -top-8 -right-8 w-28 h-28 rotate-45 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: "linear-gradient(180deg, rgba(249,160,63,0.35), transparent)" }}
+      />
+      <span aria-hidden className="spec-sheen" />
+      <div className="relative z-10">
+        <div className="w-11 h-11 mb-3 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/40 shadow-[inset_0_0_14px_rgba(249,160,63,0.22)] transition-transform duration-300 group-hover:scale-105">
+          <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+        </div>
+        <p className="font-display font-black italic text-base leading-tight tracking-tight">{title}</p>
+        <p className="text-xs text-white/55 mt-1.5 font-medium">{subtitle}</p>
+      </div>
+    </Link>
+  );
+}
+
 function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div
@@ -482,15 +522,15 @@ function MarketplaceHome() {
             filter: "blur(6px)",
           }}
         />
-        {/* Textura de grão sutil */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-          }}
-        />
+        {/* Fibra de carbono */}
+        <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.5] mix-blend-overlay pointer-events-none" />
+        {/* Verniz — reflexo de lataria */}
+        <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
+        {/* Etiqueta técnica */}
+        <div aria-hidden className="absolute right-5 sm:right-8 bottom-4 flex items-center gap-2 pointer-events-none">
+          <span className="h-px w-6 bg-primary/50" />
+          <span className="text-[9px] font-mono tracking-[0.35em] text-white/35 uppercase">MT-24</span>
+        </div>
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -498,7 +538,7 @@ function MarketplaceHome() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="relative z-10 space-y-5 sm:space-y-6 max-w-2xl"
         >
-          <h1 className="font-display font-black text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.025em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+          <h1 className="font-display font-black italic text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.035em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
             {greeting},<br />
             <span
               className={`bg-clip-text text-transparent inline-block transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
@@ -531,15 +571,24 @@ function MarketplaceHome() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                whileTap={{ scale: 0.92 }}
+                whileTap={{ scale: 0.94 }}
+                whileHover={{ y: -3 }}
                 className="flex flex-col items-center gap-2 group"
               >
                 <div
-                  className="w-14 h-14 rounded-full grid place-items-center bg-primary border border-primary group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
-                  style={{ boxShadow: "var(--shadow-card)" }}
+                  className="aero-plate w-full aspect-square max-w-[68px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
+                  style={{
+                    background:
+                      "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
+                    boxShadow:
+                      "0 14px 26px -14px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(249,160,63,0.22)",
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
-                  <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
+                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-60" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/12 to-transparent" />
+                  <div aria-hidden className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full bg-primary/25 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span aria-hidden className="spec-sheen" />
+                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
                 </div>
                 <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
@@ -550,47 +599,36 @@ function MarketplaceHome() {
 
       {/* ── Quick banners ── */}
       <section className="grid grid-cols-2 gap-3">
-        <Link to="/marketplace/errands" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <Zap className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
-          <p className="font-display font-bold text-base leading-tight">Solicitar<br/>Entrega</p>
-          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Motoboy rápido</p>
-        </Link>
-        <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <Tag className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-          <p className="font-display font-bold text-base leading-tight">PPP</p>
-          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Painel Profissional Prestador de Serviços</p>
-        </Link>
+        <AeroTile to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
+        <AeroTile to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
       </section>
 
       {/* ── Taxi ── */}
       <section>
-        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl relative overflow-hidden group bg-card border border-border/50 hover:border-primary/50 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] opacity-[0.03] font-black italic tracking-tighter mix-blend-overlay pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
-          <div className="relative z-10">
+        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl relative overflow-hidden group border border-border/50 hover:border-primary/50 transition-colors" style={{ background: "linear-gradient(140deg, #17130c 0%, #0a0806 55%, #000 100%)", boxShadow: "0 26px 46px -26px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
+          <div aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
+          <div aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-primary/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          {/* faixas de vento */}
+          <div aria-hidden className="absolute right-6 inset-y-8 w-24 pointer-events-none opacity-40 group-hover:opacity-70 transition-opacity" style={{ backgroundImage: "repeating-linear-gradient(100deg, rgba(249,160,63,0.35) 0 2px, transparent 2px 12px)", maskImage: "linear-gradient(90deg, transparent, #000)" }} />
+          <div className="absolute -right-3 top-1/2 -translate-y-1/2 text-[104px] text-white/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform duration-500 group-hover:-translate-x-2">44</div>
+          <span aria-hidden className="spec-sheen" />
+          <div className="relative z-10 text-white">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+              <div className="w-11 h-11 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/45 shadow-[inset_0_0_14px_rgba(249,160,63,0.25)]">
                 <Car className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="font-display font-bold text-2xl leading-tight drop-shadow-sm text-foreground">Táxi & Moto Táxi</h2>
+              <h2 className="font-display font-black italic text-2xl leading-tight tracking-tight">Táxi & Moto Táxi</h2>
             </div>
-            <p className="text-sm text-muted-foreground max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-white/60 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
 
       {/* ── Espaço Social & Central de Negócios ── */}
       <section className="grid grid-cols-2 gap-3">
-        <Link to="/marketplace/social" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <Users className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
-          <p className="font-display font-bold text-base leading-tight">Espaço<br/>Social</p>
-          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Classificados da cidade</p>
-        </Link>
-        <Link to="/marketplace/business" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
-          <Building2 className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-          <p className="font-display font-bold text-base leading-tight">Central de<br/>Negócios</p>
-          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Imóveis e locação</p>
-        </Link>
+        <AeroTile to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
+        <AeroTile to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e locação" />
       </section>
 
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
