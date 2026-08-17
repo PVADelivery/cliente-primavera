@@ -113,6 +113,7 @@ export function MarketplaceLayout() {
   }, [user]);
 
   const toggleTheme = () => {
+    void 0;
     if (theme === "light") {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
