@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock, Mail, Navigation, Copy, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AeroHero } from "@/components/aero";
+import { AeroHero, AeroSkeletonList, AeroEmptyState, AeroChip } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({

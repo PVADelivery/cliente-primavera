@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
+import { AeroPageHeader } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/errands")({
   head: () => ({ meta: [{ title: "Enviar Encomenda — MT 24horas express" }] }),
