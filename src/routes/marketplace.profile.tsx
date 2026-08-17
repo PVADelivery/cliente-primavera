@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 function Profile() {
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { user, profile, signOut, refreshProfile, loading: authLoading } = useAuth();
   
   const [theme, setTheme] = useState(() => (typeof window !== "undefined" ? localStorage.getItem('theme') || 'light' : 'light'));
   const toggleTheme = () => {
@@ -140,12 +140,12 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate({ to: '/login' });
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
-  if (!user) { return null; }
+  if (authLoading || !user) { return <ProfileSkeleton />; }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
