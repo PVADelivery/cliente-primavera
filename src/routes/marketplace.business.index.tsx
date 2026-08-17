@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
 import { usePropertyFavorites } from "@/hooks/usePropertyFavorites";
+import { AeroPageHeader } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
