@@ -482,15 +482,15 @@ function MarketplaceHome() {
             filter: "blur(6px)",
           }}
         />
-        {/* Textura de grão sutil */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-          }}
-        />
+        {/* Fibra de carbono */}
+        <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.5] mix-blend-overlay pointer-events-none" />
+        {/* Verniz — reflexo de lataria */}
+        <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
+        {/* Etiqueta técnica */}
+        <div aria-hidden className="absolute left-6 sm:left-10 bottom-5 flex items-center gap-2 pointer-events-none">
+          <span className="h-px w-8 bg-primary/60" />
+          <span className="text-[10px] font-mono tracking-[0.35em] text-white/40 uppercase">MT-24</span>
+        </div>
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -498,7 +498,7 @@ function MarketplaceHome() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="relative z-10 space-y-5 sm:space-y-6 max-w-2xl"
         >
-          <h1 className="font-display font-black text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.025em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+          <h1 className="font-display font-black italic text-[36px] sm:text-[54px] lg:text-[64px] leading-[0.95] tracking-[-0.035em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
             {greeting},<br />
             <span
               className={`bg-clip-text text-transparent inline-block transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
