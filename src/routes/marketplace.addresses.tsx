@@ -139,7 +139,7 @@ function Addresses() {
         <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
           <button 
             onClick={() => showForm ? setShowForm(false) : router.history.back()} 
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-card/70 hover:bg-white/10 transition-colors border border-border"
           >
             <ArrowLeft className="w-5 h-5 text-primary" />
           </button>
@@ -156,7 +156,7 @@ function Addresses() {
             <motion.div key="list" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <Button 
                 onClick={openNew} 
-                className="w-full h-14 rounded-2xl bg-white/5 hover:bg-white/10 border border-primary/30 text-primary font-bold shadow-[0_0_15px_rgba(249,160,63,0.1)] transition-all"
+                className="w-full h-14 rounded-2xl bg-card/70 hover:bg-white/10 border border-primary/30 text-primary font-bold shadow-[0_0_15px_rgba(249,160,63,0.1)] transition-all"
               >
                 <Plus className="h-5 w-5 mr-2" /> 
                 Cadastrar Novo Endereço
@@ -164,10 +164,10 @@ function Addresses() {
 
               {loading ? (
                 <div className="space-y-4">
-                  {[1, 2].map(i => <div key={i} className="h-28 bg-white/5 rounded-2xl animate-pulse border border-white/5" />)}
+                  {[1, 2].map(i => <div key={i} className="h-28 bg-card/70 rounded-2xl animate-pulse border border-white/5" />)}
                 </div>
               ) : addresses.length === 0 ? (
-                <div className="text-center py-16 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md">
+                <div className="text-center py-16 bg-card/70 rounded-3xl border border-border backdrop-blur-md">
                   <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <MapPin className="h-10 w-10 text-primary/50" />
                   </div>
@@ -195,7 +195,7 @@ function Addresses() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          className={cn("relative bg-white/5 backdrop-blur-md border rounded-2xl p-4 transition-all overflow-hidden", selectedAddressId === addr.id ? "border-primary shadow-[0_0_20px_rgba(249,160,63,0.15)]" : "border-white/10")}
+                          className={cn("relative bg-card/70 backdrop-blur-md border rounded-2xl p-4 transition-all overflow-hidden", selectedAddressId === addr.id ? "border-primary shadow-[0_0_20px_rgba(249,160,63,0.15)]" : "border-border")}
                         >
                           {selectedAddressId === addr.id && <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />}
                           
@@ -230,7 +230,7 @@ function Addresses() {
             </motion.div>
           ) : (
             <motion.div key="form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6">
-              <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
+              <div className="bg-card/70 backdrop-blur-2xl border border-border rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
                 <div className="space-y-3">
                   <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Como quer chamar este local?</Label>
                   <div className="flex flex-wrap gap-2">
@@ -258,7 +258,7 @@ function Addresses() {
                             "px-4 py-2.5 flex items-center gap-2 text-sm font-bold rounded-xl border transition-all duration-200 active:scale-95",
                             active 
                               ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(249,160,63,0.2)]" 
-                              : "bg-white/5 border-white/10 hover:border-white/20 text-foreground"
+                              : "bg-card/70 border-border hover:border-white/20 text-foreground"
                           )}
                         >
                           <Icon className="w-4 h-4" />
@@ -274,7 +274,7 @@ function Addresses() {
                           placeholder="Ex: Faculdade, Namorada..." 
                           value={form.label} 
                           onChange={e => setForm(f => ({ ...f, label: e.target.value }))} 
-                          className="h-12 rounded-xl bg-background/50 border-white/10 focus:border-primary/50 text-sm" 
+                          className="h-12 rounded-xl bg-background/50 border-border focus:border-primary/50 text-sm" 
                           maxLength={20}
                           autoFocus
                         />
@@ -286,38 +286,38 @@ function Addresses() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2 space-y-1.5">
                     <Label className="text-xs text-muted-foreground">Rua *</Label>
-                    <Input value={form.street} onChange={e => setForm(f => ({ ...f, street: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                    <Input value={form.street} onChange={e => setForm(f => ({ ...f, street: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs text-muted-foreground">Nº *</Label>
-                    <Input value={form.number} onChange={e => setForm(f => ({ ...f, number: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                    <Input value={form.number} onChange={e => setForm(f => ({ ...f, number: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                   </div>
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Bairro *</Label>
-                  <Input value={form.neighborhood} onChange={e => setForm(f => ({ ...f, neighborhood: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                  <Input value={form.neighborhood} onChange={e => setForm(f => ({ ...f, neighborhood: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Cidade *</Label>
-                  <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                  <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Complemento</Label>
-                  <Input placeholder="Apto, Bloco, Casa 2..." value={form.complement} onChange={e => setForm(f => ({ ...f, complement: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                  <Input placeholder="Apto, Bloco, Casa 2..." value={form.complement} onChange={e => setForm(f => ({ ...f, complement: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Ponto de Referência</Label>
-                  <Input placeholder="Próximo ao mercado..." value={form.reference} onChange={e => setForm(f => ({ ...f, reference: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-white/10" />
+                  <Input placeholder="Próximo ao mercado..." value={form.reference} onChange={e => setForm(f => ({ ...f, reference: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
                 </div>
               </div>
               
-              <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-background/95 backdrop-blur-xl border-t border-white/10 z-50">
+              <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-background/95 backdrop-blur-xl border-t border-border z-50">
                 <div className="max-w-2xl mx-auto flex gap-3">
-                  <Button variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl h-14 flex-1 text-muted-foreground hover:text-foreground bg-white/5 hover:bg-white/10">Cancelar</Button>
+                  <Button variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl h-14 flex-1 text-muted-foreground hover:text-foreground bg-card/70 hover:bg-white/10">Cancelar</Button>
                   <Button onClick={handleSave} className="rounded-xl h-14 flex-1 font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(249,160,63,0.2)]">
                     {editing ? 'Atualizar Endereço' : 'Salvar Endereço'}
                   </Button>

@@ -156,7 +156,7 @@ export function MarketplaceLayout() {
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleTheme}
-                className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+                className="p-1.5 rounded-full bg-card/70 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
                 aria-label="Alternar tema"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

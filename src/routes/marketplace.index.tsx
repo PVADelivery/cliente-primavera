@@ -163,7 +163,7 @@ function SmartSearchBar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-border rounded-2xl overflow-hidden z-50 shadow-2xl"
             >
               {recents.length > 0 && (
                 <>
@@ -177,7 +177,7 @@ function SmartSearchBar() {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
                       onClick={() => handleSearch(r)}
                     >
                       <History className="w-3.5 h-3.5 text-white/40 shrink-0" />
@@ -197,7 +197,7 @@ function SmartSearchBar() {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
                   onClick={() => handleSearch(s)}
                 >
                   <TrendingUp className="w-3.5 h-3.5 text-white/40 shrink-0" />
