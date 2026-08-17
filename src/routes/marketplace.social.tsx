@@ -72,26 +72,18 @@ function SocialPage() {
 
   return (
     <div className="space-y-5 pb-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate({ to: "/marketplace" })}
-          className="w-9 h-9 rounded-full grid place-items-center bg-card border border-border/50 text-foreground"
-          aria-label="Voltar"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold leading-tight">Espaço Social</h1>
-          <p className="text-xs text-muted-foreground">Classificados da cidade</p>
-        </div>
-      </div>
+      <AeroPageHeader
+        title="Espaço Social"
+        subtitle="Classificados da cidade"
+        onBack={() => navigate({ to: "/marketplace" })}
+      />
 
       <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
         {CATEGORIES.map((c) => (
           <button
             key={c.key}
             onClick={() => setTab(c.key)}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+            className={`tap-target aero-focus shrink-0 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors ${
               tab === c.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
