@@ -507,7 +507,7 @@ function MarketplaceHome() {
       </section>
 
       {/* ── Categories ── */}
-      <AeroSection title="Categorias" tag="MT-24 / 01" subtitle="Escolha por onde começar">
+      <AeroSection title="Categorias" subtitle="Escolha por onde começar">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(74px,1fr))] gap-3">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
@@ -546,7 +546,7 @@ function MarketplaceHome() {
       </AeroSection>
 
       {/* ── Atalhos ── */}
-      <AeroSection title="Serviços da cidade" tag="MT-24 / 02" subtitle="Tudo em um só lugar">
+      <AeroSection title="Serviços da cidade" subtitle="Tudo em um só lugar">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
           <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
           <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
@@ -580,7 +580,7 @@ function MarketplaceHome() {
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
       <AeroSection
         title="Em destaque"
-        tag="MT-24 / 03"
+       
         subtitle="Os mais bem avaliados agora"
         action={
           <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
@@ -646,7 +646,7 @@ function MarketplaceHome() {
       {/* ── Lojas próximas com filtros ── */}
       <AeroSection
         title="Lojas próximas"
-        tag="MT-24 / 04"
+       
         subtitle="Selecionadas para você"
         action={
           <span className="flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/25">
