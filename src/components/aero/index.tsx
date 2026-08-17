@@ -342,3 +342,155 @@ export function AeroPageHeader({
     </div>
   );
 }
+
+/** Chip âmbar (filtros aplicados, com remoção opcional) */
+export function AeroChip({
+  children,
+  onRemove,
+  removeLabel = "Remover filtro",
+  className,
+}: {
+  children: React.ReactNode;
+  onRemove?: () => void;
+  removeLabel?: string;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cx(
+        "inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/12 px-3 py-1.5 text-[12px] font-bold text-primary",
+        className,
+      )}
+    >
+      {children}
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={removeLabel}
+          className="aero-focus grid h-5 w-5 place-items-center rounded-full text-primary/80 hover:bg-primary/20 hover:text-primary"
+        >
+          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+            <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+          </svg>
+        </button>
+      )}
+    </span>
+  );
+}
+
+/** Abas em placas aerodinâmicas */
+export function AeroTabs<T extends string>({
+  items,
+  value,
+  onChange,
+  className,
+  label = "Filtros",
+}: {
+  items: Array<{ value: T; label: string; icon?: LucideIcon }>;
+  value: T;
+  onChange: (v: T) => void;
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label={label}
+      className={cx("flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 py-1", className)}
+    >
+      {items.map((it) => {
+        const Icon = it.icon;
+        return (
+          <AeroPlate
+            key={it.value}
+            role="tab"
+            aria-selected={value === it.value}
+            active={value === it.value}
+            onClick={() => onChange(it.value)}
+          >
+            {Icon && <Icon className="h-4 w-4" aria-hidden />}
+            {it.label}
+          </AeroPlate>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Estado vazio / erro padronizado */
+export function AeroEmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+  className,
+}: {
+  icon?: LucideIcon;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      role="status"
+      className={cx(
+        "relative overflow-hidden rounded-3xl aero-surface px-6 py-12 text-center flex flex-col items-center gap-3",
+        className,
+      )}
+    >
+      <AeroTexture sheen={false} />
+      <div className="relative z-10 flex flex-col items-center gap-3">
+        {Icon && (
+          <span className="grid h-16 w-16 place-items-center rounded-full bg-primary/12 ring-1 ring-primary/30">
+            <Icon className="h-7 w-7 text-primary" aria-hidden />
+          </span>
+        )}
+        <p className="font-display text-lg font-black italic tracking-tight">{title}</p>
+        {description && <p className="max-w-sm text-[13px] text-muted-foreground">{description}</p>}
+        {action}
+      </div>
+    </div>
+  );
+}
+
+/** Bloco de carregamento com brilho suave */
+export function AeroSkeleton({ className }: { className?: string }) {
+  return <span aria-hidden className={cx("block rounded-xl aero-shimmer", className)} />;
+}
+
+/** Skeleton de card padrão (mesma altura do conteúdo real) */
+export function AeroSkeletonCard({ lines = 3, className }: { lines?: number; className?: string }) {
+  return (
+    <div className={cx("rounded-3xl aero-surface p-5 space-y-3", className)}>
+      <AeroSkeleton className="h-11 w-11 rounded-full" />
+      <AeroSkeleton className="h-4 w-2/3" />
+      {Array.from({ length: Math.max(0, lines - 1) }).map((_, i) => (
+        <AeroSkeleton key={i} className={cx("h-3", i % 2 ? "w-1/2" : "w-5/6")} />
+      ))}
+    </div>
+  );
+}
+
+/** Lista de skeletons acessível */
+export function AeroSkeletonList({
+  count = 4,
+  lines = 3,
+  className,
+  label = "Carregando conteúdo",
+}: {
+  count?: number;
+  lines?: number;
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <div role="status" aria-live="polite" aria-busy className={cx("space-y-3", className)}>
+      <span className="sr-only">{label}</span>
+      {Array.from({ length: count }).map((_, i) => (
+        <AeroSkeletonCard key={i} lines={lines} />
+      ))}
+    </div>
+  );
+}
