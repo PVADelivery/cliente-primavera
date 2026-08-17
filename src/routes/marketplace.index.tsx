@@ -531,15 +531,24 @@ function MarketplaceHome() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                whileTap={{ scale: 0.92 }}
+                whileTap={{ scale: 0.94 }}
+                whileHover={{ y: -3 }}
                 className="flex flex-col items-center gap-2 group"
               >
                 <div
-                  className="w-14 h-14 rounded-full grid place-items-center bg-primary border border-primary group-hover:bg-black group-hover:border-black transition-all duration-300 relative overflow-hidden"
-                  style={{ boxShadow: "var(--shadow-card)" }}
+                  className="aero-plate w-full aspect-square max-w-[68px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
+                  style={{
+                    background:
+                      "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
+                    boxShadow:
+                      "0 14px 26px -14px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(249,160,63,0.22)",
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-60" />
-                  <Icon className="w-6 h-6 text-black group-hover:text-primary transition-colors relative z-10" strokeWidth={2} />
+                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-60" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/12 to-transparent" />
+                  <div aria-hidden className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full bg-primary/25 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span aria-hidden className="spec-sheen" />
+                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
                 </div>
                 <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
               </motion.button>
