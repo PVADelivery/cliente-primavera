@@ -365,3 +365,13 @@ iframe[src*="lovable"],
     font-size: 15px;
   }
 }
+
+/* Tipografia "livery" padronizada nos títulos de todas as telas */
+@layer base {
+  h1.font-display,
+  h2.font-display {
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+  }
+}
