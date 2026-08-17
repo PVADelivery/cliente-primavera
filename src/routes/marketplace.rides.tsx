@@ -291,7 +291,7 @@ function RidesPage() {
   return (
     <div className="pb-24 pt-4 px-4 max-w-2xl mx-auto flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-display font-black tracking-tight">Suas Corridas</h1>
+        <h1 className="text-2xl font-display font-black italic tracking-tight">Suas Corridas</h1>
         <p className="text-sm text-muted-foreground">Histórico e localização em tempo real.</p>
       </div>
 

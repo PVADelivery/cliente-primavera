@@ -73,7 +73,7 @@ function OrdersList() {
     <div className="space-y-4 max-w-2xl mx-auto pb-20 pt-2">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-black tracking-tight">Pedidos Ativos</h1>
+          <h1 className="font-display text-2xl font-black italic tracking-tight">Pedidos Ativos</h1>
           <p className="text-xs text-muted-foreground">Acompanhe seus pedidos em andamento</p>
         </div>
         <Link to="/marketplace/profile" className="text-xs font-bold text-primary hover:underline">
