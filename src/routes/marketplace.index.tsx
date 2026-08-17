@@ -58,6 +58,46 @@ function pushRecent(term: string) {
 }
 
 // ─── Skeleton components ──────────────────────────────────────────────────────
+function AeroTile({
+  to,
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  to: string;
+  icon: typeof Zap;
+  title: React.ReactNode;
+  subtitle: string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="p-5 rounded-3xl relative overflow-hidden block group border border-border/50 hover:border-primary/50 transition-colors text-white"
+      style={{
+        background: "linear-gradient(145deg, #17130c 0%, #0a0806 55%, #000 100%)",
+        boxShadow: "0 22px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)",
+      }}
+    >
+      <div aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
+      <div aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
+      {/* faixa de velocidade */}
+      <div
+        aria-hidden
+        className="absolute -top-8 -right-8 w-28 h-28 rotate-45 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: "linear-gradient(180deg, rgba(249,160,63,0.35), transparent)" }}
+      />
+      <span aria-hidden className="spec-sheen" />
+      <div className="relative z-10">
+        <div className="w-11 h-11 mb-3 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/40 shadow-[inset_0_0_14px_rgba(249,160,63,0.22)] transition-transform duration-300 group-hover:scale-105">
+          <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+        </div>
+        <p className="font-display font-black italic text-base leading-tight tracking-tight">{title}</p>
+        <p className="text-xs text-white/55 mt-1.5 font-medium">{subtitle}</p>
+      </div>
+    </Link>
+  );
+}
+
 function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div
