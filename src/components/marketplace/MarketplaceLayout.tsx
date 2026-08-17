@@ -220,6 +220,7 @@ export function MarketplaceLayout() {
                 )}
                 <Link
                   to={t.to as "/marketplace"}
+                  activeOptions={{ exact: !!t.exact }}
                   aria-current={active ? "page" : undefined}
                   aria-label={t.label}
                   ref={(el) => { tabRefs.current[index] = el as HTMLAnchorElement | null; }}
