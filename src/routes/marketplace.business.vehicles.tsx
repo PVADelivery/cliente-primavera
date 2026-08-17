@@ -130,7 +130,7 @@ function VehiclesPage() {
             onClick={() => setType(t.key)}
             className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
               type === t.key
-                ? "bg-foreground text-background border-foreground"
+                ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
             }`}
           >
