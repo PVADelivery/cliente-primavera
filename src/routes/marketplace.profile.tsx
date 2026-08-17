@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { SupportChat } from '@/components/chat/SupportChat';
 import { cn } from '@/lib/utils';
+import { AeroSkeleton, AeroSkeletonList } from '@/components/aero';
 import {
   LogOut, MapPin, ChevronRight, Camera, Loader2,
   Bike, FileText, ShieldCheck, Moon, Sun,
@@ -26,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 function Profile() {
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { user, profile, signOut, refreshProfile, loading: authLoading } = useAuth();
   
   const [theme, setTheme] = useState(() => (typeof window !== "undefined" ? localStorage.getItem('theme') || 'light' : 'light'));
   const toggleTheme = () => {
@@ -140,12 +141,12 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate({ to: '/login' });
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
-  if (!user) { return null; }
+  if (authLoading || !user) { return <ProfileSkeleton />; }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
@@ -536,6 +537,27 @@ function Profile() {
         </SheetContent>
       </Sheet>
 
+    </div>
+  );
+}
+
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pb-32" aria-busy="true" aria-live="polite">
+      <span className="sr-only">Carregando perfil…</span>
+      <div className="bg-white dark:bg-zinc-900 border-b border-border/40 px-6 pt-12 pb-8 rounded-b-[2.5rem]">
+        <div className="flex items-center gap-5">
+          <AeroSkeleton className="h-24 w-24 rounded-[2rem]" />
+          <div className="flex-1 space-y-3">
+            <AeroSkeleton className="h-5 w-2/3" />
+            <AeroSkeleton className="h-3 w-1/2" />
+            <AeroSkeleton className="h-3 w-1/3" />
+          </div>
+        </div>
+      </div>
+      <div className="px-6 mt-6">
+        <AeroSkeletonList count={4} lines={2} />
+      </div>
     </div>
   );
 }
