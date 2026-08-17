@@ -187,7 +187,7 @@ export function MarketplaceLayout() {
                     aria-hidden
                     layoutId="tab-active-pill"
                     transition={{ type: "spring", stiffness: 480, damping: 34, mass: 0.7 }}
-                    className="absolute inset-x-1.5 inset-y-1 rounded-2xl bg-primary/12 border border-primary/30 shadow-[0_0_18px_-6px_hsl(var(--primary)/0.55)] overflow-hidden"
+                    className="absolute inset-x-1.5 inset-y-1 rounded-2xl bg-primary/12 border border-primary/30 shadow-[0_0_18px_-6px_var(--primary)] overflow-hidden"
                   >
                     <span aria-hidden className="absolute inset-0 nav-sweep" />
                   </motion.span>
@@ -205,7 +205,7 @@ export function MarketplaceLayout() {
                   <span className="relative">
                     <Icon
                       className={`w-5 h-5 transition-transform duration-300 ${
-                        active ? "-translate-y-0.5 scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.6)]" : ""
+                        active ? "-translate-y-0.5 scale-110 drop-shadow-[0_0_8px_var(--primary)]" : ""
                       }`}
                     />
                     {t.to === "/marketplace/cart" && count > 0 && (
@@ -231,7 +231,7 @@ export function MarketplaceLayout() {
                     aria-hidden
                     layoutId="tab-indicator"
                     transition={{ type: "spring", stiffness: 480, damping: 34 }}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))]"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]"
                   />
                 )}
               </li>
