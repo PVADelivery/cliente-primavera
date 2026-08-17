@@ -540,35 +540,48 @@ function MarketplaceHome() {
         </div>
       </AeroSection>
 
-      {/* ── Atalhos ── */}
-      <AeroSection title="Serviços da cidade" subtitle="Tudo em um só lugar">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
-          <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
-          <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
-          <AeroTile index={2} to="/marketplace/social" icon={Users} title={<>Espaço Social</>} subtitle="Classificados da cidade" />
-          <AeroTile index={3} to="/marketplace/business" icon={Building2} title={<>Central de Negócios</>} subtitle="Imóveis e locação" />
-        </div>
-      </AeroSection>
+      {/* ── Quick banners ── */}
+      <section className="grid grid-cols-2 gap-3">
+        <Link to="/marketplace/errands" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Zap className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Solicitar<br/>Entrega</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Motoboy rápido</p>
+        </Link>
+        <Link to="/marketplace/directory" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Tag className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">PPP</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Painel Profissional Prestador de Serviços</p>
+        </Link>
+      </section>
 
       {/* ── Taxi ── */}
       <section>
-        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl relative overflow-hidden group border border-border/50 hover:border-primary/50 transition-colors" style={{ background: "linear-gradient(140deg, #17130c 0%, #0a0806 55%, #000 100%)", boxShadow: "0 26px 46px -26px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)" }}>
-          <div aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
-          <div aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-primary/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          {/* faixas de vento */}
-          <div aria-hidden className="absolute right-6 inset-y-8 w-24 pointer-events-none opacity-40 group-hover:opacity-70 transition-opacity" style={{ backgroundImage: "repeating-linear-gradient(100deg, rgba(249,160,63,0.35) 0 2px, transparent 2px 12px)", maskImage: "linear-gradient(90deg, transparent, #000)" }} />
-          <div className="absolute -right-3 top-1/2 -translate-y-1/2 text-[104px] text-white/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform duration-500 group-hover:-translate-x-2">44</div>
-          <span aria-hidden className="spec-sheen" />
-          <div className="relative z-10 text-white">
+        <Link to="/marketplace/taxi" className="block p-6 rounded-3xl relative overflow-hidden group bg-card border border-border/50 hover:border-primary/50 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <div className="absolute right-0 top-0 bottom-0 w-2/3 bg-gradient-to-l from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] opacity-[0.03] font-black italic tracking-tighter mix-blend-overlay pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-11 h-11 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/45 shadow-[inset_0_0_14px_rgba(249,160,63,0.25)]">
+              <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
                 <Car className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="font-display font-black italic text-2xl leading-tight tracking-tight">Táxi & Moto Táxi</h2>
+              <h2 className="font-display font-bold text-2xl leading-tight drop-shadow-sm text-foreground">Táxi & Moto Táxi</h2>
             </div>
-            <p className="text-sm text-white/60 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-muted-foreground max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
+        </Link>
+      </section>
+
+      {/* ── Espaço Social & Central de Negócios ── */}
+      <section className="grid grid-cols-2 gap-3">
+        <Link to="/marketplace/social" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Users className="w-6 h-6 mb-3 text-primary" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Espaço<br/>Social</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Classificados da cidade</p>
+        </Link>
+        <Link to="/marketplace/business" className="p-5 rounded-3xl relative overflow-hidden block group bg-card border border-border/50 hover:border-primary/40 transition-colors" style={{ boxShadow: "var(--shadow-card)" }}>
+          <Building2 className="w-6 h-6 mb-3 text-foreground/70 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+          <p className="font-display font-bold text-base leading-tight">Central de<br/>Negócios</p>
+          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Imóveis e locação</p>
         </Link>
       </section>
 
