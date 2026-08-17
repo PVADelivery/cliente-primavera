@@ -5,7 +5,7 @@ import { ArrowLeft, Plus, Loader2, Phone, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { SocialCategory, SocialPost } from "@/types/database";
-import { AeroPageHeader } from "@/components/aero";
+import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/social")({
   head: () => ({
