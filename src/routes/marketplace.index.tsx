@@ -578,17 +578,17 @@ function MarketplaceHome() {
       </section>
 
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <Star className="w-4 h-4 text-primary fill-primary" /> Em destaque
-          </h2>
-          <button className="text-xs font-semibold text-primary flex items-center gap-0.5 hover:underline">
-            Ver tudo <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-3 scrollbar-none snap-x snap-mandatory">
+      <AeroSection
+        title="Em destaque"
+        tag="MT-24 / 03"
+        subtitle="Os mais bem avaliados agora"
+        action={
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+            <Star className="w-3.5 h-3.5 fill-primary" /> Top {top.length}
+          </span>
+        }
+      >
+        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 py-2 scrollbar-none snap-x snap-mandatory">
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="shrink-0 snap-start w-48">
@@ -641,20 +641,19 @@ function MarketplaceHome() {
               })
           }
         </div>
-      </section>
+      </AeroSection>
 
       {/* ── Lojas próximas com filtros ── */}
-      <section>
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <h2 className="font-display text-lg font-bold leading-tight">Lojas próximas</h2>
-            <p className="text-xs text-muted-foreground">Selecionadas para você</p>
-          </div>
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+      <AeroSection
+        title="Lojas próximas"
+        tag="MT-24 / 04"
+        subtitle="Selecionadas para você"
+        action={
+          <span className="flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/25">
             <SlidersHorizontal className="w-3.5 h-3.5" /> {filtered.length} lojas
           </span>
-        </div>
-
+        }
+      >
         <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
 
         <div className="mt-4">
@@ -675,19 +674,19 @@ function MarketplaceHome() {
                   <p className="text-5xl mb-3">😴</p>
                   <p className="font-display font-bold text-foreground">Nenhuma loja encontrada</p>
                   <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros ou veja todas as lojas.</p>
-                  <button
+                  <AeroButton
                     onClick={() => { setOpenOnly(false); setSort("relevance"); saveFilters({}); }}
-                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+                    className="mt-4"
                   >
                     Ver todas as lojas
-                  </button>
+                  </AeroButton>
                 </motion.div>
               )}
 
             </>
           )}
         </div>
-      </section>
+      </AeroSection>
 
       {/* ── BONASOFT Watermark ── */}
       <div className="pt-8 pb-4 flex justify-center opacity-40 select-none pointer-events-none">
