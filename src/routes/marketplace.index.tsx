@@ -473,7 +473,7 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="group rounded-[24px] p-5 sm:p-7 lg:p-9 text-white relative overflow-hidden isolate"
+        className="group rounded-[22px] p-4 sm:p-6 text-white relative overflow-hidden isolate"
         style={{
           background:
             "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
@@ -510,12 +510,12 @@ function MarketplaceHome() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 space-y-3.5 sm:space-y-4 max-w-2xl"
+          className="relative z-10 space-y-3 max-w-2xl"
         >
-          <h1 className="font-display font-black italic text-[28px] sm:text-[38px] lg:text-[46px] leading-[1.22] pb-1 tracking-[-0.03em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
-            {greeting},<br />
+          <h1 className="font-display font-black italic text-[22px] sm:text-[30px] lg:text-[34px] leading-[1.3] pb-1 tracking-[-0.03em] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] whitespace-nowrap overflow-hidden text-ellipsis">
+            {greeting},{" "}
             <span
-              className={`bg-clip-text text-transparent inline-block leading-[1.3] pb-[0.18em] pr-[0.12em] transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
+              className={`bg-clip-text text-transparent leading-[1.3] pr-[0.12em] transition-opacity duration-500 ${heroReady ? "opacity-100" : "opacity-70"}`}
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #ffbe5a 0%, #f9a03f 45%, #e8892b 100%)",
@@ -526,7 +526,7 @@ function MarketplaceHome() {
             <span className="text-primary">.</span>
           </h1>
 
-          <p className="text-[14px] sm:text-[15px] text-white/80 font-medium max-w-md leading-relaxed">
+          <p className="text-[13px] sm:text-[14px] text-white/75 font-medium max-w-md leading-snug">
             O que você quer pedir hoje na sua cidade?
           </p>
 
