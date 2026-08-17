@@ -30,6 +30,15 @@ export function MarketplaceLayout() {
     tabs.findIndex((t) => (t.exact ? path === t.to : path.startsWith(t.to)))
   );
 
+  // Mantém a aba ativa sincronizada com a rota (persistida entre refreshes)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const current = tabs[activeIndex];
+    if (current && path.startsWith("/marketplace")) {
+      localStorage.setItem("mt24:lastTab", current.to);
+    }
+  }, [activeIndex, path]);
+
   const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
     const last = tabs.length - 1;
     let next: number | null = null;
