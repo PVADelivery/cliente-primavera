@@ -1,42 +1,29 @@
-## Objetivo
+# Topo do app com conceito automotivo (carbono + âmbar)
 
-Adicionar dois novos cards na home (`src/routes/marketplace.index.tsx`), logo abaixo do card "Táxi & Moto Táxi":
+Refazer a primeira dobra da home (`/marketplace`) com linguagem de carro de corrida: fibra de carbono, cortes aerodinâmicos, luz âmbar como farol. Nada muda de posição — mesma ordem: hero, categorias, Entrega/PPP, Táxi, Espaço Social/Central de Negócios.
 
-- **Espaço Social** → classificados sociais (vagas, achados e perdidos, doações, serviços)
-- **Central de Negócios** → portal de imóveis (imobiliárias e afins)
+## Paleta
+Mantém preto + âmbar (#F9A03F / #FFBE5A). Sem vermelho. O "vermelho Ferrari" entra só como atitude: contraste alto, superfícies escuras polidas, brilho especular.
 
-## Home
+## Hero
+- Superfície escura com verniz automotivo: gradiente radial escuro + faixa de reflexo diagonal (highlight de lataria) atravessando o card.
+- Sol âmbar no canto direito mantido, agora lendo como farol: núcleo quente + halo, com leve reação ao hover.
+- Trama de fibra de carbono sutil sobre o preto (padrão SVG repetido, opacidade baixa) substituindo o grão atual.
+- Saudação em display black, itálico levemente inclinado (postura de livery), com número/etiqueta discreta tipo "MT-24" em canto — detalhe fino, não poluído.
+- Barra de busca vira "entrada de ar": cantos com chanfro, borda âmbar fina que acende no foco.
 
-Nova `<section className="grid grid-cols-2 gap-3">` abaixo do Táxi, no mesmo estilo dos cards "Solicitar Entrega"/"Agenda da Cidade" (rounded-3xl, `bg-card`, borda, `--shadow-card`, ícone lucide em `text-primary`):
+## Categorias (placas aerodinâmicas)
+- Trocar os círculos por placas inclinadas tipo aerofólio: card escuro com corte diagonal (clip-path), skew leve, reflexo metálico no topo.
+- Ícone em âmbar sobre carbono; ao tocar, a placa "acelera" (translada + o reflexo varre a superfície).
+- Grid mantido 4 colunas no mobile / 8 no desktop, rótulos abaixo.
 
-- "Espaço Social" / "Classificados da cidade" → `/marketplace/social`
-- "Central de Negócios" / "Imóveis e locação" → `/marketplace/business`
+## Cards de ação (Entrega, PPP, Táxi, Social, Negócios)
+- Mesmo layout e textos. Acabamento novo: painel carbono, borda de 1px que acende âmbar no hover, faixa de velocidade diagonal atravessando o canto.
+- Ícone dentro de um "medidor" circular com aro âmbar.
+- Card Táxi ganha marca d'água tipográfica maior e mais nítida (estilo número de carro), com faixas de vento à direita.
+- Micro-animação: elevação + varredura de luz, sem exagero.
 
-## Central de Negócios — `/marketplace/business`
-
-Tela de listagem de imóveis, mobile-first, lendo do Supabase externo:
-
-- Filtros no topo: tipo de negócio (Locação/Venda) e tipo de imóvel (Casa, Apartamento, Sala, Kitnet, Terreno), além de busca por bairro.
-- Card por imóvel: selo de negócio + tipo, bairro + cidade/UF, descrição, e linha de atributos com ícones (área m², quartos, vagas, banheiros — só aparecem os que existirem), e valor em destaque ("Valor: R$ 1.200,00" ou "Consulte" quando nulo).
-- Ordenação por valor crescente, imóveis sem valor por último.
-- Detalhe do imóvel em `/marketplace/business/$propertyId` com descrição completa, atributos e botão de contato (WhatsApp/telefone da imobiliária).
-- Estados de loading (skeleton), vazio e erro.
-
-## Espaço Social — `/marketplace/social`
-
-Lista de classificados sociais com abas por categoria (Vagas, Achados e perdidos, Doações, Serviços), card com título, categoria, descrição, autor/contato e data, além de botão "Publicar" (exige login) com formulário simples.
-
-## Banco de dados (Supabase externo)
-
-Vou gerar dois scripts SQL em `scripts/` para você rodar no seu projeto — não altero seu banco sozinho:
-
-- `scripts/properties.sql`: tabela `public.properties` (id, agency_id/owner user_id, deal_type, property_type, neighborhood, city, state, description, total_area, built_area, bedrooms, bathrooms, parking, price nullable, contact_phone, images, is_active, timestamps), GRANTs (`SELECT` para `anon`/`authenticated`, `ALL` para `service_role`), RLS habilitada, policy pública de leitura de ativos e policies de escrita restritas ao dono/admin via `has_role()`. Inclui INSERTs com os 12 imóveis que você colou.
-- `scripts/social_posts.sql`: tabela `public.social_posts` (id, user_id, category enum, title, body, contact, images, is_active, created_at) com o mesmo padrão de GRANTs + RLS (leitura pública, escrita apenas do próprio usuário).
-
-## Detalhes técnicos
-
-- Rotas file-based do TanStack: `src/routes/marketplace.business.tsx`, `src/routes/marketplace.business.$propertyId.tsx`, `src/routes/marketplace.social.tsx`.
-- Cada rota com `head()` próprio (title/description/og).
-- Tipos novos em `src/types/database.ts` (`Property`, `SocialPost`) e entradas em `Database["public"]["Tables"]`.
-- Consultas via `supabase` de `src/lib/supabase.ts` com `useQuery`; enquanto as tabelas não existirem, a tela mostra o estado vazio sem quebrar (tratamento de `PGRST205`).
-- Sem alterações no hero, tema ou tokens existentes.
+## Técnico
+- Alterações concentradas em `src/routes/marketplace.index.tsx` (hero, `CATEGORIES`, banners) e utilitários novos em `src/styles.css`: `@utility carbon-weave`, `@utility spec-sheen`, `@utility aero-plate` (clip-path/skew) e um keyframe de varredura.
+- Sem novas dependências; animações com framer-motion já instalado e CSS.
+- Sem mudança de dados, rotas ou lógica de negócio.
