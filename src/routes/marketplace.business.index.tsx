@@ -206,7 +206,7 @@ function BusinessPage() {
           <button
             key={d.key}
             onClick={() => setDeal(d.key)}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+            className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
               deal === d.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
@@ -218,7 +218,7 @@ function BusinessPage() {
         <button
           onClick={() => setOnlyFavorites((v) => !v)}
           aria-pressed={onlyFavorites}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${
+          className={`shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${
             onlyFavorites
               ? "bg-primary text-primary-foreground border-primary"
               : "bg-card text-muted-foreground border-border/60"
@@ -234,7 +234,7 @@ function BusinessPage() {
           <button
             key={t.key}
             onClick={() => setType(t.key)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+            className={`shrink-0 px-3.5 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
               type === t.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
@@ -306,7 +306,7 @@ function BusinessPage() {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             aria-label="Ordenar imóveis"
-            className="h-9 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
+            className="h-11 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
           >
             {SORTS.map((s) => (
               <option key={s.key} value={s.key}>
@@ -337,7 +337,7 @@ function BusinessPage() {
                 onClick={() => toggleFavorite(p.id)}
                 aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
                 aria-pressed={isFavorite(p.id)}
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
+                className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
               >
                 <Heart
                   className={`w-4 h-4 ${isFavorite(p.id) ? "text-primary fill-current" : "text-muted-foreground"}`}
