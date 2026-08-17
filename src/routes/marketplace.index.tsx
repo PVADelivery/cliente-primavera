@@ -503,7 +503,7 @@ function MarketplaceHome() {
 
       {/* ── Categories ── */}
       <AeroSection title="Categorias" subtitle="Escolha por onde começar">
-        <div className="flex gap-2.5 sm:gap-3 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1 snap-x snap-mandatory">
+        <div className="flex gap-2.5 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:mx-0 sm:px-0">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
@@ -516,7 +516,7 @@ function MarketplaceHome() {
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-[76px]"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto"
               >
                 <div
                   className="aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
