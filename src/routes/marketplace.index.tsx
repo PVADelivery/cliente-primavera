@@ -227,39 +227,24 @@ function FilterBar({
   openOnly: boolean; setOpenOnly: (v: boolean) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-none">
+    <div className="flex gap-2 overflow-x-auto -mx-4 px-4 py-1 scrollbar-none" role="group" aria-label="Filtros de lojas">
       {SORT_OPTIONS.map(opt => {
         const active = sort === opt.key;
         return (
-          <motion.button
-            key={opt.key}
-            onClick={() => setSort(opt.key)}
-            whileTap={{ scale: 0.92 }}
-            layout
-            className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
-              active
-                ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-1 ring-primary/20"
-                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-            }`}
-          >
+          <AeroPlate key={opt.key} active={active} onClick={() => setSort(opt.key)}>
             {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
             {opt.label}
-          </motion.button>
+          </AeroPlate>
         );
       })}
-      <motion.button
+      <AeroPlate
+        active={openOnly}
         onClick={() => setOpenOnly(!openOnly)}
-        whileTap={{ scale: 0.92 }}
-        layout
-        className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
-          openOnly
-            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-emerald-500/40 ring-2 ring-emerald-500/20"
-            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-        }`}
+        className={openOnly ? "bg-emerald-500 border-emerald-500 text-white" : undefined}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
         Aberto agora
-      </motion.button>
+      </AeroPlate>
     </div>
   );
 }
