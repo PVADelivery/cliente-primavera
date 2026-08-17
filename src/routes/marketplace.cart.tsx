@@ -25,7 +25,7 @@ function CartPage() {
   return (
     <div className="space-y-4">
       <header>
-        <h1 className="font-display text-2xl font-bold">Carrinho</h1>
+        <h1 className="font-display text-2xl font-black italic tracking-tight">Carrinho</h1>
         <p className="text-sm text-muted-foreground">{companyName}</p>
       </header>
       <ul className="space-y-2">

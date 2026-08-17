@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, MapPin, Search, Globe, MessageCircle, Star, BookUser, Clock, Mail, Navigation, Copy, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AeroHero } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
@@ -170,38 +171,12 @@ function DirectoryPage() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Premium Header */}
-      <section
-        className="rounded-b-[2.5rem] p-8 text-primary-foreground relative overflow-hidden mb-8"
-        style={{ background: "var(--gradient-sunset)", boxShadow: "0 10px 30px -10px rgba(var(--primary), 0.3)" }}
-      >
-        <div className="absolute inset-0 opacity-30 bg-noise" style={{ background: "var(--gradient-mesh)" }} />
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 pt-4">
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest bg-white/20 text-white backdrop-blur-md px-4 py-1.5 rounded-full mb-4 shadow-sm"
-          >
-            <BookUser className="w-3.5 h-3.5" /> Painel Profissional Prestador de Serviços
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-4xl font-black leading-none tracking-tight mb-3"
-          >
-            Toda a cidade<br />em um toque.
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm text-white/90 max-w-[280px] font-medium"
-          >
-            Acesse rapidamente contatos, redes e rotas de todos os estabelecimentos locais.
-          </motion.p>
-        </div>
-      </section>
+      <AeroHero
+        className="mb-8"
+        eyebrow={<><BookUser className="w-3.5 h-3.5" /> Painel Profissional Prestador de Serviços</>}
+        title={<>Toda a cidade<br />em um toque.</>}
+        subtitle="Acesse rapidamente contatos, redes e rotas de todos os estabelecimentos locais."
+      />
 
       <div className="px-4 sm:px-6 space-y-6">
         <div className="flex flex-col gap-4 relative z-20 -mt-4">

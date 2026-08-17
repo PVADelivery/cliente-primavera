@@ -145,24 +145,25 @@ export function MarketplaceLayout() {
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07]">
-          <div className="mx-auto max-w-2xl flex items-center justify-between px-4 h-14">
-            <Link to="/marketplace" className="flex items-center gap-2.5">
+        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07] relative overflow-hidden">
+          <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
+          <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-14">
+            <Link to="/marketplace" className="flex min-w-0 items-center gap-2.5 aero-focus rounded-xl">
               <span className="flex items-center justify-center w-8 h-8">
                 <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
               </span>
-              <span className="font-display font-bold tracking-tight text-sm text-white">MT 24horas express</span>
+              <span className="font-display font-black italic tracking-tight text-sm text-white truncate">MT 24horas express</span>
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex shrink-0 items-center gap-3">
               <button
                 onClick={toggleTheme}
-                className="p-1.5 rounded-full bg-white/5 text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+                className="tap-target aero-focus grid place-items-center w-10 h-10 rounded-full bg-card/70 border border-border text-white/85 hover:text-white hover:border-primary/50 transition-colors"
                 aria-label="Alternar tema"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               {!user ? (
-                <Link to="/login" className="text-sm font-medium text-primary">Entrar</Link>
+                <Link to="/login" className="tap-target aero-focus inline-flex items-center px-4 rounded-full bg-primary text-primary-foreground text-sm font-bold">Entrar</Link>
               ) : null}
             </div>
           </div>
@@ -174,7 +175,7 @@ export function MarketplaceLayout() {
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
         <ul className="mx-auto max-w-2xl grid grid-cols-6">
           {tabs.map((t) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
@@ -183,8 +184,9 @@ export function MarketplaceLayout() {
               <li key={t.to} className="relative">
                 <Link
                   to={t.to as "/marketplace"}
-                  className={`flex flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors ${
-                    active ? "text-primary" : "text-muted-foreground"
+                  aria-current={active ? "page" : undefined}
+                  className={`aero-focus flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold transition-colors ${
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <span className="relative">

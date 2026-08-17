@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
 import { useAuth } from "@/contexts/AuthContext";
+import { AeroTile, AeroPlate, AeroSection, AeroButton } from "@/components/aero";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -58,46 +59,6 @@ function pushRecent(term: string) {
 }
 
 // ─── Skeleton components ──────────────────────────────────────────────────────
-function AeroTile({
-  to,
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  to: string;
-  icon: typeof Zap;
-  title: React.ReactNode;
-  subtitle: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className="p-5 rounded-3xl relative overflow-hidden block group border border-border/50 hover:border-primary/50 transition-colors text-white"
-      style={{
-        background: "linear-gradient(145deg, #17130c 0%, #0a0806 55%, #000 100%)",
-        boxShadow: "0 22px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.07)",
-      }}
-    >
-      <div aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
-      <div aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
-      {/* faixa de velocidade */}
-      <div
-        aria-hidden
-        className="absolute -top-8 -right-8 w-28 h-28 rotate-45 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: "linear-gradient(180deg, rgba(249,160,63,0.35), transparent)" }}
-      />
-      <span aria-hidden className="spec-sheen" />
-      <div className="relative z-10">
-        <div className="w-11 h-11 mb-3 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/40 shadow-[inset_0_0_14px_rgba(249,160,63,0.22)] transition-transform duration-300 group-hover:scale-105">
-          <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
-        </div>
-        <p className="font-display font-black italic text-base leading-tight tracking-tight">{title}</p>
-        <p className="text-xs text-white/55 mt-1.5 font-medium">{subtitle}</p>
-      </div>
-    </Link>
-  );
-}
-
 function SkeletonPulse({ className }: { className?: string }) {
   return (
     <div
@@ -202,7 +163,7 @@ function SmartSearchBar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-border rounded-2xl overflow-hidden z-50 shadow-2xl"
             >
               {recents.length > 0 && (
                 <>
@@ -216,7 +177,7 @@ function SmartSearchBar() {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
                       onClick={() => handleSearch(r)}
                     >
                       <History className="w-3.5 h-3.5 text-white/40 shrink-0" />
@@ -236,7 +197,7 @@ function SmartSearchBar() {
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
                   onClick={() => handleSearch(s)}
                 >
                   <TrendingUp className="w-3.5 h-3.5 text-white/40 shrink-0" />
@@ -266,39 +227,24 @@ function FilterBar({
   openOnly: boolean; setOpenOnly: (v: boolean) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-none">
+    <div className="flex gap-2 overflow-x-auto -mx-4 px-4 py-1 scrollbar-none" role="group" aria-label="Filtros de lojas">
       {SORT_OPTIONS.map(opt => {
         const active = sort === opt.key;
         return (
-          <motion.button
-            key={opt.key}
-            onClick={() => setSort(opt.key)}
-            whileTap={{ scale: 0.92 }}
-            layout
-            className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
-              active
-                ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-primary/40 ring-1 ring-primary/20"
-                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-            }`}
-          >
+          <AeroPlate key={opt.key} active={active} onClick={() => setSort(opt.key)}>
             {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
             {opt.label}
-          </motion.button>
+          </AeroPlate>
         );
       })}
-      <motion.button
+      <AeroPlate
+        active={openOnly}
         onClick={() => setOpenOnly(!openOnly)}
-        whileTap={{ scale: 0.92 }}
-        layout
-        className={`shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
-          openOnly
-            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_4px_24px_-4px_var(--tw-shadow-color)] shadow-emerald-500/40 ring-2 ring-emerald-500/20"
-            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-        }`}
+        className={openOnly ? "bg-emerald-500 border-emerald-500 text-white" : undefined}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
         Aberto agora
-      </motion.button>
+      </AeroPlate>
     </div>
   );
 }
@@ -561,22 +507,24 @@ function MarketplaceHome() {
       </section>
 
       {/* ── Categories ── */}
-      <section>
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+      <AeroSection title="Categorias" tag="MT-24 / 01" subtitle="Escolha por onde começar">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(74px,1fr))] gap-3">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             return (
               <motion.button
                 key={c.label}
+                type="button"
+                aria-label={c.label}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl"
               >
                 <div
-                  className="aero-plate w-full aspect-square max-w-[68px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
+                  className="aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
                   style={{
                     background:
                       "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
@@ -590,18 +538,22 @@ function MarketplaceHome() {
                   <span aria-hidden className="spec-sheen" />
                   <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
                 </div>
-                <span className="text-[11px] font-semibold text-foreground/80 text-center leading-tight">{c.label}</span>
+                <span className="text-[12px] font-semibold text-foreground text-center leading-tight">{c.label}</span>
               </motion.button>
             );
           })}
         </div>
-      </section>
+      </AeroSection>
 
-      {/* ── Quick banners ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroTile to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
-        <AeroTile to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
-      </section>
+      {/* ── Atalhos ── */}
+      <AeroSection title="Serviços da cidade" tag="MT-24 / 02" subtitle="Tudo em um só lugar">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+          <AeroTile index={0} to="/marketplace/errands" icon={Zap} title={<>Solicitar Entrega</>} subtitle="Motoboy rápido" />
+          <AeroTile index={1} to="/marketplace/directory" icon={Tag} title={<>PPP</>} subtitle="Painel Profissional Prestador de Serviços" />
+          <AeroTile index={2} to="/marketplace/social" icon={Users} title={<>Espaço Social</>} subtitle="Classificados da cidade" />
+          <AeroTile index={3} to="/marketplace/business" icon={Building2} title={<>Central de Negócios</>} subtitle="Imóveis e locação" />
+        </div>
+      </AeroSection>
 
       {/* ── Taxi ── */}
       <section>
@@ -625,24 +577,18 @@ function MarketplaceHome() {
         </Link>
       </section>
 
-      {/* ── Espaço Social & Central de Negócios ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroTile to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
-        <AeroTile to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e locação" />
-      </section>
-
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-lg font-bold flex items-center gap-2">
-            <Star className="w-4 h-4 text-primary fill-primary" /> Em destaque
-          </h2>
-          <button className="text-xs font-semibold text-primary flex items-center gap-0.5 hover:underline">
-            Ver tudo <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-3 scrollbar-none snap-x snap-mandatory">
+      <AeroSection
+        title="Em destaque"
+        tag="MT-24 / 03"
+        subtitle="Os mais bem avaliados agora"
+        action={
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+            <Star className="w-3.5 h-3.5 fill-primary" /> Top {top.length}
+          </span>
+        }
+      >
+        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 py-2 scrollbar-none snap-x snap-mandatory">
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="shrink-0 snap-start w-48">
@@ -695,20 +641,19 @@ function MarketplaceHome() {
               })
           }
         </div>
-      </section>
+      </AeroSection>
 
       {/* ── Lojas próximas com filtros ── */}
-      <section>
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <h2 className="font-display text-lg font-bold leading-tight">Lojas próximas</h2>
-            <p className="text-xs text-muted-foreground">Selecionadas para você</p>
-          </div>
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+      <AeroSection
+        title="Lojas próximas"
+        tag="MT-24 / 04"
+        subtitle="Selecionadas para você"
+        action={
+          <span className="flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/25">
             <SlidersHorizontal className="w-3.5 h-3.5" /> {filtered.length} lojas
           </span>
-        </div>
-
+        }
+      >
         <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
 
         <div className="mt-4">
@@ -729,19 +674,19 @@ function MarketplaceHome() {
                   <p className="text-5xl mb-3">😴</p>
                   <p className="font-display font-bold text-foreground">Nenhuma loja encontrada</p>
                   <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros ou veja todas as lojas.</p>
-                  <button
+                  <AeroButton
                     onClick={() => { setOpenOnly(false); setSort("relevance"); saveFilters({}); }}
-                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+                    className="mt-4"
                   >
                     Ver todas as lojas
-                  </button>
+                  </AeroButton>
                 </motion.div>
               )}
 
             </>
           )}
         </div>
-      </section>
+      </AeroSection>
 
       {/* ── BONASOFT Watermark ── */}
       <div className="pt-8 pb-4 flex justify-center opacity-40 select-none pointer-events-none">

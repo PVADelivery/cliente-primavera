@@ -294,3 +294,102 @@ iframe[src*="lovable"],
 @media (prefers-reduced-motion: reduce) {
   .group:hover .spec-sheen::after { animation: none; }
 }
+
+/* ── Sistema Aero: superfícies, foco e chips padronizados ───────────────── */
+
+/* Superfície padrão do app (carbono escuro com aro sutil) */
+@utility aero-surface {
+  background-image: linear-gradient(150deg, rgba(23,19,12,0.96) 0%, rgba(10,8,6,0.96) 55%, rgba(0,0,0,0.98) 100%);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: 0 22px 40px -26px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Aro âmbar que acende */
+@utility aero-rim {
+  transition: border-color .3s ease, box-shadow .3s ease;
+  &:hover {
+    border-color: color-mix(in oklab, var(--primary) 55%, transparent);
+    box-shadow: 0 26px 50px -26px rgba(0,0,0,0.95), 0 0 0 1px color-mix(in oklab, var(--primary) 28%, transparent);
+  }
+}
+
+/* Anel de foco consistente para teclado */
+@utility aero-focus {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 0.75rem;
+  }
+}
+
+/* Área de toque mínima confortável */
+@utility tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Faixa de velocidade diagonal */
+@utility speed-stripes {
+  background-image: repeating-linear-gradient(100deg, color-mix(in oklab, var(--primary) 32%, transparent) 0 2px, transparent 2px 12px);
+  mask-image: linear-gradient(90deg, transparent, #000);
+}
+
+/* Foco global visível em qualquer elemento interativo */
+@layer base {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Profundidade "aero" herdada por todas as superfícies do app (tema escuro) */
+@layer base {
+  .dark .bg-card,
+  .dark .bg-secondary {
+    background-image: linear-gradient(150deg, rgba(255, 255, 255, 0.035) 0%, rgba(0, 0, 0, 0.32) 100%);
+  }
+  /* Alvos de toque confortáveis em navegação e ações */
+  nav a,
+  nav button {
+    min-height: 44px;
+  }
+  /* Tipografia mínima legível em mobile */
+  body {
+    font-size: 15px;
+  }
+}
+
+/* Tipografia "livery" padronizada nos títulos de todas as telas */
+@layer base {
+  h1.font-display,
+  h2.font-display {
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* Acabamento padrão de cards e formulários em todo o app */
+@layer base {
+  .dark .bg-card {
+    box-shadow: 0 22px 40px -28px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 1;
+  }
+}

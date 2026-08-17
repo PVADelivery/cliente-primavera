@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { AeroPageHeader } from "@/components/aero";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
@@ -712,18 +713,12 @@ function TaxiPage() {
 
   return (
     <div className="pb-8 flex flex-col min-h-screen relative">
-      <div className="flex items-center gap-3 mb-4 shrink-0">
-        <button
-          onClick={() => window.history.back()}
-          className="w-10 h-10 rounded-full bg-secondary grid place-items-center text-muted-foreground active:scale-95 transition-transform"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold">Táxi & Moto Táxi</h1>
-          <p className="text-xs text-muted-foreground">Busque sua rua e adicione o número da residência</p>
-        </div>
-      </div>
+      <AeroPageHeader
+        className="mb-4 shrink-0"
+        title="Táxi & Moto Táxi"
+        subtitle="Busque sua rua e adicione o número da residência"
+        onBack={() => window.history.back()}
+      />
 
       <div className="space-y-4">
         {/* Endereço de Partida + Número */}
