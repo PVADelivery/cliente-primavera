@@ -56,17 +56,30 @@ function Profile() {
   const [showRidesHistory, setShowRidesHistory] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [coupons, setCoupons] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
 
   useEffect(() => {
     setFullName(profile?.full_name || '');
     setPhone(profile?.phone || '');
   }, [profile]);
 
+  const loadProfileData = async () => {
+    if (!user) return;
+    setDataLoading(true);
+    setDataError(null);
+    try {
+      await Promise.all([fetchOrders(), fetchRides(), fetchCoupons(false), refreshProfile?.()]);
+    } catch (err: any) {
+      setDataError(err?.message || 'Não foi possível carregar seus dados.');
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-    fetchOrders();
-    fetchRides();
-    fetchCoupons(false);
+    loadProfileData();
   }, [user]);
 
   const fetchCoupons = async (show = true) => {
@@ -87,25 +100,23 @@ function Profile() {
   };
 
   const fetchOrders = async () => {
-    try {
-      const { data } = await supabase
+    const { data, error } = await supabase
         .from('orders')
         .select(`id, status, total, created_at, company:companies(name, logo_url)`)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      setOrders(data || []);
-    } catch { /* silent */ }
+    if (error) throw error;
+    setOrders(data || []);
   };
 
   const fetchRides = async () => {
-    try {
-      const { data } = await supabase
+    const { data, error } = await supabase
         .from('ride_requests')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      setRides(data || []);
-    } catch { /* silent */ }
+    if (error) throw error;
+    setRides(data || []);
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +158,8 @@ function Profile() {
   }, [user, authLoading, navigate]);
 
   if (authLoading || !user) { return <ProfileSkeleton />; }
+  if (dataError) { return <ProfileError message={dataError} onRetry={loadProfileData} />; }
+  if (dataLoading) { return <ProfileSkeleton />; }
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
