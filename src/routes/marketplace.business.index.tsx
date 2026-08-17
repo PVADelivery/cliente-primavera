@@ -172,27 +172,19 @@ function BusinessPage() {
 
   return (
     <div className="space-y-5 pb-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate({ to: "/marketplace" })}
-          className="w-9 h-9 rounded-full grid place-items-center bg-card border border-border/50 text-foreground"
-          aria-label="Voltar"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold leading-tight">Central de Negócios</h1>
-          <p className="text-xs text-muted-foreground">Imóveis para locação e venda</p>
-        </div>
-      </div>
+      <AeroPageHeader
+        title="Central de Negócios"
+        subtitle="Imóveis para locação e venda"
+        onBack={() => navigate({ to: "/marketplace" })}
+      />
 
       <div className="grid grid-cols-2 gap-2">
-        <span className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-primary text-primary-foreground border border-primary">
+        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-primary text-primary-foreground border border-primary">
           Imóveis
         </span>
         <Link
           to="/marketplace/business/vehicles"
-          className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground"
+          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:border-primary/50 transition-colors"
         >
           Veículos
         </Link>
