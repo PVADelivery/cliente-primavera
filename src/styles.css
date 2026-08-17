@@ -348,3 +348,20 @@ iframe[src*="lovable"],
     outline-offset: 2px;
   }
 }
+
+/* Profundidade "aero" herdada por todas as superfícies do app (tema escuro) */
+@layer base {
+  .dark .bg-card,
+  .dark .bg-secondary {
+    background-image: linear-gradient(150deg, rgba(255, 255, 255, 0.035) 0%, rgba(0, 0, 0, 0.32) 100%);
+  }
+  /* Alvos de toque confortáveis em navegação e ações */
+  nav a,
+  nav button {
+    min-height: 44px;
+  }
+  /* Tipografia mínima legível em mobile */
+  body {
+    font-size: 15px;
+  }
+}
