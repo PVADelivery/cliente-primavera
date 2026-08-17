@@ -48,6 +48,15 @@ function OrdersList() {
     },
   });
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto pb-20 pt-2">
+        <h1 className="font-display text-2xl font-black italic tracking-tight">Pedidos Ativos</h1>
+        <AeroSkeletonList count={3} lines={3} label="Carregando pedidos" />
+      </div>
+    );
+  }
+
   if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-16 space-y-3">
