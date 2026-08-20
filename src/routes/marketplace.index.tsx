@@ -130,7 +130,13 @@ function SkeletonCarouselItem() {
 }
 
 // ─── Smart Search Bar ─────────────────────────────────────────────────────────
-function SmartSearchBar() {
+function SmartSearchBar({
+  searchTerm,
+  setSearchTerm,
+}: {
+  searchTerm: string;
+  setSearchTerm: (v: string) => void;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const recents = loadRecents();
@@ -147,6 +153,7 @@ function SmartSearchBar() {
   }, []);
 
   const handleSearch = (term: string) => {
+    setSearchTerm(term);
     if (term.trim()) pushRecent(term.trim());
     setFocused(false);
     inputRef.current?.blur();
@@ -161,31 +168,36 @@ function SmartSearchBar() {
         className="relative"
       >
         <div
-          className={`flex items-center gap-3 bg-black/90 backdrop-blur-md text-white rounded-2xl px-4 py-3.5 border transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] ${focused ? "border-primary ring-2 ring-primary/40" : "border-black/60 hover:bg-black"}`}
+          className={`flex items-center gap-3 bg-black/90 backdrop-blur-md text-white rounded-2xl px-4 py-3.5 border transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] ${focused || searchTerm ? "border-primary ring-2 ring-primary/40" : "border-black/60 hover:bg-black"}`}
         >
-          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused ? "text-primary" : "text-white/70"}`} />
+          <Search className={`w-4 h-4 shrink-0 transition-colors ${focused || searchTerm ? "text-primary" : "text-white/70"}`} />
           <input
             ref={inputRef}
             type="text"
-            placeholder="Buscar lojas, pratos…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar lojas, pratos (ex: x tudo, pizza, açaí)…"
             className="flex-1 bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/50 min-w-0"
             onFocus={() => setFocused(true)}
-            onKeyDown={e => e.key === "Enter" && handleSearch((e.target as HTMLInputElement).value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch(searchTerm);
+              }
+            }}
           />
-          <AnimatePresence>
-            {focused && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ duration: 0.15 }}
-                onClick={() => { setFocused(false); inputRef.current?.blur(); }}
-                className="text-white/50 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </motion.button>
-            )}
-          </AnimatePresence>
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm("");
+                inputRef.current?.focus();
+              }}
+              className="text-white/50 hover:text-white p-1"
+              title="Limpar busca"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Search suggestions dropdown */}
@@ -224,7 +236,7 @@ function SmartSearchBar() {
                 <TrendingUp className="w-3.5 h-3.5 text-primary" />
                 <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Populares</span>
               </div>
-              {["Pizza", "Hambúrguer", "Japonês", "Mercado", "Farmácia"].map((s, i) => (
+              {["X tudo", "Pizza", "Hambúrguer", "Açaí", "Lanches", "Mercado", "Farmácia"].map((s, i) => (
                 <motion.button
                   key={s}
                   initial={{ opacity: 0, x: -8 }}
@@ -411,6 +423,7 @@ function MarketplaceHome() {
   const [heroReady, setHeroReady] = useState(false);
   const [sort, setSort] = useState<SortKey>("relevance");
   const [openOnly, setOpenOnly] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -458,15 +471,52 @@ function MarketplaceHome() {
     },
   });
 
+  const { data: allProducts = [] } = useQuery<any[]>({
+    queryKey: ["all-products-search"],
+    queryFn: async () => {
+      try {
+        const { data } = await supabase
+          .from("products")
+          .select("id, name, description, category, company_id")
+          .eq("is_active", true);
+        return data || [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
   const allStores = stores ?? [];
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 8), [allStores]);
 
   const filtered = useMemo(() => {
-    // Exibe todas as empresas cadastradas
     let list = [...allStores];
+    const q = searchTerm.trim().toLowerCase();
+
+    if (q) {
+      const matchingCompanyIds = new Set(
+        allProducts
+          .filter(
+            (p) =>
+              p.name?.toLowerCase().includes(q) ||
+              p.description?.toLowerCase().includes(q) ||
+              p.category?.toLowerCase().includes(q)
+          )
+          .map((p) => p.company_id)
+      );
+
+      list = list.filter((s) => {
+        const nameMatch = s.name?.toLowerCase().includes(q);
+        const catMatch = s.category?.toLowerCase().includes(q);
+        const descMatch = s.description?.toLowerCase().includes(q);
+        const addressMatch = s.address?.toLowerCase().includes(q);
+        const productMatch = matchingCompanyIds.has(s.id);
+        return nameMatch || catMatch || descMatch || addressMatch || productMatch;
+      });
+    }
 
     if (openOnly) {
-      list = list.filter(s => s.is_open === true || s.is_open === null || s.is_open === undefined);
+      list = list.filter((s) => s.is_open === true || s.is_open === null || s.is_open === undefined);
     }
 
     if (sort === "fee") {
@@ -475,7 +525,7 @@ function MarketplaceHome() {
       list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
     return list;
-  }, [allStores, sort, openOnly]);
+  }, [allStores, allProducts, searchTerm, sort, openOnly]);
 
   const visibleStores = filtered;
 
@@ -541,7 +591,7 @@ function MarketplaceHome() {
             O que você quer pedir hoje na sua cidade?
           </p>
 
-          <SmartSearchBar />
+          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </motion.div>
       </section>
 
@@ -550,23 +600,32 @@ function MarketplaceHome() {
         <div className="flex gap-2.5 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:mx-0 sm:px-0">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
+            const isActive = searchTerm.toLowerCase() === c.label.toLowerCase();
             return (
               <motion.button
                 key={c.label}
                 type="button"
                 aria-label={c.label}
+                onClick={() => {
+                  if (isActive) {
+                    setSearchTerm("");
+                  } else {
+                    setSearchTerm(c.label);
+                  }
+                }}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className="aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-transform duration-300 group-hover:-skew-x-[3deg]"
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] ${isActive ? "ring-2 ring-primary shadow-[0_0_20px_rgba(249,160,63,0.5)]" : ""}`}
                   style={{
-                    background:
-                      "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
+                    background: isActive
+                      ? "linear-gradient(150deg, #3d2a0f 0%, #17130c 55%, #000 100%)"
+                      : "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
                     boxShadow:
                       "0 14px 26px -14px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(249,160,63,0.22)",
                   }}
@@ -577,7 +636,7 @@ function MarketplaceHome() {
                   <span aria-hidden className="spec-sheen" />
                   <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
                 </div>
-                <span className="text-[12px] font-semibold text-foreground text-center leading-tight">{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-primary font-bold" : "text-foreground"}`}>{c.label}</span>
               </motion.button>
             );
           })}
@@ -699,6 +758,20 @@ function MarketplaceHome() {
         }
       >
         <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
+
+        {searchTerm && (
+          <div className="mt-3 flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-2.5 rounded-2xl">
+            <p className="text-xs font-bold text-foreground">
+              Exibindo resultados para "<span className="text-primary">{searchTerm}</span>" ({filtered.length} {filtered.length === 1 ? "loja" : "lojas"})
+            </p>
+            <button
+              onClick={() => setSearchTerm("")}
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" /> Limpar
+            </button>
+          </div>
+        )}
 
         <div className="mt-4">
           {isLoading ? (
