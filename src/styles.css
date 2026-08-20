@@ -238,6 +238,17 @@ iframe[src*="lovable"],
   .sun-breathe { animation: none; }
 }
 
+/* Efeito de Aura de Fogo e Energia Futurista atrás dos cards */
+@keyframes fire-pulse-kf {
+  0%, 100% { opacity: 0.6; transform: scale(0.99); filter: blur(16px); }
+  50% { opacity: 1; transform: scale(1.02); filter: blur(22px); }
+}
+
+@utility fire-glow {
+  background: radial-gradient(circle, rgba(249,160,63,0.55) 0%, rgba(239,68,68,0.45) 40%, rgba(220,38,38,0.18) 75%, transparent 100%);
+  animation: fire-pulse-kf 3s ease-in-out infinite;
+}
+
 /* ── Linguagem automotiva: carbono, verniz e aerodinâmica ───────────────── */
 
 /* Trama de fibra de carbono */

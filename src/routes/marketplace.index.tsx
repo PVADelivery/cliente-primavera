@@ -293,13 +293,18 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ delay: i * 0.06, duration: 0.35, ease: "easeOut" }}
+      className="relative group"
     >
-      <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="block group">
+      {/* Dynamic Futuristic Fire Aura behind the card */}
+      <div className="absolute -inset-2 rounded-[32px] fire-glow opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none z-0" />
+      <div className="absolute -inset-1 rounded-[28px] bg-gradient-to-r from-amber-500/30 via-orange-600/40 to-red-500/30 blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none z-0" />
+
+      <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="block group relative z-10">
         <motion.div
           whileHover={{ y: -6, scale: 1.01 }}
           whileTap={{ scale: 0.96 }}
           transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-          className="rounded-3xl overflow-hidden border border-border/40 group-hover:border-blue-500/50 transition-all duration-400 relative z-0 bg-card"
+          className="rounded-3xl overflow-hidden border border-border/40 group-hover:border-amber-500/60 transition-all duration-400 relative z-10 bg-card"
           style={{
             boxShadow: "var(--shadow-card)",
           }}
