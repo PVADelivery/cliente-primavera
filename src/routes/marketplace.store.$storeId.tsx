@@ -125,21 +125,21 @@ function StoreDetail() {
     },
   });
 
-  const { data: products = MOCK_PRODUCTS } = useQuery<(Product & { promo?: number })[]>({
+  const { data: products = [] } = useQuery<(Product & { promo?: number })[]>({
     queryKey: ["products", storeId],
-    placeholderData: MOCK_PRODUCTS,
+    placeholderData: [],
     queryFn: async () => {
-      if (!isSupabaseConfigured) return MOCK_PRODUCTS;
+      if (!isSupabaseConfigured) return [];
       try {
         const result = await Promise.race([
           supabase.from("products").select("*").eq("company_id", storeId).eq("is_active", true),
           new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
         ]);
         const data = (result as { data: Product[] | null }).data;
-        if (!data || data.length === 0) return MOCK_PRODUCTS;
+        if (!data || data.length === 0) return [];
         return data as (Product & { promo?: number })[];
       } catch {
-        return MOCK_PRODUCTS;
+        return [];
       }
     },
   });
@@ -375,8 +375,17 @@ function StoreDetail() {
 
       {/* Product sections */}
       <div className="px-4 pt-6 space-y-10">
-        {categories.length === 0 && (
-          <div className="text-center py-20 bg-card rounded-3xl border border-border border-dashed">
+        {categories.length === 0 && !query && (
+          <div className="py-16 text-center bg-card rounded-3xl border border-border/40 p-8 shadow-sm">
+            <UtensilsCrossed className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+            <h3 className="font-display text-lg font-bold text-foreground">Cardápio em atualização</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto mt-1">
+              Esta loja ainda não possui produtos cadastrados no momento. Volte em breve!
+            </p>
+          </div>
+        )}
+        {filtered.length === 0 && query && (
+          <div className="py-12 text-center">
             <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-sm font-semibold text-muted-foreground">
               Nenhum prato encontrado para "{query}".
