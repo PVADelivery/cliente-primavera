@@ -26,7 +26,24 @@ function escapeHtml(input: unknown, max = 1500): string {
 }
 
 export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Marketplace Cliente") {
-  if (typeof window === "undefined") return;
+  const msg = (payload.error_message || "").toLowerCase();
+  const isIgnored =
+    msg.includes("aceita por outro") ||
+    msg.includes("delivery_not_available") ||
+    msg.includes("row level security") ||
+    msg.includes("blocked the action") ||
+    msg.includes("not found") ||
+    msg.includes("cancelada pelo usuário") ||
+    msg.includes("insertbefore") ||
+    msg.includes("removechild") ||
+    msg.includes("failed to fetch dynamically imported module") ||
+    msg.includes("importing a module script failed") ||
+    msg.includes("categoria não habilitada") ||
+    msg.includes("não habilitada pelo administrador") ||
+    msg.includes("categoria nao habilitada") ||
+    msg.includes("nao habilitada pelo administrador");
+
+  if (isIgnored) return;
 
   const now = Date.now();
   const errorKey = `${appName}:${payload.error_message}:${payload.url || ""}`;
