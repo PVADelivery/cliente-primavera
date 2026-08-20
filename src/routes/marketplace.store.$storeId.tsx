@@ -88,6 +88,11 @@ function StoreDetail() {
     queryFn: async () => {
       if (!isSupabaseConfigured) return null;
       try {
+        const { data: rpcData } = await supabase.rpc("get_public_companies");
+        if (rpcData && Array.isArray(rpcData)) {
+          const found = rpcData.find((s: any) => s.id === storeId);
+          if (found) return found as Company;
+        }
         const result = await Promise.race([
           supabase.from("companies").select("*").eq("id", storeId).maybeSingle(),
           new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),

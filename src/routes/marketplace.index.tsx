@@ -431,13 +431,19 @@ function MarketplaceHome() {
     placeholderData: [],
     queryFn: async () => {
       try {
+        // Tenta primeiro via RPC pública (bypassa restrições RLS em tabelas para visitantes anon)
+        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_companies");
+        if (!rpcErr && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
+          return rpcData as Company[];
+        }
+
         const { data, error } = await supabase
           .from("companies")
           .select("*")
           .order("name", { ascending: true });
         if (error) {
           console.error("Error fetching companies:", error);
-          return [];
+          return (rpcData as Company[]) || [];
         }
         return data || [];
       } catch (err) {
