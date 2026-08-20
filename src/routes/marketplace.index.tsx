@@ -534,39 +534,47 @@ function MarketplaceHome() {
 
       {/* ── Hero ── */}
       <section
-        className="group rounded-[22px] p-4 sm:p-6 text-white relative overflow-hidden isolate"
+        className="group rounded-[22px] p-4 sm:p-6 text-white relative z-20"
         style={{
-          background:
-            "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
           boxShadow:
             "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
-        {/* Sol interno — halo suave */}
+        {/* Camada de fundo recortada para conter os efeitos visuais sem cortar o dropdown de busca */}
         <div
-          aria-hidden
-          className="absolute -top-32 -right-20 w-[320px] h-[320px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
+          className="absolute inset-0 rounded-[22px] overflow-hidden -z-10"
           style={{
             background:
-              "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
-            filter: "blur(28px)",
+              "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
           }}
-        />
-        {/* Núcleo do sol — brilho concentrado */}
-        <div
-          aria-hidden
-          className="absolute -top-14 -right-4 w-32 h-32 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
-            filter: "blur(6px)",
-          }}
-        />
-        {/* Fibra de carbono */}
-        <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.5] mix-blend-overlay pointer-events-none" />
-        {/* Verniz — reflexo de lataria */}
-        <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
-        {/* Etiqueta técnica */}
+        >
+          {/* Sol interno — halo suave */}
+          <div
+            aria-hidden
+            className="absolute -top-32 -right-20 w-[320px] h-[320px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
+              filter: "blur(28px)",
+            }}
+          />
+          {/* Núcleo do sol — brilho concentrado */}
+          <div
+            aria-hidden
+            className="absolute -top-14 -right-4 w-32 h-32 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
+              filter: "blur(6px)",
+            }}
+          />
+          {/* Fibra de carbono */}
+          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.5] mix-blend-overlay pointer-events-none" />
+          {/* Verniz — reflexo de lataria */}
+          <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
+        </div>
+
+        {/* Conteúdo do Hero e Barra de Busca */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
