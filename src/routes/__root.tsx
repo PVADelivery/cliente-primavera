@@ -13,7 +13,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 
 import { initializeGlobalErrorHandlers, reportErrorToTelegram } from "@/services/logger";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
+import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
 
 function NotFoundComponent() {
   return (
@@ -135,8 +136,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -152,7 +151,9 @@ function RootComponent() {
       <AuthProvider>
         <CartProvider>
           <NotificationsBridge />
-          <Outlet />
+          <Suspense fallback={null}>
+            <Outlet />
+          </Suspense>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
