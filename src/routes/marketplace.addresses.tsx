@@ -143,7 +143,7 @@ function Addresses() {
           >
             <ArrowLeft className="w-5 h-5 text-primary" />
           </button>
-          <h1 className="font-display font-bold text-lg tracking-tight bg-gradient-to-r from-primary to-white bg-clip-text text-transparent">
+          <h1 className="font-display font-bold text-lg tracking-tight text-foreground">
             {showForm ? (editing ? 'Editar Endereço' : 'Novo Endereço') : 'Meus Endereços'}
           </h1>
           <div className="w-10" />
