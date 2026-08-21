@@ -355,11 +355,6 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             {/* Top chips */}
             <div className="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">
-                {freeShip && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/90 text-white px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm shadow-lg">
-                    <Zap className="w-2.5 h-2.5 fill-white" /> Grátis
-                  </span>
-                )}
                 {(s.rating ?? 5) >= 4.7 && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F9A03F]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     Melhor avaliado
@@ -398,8 +393,8 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
               <Clock className="w-4 h-4" /> {eta}–{eta + 10} min
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-            <span className={`font-semibold ${freeShip ? "text-emerald-500" : "text-muted-foreground"}`}>
-              {freeShip ? "Entrega grátis" : s.delivery_fee != null ? `R$ ${s.delivery_fee.toFixed(2).replace(".", ",")}` : "Taxa a calcular"}
+            <span className="font-semibold text-muted-foreground">
+              {s.delivery_fee && s.delivery_fee > 0 ? `R$ ${s.delivery_fee.toFixed(2).replace(".", ",")}` : "Entrega por região"}
             </span>
             <span className="ml-auto flex items-center gap-0.5 text-primary font-bold opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
               Abrir <ChevronRight className="w-3.5 h-3.5" />
@@ -733,12 +728,6 @@ function MarketplaceHome() {
                         <span className="absolute top-2 left-2 text-[10px] font-bold bg-black/70 text-white px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur">
                           <Star className="w-3 h-3 fill-primary text-primary" /> {(s.rating ?? 5).toFixed(1)}
                         </span>
-
-                        {freeShip && (
-                          <span className="absolute top-2 right-2 text-[10px] font-bold bg-emerald-500/90 text-white px-2 py-0.5 rounded-full">
-                            Grátis
-                          </span>
-                        )}
 
                         {/* Store name inside */}
                         <div className="absolute bottom-2 left-3 right-3">

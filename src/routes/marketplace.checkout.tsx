@@ -546,7 +546,7 @@ function Checkout() {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Taxa de entrega</span>
                   <span className="font-medium">
-                    {loadingFee ? <Loader2 className="w-4 h-4 animate-spin inline" /> : (deliveryFee ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis')}
+                    {loadingFee ? <Loader2 className="w-4 h-4 animate-spin inline" /> : (deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : 'A calcular')}
                   </span>
                 </div>
               )}

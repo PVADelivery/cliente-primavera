@@ -549,7 +549,7 @@ function StoreDetail() {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Taxa de entrega</span>
-                            <span className="font-semibold">{deliveryFee === 0 ? "Grátis" : `R$ ${deliveryFee.toFixed(2).replace(".", ",")}`}</span>
+                            <span className="font-semibold">{deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace(".", ",")}` : "A calcular"}</span>
                           </div>
                           <div className="flex justify-between text-lg pt-2 font-black border-t border-border mt-2">
                             <span>Total</span>
