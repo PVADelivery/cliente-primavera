@@ -37,6 +37,74 @@ function Addresses() {
     complement: '', reference: '', label: '',
   });
   const [selectedLabel, setSelectedLabel] = useState<string>('Casa');
+  const [allHoods, setAllHoods] = useState<Array<{ name: string; regionId?: string }>>([]);
+  const [isHoodFocused, setIsHoodFocused] = useState(false);
+
+  useEffect(() => {
+    async function loadOfficialHoods() {
+      const set = new Set<string>();
+      const list: Array<{ name: string; regionId?: string }> = [];
+
+      const staticList = [
+        "CENTRO", "CENTRO LESTE", "JD DAS AMERICAS 1/2/3", "LAGO MUNICIPAL", "JD ITALIA", "JD MARINGA",
+        "JD MILANO", "JD PROGRESSO", "PONCHO VERDE 1/2", "SÃO CRISTOVÃO 1/2/3", "VERTENTES DAS ÁGUAS",
+        "BELA VISTA", "PONCHO VERDE 3/4/5", "JD LUCIANA 1/2", "DISTRITO INDUSTRIAL", "BELVEDERE",
+        "VOLTA GRANDE", "BURITIS 1/2/3/4/5", "PVA 3 - PADRE ONESTO COSTA", "JD FLORENÇA - VILA GRAMADO",
+        "3 AMERICAS", "BURITIS 6 / BURITIS PRIME", "BURITIS UNIVERSITARIO 1/2 - FASIPE", "JARDIM EUROPA",
+        "CHACARA FONTANA", "PORTO SEGURO", "SPLENDORE", "SANTA FELICIDADE 1/2", "JD DOS IPES (CASAS PACAEMBU)",
+        "SAIDA PARA CV / CUIABA / PRF", "SAIDA PARA BARRA / INDUSTRIAL JOSE DE ALENCAR",
+        "SAIDA PARA PTGA / JOHN DEERE", "CASTELANDIA 1/2/3/4", "SÃO JOSE", "CRISTO REI - FELIZ NATAL",
+        "PIONEIRO", "INDUSTRIAL ATACADÃO", "TUIUIU", "GUTERRES", "ALVORADA"
+      ];
+
+      staticList.forEach(n => {
+        if (!set.has(n.toUpperCase())) {
+          set.add(n.toUpperCase());
+          list.push({ name: n });
+        }
+      });
+
+      try {
+        const { data: regions } = await supabase.from('regions').select('id, name');
+        if (regions) {
+          regions.forEach((r: any) => {
+            const cleanName = r.name.replace(/^[*0-9\s]+/, '').trim();
+            if (cleanName && !set.has(cleanName.toUpperCase())) {
+              set.add(cleanName.toUpperCase());
+              list.push({ name: cleanName, regionId: r.id });
+            }
+            const parts = r.name.split('/');
+            parts.forEach((p: any) => {
+              const item = p.replace(/^[*0-9\s]+/, '').trim();
+              if (item.length > 2 && !set.has(item.toUpperCase())) {
+                set.add(item.toUpperCase());
+                list.push({ name: item, regionId: r.id });
+              }
+            });
+          });
+        }
+
+        const { data: dbHoods } = await supabase.from('region_neighborhoods').select('name, region_id');
+        if (dbHoods) {
+          dbHoods.forEach((h: any) => {
+            if (h.name && !set.has(h.name.trim().toUpperCase())) {
+              set.add(h.name.trim().toUpperCase());
+              list.push({ name: h.name.trim(), regionId: h.region_id });
+            }
+          });
+        }
+      } catch (err) {
+        console.error('[Addresses] Error loading official neighborhoods:', err);
+      }
+
+      setAllHoods(list);
+    }
+    loadOfficialHoods();
+  }, []);
+
+  const filteredHoods = allHoods.filter(h => 
+    !form.neighborhood.trim() || h.name.toLowerCase().includes(form.neighborhood.trim().toLowerCase())
+  ).slice(0, 15);
 
   const fetchAddresses = async (userId: string) => {
     const { data, error } = await supabase
@@ -294,9 +362,51 @@ function Addresses() {
                   </div>
                 </div>
                 
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Bairro *</Label>
-                  <Input value={form.neighborhood} onChange={e => setForm(f => ({ ...f, neighborhood: e.target.value }))} className="h-12 rounded-xl bg-background/50 border-border" />
+                <div className="space-y-1.5 relative">
+                  <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                    <span>Bairro *</span>
+                    <span className="text-[10px] text-primary font-normal">Selecione na lista para frete exato</span>
+                  </Label>
+                  <div className="relative">
+                    <Input 
+                      placeholder="Digite ou selecione seu bairro..."
+                      value={form.neighborhood} 
+                      onChange={e => {
+                        setForm(f => ({ ...f, neighborhood: e.target.value }));
+                        setIsHoodFocused(true);
+                      }} 
+                      onFocus={() => setIsHoodFocused(true)}
+                      onBlur={() => setTimeout(() => setIsHoodFocused(false), 200)}
+                      className="h-12 rounded-xl bg-background/50 border-border focus:border-primary text-sm pr-10" 
+                    />
+                    <MapPin className="w-4 h-4 text-primary absolute right-3.5 top-4 pointer-events-none" />
+                  </div>
+
+                  {/* Dropdown de Bairros Oficiais do Admin */}
+                  {isHoodFocused && filteredHoods.length > 0 && (
+                    <div className="absolute left-0 right-0 top-[72px] z-50 rounded-2xl border border-border bg-card shadow-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-border/40">
+                      {filteredHoods.map((h, idx) => (
+                        <button
+                          key={`${h.name}-${idx}`}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setForm(f => ({ ...f, neighborhood: h.name }));
+                            setIsHoodFocused(false);
+                          }}
+                          className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-primary/10 transition-colors group"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-bold text-foreground">{h.name}</span>
+                          </div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                            Oficial Admin
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-1.5">
