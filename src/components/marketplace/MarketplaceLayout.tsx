@@ -94,34 +94,29 @@ export function MarketplaceLayout() {
           localActiveCount = localRides.filter((r: any) => ["pending", "accepted", "in_progress"].includes(r.status)).length;
         } catch (e) {}
 
-        let totalActiveRides = 0;
+        let dbActiveCount = 0;
+        if (savedIds.length > 0 || user?.id) {
+          try {
+            let query = supabase
+              .from("ride_requests")
+              .select("id", { count: "exact", head: true })
+              .in("status", ["pending", "accepted", "in_progress"]);
 
-        if (user?.id || savedIds.length > 0) {
-          let query = supabase
-            .from("ride_requests")
-            .select("id, status")
-            .in("status", ["pending", "accepted", "in_progress"]);
+            if (savedIds.length > 0) {
+              query = query.in("id", savedIds);
+            } else if (user?.id) {
+              query = query.eq("user_id", user.id);
+            }
 
-          if (user?.id && savedIds.length > 0) {
-            const formattedIds = savedIds.map((id: string) => `"${id}"`).join(",");
-            query = query.or(`user_id.eq.${user.id},id.in.(${formattedIds})`);
-          } else if (user?.id) {
-            query = query.eq("user_id", user.id);
-          } else if (savedIds.length > 0) {
-            query = query.in("id", savedIds);
-          }
-
-          const { data: activeRides, error: ridesErr } = await query;
-          if (!ridesErr && activeRides) {
-            totalActiveRides = activeRides.length;
-          } else {
-            totalActiveRides = localActiveCount;
-          }
-        } else {
-          totalActiveRides = localActiveCount;
+            const { count: c, error: ridesErr } = await query;
+            if (!ridesErr && typeof c === "number") {
+              dbActiveCount = c;
+            }
+          } catch (e) {}
         }
 
-        setActiveRidesCount(totalActiveRides);
+        const finalRidesCount = Math.max(dbActiveCount, localActiveCount);
+        setActiveRidesCount(finalRidesCount);
       } catch (err) {
         console.error("Erro ao buscar contadores ativos:", err);
       }

@@ -334,7 +334,15 @@ function RidesPage() {
                 <div className="text-right">
                   <span className="text-xs text-muted-foreground block">Valor Estimado</span>
                   <span className="font-bold text-lg">
-                    R$ {Number(activeRide.price || activeRide.estimated_value || activeRide.value || (activeRide.vehicle_type === "taxi" ? 15.0 : 10.0)).toFixed(2).replace('.', ',')}
+                    R$ {(() => {
+                      const p = Number(activeRide.price || activeRide.estimated_value || activeRide.value || 0);
+                      if (p > 0) return p.toFixed(2).replace('.', ',');
+                      const dist = Number(activeRide.distance_km || 0);
+                      const base = activeRide.vehicle_type === "taxi" ? 9.99 : 6.99;
+                      const rate = activeRide.vehicle_type === "taxi" ? 3.0 : 2.0;
+                      if (dist > 0) return (base + dist * rate).toFixed(2).replace('.', ',');
+                      return (activeRide.vehicle_type === "taxi" ? 15.0 : 10.0).toFixed(2).replace('.', ',');
+                    })()}
                   </span>
                 </div>
               </div>
