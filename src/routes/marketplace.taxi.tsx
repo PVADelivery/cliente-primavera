@@ -643,6 +643,8 @@ function TaxiPage() {
         } catch (e) {}
       }
 
+      const calculatedPrice = price > 0 ? price : (vehicleType === "taxi" ? 15.0 : 10.0);
+
       const newRidePayload = {
         id: rideId,
         user_id: user?.id || null,
@@ -652,9 +654,8 @@ function TaxiPage() {
         dropoff_address: finalDropoff,
         vehicle_type: vehicleType,
         notes: notes,
-        // O preço NÃO é enviado pelo cliente: o trigger `set_ride_price`
-        // recalcula o valor no servidor a partir de distance_km/vehicle_type.
-        distance_km: distance,
+        distance_km: distance || 0,
+        price: calculatedPrice,
         status: "pending",
         created_at: new Date().toISOString(),
       };
