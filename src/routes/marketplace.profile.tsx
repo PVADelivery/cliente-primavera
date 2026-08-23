@@ -29,7 +29,14 @@ import {
 function Profile() {
   const { user, profile, signOut, refreshProfile, loading: authLoading } = useAuth();
   
-  const [theme, setTheme] = useState(() => (typeof window !== "undefined" ? localStorage.getItem('theme') || 'light' : 'light'));
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem('theme');
+      if (saved) setTheme(saved);
+    }
+  }, []);
   const toggleTheme = () => {
     if (typeof window === "undefined") return;
     const newTheme = theme === 'light' ? 'dark' : 'light';

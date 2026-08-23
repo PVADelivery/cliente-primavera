@@ -29,7 +29,14 @@ function Addresses() {
   
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(() => (typeof window !== "undefined" ? localStorage.getItem('@epraja_selected_address') || '' : ''));
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem('@epraja_selected_address');
+      if (saved) setSelectedAddressId(saved);
+    }
+  }, []);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({
