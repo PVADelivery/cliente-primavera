@@ -117,7 +117,23 @@ function RidesPage() {
           }
         }
 
-        // 5. Somente considerar corridas do banco de dados oficial do Supabase (evitando corridas fantasma de testes locais)
+        // 5. Incluir corridas ativas salvas localmente no dispositivo (garante exibição imediata em modo visitante ou com delay do Supabase)
+        if (typeof window !== "undefined") {
+          try {
+            const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
+            for (const item of localRides) {
+              if (item && item.id && !seenIds.has(item.id)) {
+                const isRecent = item.created_at && (Date.now() - new Date(item.created_at).getTime() < 86400000);
+                const isActive = ["pending", "accepted", "in_progress"].includes(item.status);
+                if (isActive || isRecent) {
+                  seenIds.add(item.id);
+                  combinedRides.push(item);
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
         combinedRides.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
 
         let formattedRides = combinedRides;
@@ -264,10 +280,19 @@ function RidesPage() {
       if (error) throw error;
       toast.success("Corrida cancelada com sucesso.");
       
-      // Atualiza localmente
+      // Atualiza localmente no estado e no localStorage
       setRides(prev => prev.map(r => r.id === rideId ? { ...r, status: "cancelled" } : r));
       if (activeRide?.id === rideId) {
         setActiveRide(null);
+      }
+
+      if (typeof window !== "undefined") {
+        try {
+          const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
+          const updated = localRides.map((r: any) => r.id === rideId ? { ...r, status: "cancelled" } : r);
+          localStorage.setItem("pva_local_rides", JSON.stringify(updated));
+          window.dispatchEvent(new Event("pva_ride_updated"));
+        } catch (e) {}
       }
     } catch (err: any) {
       toast.error(err?.message || "Erro ao cancelar corrida.");
