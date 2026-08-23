@@ -52,6 +52,33 @@ function Addresses() {
       const set = new Set<string>();
       const list: Array<{ name: string; regionId?: string }> = [];
 
+      try {
+        // 1. Busca primeiro as regiões e bairros cadastrados pelo Admin no banco
+        const { data: regions } = await supabase.from('regions').select('id, name').order('name');
+        if (regions && regions.length > 0) {
+          regions.forEach((r: any) => {
+            const cleanName = r.name.replace(/^[*0-9\s]+/, '').trim();
+            if (cleanName && !set.has(cleanName.toUpperCase())) {
+              set.add(cleanName.toUpperCase());
+              list.push({ name: cleanName, regionId: r.id });
+            }
+          });
+        }
+
+        const { data: dbHoods } = await supabase.from('region_neighborhoods').select('name, region_id').order('name');
+        if (dbHoods && dbHoods.length > 0) {
+          dbHoods.forEach((h: any) => {
+            if (h.name && !set.has(h.name.trim().toUpperCase())) {
+              set.add(h.name.trim().toUpperCase());
+              list.push({ name: h.name.trim(), regionId: h.region_id });
+            }
+          });
+        }
+      } catch (err) {
+        console.error('[Addresses] Error loading official neighborhoods:', err);
+      }
+
+      // 2. Lista de fallback de bairros de Primavera do Leste
       const staticList = [
         "CENTRO", "CENTRO LESTE", "JD DAS AMERICAS 1/2/3", "LAGO MUNICIPAL", "JD ITALIA", "JD MARINGA",
         "JD MILANO", "JD PROGRESSO", "PONCHO VERDE 1/2", "SÃO CRISTOVÃO 1/2/3", "VERTENTES DAS ÁGUAS",
@@ -70,39 +97,6 @@ function Addresses() {
           list.push({ name: n });
         }
       });
-
-      try {
-        const { data: regions } = await supabase.from('regions').select('id, name');
-        if (regions) {
-          regions.forEach((r: any) => {
-            const cleanName = r.name.replace(/^[*0-9\s]+/, '').trim();
-            if (cleanName && !set.has(cleanName.toUpperCase())) {
-              set.add(cleanName.toUpperCase());
-              list.push({ name: cleanName, regionId: r.id });
-            }
-            const parts = r.name.split('/');
-            parts.forEach((p: any) => {
-              const item = p.replace(/^[*0-9\s]+/, '').trim();
-              if (item.length > 2 && !set.has(item.toUpperCase())) {
-                set.add(item.toUpperCase());
-                list.push({ name: item, regionId: r.id });
-              }
-            });
-          });
-        }
-
-        const { data: dbHoods } = await supabase.from('region_neighborhoods').select('name, region_id');
-        if (dbHoods) {
-          dbHoods.forEach((h: any) => {
-            if (h.name && !set.has(h.name.trim().toUpperCase())) {
-              set.add(h.name.trim().toUpperCase());
-              list.push({ name: h.name.trim(), regionId: h.region_id });
-            }
-          });
-        }
-      } catch (err) {
-        console.error('[Addresses] Error loading official neighborhoods:', err);
-      }
 
       setAllHoods(list);
     }
@@ -407,9 +401,6 @@ function Addresses() {
                             <MapPin className="w-4 h-4 text-primary shrink-0 group-hover:scale-110 transition-transform" />
                             <span className="text-sm font-bold text-foreground">{h.name}</span>
                           </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                            Oficial Admin
-                          </span>
                         </button>
                       ))}
                     </div>
