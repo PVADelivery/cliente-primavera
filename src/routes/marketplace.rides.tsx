@@ -117,20 +117,7 @@ function RidesPage() {
           }
         }
 
-        // 5. Incluir corridas salvas localmente no dispositivo para resiliencia total
-        if (typeof window !== "undefined") {
-          try {
-            const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
-            for (const item of localRides) {
-              if (!seenIds.has(item.id)) {
-                seenIds.add(item.id);
-                combinedRides.push(item);
-              }
-            }
-          } catch (e) {}
-        }
-
-        // Ordenar do mais recente para o mais antigo
+        // 5. Somente considerar corridas do banco de dados oficial do Supabase (evitando corridas fantasma de testes locais)
         combinedRides.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
 
         let formattedRides = combinedRides;
@@ -410,7 +397,7 @@ function RidesPage() {
           );
         }
 
-        if (secondaryActiveRides.length === 0) {
+        if (activeRide || secondaryActiveRides.length === 0) {
           return (
             <div className="flex items-center justify-end mt-2">
               <Button size="sm" onClick={() => navigate({ to: "/marketplace/taxi" })}>

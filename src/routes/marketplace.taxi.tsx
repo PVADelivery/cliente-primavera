@@ -643,7 +643,20 @@ function TaxiPage() {
         } catch (e) {}
       }
 
-      const calculatedPrice = price > 0 ? price : (vehicleType === "taxi" ? 15.0 : 10.0);
+      let finalDist = distance;
+      if ((!finalDist || finalDist <= 0) && pickupCoords && dropoffCoords) {
+        finalDist = calculateDistance(
+          pickupCoords[1],
+          pickupCoords[0],
+          dropoffCoords[1],
+          dropoffCoords[0]
+        );
+      }
+
+      let baseFee = vehicleType === "taxi" ? 9.99 : 6.99;
+      let kmRate = vehicleType === "taxi" ? (rates.taxi || 3.0) : (rates.mototaxi || 2.0);
+      let calculatedPrice = price > 0 ? price : Number((baseFee + (finalDist * kmRate)).toFixed(2));
+      if (calculatedPrice < baseFee) calculatedPrice = baseFee;
 
       const newRidePayload = {
         id: rideId,
@@ -654,8 +667,8 @@ function TaxiPage() {
         dropoff_address: finalDropoff,
         vehicle_type: vehicleType,
         notes: notes,
-        distance_km: distance || 0,
-        price: calculatedPrice,
+        distance_km: Number(finalDist.toFixed(2)),
+        price: Number(calculatedPrice.toFixed(2)),
         status: "pending",
         created_at: new Date().toISOString(),
       };
