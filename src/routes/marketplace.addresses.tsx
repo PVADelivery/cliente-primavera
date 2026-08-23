@@ -162,21 +162,35 @@ function Addresses() {
       toast.error('Preencha os campos obrigatórios (Rua, Nº, Bairro, Cidade)'); return;
     }
 
-    const payload = {
+    const complementText = [form.complement, form.reference ? `Ref: ${form.reference}` : ''].filter(Boolean).join(' - ') || null;
+
+    const payload: any = {
       user_id: user.id,
-      street: form.street, number: form.number,
+      customer_id: user.id,
+      street: form.street,
+      number: form.number,
       neighborhood: form.neighborhood, 
       city: form.city,
-      complement: form.complement || null, reference: form.reference || null,
+      complement: complementText,
       label: form.label || null,
     };
     
     if (editing) {
-      const { error } = await supabase.from('addresses').update(payload).eq('id', editing.id);
+      let { error } = await supabase.from('addresses').update(payload).eq('id', editing.id);
+      if (error && (error.message.includes('customer_id') || error.code === 'PGRST204')) {
+        delete payload.customer_id;
+        const res2 = await supabase.from('addresses').update(payload).eq('id', editing.id);
+        error = res2.error;
+      }
       if (error) { toast.error('Erro ao atualizar: ' + error.message); return; }
       toast.success('Endereço atualizado');
     } else {
-      const { error } = await supabase.from('addresses').insert(payload);
+      let { error } = await supabase.from('addresses').insert(payload);
+      if (error && (error.message.includes('customer_id') || error.code === 'PGRST204')) {
+        delete payload.customer_id;
+        const res2 = await supabase.from('addresses').insert(payload);
+        error = res2.error;
+      }
       if (error) { toast.error('Erro ao salvar: ' + error.message); return; }
       toast.success('Endereço adicionado');
     }
