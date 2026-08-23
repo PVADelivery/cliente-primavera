@@ -682,6 +682,12 @@ function TaxiPage() {
         console.error("Supabase insert error (saved in local storage):", error);
       }
 
+      if (typeof window !== "undefined") {
+        try {
+          window.dispatchEvent(new Event("pva_ride_updated"));
+        } catch (e) {}
+      }
+
       setSuccess(true);
     } catch (err: any) {
       console.error(err);

@@ -66,35 +66,62 @@ export function MarketplaceLayout() {
   }, []);
 
   useEffect(() => {
-    if (!user || typeof window === "undefined") {
-      setActiveOrdersCount(0);
-      setActiveRidesCount(0);
-      return;
-    }
+    if (typeof window === "undefined") return;
 
     const fetchActiveCounts = async () => {
       try {
-        // Pedidos ativos (usa apenas valores válidos do enum order_status)
-        const { count: ordersCount, error: ordersErr } = await supabase
-          .from("orders")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .in("status", ["pending", "preparing", "ready", "in_route"]);
+        // 1. Pedidos ativos
+        if (user?.id) {
+          const { count: ordersCount, error: ordersErr } = await supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .in("status", ["pending", "preparing", "ready", "in_route"]);
 
-        if (!ordersErr && typeof ordersCount === "number") {
-          setActiveOrdersCount(ordersCount);
+          if (!ordersErr && typeof ordersCount === "number") {
+            setActiveOrdersCount(ordersCount);
+          }
+        } else {
+          setActiveOrdersCount(0);
         }
 
-        // Corridas ativas
-        const { count: ridesCount, error: ridesErr } = await supabase
-          .from("ride_requests")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .in("status", ["pending", "accepted", "in_progress"]);
+        // 2. Corridas ativas (Suporta usuário logado e corridas salvas no localStorage)
+        let savedIds: string[] = [];
+        let localActiveCount = 0;
+        try {
+          savedIds = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
+          const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
+          localActiveCount = localRides.filter((r: any) => ["pending", "accepted", "in_progress"].includes(r.status)).length;
+        } catch (e) {}
 
-        if (!ridesErr && typeof ridesCount === "number") {
-          setActiveRidesCount(ridesCount);
+        let totalActiveRides = 0;
+
+        if (user?.id || savedIds.length > 0) {
+          let query = supabase
+            .from("ride_requests")
+            .select("id, status")
+            .in("status", ["pending", "accepted", "in_progress"]);
+
+          if (user?.id && savedIds.length > 0) {
+            const formattedIds = savedIds.map((id: string) => `"${id}"`).join(",");
+            query = query.or(`user_id.eq.${user.id},id.in.(${formattedIds})`);
+          } else if (user?.id) {
+            query = query.eq("user_id", user.id);
+          } else if (savedIds.length > 0) {
+            query = query.in("id", savedIds);
+          }
+
+          const { data: activeRides, error: ridesErr } = await query;
+          if (!ridesErr && activeRides) {
+            totalActiveRides = activeRides.length;
+          } else {
+            totalActiveRides = localActiveCount;
+          }
+        } else {
+          totalActiveRides = localActiveCount;
         }
+
+        setActiveRidesCount(totalActiveRides);
       } catch (err) {
         console.error("Erro ao buscar contadores ativos:", err);
       }
@@ -102,22 +129,29 @@ export function MarketplaceLayout() {
 
     fetchActiveCounts();
 
+    const channelName = user?.id ? `active_badges_${user.id}` : `active_badges_anon_${Date.now()}`;
     const channel = supabase
-      .channel(`active_badges_${user.id}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "orders" },
         () => fetchActiveCounts()
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "ride_requests", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "ride_requests" },
         () => fetchActiveCounts()
       )
       .subscribe();
 
+    const handleRideUpdate = () => fetchActiveCounts();
+    window.addEventListener("pva_ride_updated", handleRideUpdate);
+    window.addEventListener("storage", handleRideUpdate);
+
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener("pva_ride_updated", handleRideUpdate);
+      window.removeEventListener("storage", handleRideUpdate);
     };
   }, [user]);
 
