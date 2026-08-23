@@ -377,23 +377,30 @@ function RidesPage() {
                 </div>
               )}
 
-              <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-background bg-emerald-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow" />
-                  <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] ml-3 md:ml-0">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Origem</span>
-                      <span className="text-xs truncate">{activeRide.pickup_address}</span>
-                    </div>
+              <div className="relative pl-6 space-y-4 my-2 border-l-2 border-dashed border-border ml-3">
+                {/* Embarque (Origem) */}
+                <div className="relative">
+                  <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 flex items-center justify-center shadow-xs" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-extrabold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                      Embarque (Origem)
+                    </span>
+                    <span className="text-xs font-semibold text-foreground leading-tight mt-0.5">
+                      {activeRide.pickup_address}
+                    </span>
                   </div>
                 </div>
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-background bg-rose-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow" />
-                  <div className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] ml-3 md:ml-0">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Destino</span>
-                      <span className="text-xs truncate">{activeRide.dropoff_address}</span>
-                    </div>
+
+                {/* Desembarque (Destino) */}
+                <div className="relative">
+                  <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-rose-500 ring-4 ring-rose-500/20 flex items-center justify-center shadow-xs" />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-extrabold tracking-wider text-rose-600 dark:text-rose-400 uppercase">
+                      Desembarque (Destino)
+                    </span>
+                    <span className="text-xs font-semibold text-foreground leading-tight mt-0.5">
+                      {activeRide.dropoff_address}
+                    </span>
                   </div>
                 </div>
               </div>
