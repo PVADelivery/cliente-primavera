@@ -244,6 +244,61 @@ function RidesPage() {
       } catch (e) {}
     };
 
+    const drawRouteLine = (pickupLat: number, pickupLng: number, dropoffLat: number, dropoffLng: number) => {
+      if (!m || !pickupLat || !pickupLng || !dropoffLat || !dropoffLng) return;
+      const url = `https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}?overview=full&geometries=geojson`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.routes && data.routes.length > 0) {
+            const routeGeojson = {
+              type: "Feature",
+              properties: {},
+              geometry: data.routes[0].geometry,
+            };
+            try {
+              if (m.getSource("route-source")) {
+                (m.getSource("route-source") as any).setData(routeGeojson);
+              } else {
+                m.addSource("route-source", {
+                  type: "geojson",
+                  data: routeGeojson,
+                });
+                m.addLayer({
+                  id: "route-layer-bg",
+                  type: "line",
+                  source: "route-source",
+                  layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                  },
+                  paint: {
+                    "line-color": "#1e293b",
+                    "line-width": 7,
+                    "line-opacity": 0.4,
+                  },
+                });
+                m.addLayer({
+                  id: "route-layer",
+                  type: "line",
+                  source: "route-source",
+                  layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                  },
+                  paint: {
+                    "line-color": "#3b82f6",
+                    "line-width": 5,
+                    "line-opacity": 0.9,
+                  },
+                });
+              }
+            } catch (e) {}
+          }
+        })
+        .catch(() => {});
+    };
+
     // Renderiza Marcadores de Origem e Destino
     const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
       try {
@@ -260,6 +315,8 @@ function RidesPage() {
             .setLngLat([dropoffLongitude, dropoffLatitude])
             .addTo(m);
         } catch (e) {}
+
+        drawRouteLine(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
       }
     };
 
