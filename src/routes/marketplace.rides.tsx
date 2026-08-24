@@ -42,6 +42,8 @@ function RidesPage() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const driverMarkerRef = useRef<any>(null);
+  const pickupMarkerRef = useRef<any>(null);
+  const dropoffMarkerRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -183,60 +185,94 @@ function RidesPage() {
 
   useEffect(() => {
     if (!MapLibre || !mapContainer.current || !activeRide) return;
-    if (mapRef.current) return;
 
-    mapRef.current = new MapLibre.Map({
-      container: mapContainer.current,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-      center: PVA_CENTER,
-      zoom: 14,
-      attributionControl: false,
-    });
+    const pickupLat = Number(activeRide?.pickup_latitude || activeRide?.pickup_lat || activeRide?.origin_lat || -15.5606);
+    const pickupLng = Number(activeRide?.pickup_longitude || activeRide?.pickup_lng || activeRide?.origin_lng || -54.3075);
 
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+    const dropoffLat = Number(activeRide?.dropoff_latitude || activeRide?.dropoff_lat || activeRide?.destination_lat || 0);
+    const dropoffLng = Number(activeRide?.dropoff_longitude || activeRide?.dropoff_lng || activeRide?.destination_lng || 0);
+
+    if (!mapRef.current) {
+      mapRef.current = new MapLibre.Map({
+        container: mapContainer.current,
+        style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+        center: [pickupLng, pickupLat],
+        zoom: 14,
+        attributionControl: false,
+      });
+    }
+
+    const m = mapRef.current;
+
+    // Pickup Marker (Origem - Verde)
+    try {
+      if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
+      pickupMarkerRef.current = new MapLibre.Marker({ color: "#10b981" })
+        .setLngLat([pickupLng, pickupLat])
+        .addTo(m);
+    } catch (e) {}
+
+    // Dropoff Marker (Destino - Vermelho)
+    if (dropoffLat !== 0 && dropoffLng !== 0) {
+      try {
+        if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
+        dropoffMarkerRef.current = new MapLibre.Marker({ color: "#ef4444" })
+          .setLngLat([dropoffLng, dropoffLat])
+          .addTo(m);
+      } catch (e) {}
+    }
+
+    // Posição Inicial do Motorista
+    const updateDriverMarker = (lat: number, lng: number) => {
+      if (!m || !lat || !lng) return;
+      try {
+        if (!driverMarkerRef.current) {
+          driverMarkerRef.current = new MapLibre.Marker({ color: "#f59e0b" })
+            .setLngLat([lng, lat])
+            .addTo(m);
+        } else {
+          driverMarkerRef.current.setLngLat([lng, lat]);
+        }
+        m.flyTo({ center: [lng, lat], zoom: 15 });
+      } catch (e) {}
     };
-  }, [MapLibre, activeRide]);
-
-  useEffect(() => {
-    if (!activeRide?.driver_id || !mapRef.current || !MapLibre) return;
 
     const rawDrv = activeRide.driver;
     const drv = Array.isArray(rawDrv) ? rawDrv[0] : rawDrv;
-
     if (drv?.latitude && drv?.longitude) {
-      if (!driverMarkerRef.current) {
-        const el = document.createElement("div");
-        el.className = "w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-primary overflow-hidden";
-        el.innerHTML = `<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg></div>`;
-        
-        driverMarkerRef.current = new MapLibre.Marker({ element: el })
-          .setLngLat([drv.longitude, drv.latitude])
-          .addTo(mapRef.current);
-          
-        mapRef.current.flyTo({ center: [drv.longitude, drv.latitude], zoom: 15 });
-      }
+      updateDriverMarker(Number(drv.latitude), Number(drv.longitude));
     }
 
-    const locSub = supabase
-      .channel(`driver_loc_${activeRide.driver_id}`)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "delivery_drivers", filter: `id=eq.${activeRide.driver_id}` }, (payload) => {
-        const newLat = payload.new.latitude;
-        const newLng = payload.new.longitude;
-        if (newLat && newLng && driverMarkerRef.current) {
-          driverMarkerRef.current.setLngLat([newLng, newLat]);
-          mapRef.current?.flyTo({ center: [newLng, newLat] });
+    // Se houver motorista atribuído, busca localização em tempo real no Supabase
+    let locSub: any = null;
+    if (activeRide?.driver_id) {
+      const fetchDriverLoc = async () => {
+        const { data: d1 } = await supabase.from("delivery_drivers").select("latitude, longitude, current_latitude, current_longitude").eq("user_id", activeRide.driver_id).maybeSingle();
+        const d = d1 || (await supabase.from("delivery_drivers").select("latitude, longitude, current_latitude, current_longitude").eq("id", activeRide.driver_id).maybeSingle()).data;
+        if (d) {
+          const lat = Number(d.latitude || d.current_latitude);
+          const lng = Number(d.longitude || d.current_longitude);
+          if (lat && lng) updateDriverMarker(lat, lng);
         }
-      })
-      .subscribe();
+      };
+      fetchDriverLoc();
+
+      locSub = supabase
+        .channel(`driver_loc_${activeRide.driver_id}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
+          const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
+          const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
+          if (newLat && newLng) {
+            updateDriverMarker(newLat, newLng);
+          }
+        })
+        .subscribe();
+    }
 
     return () => {
-      supabase.removeChannel(locSub);
+      if (locSub) supabase.removeChannel(locSub);
     };
-  }, [activeRide?.driver_id, MapLibre]);
+  }, [MapLibre, activeRide?.id, activeRide?.driver_id]);
 
   if (!mounted) {
     return (
