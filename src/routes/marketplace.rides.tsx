@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck, XCircle } from "lucide-react";
+import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck, XCircle, Phone } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -368,12 +368,21 @@ function RidesPage() {
                     <ShieldCheck className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-sm leading-none mb-1">{drv?.full_name || "Motorista"}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{drv?.vehicle} • {drv?.license_plate}</p>
+                    <p className="font-bold text-sm leading-none mb-1">{drv?.full_name || "Motorista Parceiro"}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {(() => {
+                        const plate = drv?.license_plate || drv?.vehicle_plate || drv?.plate;
+                        const isTaxi = activeRide?.vehicle_type === "taxi" || activeRide?.vehicle_type === "carro";
+                        const vehLabel = isTaxi ? "Carro (Táxi)" : "Moto Táxi";
+                        return plate && plate !== "—" ? `${vehLabel} • Placa: ${plate}` : vehLabel;
+                      })()}
+                    </p>
                   </div>
-                  <a href={`tel:${drv?.phone || ""}`} className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-                    📞
-                  </a>
+                  {drv?.phone && (
+                    <a href={`tel:${drv.phone}`} title="Ligar para o motorista" className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs hover:opacity-90 transition-all">
+                      <Phone className="w-4 h-4" />
+                    </a>
+                  )}
                 </div>
               )}
 
