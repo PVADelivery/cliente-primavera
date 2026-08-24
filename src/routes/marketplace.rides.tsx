@@ -195,11 +195,36 @@ function RidesPage() {
     if (!mapRef.current) {
       mapRef.current = new MapLibre.Map({
         container: mapContainer.current,
-        style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+        style: {
+          version: 8,
+          sources: {
+            "osm-tiles": {
+              type: "raster",
+              tiles: [
+                "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              ],
+              tileSize: 256,
+            }
+          },
+          layers: [
+            {
+              id: "osm-layer",
+              type: "raster",
+              source: "osm-tiles",
+              minzoom: 0,
+              maxzoom: 19
+            }
+          ]
+        },
         center: [pickupLng, pickupLat],
         zoom: 14,
         attributionControl: false,
       });
+      setTimeout(() => {
+        try { mapRef.current?.resize(); } catch (e) {}
+      }, 150);
     }
 
     const m = mapRef.current;
