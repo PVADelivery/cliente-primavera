@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck, XCircle, Phone } from "lucide-react";
+import { Car, Bike, MapPin, Loader2, ArrowLeft, Navigation, ShieldCheck, XCircle, Phone, MessageSquare } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -493,11 +493,23 @@ function RidesPage() {
                       })()}
                     </p>
                   </div>
-                  {drv?.phone && (
-                    <a href={`tel:${drv.phone}`} title="Ligar para o motorista" className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-xs hover:opacity-90 transition-all">
-                      <Phone className="w-4 h-4" />
-                    </a>
-                  )}
+                  {(() => {
+                    const rawPhone = drv?.phone || drv?.whatsapp || activeRide?.driver_phone || "";
+                    const cleanPhone = String(rawPhone).replace(/\D/g, "");
+                    const finalPhone = cleanPhone.length === 10 || cleanPhone.length === 11 ? `55${cleanPhone}` : cleanPhone;
+                    if (!finalPhone) return null;
+                    return (
+                      <a
+                        href={`https://wa.me/${finalPhone}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Falar com o motorista no WhatsApp"
+                        className="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md transition-all active:scale-95"
+                      >
+                        <MessageSquare className="w-5 h-5 fill-current" />
+                      </a>
+                    );
+                  })()}
                 </div>
               )}
 
