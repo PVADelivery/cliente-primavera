@@ -263,21 +263,64 @@ function RidesPage() {
       }
     };
 
+    const cleanAddressForGeo = (addr: string) => {
+      if (!addr) return "";
+      return addr
+        .replace(/\s*\(.*?\)/g, "")
+        .replace(/\s*-\s*Primavera do Leste/gi, "")
+        .replace(/nº\s*\d+/gi, "")
+        .replace(/,\s*nº\s*/gi, "")
+        .trim();
+    };
+
+    const initMapRoute = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
+      renderRouteMarkers(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
+      fitMapBounds(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
+    };
+
     if (pLat && pLng) {
-      renderRouteMarkers(pLat, pLng, dLat, dLng);
-    } else if (activeRide.pickup_address) {
-      // Geocodificação de Fallback se coordenadas não estavam salvas na corrida
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(activeRide.pickup_address + ", Primavera do Leste")}`)
-        .then(res => res.json())
-        .then(data => {
+      initMapRoute(pLat, pLng, dLat, dLng);
+    } else if (activeRide?.pickup_address) {
+      const cleaned = cleanAddressForGeo(activeRide.pickup_address);
+      const queryStr = `${cleaned}, Primavera do Leste, MT, Brasil`;
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryStr)}`)
+        .then((res) => res.json())
+        .then((data) => {
           if (isMounted && data && data.length > 0) {
             pLat = parseFloat(data[0].lat);
             pLng = parseFloat(data[0].lon);
-            renderRouteMarkers(pLat, pLng, dLat, dLng);
-            fitMapBounds(pLat, pLng, dLat, dLng);
+            initMapRoute(pLat, pLng, dLat, dLng);
+          } else {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("Jardim Progresso, Primavera do Leste, MT")}`)
+              .then((res2) => res2.json())
+              .then((data2) => {
+                if (isMounted && data2 && data2.length > 0) {
+                  pLat = parseFloat(data2[0].lat);
+                  pLng = parseFloat(data2[0].lon);
+                  initMapRoute(pLat, pLng, dLat, dLng);
+                } else {
+                  pLat = -15.5606;
+                  pLng = -54.3075;
+                  initMapRoute(pLat, pLng, dLat, dLng);
+                }
+              })
+              .catch(() => {
+                pLat = -15.5606;
+                pLng = -54.3075;
+                initMapRoute(pLat, pLng, dLat, dLng);
+              });
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          pLat = -15.5606;
+          pLng = -54.3075;
+          initMapRoute(pLat, pLng, dLat, dLng);
+        });
+    } else {
+      pLat = -15.5606;
+      pLng = -54.3075;
+      initMapRoute(pLat, pLng, dLat, dLng);
     }
 
     // Atualiza Posição do Motorista com ícone animado de Veículo (Moto / Carro) estilo Urbano Norte
@@ -300,15 +343,20 @@ function RidesPage() {
         } else {
           driverMarkerRef.current.setLngLat([lng, lat]);
         }
-        fitMapBounds(pLat, pLng, dLat, dLng, lat, lng);
+        fitMapBounds(pLat || -15.5606, pLng || -54.3075, dLat, dLng, lat, lng);
       } catch (e) {}
     };
 
-    // Posição Inicial vinda da junção de dados
+    // Posição Inicial vinda da junção de dados ou aproximação de motorista a caminho
     const rawDrv = activeRide.driver;
     const drv = Array.isArray(rawDrv) ? rawDrv[0] : rawDrv;
     if (drv?.latitude && drv?.longitude) {
       updateDriverMarker(Number(drv.latitude), Number(drv.longitude));
+    } else if (activeRide?.driver_id) {
+      // Se o motorista foi aceito, garante posicionamento visual temporário próximo à origem enquanto atualiza o GPS
+      const tempLat = (pLat || -15.5606) - 0.002;
+      const tempLng = (pLng || -54.3075) + 0.002;
+      updateDriverMarker(tempLat, tempLng);
     }
 
     // Se houver motorista atribuído, busca localização em tempo real no Supabase (Query + Polling 2s + Realtime)
