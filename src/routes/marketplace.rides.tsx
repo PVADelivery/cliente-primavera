@@ -37,24 +37,7 @@ function RidesPage() {
   const [rides, setRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeRide, setActiveRide] = useState<any | null>(null);
-  
-  const [MapLibre, setMapLibre] = useState<any>(null);
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const driverMarkerRef = useRef<any>(null);
-  const pickupMarkerRef = useRef<any>(null);
-  const dropoffMarkerRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let isMounted = true;
-    import("maplibre-gl").then((mod) => {
-      if (isMounted) {
-        setMapLibre(mod.default || mod);
-      }
-    });
-    return () => { isMounted = false; };
-  }, []);
 
   useEffect(() => {
     const fetchRides = async () => {
@@ -183,229 +166,221 @@ function RidesPage() {
     };
   }, [user]);
 
+function CustomerRideMap({ activeRide }: { activeRide: any }) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const pickupMarkerRef = useRef<any>(null);
+  const dropoffMarkerRef = useRef<any>(null);
+  const driverMarkerRef = useRef<any>(null);
+
   useEffect(() => {
-    if (!MapLibre || !mapContainer.current || !activeRide) return;
+    if (typeof window === "undefined" || !mapContainerRef.current || !activeRide) return;
 
     let isMounted = true;
-    let pLat = Number(activeRide?.pickup_latitude || activeRide?.pickup_lat || activeRide?.origin_lat || 0);
-    let pLng = Number(activeRide?.pickup_longitude || activeRide?.pickup_lng || activeRide?.origin_lng || 0);
 
-    let dLat = Number(activeRide?.dropoff_latitude || activeRide?.dropoff_lat || activeRide?.destination_lat || 0);
-    let dLng = Number(activeRide?.dropoff_longitude || activeRide?.dropoff_lng || activeRide?.destination_lng || 0);
+    import("maplibre-gl").then((mod: any) => {
+      if (!isMounted || !mapContainerRef.current || mapRef.current) return;
 
-    const initialCenter: [number, number] = (pLat && pLng) ? [pLng, pLat] : PVA_CENTER;
+      try {
+        const MapLibre = mod.default || mod;
+        const MapClass = MapLibre.Map || mod.Map;
+        const MarkerClass = MapLibre.Marker || mod.Marker;
 
-    if (!mapRef.current) {
-      mapRef.current = new MapLibre.Map({
-        container: mapContainer.current,
-        style: {
-          version: 8,
-          sources: {
-            "osm-tiles": {
-              type: "raster",
-              tiles: [
-                "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              ],
-              tileSize: 256,
-            }
+        if (!MapClass) return;
+
+        let pLat = Number(activeRide?.pickup_latitude || activeRide?.pickup_lat || activeRide?.origin_lat || 0);
+        let pLng = Number(activeRide?.pickup_longitude || activeRide?.pickup_lng || activeRide?.origin_lng || 0);
+
+        let dLat = Number(activeRide?.dropoff_latitude || activeRide?.dropoff_lat || activeRide?.destination_lat || 0);
+        let dLng = Number(activeRide?.dropoff_longitude || activeRide?.dropoff_lng || activeRide?.destination_lng || 0);
+
+        const initialCenter: [number, number] = (pLat && pLng) ? [pLng, pLat] : PVA_CENTER;
+
+        const m = new MapClass({
+          container: mapContainerRef.current,
+          style: {
+            version: 8,
+            sources: {
+              "osm-tiles": {
+                type: "raster",
+                tiles: [
+                  "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                ],
+                tileSize: 256,
+              }
+            },
+            layers: [
+              {
+                id: "osm-layer",
+                type: "raster",
+                source: "osm-tiles",
+                minzoom: 0,
+                maxzoom: 19
+              }
+            ]
           },
-          layers: [
-            {
-              id: "osm-layer",
-              type: "raster",
-              source: "osm-tiles",
-              minzoom: 0,
-              maxzoom: 19
-            }
-          ]
-        },
-        center: initialCenter,
-        zoom: 14,
-        attributionControl: false,
-      });
-      setTimeout(() => {
-        try { mapRef.current?.resize(); } catch (e) {}
-      }, 150);
-    }
-
-    const m = mapRef.current;
-
-    const fitMapBounds = (pickupLat: number, pickupLng: number, dropoffLat?: number, dropoffLng?: number, drvLat?: number, drvLng?: number) => {
-      try {
-        const bounds = new MapLibre.LngLatBounds();
-        if (pickupLat && pickupLng) bounds.extend([pickupLng, pickupLat]);
-        if (dropoffLat && dropoffLng) bounds.extend([dropoffLng, dropoffLat]);
-        if (drvLat && drvLng) bounds.extend([drvLng, drvLat]);
-        if (!bounds.isEmpty()) {
-          m.fitBounds(bounds, { padding: 50, maxZoom: 16, duration: 800 });
-        }
-      } catch (e) {}
-    };
-
-    const drawRouteLine = (pickupLat: number, pickupLng: number, dropoffLat: number, dropoffLng: number) => {
-      if (!m || !pickupLat || !pickupLng || !dropoffLat || !dropoffLng) return;
-
-      const updateRouteSource = (geojson: any) => {
-        try {
-          if (m.getSource("route-source")) {
-            (m.getSource("route-source") as any).setData(geojson);
-          } else {
-            m.addSource("route-source", {
-              type: "geojson",
-              data: geojson,
-            });
-            m.addLayer({
-              id: "route-layer-bg",
-              type: "line",
-              source: "route-source",
-              layout: {
-                "line-join": "round",
-                "line-cap": "round",
-              },
-              paint: {
-                "line-color": "#0f172a",
-                "line-width": 8,
-                "line-opacity": 0.6,
-              },
-            });
-            m.addLayer({
-              id: "route-layer",
-              type: "line",
-              source: "route-source",
-              layout: {
-                "line-join": "round",
-                "line-cap": "round",
-              },
-              paint: {
-                "line-color": "#2563eb",
-                "line-width": 5,
-                "line-opacity": 1.0,
-              },
-            });
-          }
-        } catch (e) {}
-      };
-
-      // 1. Linha Direta Instantânea Garantida
-      const initialGeojson = {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [pickupLng, pickupLat],
-            [dropoffLng, dropoffLat],
-          ],
-        },
-      };
-      updateRouteSource(initialGeojson);
-
-      // 2. Tenta obter o traçado exato das ruas via OSRM
-      const url = `https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}?overview=full&geometries=geojson`;
-      fetch(url)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.routes && data.routes.length > 0) {
-            const routeGeojson = {
-              type: "Feature",
-              properties: {},
-              geometry: data.routes[0].geometry,
-            };
-            updateRouteSource(routeGeojson);
-          }
-        })
-        .catch(() => {});
-    };
-
-    // Renderiza Marcadores de Origem e Destino
-    const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
-      try {
-        if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
-        pickupMarkerRef.current = new MapLibre.Marker({ color: "#10b981" })
-          .setLngLat([pickupLongitude, pickupLatitude])
-          .addTo(m);
-      } catch (e) {}
-
-      if (dropoffLatitude && dropoffLongitude) {
-        try {
-          if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
-          dropoffMarkerRef.current = new MapLibre.Marker({ color: "#ef4444" })
-            .setLngLat([dropoffLongitude, dropoffLatitude])
-            .addTo(m);
-        } catch (e) {}
-
-        drawRouteLine(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-      }
-    };
-
-    const cleanAddressForGeo = (addr: string) => {
-      if (!addr) return "";
-      return addr
-        .replace(/\s*\(.*?\)/g, "")
-        .replace(/\s*-\s*Primavera do Leste/gi, "")
-        .replace(/nº\s*\d+/gi, "")
-        .replace(/,\s*nº\s*/gi, "")
-        .trim();
-    };
-
-    const initMapRoute = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
-      renderRouteMarkers(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-      fitMapBounds(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-    };
-
-    if (pLat && pLng) {
-      initMapRoute(pLat, pLng, dLat, dLng);
-    } else if (activeRide?.pickup_address) {
-      const cleaned = cleanAddressForGeo(activeRide.pickup_address);
-      const queryStr = `${cleaned}, Primavera do Leste, MT, Brasil`;
-
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryStr)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (isMounted && data && data.length > 0) {
-            pLat = parseFloat(data[0].lat);
-            pLng = parseFloat(data[0].lon);
-            initMapRoute(pLat, pLng, dLat, dLng);
-          } else {
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("Jardim Progresso, Primavera do Leste, MT")}`)
-              .then((res2) => res2.json())
-              .then((data2) => {
-                if (isMounted && data2 && data2.length > 0) {
-                  pLat = parseFloat(data2[0].lat);
-                  pLng = parseFloat(data2[0].lon);
-                  initMapRoute(pLat, pLng, dLat, dLng);
-                } else {
-                  pLat = -15.5606;
-                  pLng = -54.3075;
-                  initMapRoute(pLat, pLng, dLat, dLng);
-                }
-              })
-              .catch(() => {
-                pLat = -15.5606;
-                pLng = -54.3075;
-                initMapRoute(pLat, pLng, dLat, dLng);
-              });
-          }
-        })
-        .catch(() => {
-          pLat = -15.5606;
-          pLng = -54.3075;
-          initMapRoute(pLat, pLng, dLat, dLng);
+          center: initialCenter,
+          zoom: 14,
+          attributionControl: false,
         });
-    } else {
-      pLat = -15.5606;
-      pLng = -54.3075;
-      initMapRoute(pLat, pLng, dLat, dLng);
-    }
 
-    // Atualiza Posição do Motorista com ícone animado de Veículo (Moto / Carro) estilo Urbano Norte
-    const updateDriverMarker = (lat: number, lng: number) => {
-      if (!m || !lat || !lng) return;
-      try {
-        const isTaxi = activeRide?.vehicle_type === "taxi" || activeRide?.vehicle_type === "carro";
-        if (!driverMarkerRef.current) {
+        mapRef.current = m;
+
+        setTimeout(() => {
+          try { m.resize(); } catch (e) {}
+        }, 150);
+
+        const fitMapBounds = (pickupLat: number, pickupLng: number, dropoffLat?: number, dropoffLng?: number, drvLat?: number, drvLng?: number) => {
+          try {
+            const bounds = new MapLibre.LngLatBounds();
+            if (pickupLat && pickupLng) bounds.extend([pickupLng, pickupLat]);
+            if (dropoffLat && dropoffLng) bounds.extend([dropoffLng, dropoffLat]);
+            if (drvLat && drvLng) bounds.extend([drvLng, drvLat]);
+            if (!bounds.isEmpty()) {
+              m.fitBounds(bounds, { padding: 50, maxZoom: 16, duration: 800 });
+            }
+          } catch (e) {}
+        };
+
+        const drawRouteLine = (pickupLat: number, pickupLng: number, dropoffLat: number, dropoffLng: number) => {
+          if (!m || !pickupLat || !pickupLng || !dropoffLat || !dropoffLng) return;
+
+          const updateRouteSource = (geojson: any) => {
+            try {
+              if (m.getSource("route-source")) {
+                (m.getSource("route-source") as any).setData(geojson);
+              } else {
+                m.addSource("route-source", {
+                  type: "geojson",
+                  data: geojson,
+                });
+                m.addLayer({
+                  id: "route-layer-bg",
+                  type: "line",
+                  source: "route-source",
+                  layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                  },
+                  paint: {
+                    "line-color": "#0f172a",
+                    "line-width": 8,
+                    "line-opacity": 0.6,
+                  },
+                });
+                m.addLayer({
+                  id: "route-layer",
+                  type: "line",
+                  source: "route-source",
+                  layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                  },
+                  paint: {
+                    "line-color": "#2563eb",
+                    "line-width": 5,
+                    "line-opacity": 1.0,
+                  },
+                });
+              }
+            } catch (e) {}
+          };
+
+          const initialGeojson = {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [pickupLng, pickupLat],
+                [dropoffLng, dropoffLat],
+              ],
+            },
+          };
+          updateRouteSource(initialGeojson);
+
+          const url = `https://router.project-osrm.org/route/v1/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}?overview=full&geometries=geojson`;
+          fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data && data.routes && data.routes.length > 0) {
+                const routeGeojson = {
+                  type: "Feature",
+                  properties: {},
+                  geometry: data.routes[0].geometry,
+                };
+                updateRouteSource(routeGeojson);
+              }
+            })
+            .catch(() => {});
+        };
+
+        const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
+          if (MarkerClass) {
+            try {
+              if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
+              pickupMarkerRef.current = new MarkerClass({ color: "#10b981" })
+                .setLngLat([pickupLongitude, pickupLatitude])
+                .addTo(m);
+            } catch (e) {}
+
+            if (dropoffLatitude && dropoffLongitude) {
+              try {
+                if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
+                dropoffMarkerRef.current = new MarkerClass({ color: "#ef4444" })
+                  .setLngLat([dropoffLongitude, dropoffLatitude])
+                  .addTo(m);
+              } catch (e) {}
+
+              drawRouteLine(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
+            }
+          }
+        };
+
+        const cleanStreetOnly = (addr: string): string => {
+          if (!addr) return "";
+          let cleaned = addr
+            .replace(/\s*\(.*?\)/g, "")
+            .replace(/\s*-\s*Primavera do Leste.*/gi, "")
+            .replace(/nº\s*\d+/gi, "")
+            .replace(/,\s*\d+/gi, "")
+            .trim();
+
+          const parts = cleaned.split(",");
+          if (parts.length > 0) {
+            const first = parts[0].trim();
+            if (first.length > 3) return first;
+          }
+          return cleaned;
+        };
+
+        const geocodeAddress = async (addrStr: string): Promise<[number, number] | null> => {
+          if (!addrStr) return null;
+          const streetName = cleanStreetOnly(addrStr);
+          if (!streetName) return null;
+
+          try {
+            const q1 = `${streetName}, Primavera do Leste, MT`;
+            const r1 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q1)}`);
+            const d1 = await r1.json();
+            if (d1 && d1.length > 0) {
+              return [parseFloat(d1[0].lat), parseFloat(d1[0].lon)];
+            }
+
+            const q2 = `${streetName}, Primavera do Leste, MT, Brasil`;
+            const r2 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q2)}`);
+            const d2 = await r2.json();
+            if (d2 && d2.length > 0) {
+              return [parseFloat(d2[0].lat), parseFloat(d2[0].lon)];
+            }
+          } catch (e) {}
+          return null;
+        };
+
+        const createVehicleMarkerElement = (vehType: string) => {
+          const isTaxi = vehType === "taxi" || vehType === "carro" || vehType === "car";
           const el = document.createElement("div");
           el.className = "relative flex items-center justify-center pointer-events-none";
           el.innerHTML = `
@@ -414,69 +389,133 @@ function RidesPage() {
               ${isTaxi ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.2 1 12 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>' : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="5" cy="16" r="3"/><circle cx="19" cy="16" r="3"/><path d="M12 16h1a3 3 0 0 0 3-3v-2l-3-4H9l1.5 4H8"/><path d="M9 7h2.5"/></svg>'}
             </div>
           `;
-          driverMarkerRef.current = new MapLibre.Marker({ element: el })
-            .setLngLat([lng, lat])
-            .addTo(m);
-        } else {
-          driverMarkerRef.current.setLngLat([lng, lat]);
+          return el;
+        };
+
+        const updateDriverMarker = (lat: number, lng: number) => {
+          if (!m || !lat || !lng || !MarkerClass) return;
+          try {
+            if (!driverMarkerRef.current) {
+              const el = createVehicleMarkerElement(activeRide?.vehicle_type || "");
+              driverMarkerRef.current = new MarkerClass({ element: el })
+                .setLngLat([lng, lat])
+                .addTo(m);
+            } else {
+              driverMarkerRef.current.setLngLat([lng, lat]);
+            }
+            fitMapBounds(pLat || -15.5606, pLng || -54.3075, dLat, dLng, lat, lng);
+          } catch (e) {}
+        };
+
+        const setupRouteAndMarkers = async () => {
+          if (!pLat || !pLng) {
+            if (activeRide?.pickup_address) {
+              const coords = await geocodeAddress(activeRide.pickup_address);
+              if (coords) {
+                pLat = coords[0];
+                pLng = coords[1];
+              }
+            }
+          }
+
+          if (!dLat || !dLng) {
+            if (activeRide?.dropoff_address) {
+              const coords = await geocodeAddress(activeRide.dropoff_address);
+              if (coords) {
+                dLat = coords[0];
+                dLng = coords[1];
+              }
+            }
+          }
+
+          if (!pLat || !pLng) {
+            pLat = -15.5606;
+            pLng = -54.3075;
+          }
+
+          if (!dLat || !dLng) {
+            dLat = pLat - 0.005;
+            dLng = pLng - 0.005;
+          }
+
+          if (isMounted) {
+            renderRouteMarkers(pLat, pLng, dLat, dLng);
+
+            if (activeRide?.driver_id || activeRide?.driver) {
+              const tempLat = pLat + 0.002;
+              const tempLng = pLng - 0.002;
+              updateDriverMarker(tempLat, tempLng);
+            }
+
+            fitMapBounds(pLat, pLng, dLat, dLng);
+          }
+        };
+
+        setupRouteAndMarkers();
+
+        // Se houver motorista atribuído, busca localização em tempo real no Supabase (Query + Polling 2s + Realtime)
+        let locSub: any = null;
+        let pollInterval: any = null;
+
+        if (activeRide?.driver_id) {
+          const fetchDriverLoc = async () => {
+            try {
+              const { data: d1 } = await (supabase as any)
+                .from("delivery_drivers")
+                .select("latitude, longitude, current_latitude, current_longitude")
+                .or(`user_id.eq.${activeRide.driver_id},id.eq.${activeRide.driver_id}`)
+                .maybeSingle();
+              if (d1) {
+                const lat = Number(d1.latitude || d1.current_latitude);
+                const lng = Number(d1.longitude || d1.current_longitude);
+                if (lat && lng) updateDriverMarker(lat, lng);
+              }
+            } catch (e) {}
+          };
+
+          fetchDriverLoc();
+          pollInterval = setInterval(fetchDriverLoc, 2000);
+
+          locSub = supabase
+            .channel(`driver_loc_${activeRide.driver_id}`)
+            .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
+              const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
+              const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
+              if (newLat && newLng) {
+                updateDriverMarker(newLat, newLng);
+              }
+            })
+            .subscribe();
         }
-        fitMapBounds(pLat || -15.5606, pLng || -54.3075, dLat, dLng, lat, lng);
-      } catch (e) {}
-    };
 
-    // Posição Inicial vinda da junção de dados ou aproximação de motorista a caminho
-    const rawDrv = activeRide.driver;
-    const drv = Array.isArray(rawDrv) ? rawDrv[0] : rawDrv;
-    if (drv?.latitude && drv?.longitude) {
-      updateDriverMarker(Number(drv.latitude), Number(drv.longitude));
-    } else if (activeRide?.driver_id) {
-      // Se o motorista foi aceito, garante posicionamento visual temporário próximo à origem enquanto atualiza o GPS
-      const tempLat = (pLat || -15.5606) - 0.002;
-      const tempLng = (pLng || -54.3075) + 0.002;
-      updateDriverMarker(tempLat, tempLng);
-    }
-
-    // Se houver motorista atribuído, busca localização em tempo real no Supabase (Query + Polling 2s + Realtime)
-    let locSub: any = null;
-    let pollInterval: any = null;
-
-    if (activeRide?.driver_id) {
-      const fetchDriverLoc = async () => {
-        try {
-          const { data: d1 } = await (supabase as any)
-            .from("delivery_drivers")
-            .select("latitude, longitude, current_latitude, current_longitude")
-            .or(`user_id.eq.${activeRide.driver_id},id.eq.${activeRide.driver_id}`)
-            .maybeSingle();
-          if (d1) {
-            const lat = Number(d1.latitude || d1.current_latitude);
-            const lng = Number(d1.longitude || d1.current_longitude);
-            if (lat && lng) updateDriverMarker(lat, lng);
-          }
-        } catch (e) {}
-      };
-
-      fetchDriverLoc();
-      pollInterval = setInterval(fetchDriverLoc, 2000);
-
-      locSub = supabase
-        .channel(`driver_loc_${activeRide.driver_id}`)
-        .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
-          const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
-          const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
-          if (newLat && newLng) {
-            updateDriverMarker(newLat, newLng);
-          }
-        })
-        .subscribe();
-    }
+      } catch (err) {
+        console.warn("[CustomerRideMap] Erro ao inicializar MapLibre:", err);
+      }
+    });
 
     return () => {
       isMounted = false;
-      if (pollInterval) clearInterval(pollInterval);
-      if (locSub) supabase.removeChannel(locSub);
+      if (mapRef.current) {
+        try { mapRef.current.remove(); } catch (e) {}
+        mapRef.current = null;
+      }
     };
-  }, [MapLibre, activeRide?.id, activeRide?.driver_id]);
+  }, [activeRide?.id, activeRide?.driver_id]);
+
+  return (
+    <div className="w-full h-[250px] bg-secondary relative" ref={mapContainerRef}>
+      {!activeRide?.driver_id && (
+        <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10 text-center px-4">
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-3">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+          <h3 className="font-bold text-foreground">Procurando Motorista</h3>
+          <p className="text-xs text-muted-foreground mt-1">Aguarde enquanto encontramos um motorista parceiro próximo a você.</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
   if (!mounted) {
     return (
@@ -566,17 +605,7 @@ function RidesPage() {
       {activeRide && (
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl overflow-hidden bg-card border border-border shadow-card">
-            <div className="w-full h-[250px] bg-secondary relative" ref={mapContainer}>
-              {!activeRide.driver_id && (
-                <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center z-10 text-center px-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-3">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  </div>
-                  <h3 className="font-bold text-foreground">Procurando Motorista</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Aguarde enquanto encontramos um motorista parceiro próximo a você.</p>
-                </div>
-              )}
-            </div>
+            <CustomerRideMap activeRide={activeRide} />
 
             <div className="p-4 flex flex-col gap-4">
               <div className="flex items-center justify-between">
