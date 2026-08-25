@@ -319,11 +319,78 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             .catch(() => {});
         };
 
+        // Pino padrão do app: gota com aro branco, sombra no chão e ícone central
+        const createPinElement = (opts: { top: string; bottom: string; ring: string; icon: string; pulse?: boolean }) => {
+          const uid = `pin_${Math.random().toString(36).slice(2, 9)}`;
+          const el = document.createElement("div");
+          el.className = "relative flex items-center justify-center pointer-events-none -translate-y-[46%]";
+          el.innerHTML = `
+            <div class="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-5 h-[6px] rounded-full bg-black/35 blur-[3px]"></div>
+            <div class="relative w-[38px] h-[48px] filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.35)] ${opts.pulse ? "animate-pulse" : ""}">
+              <svg width="38" height="48" viewBox="0 0 38 48" fill="none" class="absolute inset-0">
+                <defs>
+                  <linearGradient id="${uid}" x1="4" y1="0" x2="34" y2="46" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="${opts.top}"/>
+                    <stop offset="100%" stop-color="${opts.bottom}"/>
+                  </linearGradient>
+                </defs>
+                <path d="M19 1.5C9.6 1.5 2 9.1 2 18.5c0 5.5 3.6 11 7.4 15.2 2.9 3.2 5.9 5.8 7.4 8.2.6 1 1.8 1 2.4 0 1.5-2.4 4.5-5 7.4-8.2C30.4 29.5 36 24 36 18.5 36 9.1 28.4 1.5 19 1.5Z" fill="url(#${uid})"/>
+                <path d="M19 1.5C9.6 1.5 2 9.1 2 18.5c0 5.5 3.6 11 7.4 15.2 2.9 3.2 5.9 5.8 7.4 8.2.6 1 1.8 1 2.4 0 1.5-2.4 4.5-5 7.4-8.2C30.4 29.5 36 24 36 18.5 36 9.1 28.4 1.5 19 1.5Z" stroke="rgba(255,255,255,0.9)" stroke-width="2" fill="none"/>
+                <circle cx="19" cy="18" r="12" fill="#ffffff"/>
+                <circle cx="19" cy="18" r="12" stroke="${opts.ring}" stroke-width="1.2" fill="none"/>
+              </svg>
+              <div class="absolute left-0 right-0 top-[6px] h-[24px] flex items-center justify-center text-slate-900">
+                ${opts.icon}
+              </div>
+            </div>
+          `;
+          return el;
+        };
+
+        // Motocicleta em vista lateral — traço limpo e legível em tamanho pequeno
+        const MOTO_ICON = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.2" cy="16.4" r="3.9"/>
+            <circle cx="18.8" cy="16.4" r="3.9"/>
+            <path d="M5.2 16.4 8.6 10h5.1l2.6 6.4"/>
+            <path d="M7.6 10c1.2-1.8 4.2-2 6.1-.6"/>
+            <path d="M13.7 10 17 5.4h2.4"/>
+            <path d="M16.4 5.4h3.9"/>
+            <path d="M9.6 16.4h5.6"/>
+          </svg>`;
+
+        const CAR_ICON = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 15v-2.2c0-.5.2-1 .5-1.4l2-2.6c.4-.5 1-.8 1.6-.8h8.6c.6 0 1.2.3 1.6.8l2 2.6c.3.4.5.9.5 1.4V15"/>
+            <path d="M3 15h18"/>
+            <circle cx="7.5" cy="16.4" r="2.1"/>
+            <circle cx="16.5" cy="16.4" r="2.1"/>
+          </svg>`;
+
+        const FLAG_ICON = `
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 21V4"/>
+            <path d="M5 4h12l-2.2 3.5L17 11H5"/>
+          </svg>`;
+
+        const DOT_ICON = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>`;
+
         const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
           if (MarkerClass) {
             try {
               if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
-              pickupMarkerRef.current = new MarkerClass({ color: "#10b981" })
+              pickupMarkerRef.current = new MarkerClass({
+                element: createPinElement({ top: "#34d399", bottom: "#059669", ring: "#10b981", icon: DOT_ICON }),
+                anchor: "bottom",
+              })
                 .setLngLat([pickupLongitude, pickupLatitude])
                 .addTo(m);
             } catch (e) {}
@@ -331,7 +398,10 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             if (dropoffLatitude && dropoffLongitude) {
               try {
                 if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
-                dropoffMarkerRef.current = new MarkerClass({ color: "#ef4444" })
+                dropoffMarkerRef.current = new MarkerClass({
+                  element: createPinElement({ top: "#fb7185", bottom: "#dc2626", ring: "#ef4444", icon: FLAG_ICON }),
+                  anchor: "bottom",
+                })
                   .setLngLat([dropoffLongitude, dropoffLatitude])
                   .addTo(m);
               } catch (e) {}
@@ -383,74 +453,14 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
 
         const createVehicleMarkerElement = (vehType: string) => {
           const isTaxi = vehType === "taxi" || vehType === "carro" || vehType === "car";
-          const el = document.createElement("div");
-          el.className = "relative flex flex-col items-center justify-center pointer-events-none -translate-y-[90%]";
-          el.innerHTML = `
-            <div class="absolute -bottom-1 w-6 h-2 bg-black/40 rounded-full blur-[2px]"></div>
-            <div class="relative w-10 h-[50px] flex items-center justify-center filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]">
-              <svg width="40" height="50" viewBox="0 0 40 50" fill="none" class="absolute inset-0">
-                <defs>
-                  <linearGradient id="pinGradYellowCust" x1="0" y1="0" x2="40" y2="50" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#ffbe0b"/>
-                    <stop offset="45%" stop-color="#fb5607"/>
-                    <stop offset="100%" stop-color="#ff006e"/>
-                  </linearGradient>
-                </defs>
-
-                <!-- Pino externo em gota alaranjado 3D -->
-                <path d="M20 0C8.954 0 0 8.954 0 20C0 32 16 46 20 50C24 46 40 32 40 20C40 8.954 31.046 0 20 0Z" fill="url(#pinGradYellowCust)"/>
-                
-                <!-- Borda fina destacada em vermelho/laranja -->
-                <path d="M20 1C9.507 1 1 9.507 1 20C1 31.2 16.2 44.5 20 48.2C23.8 44.5 39 31.2 39 20C39 9.507 30.493 1 20 1Z" stroke="#d97706" stroke-width="1.5" fill="none"/>
-                
-                <!-- Círculo interior branco fosco perfeito -->
-                <circle cx="20" cy="20" r="14" fill="#ffffff"/>
-                <circle cx="20" cy="20" r="14" stroke="#f59e0b" stroke-width="1"/>
-              </svg>
-
-              <!-- Silhueta da Motocicleta preta exatamente como no modelo fornecido pelo usuário -->
-              <div class="relative z-10 -mt-2.5 text-slate-950 flex items-center justify-center">
-                ${isTaxi ? `
-                  <svg width="20" height="13" viewBox="0 0 24 16" fill="currentColor">
-                    <path d="M19 12h2c.6 0 1-.4 1-1V8c0-.9-.7-1.7-1.5-1.9C18.7 5.6 16 5 16 5s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9L2.1 5.7C1.4 6.2 1 7 1 8v3c0 .6.4 1 1 1h2"/>
-                    <circle cx="7" cy="12" r="2.5"/>
-                    <circle cx="17" cy="12" r="2.5"/>
-                  </svg>
-                ` : `
-                  <svg width="22" height="15" viewBox="0 0 28 20" fill="currentColor">
-                    <!-- Rodas pretas foscas com cubo/aro central -->
-                    <circle cx="6.5" cy="13.5" r="4.2"/>
-                    <circle cx="6.5" cy="13.5" r="1.8" fill="#ffffff"/>
-                    <circle cx="6.5" cy="13.5" r="0.8" fill="currentColor"/>
-
-                    <circle cx="21.5" cy="13.5" r="4"/>
-                    <circle cx="21.5" cy="13.5" r="1.6" fill="#ffffff"/>
-                    <circle cx="21.5" cy="13.5" r="0.8" fill="currentColor"/>
-
-                    <!-- Escapamento duplo sob o chassi -->
-                    <path d="M7.5 13H16M7 14.8H15.5" stroke="#ffffff" stroke-width="0.8"/>
-                    <path d="M7.5 13H16.5M7 14.8H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-
-                    <!-- Bloco de motor pesadamente detalhado V-Twin -->
-                    <rect x="10.5" y="9.5" width="5" height="4.5" rx="0.8"/>
-
-                    <!-- Tanque de combustível em gota inclinado -->
-                    <path d="M12 6.5C12 4.8 15 4.2 18.5 6C19.5 6.6 19 8.2 17 8.6C14.8 9.2 12.5 8.4 12 6.5Z"/>
-
-                    <!-- Banco anatômico baixo curvado -->
-                    <path d="M5.8 9C7.8 9 9.8 9.5 12 8.3C13 9.5 12 11.2 9.8 11.6C7.8 11.6 5.8 10.6 5.8 9Z"/>
-
-                    <!-- Garfo dianteiro inclinado com farol retangular e retrovisor -->
-                    <path d="M17 13.5L21 4H24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <rect x="21.5" y="4.5" width="3" height="2.5" rx="0.6" fill="currentColor"/>
-                    <circle cx="20" cy="2.5" r="0.9"/>
-                  </svg>
-                `}
-              </div>
-            </div>
-          `;
-          return el;
+          return createPinElement({
+            top: "#fbbf24",
+            bottom: "#f97316",
+            ring: "#f59e0b",
+            icon: isTaxi ? CAR_ICON : MOTO_ICON,
+          });
         };
+
 
         const updateDriverMarker = (lat: number, lng: number) => {
           if (!m || !lat || !lng || !MarkerClass) return;
