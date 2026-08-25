@@ -319,27 +319,19 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             .catch(() => {});
         };
 
-        // Pino padrão do app: gota com aro branco, sombra no chão e ícone central
-        const createPinElement = (opts: { top: string; bottom: string; ring: string; icon: string; pulse?: boolean }) => {
-          const uid = `pin_${Math.random().toString(36).slice(2, 9)}`;
+        // Marcador no padrão visual do Google Maps: gota sólida, centro branco e sombra curta.
+        const createPinElement = (opts: { color: string; icon: string; pulse?: boolean }) => {
           const el = document.createElement("div");
-          el.className = "relative flex items-center justify-center pointer-events-none";
+          el.className = "relative flex h-[52px] w-[40px] items-start justify-center pointer-events-none";
           el.innerHTML = `
-            <div class="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-5 h-[6px] rounded-full bg-black/35 blur-[3px]"></div>
-            <div class="relative w-[38px] h-[48px] filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.35)] ${opts.pulse ? "animate-pulse" : ""}">
-              <svg width="38" height="48" viewBox="0 0 38 48" fill="none" class="absolute inset-0">
-                <defs>
-                  <linearGradient id="${uid}" x1="4" y1="0" x2="34" y2="46" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="${opts.top}"/>
-                    <stop offset="100%" stop-color="${opts.bottom}"/>
-                  </linearGradient>
-                </defs>
-                <path d="M19 1.5C9.6 1.5 2 9.1 2 18.5c0 5.5 3.6 11 7.4 15.2 2.9 3.2 5.9 5.8 7.4 8.2.6 1 1.8 1 2.4 0 1.5-2.4 4.5-5 7.4-8.2C30.4 29.5 36 24 36 18.5 36 9.1 28.4 1.5 19 1.5Z" fill="url(#${uid})"/>
-                <path d="M19 1.5C9.6 1.5 2 9.1 2 18.5c0 5.5 3.6 11 7.4 15.2 2.9 3.2 5.9 5.8 7.4 8.2.6 1 1.8 1 2.4 0 1.5-2.4 4.5-5 7.4-8.2C30.4 29.5 36 24 36 18.5 36 9.1 28.4 1.5 19 1.5Z" stroke="rgba(255,255,255,0.9)" stroke-width="2" fill="none"/>
-                <circle cx="19" cy="18" r="12" fill="#ffffff"/>
-                <circle cx="19" cy="18" r="12" stroke="${opts.ring}" stroke-width="1.2" fill="none"/>
+            <div class="absolute bottom-[1px] left-1/2 h-[5px] w-[17px] -translate-x-1/2 rounded-full bg-black/25 blur-[2px]"></div>
+            <div class="relative h-[48px] w-[38px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.32)] ${opts.pulse ? "animate-pulse" : ""}">
+              <svg width="38" height="48" viewBox="0 0 38 48" fill="none" class="absolute inset-0" aria-hidden="true">
+                <path d="M19 1C9.06 1 1 8.98 1 18.83c0 13.16 15.72 27.13 16.39 27.72a2.43 2.43 0 0 0 3.22 0C21.28 45.96 37 32 37 18.83 37 8.98 28.94 1 19 1Z" fill="${opts.color}"/>
+                <path d="M19 1.75c-9.52 0-17.25 7.65-17.25 17.08 0 12.61 15.28 26.24 16.14 26.99.63.55 1.59.55 2.22 0 .86-.75 16.14-14.38 16.14-26.99C36.25 9.4 28.52 1.75 19 1.75Z" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
+                <circle cx="19" cy="18.5" r="11.5" fill="#ffffff"/>
               </svg>
-              <div class="absolute left-0 right-0 top-[6px] h-[24px] flex items-center justify-center text-slate-900">
+              <div class="absolute left-[7px] top-[6.5px] flex h-[24px] w-[24px] items-center justify-center" style="color:${opts.color}">
                 ${opts.icon}
               </div>
             </div>
@@ -347,17 +339,16 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           return el;
         };
 
-        // Motocicleta em vista lateral — traço limpo e legível em tamanho pequeno
+        // Motocicleta lateral simplificada para continuar legível dentro do marcador.
         const MOTO_ICON = `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="5.2" cy="16.4" r="3.9"/>
-            <circle cx="18.8" cy="16.4" r="3.9"/>
-            <path d="M5.2 16.4 8.6 10h5.1l2.6 6.4"/>
-            <path d="M7.6 10c1.2-1.8 4.2-2 6.1-.6"/>
-            <path d="M13.7 10 17 5.4h2.4"/>
-            <path d="M16.4 5.4h3.9"/>
-            <path d="M9.6 16.4h5.6"/>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="17" r="3"/>
+            <circle cx="19" cy="17" r="3"/>
+            <path d="M5 17h5l3-6h3l3 6"/>
+            <path d="m9 17-2.5-6H4"/>
+            <path d="M13 11 11 8h4"/>
+            <path d="m16 11 1.5-4H20"/>
           </svg>`;
 
         const CAR_ICON = `
@@ -388,7 +379,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             try {
               if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
               pickupMarkerRef.current = new MarkerClass({
-                element: createPinElement({ top: "#34d399", bottom: "#059669", ring: "#10b981", icon: DOT_ICON }),
+                element: createPinElement({ color: "#188038", icon: DOT_ICON }),
                 anchor: "bottom",
               })
                 .setLngLat([pickupLongitude, pickupLatitude])
@@ -399,7 +390,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
               try {
                 if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
                 dropoffMarkerRef.current = new MarkerClass({
-                  element: createPinElement({ top: "#fb7185", bottom: "#dc2626", ring: "#ef4444", icon: FLAG_ICON }),
+                  element: createPinElement({ color: "#d93025", icon: FLAG_ICON }),
                   anchor: "bottom",
                 })
                   .setLngLat([dropoffLongitude, dropoffLatitude])
@@ -454,9 +445,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         const createVehicleMarkerElement = (vehType: string) => {
           const isTaxi = vehType === "taxi" || vehType === "carro" || vehType === "car";
           return createPinElement({
-            top: "#fbbf24",
-            bottom: "#f97316",
-            ring: "#f59e0b",
+            color: "#1a73e8",
             icon: isTaxi ? CAR_ICON : MOTO_ICON,
           });
         };
