@@ -323,7 +323,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         const createPinElement = (opts: { top: string; bottom: string; ring: string; icon: string; pulse?: boolean }) => {
           const uid = `pin_${Math.random().toString(36).slice(2, 9)}`;
           const el = document.createElement("div");
-          el.className = "relative flex items-center justify-center pointer-events-none -translate-y-[46%]";
+          el.className = "relative flex items-center justify-center pointer-events-none";
           el.innerHTML = `
             <div class="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-5 h-[6px] rounded-full bg-black/35 blur-[3px]"></div>
             <div class="relative w-[38px] h-[48px] filter drop-shadow-[0_5px_10px_rgba(0,0,0,0.35)] ${opts.pulse ? "animate-pulse" : ""}">
@@ -467,7 +467,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           try {
             if (!driverMarkerRef.current) {
               const el = createVehicleMarkerElement(activeRide?.vehicle_type || "");
-              driverMarkerRef.current = new MarkerClass({ element: el })
+              driverMarkerRef.current = new MarkerClass({ element: el, anchor: "bottom" })
                 .setLngLat([lng, lat])
                 .addTo(m);
             } else {
