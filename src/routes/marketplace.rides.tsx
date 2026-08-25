@@ -177,6 +177,8 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
     if (typeof window === "undefined" || !mapContainerRef.current || !activeRide) return;
 
     let isMounted = true;
+    let pollInterval: any = null;
+    let locSub: any = null;
 
     import("maplibre-gl").then((mod: any) => {
       if (!isMounted || !mapContainerRef.current || mapRef.current) return;
@@ -469,9 +471,6 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         setupRouteAndMarkers();
 
         // Se houver motorista atribuído, busca localização em tempo real no Supabase (Query + Polling 2s + Realtime)
-        let locSub: any = null;
-        let pollInterval: any = null;
-
         if (activeRide?.driver_id) {
           const fetchDriverLoc = async () => {
             try {
@@ -491,16 +490,21 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           fetchDriverLoc();
           pollInterval = setInterval(fetchDriverLoc, 2000);
 
-          locSub = supabase
-            .channel(`driver_loc_${activeRide.driver_id}`)
-            .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
-              const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
-              const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
-              if (newLat && newLng) {
-                updateDriverMarker(newLat, newLng);
-              }
-            })
-            .subscribe();
+          try {
+            const channelName = `driver_loc_${activeRide.driver_id}_${Math.random().toString(36).slice(2, 8)}`;
+            locSub = supabase.channel(channelName);
+            locSub
+              .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
+                const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
+                const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
+                if (newLat && newLng) {
+                  updateDriverMarker(newLat, newLng);
+                }
+              })
+              .subscribe();
+          } catch (e) {
+            console.warn("[CustomerRideMap] Aviso ao assinar Realtime:", e);
+          }
         }
 
       } catch (err) {
@@ -510,6 +514,10 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
 
     return () => {
       isMounted = false;
+      if (pollInterval) clearInterval(pollInterval);
+      if (locSub) {
+        try { supabase.removeChannel(locSub); } catch (e) {}
+      }
       if (mapRef.current) {
         try { mapRef.current.remove(); } catch (e) {}
         mapRef.current = null;
