@@ -73,7 +73,7 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative block group clearcoat border border-black/10 hover:border-black/20 active:border-black/30 transition-colors bg-primary hover:bg-primary active:bg-primary"
+      className="p-5 rounded-3xl relative block group clearcoat border border-black/10 hover:border-primary/40 active:border-primary/60 transition-colors bg-white hover:bg-white active:bg-white"
       style={{
         boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
       }}
@@ -83,11 +83,11 @@ function AeroPanel({
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-black/15 ring-1 ring-black/25 mb-4">
-          <Icon className="w-5 h-5 text-primary-foreground" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-primary/10 ring-1 ring-primary/25 mb-4">
+          <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-primary-foreground">{title}</p>
-        <p className="text-xs text-primary-foreground/80 mt-1.5 font-medium">{subtitle}</p>
+        <p className="font-display font-bold italic text-base leading-tight text-primary">{title}</p>
+        <p className="text-xs text-primary/80 mt-1.5 font-medium">{subtitle}</p>
 
       </div>
     </Link>
