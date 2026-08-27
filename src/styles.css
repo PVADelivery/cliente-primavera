@@ -310,6 +310,7 @@ iframe[src*="lovable"],
     repeating-linear-gradient(45deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(-45deg, rgba(0,0,0,0.55) 0 1px, transparent 1px 4px);
   background-size: 8px 8px, 8px 8px;
+  border-radius: inherit;
 }
 
 /* Reflexo de lataria (highlight especular diagonal) */
@@ -322,6 +323,7 @@ iframe[src*="lovable"],
     rgba(255,255,255,0.03) 52%,
     transparent 70%
   );
+  border-radius: inherit;
 }
 
 /* Placa aerodinâmica — chanfro tipo aerofólio */

@@ -75,7 +75,7 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className={`p-5 rounded-3xl relative block group clearcoat border transition-colors aero-focus ${
+      className={`p-5 rounded-3xl relative block group clearcoat border transition-colors aero-focus overflow-hidden ${
         active
           ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
           : "bg-btn-surface border-btn-line hover:bg-btn-surface-hover hover:border-primary/45 active:bg-btn-active active:border-btn-active active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
@@ -87,10 +87,10 @@ function AeroPanel({
       {/* Halo amarelo difuso atrás do botão */}
       <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
-      {/* Detalhe de bandeira quadriculada (discreto, canto superior direito) */}
+      {/* Detalhe de bandeira quadriculada (discreto, ajustado para dentro do card) */}
       <span
         aria-hidden
-        className={`checker-mini checker-fade-l absolute top-2.5 right-3 w-10 h-[6px] rounded-full pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/60 opacity-90" : "text-primary/45 opacity-80 group-hover:opacity-100"}`}
+        className={`checker-mini checker-fade-l absolute top-3.5 right-4 w-9 h-[5px] rounded-full pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/60 opacity-90" : "text-primary/45 opacity-80 group-hover:opacity-100"}`}
       />
 
       <span aria-hidden className="spec-sheen" />
