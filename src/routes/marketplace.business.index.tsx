@@ -180,12 +180,12 @@ function BusinessPage() {
       />
 
       <div className="grid grid-cols-2 gap-2">
-        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-primary text-primary-foreground border border-primary">
+        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm">
           Imóveis
         </span>
         <Link
           to="/marketplace/business/vehicles"
-          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:border-primary/50 transition-colors"
+          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors"
         >
           Veículos
         </Link>
@@ -206,10 +206,10 @@ function BusinessPage() {
           <button
             key={d.key}
             onClick={() => setDeal(d.key)}
-            className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
+            className={`tap-target aero-focus shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
               deal === d.key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border/60"
+                ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
+                : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
             }`}
           >
             {d.label}
@@ -218,10 +218,10 @@ function BusinessPage() {
         <button
           onClick={() => setOnlyFavorites((v) => !v)}
           aria-pressed={onlyFavorites}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${
+          className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${
             onlyFavorites
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-card text-muted-foreground border-border/60"
+              ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
+              : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
           }`}
         >
           <Heart className={`w-3.5 h-3.5 ${onlyFavorites ? "fill-current" : ""}`} />

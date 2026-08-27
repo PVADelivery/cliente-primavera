@@ -105,11 +105,11 @@ function VehiclesPage() {
       <div className="grid grid-cols-2 gap-2">
         <Link
           to="/marketplace/business"
-          className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground"
+          className="aero-focus h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors"
         >
           Imóveis
         </Link>
-        <span className="h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-primary text-primary-foreground border border-primary">
+        <span className="h-11 rounded-2xl grid place-items-center text-xs font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm">
           Veículos
         </span>
       </div>
@@ -129,10 +129,10 @@ function VehiclesPage() {
           <button
             key={t.key}
             onClick={() => setType(t.key)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+            className={`tap-target aero-focus shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
               type === t.key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border/60"
+                ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
+                : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
             }`}
           >
             {t.label}

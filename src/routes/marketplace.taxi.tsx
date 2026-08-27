@@ -867,10 +867,10 @@ function TaxiPage() {
           <button
             type="button"
             onClick={() => setVehicleType("mototaxi")}
-            className={`flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center p-3.5 rounded-2xl border transition-all aero-focus tap-target ${
               vehicleType === "mototaxi"
-                ? "border-primary bg-primary/10 text-primary shadow-sm"
-                : "border-border/60 bg-card hover:bg-muted text-muted-foreground"
+                ? "bg-btn-surface border-btn-line text-btn-ink shadow-md"
+                : "border-border/60 bg-card hover:bg-muted text-muted-foreground active:scale-95"
             }`}
           >
             <Bike className="w-6 h-6 mb-1" />
@@ -881,10 +881,10 @@ function TaxiPage() {
           <button
             type="button"
             onClick={() => setVehicleType("taxi")}
-            className={`flex-1 flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+            className={`flex-1 flex flex-col items-center justify-center p-3.5 rounded-2xl border transition-all aero-focus tap-target ${
               vehicleType === "taxi"
-                ? "border-primary bg-primary/10 text-primary shadow-sm"
-                : "border-border/60 bg-card hover:bg-muted text-muted-foreground"
+                ? "bg-btn-surface border-btn-line text-btn-ink shadow-md"
+                : "border-border/60 bg-card hover:bg-muted text-muted-foreground active:scale-95"
             }`}
           >
             <Car className="w-6 h-6 mb-1" />

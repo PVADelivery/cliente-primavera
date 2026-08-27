@@ -86,8 +86,8 @@ function SocialPage() {
             onClick={() => setTab(c.key)}
             className={`tap-target aero-focus shrink-0 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors ${
               tab === c.key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border/60"
+                ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
+                : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
             }`}
           >
             {c.label}
@@ -135,7 +135,7 @@ function SocialPage() {
 
       <button
         onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
-        className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg"
+        className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-btn-surface text-btn-ink border border-btn-line hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink font-bold text-sm flex items-center gap-2 shadow-lg aero-focus"
       >
         <Plus className="w-4 h-4" /> Publicar
       </button>

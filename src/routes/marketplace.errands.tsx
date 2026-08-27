@@ -830,10 +830,10 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           <button
             type="button"
             onClick={() => setVehicleType("moto")}
-            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all ${
+            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all aero-focus tap-target ${
               vehicleType === "moto"
-                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                : "border-border bg-card text-muted-foreground hover:bg-muted"
+                ? "bg-btn-surface border-btn-line text-btn-ink font-bold shadow-md"
+                : "border-border bg-card text-muted-foreground hover:bg-muted active:scale-95"
             }`}
           >
             <span className="text-xl mb-1">🏍️</span>
@@ -844,10 +844,10 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           <button
             type="button"
             onClick={() => setVehicleType("carro")}
-            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all ${
+            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all aero-focus tap-target ${
               vehicleType === "carro"
-                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                : "border-border bg-card text-muted-foreground hover:bg-muted"
+                ? "bg-btn-surface border-btn-line text-btn-ink font-bold shadow-md"
+                : "border-border bg-card text-muted-foreground hover:bg-muted active:scale-95"
             }`}
           >
             <span className="text-xl mb-1">🚗</span>
@@ -858,10 +858,10 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
           <button
             type="button"
             onClick={() => setVehicleType("carro_aberto")}
-            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all ${
+            className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all aero-focus tap-target ${
               vehicleType === "carro_aberto"
-                ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                : "border-border bg-card text-muted-foreground hover:bg-muted"
+                ? "bg-btn-surface border-btn-line text-btn-ink font-bold shadow-md"
+                : "border-border bg-card text-muted-foreground hover:bg-muted active:scale-95"
             }`}
           >
             <span className="text-xl mb-1">🛻</span>

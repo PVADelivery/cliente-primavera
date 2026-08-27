@@ -138,10 +138,10 @@ export function AeroButton({
 }) {
   const styles: Record<string, string> = {
     primary:
-      "bg-btn-active text-btn-active-ink hover:brightness-105 active:brightness-100 shadow-[0_14px_34px_-16px_rgba(255,222,33,0.9)]",
+      "bg-btn-surface text-btn-ink border border-btn-line hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink shadow-[0_14px_34px_-16px_rgba(255,222,33,0.9)]",
     ghost:
-      "bg-btn-surface text-btn-ink border border-btn-line hover:border-primary/45 active:bg-btn-active active:text-btn-active-ink active:border-btn-active",
-    danger: "bg-rose-600 text-white hover:bg-rose-500",
+      "bg-transparent text-foreground border border-btn-line hover:border-primary/45 active:bg-btn-active active:text-btn-active-ink active:border-btn-active",
+    danger: "bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700",
   };
   const disabled = loading || rest.disabled;
   return (

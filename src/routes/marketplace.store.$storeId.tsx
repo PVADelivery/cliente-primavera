@@ -361,10 +361,10 @@ function StoreDetail() {
               <button
                 key={cat}
                 onClick={() => scrollToCat(cat)}
-                className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                className={`tap-target aero-focus shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
                   activeCat === cat
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? "bg-btn-surface text-btn-ink border border-btn-line shadow-md"
+                    : "bg-card border border-border/60 text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
                 }`}
               >
                 {cat}
@@ -388,8 +388,9 @@ function StoreDetail() {
         {filtered.length === 0 && query && (
           <div className="py-12 text-center">
             <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-sm font-semibold text-muted-foreground">
-              Nenhum prato encontrado para "{query}".
+            <h3 className="font-display text-lg font-bold text-foreground">Nenhum item encontrado</h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto mt-1">
+              Tente buscar por outro termo no cardápio.
             </p>
           </div>
         )}
@@ -497,8 +498,8 @@ function StoreDetail() {
             <div className="max-w-xl mx-auto w-full pointer-events-auto">
               <Drawer open={cartOpen} onOpenChange={setCartOpen}>
                 <DrawerTrigger asChild>
-                  <button className="w-full h-14 bg-primary text-primary-foreground rounded-2xl flex items-center justify-between px-5 font-bold shadow-lg hover:bg-primary/90 transition-colors">
-                    <div className="flex items-center gap-2 bg-black/20 px-2 py-1 rounded-lg">
+                  <button className="w-full h-14 bg-btn-surface text-btn-ink border border-btn-line rounded-2xl flex items-center justify-between px-5 font-bold shadow-lg hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink transition-colors aero-focus tap-target">
+                    <div className="flex items-center gap-2 bg-black/10 px-2 py-1 rounded-lg">
                       <ShoppingBag className="w-4 h-4" />
                       <span>{count}</span>
                     </div>
