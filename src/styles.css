@@ -57,6 +57,17 @@
   --color-gold: var(--gold);
   --color-gold-ink: var(--gold-ink);
   --color-gold-surface: var(--gold-surface);
+
+  /* ── Tokens globais de botões/chips (padrão das pills) ── */
+  --color-btn-surface: var(--btn-surface);
+  --color-btn-surface-hover: var(--btn-surface-hover);
+  --color-btn-ink: var(--btn-ink);
+  --color-btn-ink-soft: var(--btn-ink-soft);
+  --color-btn-line: var(--btn-line);
+  --color-btn-active: var(--btn-active);
+  --color-btn-active-ink: var(--btn-active-ink);
+  --color-btn-disabled: var(--btn-disabled);
+  --color-btn-disabled-ink: var(--btn-disabled-ink);
 }
 
 /* ══════════════════════════════════════════════
