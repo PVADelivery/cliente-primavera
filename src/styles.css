@@ -495,3 +495,43 @@ iframe[src*="lovable"],
 @media (prefers-reduced-motion: reduce) {
   .nav-sweep { animation: none; opacity: 0.25; }
 }
+
+/* ── Bandeira quadriculada (identidade táxi/corrida) ───────────────────────── */
+@utility checker-flag {
+  background-image:
+    conic-gradient(from 90deg at 50% 50%, currentColor 25%, transparent 0 50%, currentColor 0 75%, transparent 0);
+  background-size: 12px 12px;
+  background-position: 0 0;
+}
+
+/* Faixa fina quadriculada (2 fileiras) */
+@utility checker-strip {
+  background-image:
+    conic-gradient(from 90deg at 50% 50%, currentColor 25%, transparent 0 50%, currentColor 0 75%, transparent 0);
+  background-size: 10px 10px;
+  height: 10px;
+}
+
+/* Faixa quadriculada que corre lateralmente */
+@utility checker-run {
+  background-image:
+    conic-gradient(from 90deg at 50% 50%, currentColor 25%, transparent 0 50%, currentColor 0 75%, transparent 0);
+  background-size: 10px 10px;
+  animation: checker-run-move 2.4s linear infinite;
+}
+
+@keyframes checker-run-move {
+  to { background-position: -20px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checker-run { animation: none; }
+}
+
+/* Máscara de esmaecimento para detalhes quadriculados */
+@utility checker-fade-r {
+  mask-image: linear-gradient(90deg, #000, transparent);
+}
+@utility checker-fade-l {
+  mask-image: linear-gradient(270deg, #000, transparent);
+}

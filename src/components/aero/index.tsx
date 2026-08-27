@@ -237,9 +237,15 @@ export function AeroSection({
               <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-primary/80">{tag}</span>
             </span>
           )}
-          <h2 className="font-display text-lg sm:text-xl font-black italic tracking-tight leading-tight truncate">
-            {title}
-          </h2>
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              aria-hidden
+              className="checker-flag text-foreground/70 shrink-0 w-[18px] h-[12px] rounded-[3px] ring-1 ring-foreground/15"
+            />
+            <h2 className="font-display text-lg sm:text-xl font-black italic tracking-tight leading-tight truncate">
+              {title}
+            </h2>
+          </div>
           {subtitle && <p className="text-[13px] text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
         {action && <div className="shrink-0">{action}</div>}

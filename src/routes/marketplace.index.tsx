@@ -87,6 +87,11 @@ function AeroPanel({
       {/* Halo amarelo difuso atrás do botão */}
       <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
+      {/* Detalhe de bandeira quadriculada */}
+      <span
+        aria-hidden
+        className={`checker-flag checker-fade-l absolute top-0 right-0 w-20 h-[10px] rounded-tr-3xl pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/70 opacity-80" : "text-btn-ink/25 opacity-70 group-hover:opacity-100"}`}
+      />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
         <div className={`w-11 h-11 rounded-full grid place-items-center ring-1 mb-4 transition-colors ${active ? "bg-black/15 ring-black/25" : "bg-black/[0.04] ring-black/10 group-active:bg-black/15 group-active:ring-black/25"}`}>
@@ -604,6 +609,12 @@ function MarketplaceHome() {
 
           <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </motion.div>
+
+        {/* Bandeira quadriculada correndo na base do hero */}
+        <span
+          aria-hidden
+          className="checker-run checker-fade-r absolute left-4 right-4 bottom-0 h-[10px] rounded-b-[6px] text-white/35 pointer-events-none"
+        />
       </section>
 
       {/* ── Categories ── */}
@@ -641,6 +652,11 @@ function MarketplaceHome() {
                   <span aria-hidden className="absolute -inset-3 rounded-full bg-primary-glow/40 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
                   <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
                   <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
+                  <span
+                    aria-hidden
+                    className={`checker-flag absolute inset-x-0 bottom-0 h-[6px] pointer-events-none transition-colors ${isActive ? "text-btn-active-ink/70" : "text-btn-ink/20"}`}
+                    style={{ backgroundSize: "6px 6px" }}
+                  />
                   <span aria-hidden className="spec-sheen" />
                   <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                 </div>
@@ -672,6 +688,9 @@ function MarketplaceHome() {
           <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
           <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-primary/10 font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          {/* Faixa de bandeira quadriculada correndo no topo e na base */}
+          <span aria-hidden className="checker-run checker-fade-r absolute top-0 left-0 right-0 h-[10px] text-btn-ink/25 group-active:text-btn-active-ink/60 pointer-events-none" />
+          <span aria-hidden className="checker-run checker-fade-l absolute bottom-0 left-0 right-0 h-[10px] text-btn-ink/20 group-active:text-btn-active-ink/50 pointer-events-none" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
