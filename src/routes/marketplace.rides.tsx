@@ -455,10 +455,9 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           if (isMounted) {
             renderRouteMarkers(pLat, pLng, dLat, dLng);
 
-            if (activeRide?.driver_id || activeRide?.driver) {
-              const tempLat = pLat + 0.002;
-              const tempLng = pLng - 0.002;
-              updateDriverMarker(tempLat, tempLng);
+            // Se já tiver latitude do motorista salva na corrida, posiciona imediatamente
+            if (activeRide?.driver_latitude && activeRide?.driver_longitude) {
+              updateDriverMarker(Number(activeRide.driver_latitude), Number(activeRide.driver_longitude));
             }
 
             fitMapBounds(pLat, pLng, dLat, dLng);
@@ -467,19 +466,39 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
 
         setupRouteAndMarkers();
 
-        // Se houver motorista atribuído, busca localização em tempo real no Supabase (Query + Polling 2s + Realtime)
-        if (activeRide?.driver_id) {
+        // Se houver corrida/motorista, busca e sincroniza localização em tempo real no Supabase
+        if (activeRide?.id || activeRide?.driver_id) {
           const fetchDriverLoc = async () => {
             try {
-              const { data: d1 } = await (supabase as any)
-                .from("delivery_drivers")
-                .select("latitude, longitude, current_latitude, current_longitude")
-                .or(`user_id.eq.${activeRide.driver_id},id.eq.${activeRide.driver_id}`)
-                .maybeSingle();
-              if (d1) {
-                const lat = Number(d1.latitude || d1.current_latitude);
-                const lng = Number(d1.longitude || d1.current_longitude);
-                if (lat && lng) updateDriverMarker(lat, lng);
+              // 1. Busca primeiro em ride_requests
+              if (activeRide?.id) {
+                const { data: rData } = await (supabase as any)
+                  .from("ride_requests")
+                  .select("driver_latitude, driver_longitude, driver_id")
+                  .eq("id", activeRide.id)
+                  .maybeSingle();
+                
+                if (rData?.driver_latitude && rData?.driver_longitude) {
+                  updateDriverMarker(Number(rData.driver_latitude), Number(rData.driver_longitude));
+                  return;
+                }
+              }
+
+              // 2. Busca na tabela delivery_drivers
+              const drvId = activeRide?.driver_id;
+              if (drvId) {
+                const { data: d1 } = await (supabase as any)
+                  .from("delivery_drivers")
+                  .select("latitude, longitude, current_latitude, current_longitude")
+                  .or(`user_id.eq.${drvId},id.eq.${drvId}`)
+                  .maybeSingle();
+                if (d1) {
+                  const lat = Number(d1.latitude || d1.current_latitude);
+                  const lng = Number(d1.longitude || d1.current_longitude);
+                  if (lat && lng && isCoordInPVA(lat, lng)) {
+                    updateDriverMarker(lat, lng);
+                  }
+                }
               }
             } catch (e) {}
           };
@@ -488,9 +507,16 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           pollInterval = setInterval(fetchDriverLoc, 2000);
 
           try {
-            const channelName = `driver_loc_${activeRide.driver_id}_${Math.random().toString(36).slice(2, 8)}`;
+            const channelName = `driver_loc_${activeRide.id || activeRide.driver_id}_${Math.random().toString(36).slice(2, 8)}`;
             locSub = supabase.channel(channelName);
             locSub
+              .on("postgres_changes", { event: "*", schema: "public", table: "ride_requests", filter: `id=eq.${activeRide.id}` }, (payload: any) => {
+                const newLat = Number(payload.new?.driver_latitude);
+                const newLng = Number(payload.new?.driver_longitude);
+                if (newLat && newLng) {
+                  updateDriverMarker(newLat, newLng);
+                }
+              })
               .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
                 const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
                 const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
