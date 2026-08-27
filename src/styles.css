@@ -385,7 +385,7 @@ iframe[src*="lovable"],
   &:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
-    border-radius: 0.75rem;
+    box-shadow: 0 0 0 4px rgba(255, 222, 33, 0.35);
   }
 }
 
@@ -412,6 +412,7 @@ iframe[src*="lovable"],
   [tabindex]:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(255, 222, 33, 0.35);
   }
 }
 
