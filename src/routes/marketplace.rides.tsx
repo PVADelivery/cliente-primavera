@@ -226,6 +226,12 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           },
           center: initialCenter,
           zoom: 14,
+          minZoom: 12,
+          maxZoom: 18,
+          maxBounds: [
+            [-54.65, -15.85],
+            [-53.95, -15.25]
+          ],
           attributionControl: false,
         });
 
@@ -235,14 +241,21 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           try { m.resize(); } catch (e) {}
         }, 150);
 
+        const isCoordInPVA = (lat: number, lng: number) => {
+          return typeof lat === "number" && typeof lng === "number" &&
+                 !isNaN(lat) && !isNaN(lng) &&
+                 lat < -15.0 && lat > -16.0 &&
+                 lng < -53.8 && lng > -54.8;
+        };
+
         const fitMapBounds = (pickupLat: number, pickupLng: number, dropoffLat?: number, dropoffLng?: number, drvLat?: number, drvLng?: number) => {
           try {
             const bounds = new MapLibre.LngLatBounds();
-            if (pickupLat && pickupLng) bounds.extend([pickupLng, pickupLat]);
-            if (dropoffLat && dropoffLng) bounds.extend([dropoffLng, dropoffLat]);
-            if (drvLat && drvLng) bounds.extend([drvLng, drvLat]);
+            if (isCoordInPVA(pickupLat, pickupLng)) bounds.extend([pickupLng, pickupLat]);
+            if (dropoffLat && dropoffLng && isCoordInPVA(dropoffLat, dropoffLng)) bounds.extend([dropoffLng, dropoffLat]);
+            if (drvLat && drvLng && isCoordInPVA(drvLat, drvLng)) bounds.extend([drvLng, drvLat]);
             if (!bounds.isEmpty()) {
-              m.fitBounds(bounds, { padding: 50, maxZoom: 16, duration: 800 });
+              m.fitBounds(bounds, { padding: 40, minZoom: 13, maxZoom: 16, duration: 600 });
             }
           } catch (e) {}
         };
