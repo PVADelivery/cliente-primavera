@@ -689,9 +689,9 @@ function MarketplaceHome() {
           <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
           <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-primary/10 font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
-          {/* Faixa de bandeira quadriculada correndo no topo e na base */}
-          <span aria-hidden className="checker-run checker-fade-r absolute top-0 left-0 right-0 h-[10px] text-btn-ink/25 group-active:text-btn-active-ink/60 pointer-events-none" />
-          <span aria-hidden className="checker-run checker-fade-l absolute bottom-0 left-0 right-0 h-[10px] text-btn-ink/20 group-active:text-btn-active-ink/50 pointer-events-none" />
+          {/* Faixa de bandeira quadriculada correndo no topo */}
+          <span aria-hidden className="checker-run checker-fade-x absolute top-2.5 left-5 right-5 h-[6px] rounded-full text-primary/45 group-active:text-btn-active-ink/60 pointer-events-none" style={{ backgroundSize: "6px 6px" }} />
+
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
