@@ -669,7 +669,7 @@ function MarketplaceHome() {
                 <div className="w-10 h-10 rounded-full bg-[#C9A227]/10 ring-1 ring-[#C9A227]/45 shadow-sm grid place-items-center">
                 <Car className="w-5 h-5 text-[#C9A227]" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-black">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-[#A8821C]">Táxi &amp; Moto Táxi</h2>
             </div>
             <p className="text-sm text-[#C9A227]/85 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
