@@ -73,20 +73,22 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative overflow-hidden block group clearcoat border border-white/10 hover:border-primary/40 transition-colors"
+      className="p-5 rounded-3xl relative block group clearcoat border border-black/15 hover:border-black/30 transition-colors"
       style={{
-        background: "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
-        boxShadow: "0 24px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.08)",
+        background: "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
+        boxShadow: "0 24px 40px -24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
       }}
     >
-      <div aria-hidden className="absolute inset-0 carbon-weave opacity-50" />
+      {/* Nuvem branca difusa atrás do botão */}
+      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-white/55 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+      <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-primary/10 ring-1 ring-primary/40 mb-4">
-          <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-black ring-1 ring-black/60 mb-4">
+          <Icon className="w-5 h-5 text-amber-400" strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-white">{title}</p>
-        <p className="text-xs text-white/55 mt-1.5 font-medium">{subtitle}</p>
+        <p className="font-display font-bold italic text-base leading-tight text-black">{title}</p>
+        <p className="text-xs text-black/70 mt-1.5 font-medium">{subtitle}</p>
       </div>
     </Link>
   );
@@ -624,22 +626,23 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] ${isActive ? "ring-2 ring-primary shadow-[0_0_20px_rgba(249,160,63,0.5)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] ${isActive ? "ring-2 ring-black/50 shadow-[0_0_20px_rgba(0,0,0,0.3)]" : ""}`}
                   style={{
                     background: isActive
-                      ? "linear-gradient(150deg, #3d2a0f 0%, #17130c 55%, #000 100%)"
-                      : "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
+                      ? "linear-gradient(150deg, #E8892B 0%, #F9A03F 55%, #FFBE5A 100%)"
+                      : "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
                     boxShadow:
-                      "0 14px 26px -14px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(249,160,63,0.22)",
+                      "0 14px 26px -14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
                   }}
                 >
-                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-60" />
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/12 to-transparent" />
-                  <div aria-hidden className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full bg-primary/25 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Nuvem branca difusa atrás da placa */}
+                  <span aria-hidden className="absolute -inset-3 rounded-full bg-white/55 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-2xl" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
+                  <Icon className="w-6 h-6 text-black skew-x-[6deg] relative z-10" strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-primary font-bold" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-black font-bold" : "text-foreground"}`}>{c.label}</span>
               </motion.button>
             );
           })}
@@ -656,23 +659,25 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-white/10 hover:border-primary/40 transition-colors"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/15 hover:border-black/30 transition-colors"
           style={{
-            background: "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
-            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.08)",
+            background: "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
+            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
           }}
         >
-          <div aria-hidden className="absolute inset-0 carbon-weave opacity-50" />
+          {/* Nuvem branca difusa atrás do botão */}
+          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-white/55 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
-          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-white/[0.04] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-black/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 ring-1 ring-primary/40 grid place-items-center">
-                <Car className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-full bg-black ring-1 ring-black/60 grid place-items-center">
+                <Car className="w-5 h-5 text-amber-400" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-white">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-black">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-white/60 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-black/70 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
