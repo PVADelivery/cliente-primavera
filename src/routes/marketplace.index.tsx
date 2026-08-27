@@ -659,10 +659,10 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-white/10 hover:border-primary/40 transition-colors"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/15 hover:border-black/30 transition-colors"
           style={{
-            background: "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
-            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.08)",
+            background: "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
+            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
           }}
         >
           <div aria-hidden className="absolute inset-0 carbon-weave opacity-50" />
