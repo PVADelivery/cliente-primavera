@@ -173,7 +173,14 @@
   --sidebar-accent-foreground:  oklch(0.98 0 0);
   --sidebar-border:             oklch(1 0 0 / 10%);
   --sidebar-ring:               oklch(0.78 0.151 64);
+
+  /* Mesma paleta no dark: superfícies dos botões seguem brancas */
+  --gold-soft:    #D9B45B;
+  --gold:         #8F6E14;
+  --gold-ink:     #7A5E10;
+  --gold-surface: #FFFFFF;
 }
+
 
 @layer base {
   * {
