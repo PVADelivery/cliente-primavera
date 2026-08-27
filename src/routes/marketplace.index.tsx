@@ -88,10 +88,10 @@ function AeroPanel({
       <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
       
-      {/* Bandeira quadriculada de corrida (canto superior direito) */}
+      {/* Faixa de bandeira quadriculada correndo no topo (padrão 10px contínuo) */}
       <span
         aria-hidden
-        className={`checker-flag checker-fade-l absolute top-0 right-0 w-24 h-[10px] pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/70 opacity-80" : "text-black/35 opacity-80 group-hover:opacity-100"}`}
+        className={`checker-run checker-fade-r absolute top-0 left-0 right-0 h-[10px] pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/70 opacity-80" : "text-black/30 opacity-80 group-hover:opacity-100"}`}
       />
 
       <span aria-hidden className="spec-sheen" />
@@ -583,10 +583,10 @@ function MarketplaceHome() {
           {/* Verniz — reflexo de lataria */}
           <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
 
-          {/* Bandeira quadriculada correndo na base do hero (100% contida dentro da curvatura) */}
+          {/* Bandeira quadriculada de corrida na base do hero (igual ao padrão dos cards com 10px) */}
           <span
             aria-hidden
-            className="checker-run checker-fade-x absolute inset-x-8 bottom-2.5 h-[6px] rounded-full text-white/30 pointer-events-none"
+            className="checker-run checker-fade-r absolute left-0 right-0 bottom-0 h-[10px] text-white/40 pointer-events-none"
           />
         </div>
 
