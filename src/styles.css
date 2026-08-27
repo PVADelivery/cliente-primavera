@@ -108,15 +108,15 @@
   --gradient-hero: linear-gradient(150deg, oklch(0.95 0 0) 0%, oklch(0.95 0.06 95) 60%, oklch(0.905 0.185 99) 100%);
   --gradient-sunset: linear-gradient(140deg, oklch(0.905 0.185 99) 0%, oklch(0.89 0.18 97) 60%, oklch(0.78 0.15 90) 100%);
   --gradient-mesh:
-    radial-gradient(at 15% 10%, oklch(0.78 0.151 64 / 0.15) 0px, transparent 55%),
-    radial-gradient(at 85% 5%,  oklch(0.72 0.153 60 / 0.10) 0px, transparent 50%),
+    radial-gradient(at 15% 10%, oklch(0.905 0.185 99 / 0.15) 0px, transparent 55%),
+    radial-gradient(at 85% 5%,  oklch(0.87 0.18 96 / 0.10) 0px, transparent 50%),
     radial-gradient(at 50% 90%, oklch(0.55 0.12 55 / 0.08) 0px, transparent 50%);
 
   /* ── Sombras ── */
-  --shadow-elegant: 0 8px 32px -8px oklch(0.78 0.151 64 / 0.25);
+  --shadow-elegant: 0 8px 32px -8px oklch(0.905 0.185 99 / 0.25);
   --shadow-card:    0 4px 20px -6px oklch(0 0 0 / 0.08);
-  --shadow-premium: 0 20px 56px -16px oklch(0.78 0.151 64 / 0.15), 0 6px 20px -8px oklch(0 0 0 / 0.05);
-  --shadow-glow:    0 0 40px oklch(0.78 0.151 64 / 0.25);
+  --shadow-premium: 0 20px 56px -16px oklch(0.905 0.185 99 / 0.15), 0 6px 20px -8px oklch(0 0 0 / 0.05);
+  --shadow-glow:    0 0 40px oklch(0.905 0.185 99 / 0.25);
 
   /* ── Charts ── */
   --chart-1: oklch(0.905 0.185 99);
@@ -164,7 +164,7 @@
   --input:  oklch(1 0 0 / 15%);
   --ring:   oklch(0.905 0.185 99);
   --shadow-card:    0 2px 16px -4px oklch(0 0 0 / 0.70);
-  --shadow-premium: 0 20px 56px -16px oklch(0.78 0.151 64 / 0.15), 0 6px 20px -8px oklch(0 0 0 / 0.60);
+  --shadow-premium: 0 20px 56px -16px oklch(0.905 0.185 99 / 0.15), 0 6px 20px -8px oklch(0 0 0 / 0.60);
   --sidebar:                    oklch(0.18 0 0);
   --sidebar-foreground:         oklch(0.98 0 0);
   --sidebar-primary:            oklch(0.905 0.185 99);

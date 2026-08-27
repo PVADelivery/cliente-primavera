@@ -333,7 +333,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
-              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFBE5A 0%, #3B82F6 100%)" }} />
+              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFDE21 0%, #3B82F6 100%)" }} />
             )}
 
             {/* Gradient overlays */}
@@ -358,7 +358,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             <div className="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">
                 {(s.rating ?? 5) >= 4.7 && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F9A03F]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FFDE21]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     Melhor avaliado
                   </span>
                 )}
@@ -387,7 +387,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           {/* Footer */}
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
             <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
-              <Star className="w-4 h-4 fill-[#F9A03F] text-[#F9A03F]" />
+              <Star className="w-4 h-4 fill-[#FFDE21] text-[#FFDE21]" />
               {(s.rating ?? 5).toFixed(1)}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
