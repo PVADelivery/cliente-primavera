@@ -626,7 +626,7 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(255,222,33,0.45)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-primary border-primary shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-white border-black/10 group-hover:border-primary/40"}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
@@ -636,9 +636,9 @@ function MarketplaceHome() {
                   <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
                   <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10" strokeWidth={1.75} />
+                  <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-primary-foreground" : "text-neutral-500"}`} strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight text-primary`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight transition-colors ${isActive ? "text-primary-foreground" : "text-neutral-600"}`}>{c.label}</span>
 
               </motion.button>
             );
@@ -656,7 +656,7 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/10 hover:border-primary/40 active:border-primary/60 transition-colors bg-white hover:bg-white active:bg-white"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/10 hover:border-primary/40 active:border-primary transition-colors bg-white hover:bg-white active:bg-primary active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
           style={{
             boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
           }}
@@ -668,12 +668,12 @@ function MarketplaceHome() {
           <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-primary/10 font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 ring-1 ring-primary/25 shadow-sm grid place-items-center">
-                <Car className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
+                <Car className="w-5 h-5 text-neutral-500 group-active:text-primary-foreground transition-colors" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-primary">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-neutral-600 group-active:text-primary-foreground transition-colors">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-primary/80 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-neutral-500 max-w-[70%] font-medium mt-2 group-active:text-primary-foreground/80 transition-colors">Corridas rápidas e seguras na sua porta agora.</p>
 
           </div>
         </Link>
