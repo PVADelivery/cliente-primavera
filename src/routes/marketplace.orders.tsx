@@ -37,7 +37,7 @@ function OrdersList() {
         .from("orders")
         .select(`id, status, total, created_at, company:companies(name, logo_url)`)
         .eq("user_id", user.id)
-        .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
+        .in("status", ["pending", "preparing", "ready", "in_route"])
         .order("created_at", { ascending: false });
 
       if (error) {

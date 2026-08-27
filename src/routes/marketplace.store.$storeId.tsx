@@ -28,6 +28,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerDescription,
   DrawerFooter,
   DrawerTrigger,
 } from "@/components/ui/drawer";
@@ -509,7 +510,7 @@ function StoreDetail() {
                   <div className="max-w-xl mx-auto w-full">
                     <DrawerHeader className="border-b border-border pb-4">
                       <DrawerTitle className="text-xl font-black text-center">Seu Pedido</DrawerTitle>
-                      <p className="text-center text-sm text-muted-foreground">{name}</p>
+                      <DrawerDescription className="text-center text-sm text-muted-foreground">{name}</DrawerDescription>
                     </DrawerHeader>
                     <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 200px)' }}>
                       {items.length === 0 ? (

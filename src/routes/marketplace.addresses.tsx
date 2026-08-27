@@ -108,19 +108,42 @@ function Addresses() {
   ).slice(0, 15);
 
   const fetchAddresses = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('addresses')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error("[Addresses] Erro ao buscar endereços:", error);
-    } else {
-      setAddresses(data || []);
-    }
+    try {
+      let { data, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error && (error.code === 'PGRST204' || error.message?.includes('user_id') || error.message?.includes('column') || error.code === '42703')) {
+        const res2 = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('customer_id', userId);
+        data = res2.data;
+        error = res2.error;
+      }
 
-    setLoading(false);
+      if (error && (error.message?.includes('created_at') || error.code === '42703')) {
+        const res3 = await supabase
+          .from('addresses')
+          .select('*')
+          .or(`user_id.eq.${userId},customer_id.eq.${userId}`);
+        data = res3.data;
+        error = res3.error;
+      }
+
+      if (error) {
+        console.warn("[Addresses] Erro ao buscar endereços:", error);
+        setAddresses([]);
+      } else {
+        setAddresses(data || []);
+      }
+    } catch (e) {
+      console.warn("[Addresses] Falha:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

@@ -72,12 +72,33 @@ function Checkout() {
     enabled: !!user?.id,
     staleTime: 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('addresses')
-        .select('*')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false });
-      return (data ?? []) as Address[];
+      if (!user?.id) return [];
+      try {
+        let { data, error } = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        if (error && (error.code === 'PGRST204' || error.message?.includes('user_id') || error.message?.includes('column') || error.code === '42703')) {
+          const res2 = await supabase
+            .from('addresses')
+            .select('*')
+            .eq('customer_id', user.id);
+          data = res2.data;
+        }
+
+        if (error && (error.message?.includes('created_at') || error.code === '42703')) {
+          const res3 = await supabase
+            .from('addresses')
+            .select('*')
+            .or(`user_id.eq.${user.id},customer_id.eq.${user.id}`);
+          data = res3.data;
+        }
+        return (data ?? []) as Address[];
+      } catch (e) {
+        return [] as Address[];
+      }
     },
   });
 
