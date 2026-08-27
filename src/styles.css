@@ -152,16 +152,16 @@
   --gold-ink:     #7A5E10; /* textos — 6.11:1 no branco */
   --gold-surface: #FFFFFF; /* fundo dos botões/placas */
 
-  /* ── Botões e chips (padrão pills) ── */
-  --btn-surface:       #FFFFFF;
-  --btn-surface-hover: #FFFFFF;
-  --btn-ink:           #4B5563; /* 7.0:1 no branco */
-  --btn-ink-soft:      #6B7280; /* 4.8:1 no branco */
-  --btn-line:          rgba(0, 0, 0, 0.10);
-  --btn-active:        var(--primary);
-  --btn-active-ink:    var(--primary-foreground); /* ~15:1 no amarelo */
-  --btn-disabled:      #F4F4F5;
-  --btn-disabled-ink:  #71717A;
+  /* ── Botões e chips (Sempre Amarelo por padrão, Branco quando clica) ── */
+  --btn-surface:       var(--primary);
+  --btn-surface-hover: var(--primary);
+  --btn-ink:           #111827; /* Contraste preto nítido sobre o amarelo */
+  --btn-ink-soft:      #374151; /* Contraste secundário no amarelo */
+  --btn-line:          rgba(0, 0, 0, 0.12);
+  --btn-active:        #FFFFFF; /* Fica branco ao clicar */
+  --btn-active-ink:    #111827; /* Contraste no branco */
+  --btn-disabled:      #E5E7EB;
+  --btn-disabled-ink:  #9CA3AF;
 }
 
 
@@ -196,22 +196,22 @@
   --sidebar-border:             oklch(1 0 0 / 10%);
   --sidebar-ring:               oklch(0.905 0.185 99);
 
-  /* Mesma paleta no dark: superfícies dos botões seguem brancas */
+  /* Mesma paleta no dark */
   --gold-soft:    #D9B45B;
   --gold:         #8F6E14;
   --gold-ink:     #7A5E10;
-  --gold-surface: #FFFFFF;
+  --gold-surface: var(--primary);
 
-  /* Botões seguem brancos no dark, com tinta cinza legível */
-  --btn-surface:       #FFFFFF;
-  --btn-surface-hover: #FFFFFF;
-  --btn-ink:           #3F3F46;
-  --btn-ink-soft:      #52525B;
-  --btn-line:          rgba(0, 0, 0, 0.12);
-  --btn-active:        var(--primary);
-  --btn-active-ink:    var(--primary-foreground);
-  --btn-disabled:      #E7E5E4;
-  --btn-disabled-ink:  #57534E;
+  /* Botões no dark: Sempre Amarelo, Branco quando clica */
+  --btn-surface:       var(--primary);
+  --btn-surface-hover: var(--primary);
+  --btn-ink:           #111827;
+  --btn-ink-soft:      #374151;
+  --btn-line:          rgba(0, 0, 0, 0.15);
+  --btn-active:        #FFFFFF; /* Fica branco ao clicar */
+  --btn-active-ink:    #111827;
+  --btn-disabled:      #3F3F46;
+  --btn-disabled-ink:  #71717A;
 }
 
 
