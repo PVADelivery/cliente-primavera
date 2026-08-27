@@ -967,7 +967,7 @@ function MarketplaceHome() {
 
       {/* ── Categories ── */}
       <AeroSection title="Categorias" subtitle="Escolha por onde começar">
-        <div className="flex gap-2.5 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:mx-0 sm:px-0">
+        <div className="flex gap-3 overflow-x-auto scrollbar-none px-1 pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:px-0">
           {CATEGORIES.map((c, i) => {
             const Icon = c.icon;
             const isActive = searchTerm.toLowerCase() === c.label.toLowerCase();
@@ -988,10 +988,10 @@ function MarketplaceHome() {
                 transition={{ delay: i * 0.05 }}
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
+                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[76px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-btn-surface border-btn-line group-hover:border-primary/45 group-active:bg-btn-active group-active:border-btn-active"}`}
+                  className={`aero-plate w-[68px] sm:w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-btn-surface border-btn-line group-hover:border-primary/45 group-active:bg-btn-active group-active:border-btn-active"}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
@@ -1009,7 +1009,7 @@ function MarketplaceHome() {
                   <span aria-hidden className="spec-sheen" />
                   <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-bold text-center leading-tight transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
+                <span className={`text-[12px] font-bold text-center leading-tight whitespace-nowrap transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
 
               </motion.button>
             );
