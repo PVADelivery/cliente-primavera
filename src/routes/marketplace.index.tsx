@@ -665,17 +665,19 @@ function MarketplaceHome() {
             boxShadow: "0 24px 40px -24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
           }}
         >
-          <div aria-hidden className="absolute inset-0 carbon-weave opacity-50" />
+          {/* Nuvem branca difusa atrás do botão */}
+          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-white/55 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
-          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-white/[0.04] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-black/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 ring-1 ring-primary/40 grid place-items-center">
-                <Car className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-full bg-black ring-1 ring-black/60 grid place-items-center">
+                <Car className="w-5 h-5 text-amber-400" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-white">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-black">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-white/60 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-black/70 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
