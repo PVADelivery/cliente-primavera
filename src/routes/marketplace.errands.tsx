@@ -36,8 +36,8 @@ function drawRoute(mapInst: any, routeGeoJSON: any) {
         'line-cap': 'round'
       },
       'paint': {
-        'line-color': '#10b981',
-        'line-width': 4
+        'line-color': '#facc15',
+        'line-width': 5.5
       }
     });
   }
