@@ -73,21 +73,22 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative block group clearcoat border border-[#C9A227]/25 hover:border-[#C9A227]/55 transition-colors bg-white"
+      className="p-5 rounded-3xl relative block group clearcoat border border-gold-soft/40 hover:border-gold/60 active:border-gold/70 transition-colors bg-gold-surface hover:bg-gold-surface active:bg-gold-surface"
       style={{
         boxShadow: "0 24px 40px -24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
     >
       {/* Nuvem dourada difusa atrás do botão */}
-      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-[#C9A227]/15 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-gold-soft/25 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-[#C9A227]/10 ring-1 ring-[#C9A227]/45 mb-4">
-          <Icon className="w-5 h-5 text-[#C9A227]" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-gold-soft/15 ring-1 ring-gold-soft/60 mb-4">
+          <Icon className="w-5 h-5 text-gold" strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-[#A8821C]">{title}</p>
-        <p className="text-xs text-[#9A7B1A] mt-1.5 font-medium">{subtitle}</p>
+        <p className="font-display font-bold italic text-base leading-tight text-gold-ink">{title}</p>
+        <p className="text-xs text-gold-ink/90 mt-1.5 font-medium">{subtitle}</p>
+
       </div>
     </Link>
   );
@@ -625,19 +626,20 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-[#C9A227]/25 ${isActive ? "ring-2 ring-[#C9A227]/60 shadow-[0_0_20px_rgba(201,162,39,0.25)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-gold-surface border border-gold-soft/40 group-hover:border-gold/60 ${isActive ? "ring-2 ring-gold/60 shadow-[0_0_20px_rgba(217,180,91,0.35)]" : ""}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
                   }}
                 >
                   {/* Nuvem dourada difusa atrás da placa */}
-                  <span aria-hidden className="absolute -inset-3 rounded-full bg-[#C9A227]/15 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+                  <span aria-hidden className="absolute -inset-3 rounded-full bg-gold-soft/25 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
                   <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-2xl" />
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#C9A227]/10 to-transparent rounded-2xl" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-gold-soft/15 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-[#C9A227] skew-x-[6deg] relative z-10" strokeWidth={1.75} />
+                  <Icon className="w-6 h-6 text-gold skew-x-[6deg] relative z-10" strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-[#A8821C] font-bold" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-gold-ink font-bold" : "text-foreground"}`}>{c.label}</span>
+
               </motion.button>
             );
           })}
@@ -654,24 +656,25 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-[#C9A227]/25 hover:border-[#C9A227]/55 transition-colors bg-white"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-gold-soft/40 hover:border-gold/60 active:border-gold/70 transition-colors bg-gold-surface hover:bg-gold-surface active:bg-gold-surface"
           style={{
             boxShadow: "0 24px 40px -24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
           }}
         >
           {/* Nuvem dourada difusa atrás do botão */}
-          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-[#C9A227]/15 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-gold-soft/25 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
           <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
-          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-[#C9A227]/[0.08] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-gold-soft/20 font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-[#C9A227]/10 ring-1 ring-[#C9A227]/45 shadow-sm grid place-items-center">
-                <Car className="w-5 h-5 text-[#C9A227]" />
+                <div className="w-10 h-10 rounded-full bg-gold-soft/15 ring-1 ring-gold-soft/60 shadow-sm grid place-items-center">
+                <Car className="w-5 h-5 text-gold" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-[#A8821C]">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-gold-ink">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-[#9A7B1A] max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-gold-ink/90 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+
           </div>
         </Link>
       </section>
