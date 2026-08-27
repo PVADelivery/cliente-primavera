@@ -84,8 +84,8 @@ function AeroPanel({
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-black ring-1 ring-black/60 mb-4">
-          <Icon className="w-5 h-5 text-amber-400" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-white ring-1 ring-black/10 shadow-sm mb-4">
+          <Icon className="w-5 h-5 text-[#C9A227]" strokeWidth={1.75} />
         </div>
         <p className="font-display font-bold italic text-base leading-tight text-black">{title}</p>
         <p className="text-xs text-black/70 mt-1.5 font-medium">{subtitle}</p>
