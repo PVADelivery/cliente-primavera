@@ -672,8 +672,8 @@ function MarketplaceHome() {
           <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-black/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-black ring-1 ring-black/60 grid place-items-center">
-                <Car className="w-5 h-5 text-amber-400" />
+                <div className="w-10 h-10 rounded-full bg-white ring-1 ring-black/10 shadow-sm grid place-items-center">
+                <Car className="w-5 h-5 text-[#C9A227]" />
               </div>
               <h2 className="font-display font-bold italic text-2xl leading-tight text-black">Táxi &amp; Moto Táxi</h2>
             </div>
