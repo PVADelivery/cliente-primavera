@@ -620,20 +620,37 @@ function FilterBar({
       {SORT_OPTIONS.map(opt => {
         const active = sort === opt.key;
         return (
-          <AeroPlate key={opt.key} active={active} onClick={() => setSort(opt.key)}>
-            {active && <CheckCircle2 className="w-4 h-4 shrink-0" />}
+          <motion.button
+            key={opt.key}
+            type="button"
+            whileTap={{ scale: 0.94 }}
+            aria-pressed={active}
+            onClick={() => setSort(opt.key)}
+            className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
+              active
+                ? "bg-emerald-500 border-emerald-500 text-white shadow-[0_8px_20px_-6px_rgba(16,185,129,0.6)] ring-1 ring-emerald-400/50"
+                : "bg-card/90 border-border text-foreground hover:bg-muted hover:border-emerald-500/40 hover:text-emerald-500"
+            }`}
+          >
+            {active && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
             {opt.label}
-          </AeroPlate>
+          </motion.button>
         );
       })}
-      <AeroPlate
-        active={openOnly}
+      <motion.button
+        type="button"
+        whileTap={{ scale: 0.94 }}
+        aria-pressed={openOnly}
         onClick={() => setOpenOnly(!openOnly)}
-        className={openOnly ? "bg-emerald-500 border-emerald-500 text-white" : undefined}
+        className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300 ${
+          openOnly
+            ? "bg-emerald-500 border-emerald-500 text-white shadow-[0_8px_20px_-6px_rgba(16,185,129,0.6)] ring-1 ring-emerald-400/50"
+            : "bg-card/90 border-border text-foreground hover:bg-muted hover:border-emerald-500/40 hover:text-emerald-500"
+        }`}
       >
         {openOnly && <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />}
         Aberto agora
-      </AeroPlate>
+      </motion.button>
     </div>
   );
 }
@@ -1107,13 +1124,7 @@ function MarketplaceHome() {
       {/* ── Lojas próximas com filtros ── */}
       <AeroSection
         title="Lojas próximas"
-       
         subtitle="Selecionadas para você"
-        action={
-          <span className="flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/25">
-            <SlidersHorizontal className="w-3.5 h-3.5" /> {filtered.length} lojas
-          </span>
-        }
       >
         <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
 
