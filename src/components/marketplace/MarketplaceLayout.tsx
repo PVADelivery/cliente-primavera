@@ -269,7 +269,7 @@ export function MarketplaceLayout() {
                       }`}
                     />
                     {t.to === "/marketplace/cart" && count > 0 && (
-                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm">
+                      <span className="absolute -top-1.5 -right-2.5 min-w-[18px] h-4 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center shadow-md">
                         {count}
                       </span>
                     )}
