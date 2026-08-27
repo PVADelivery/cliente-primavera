@@ -937,7 +937,7 @@ function MarketplaceHome() {
             >
               {firstName}
             </span>
-            <span className="text-primary">.</span>
+            <span className="text-[#f9a03f]">.</span>
           </h1>
 
           <p className="text-[13px] sm:text-[14px] text-white/75 font-medium max-w-md leading-snug">
