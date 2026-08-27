@@ -535,3 +535,15 @@ iframe[src*="lovable"],
 @utility checker-fade-l {
   mask-image: linear-gradient(270deg, #000, transparent);
 }
+
+/* Bandeira quadriculada fina (detalhe discreto nos cards) */
+@utility checker-mini {
+  background-image:
+    conic-gradient(from 90deg at 50% 50%, currentColor 25%, transparent 0 50%, currentColor 0 75%, transparent 0);
+  background-size: 5px 5px;
+}
+
+/* Esmaecimento nas duas pontas */
+@utility checker-fade-x {
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+}
