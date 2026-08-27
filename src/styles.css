@@ -134,7 +134,14 @@
   --sidebar-accent-foreground:  oklch(0.15 0 0);
   --sidebar-border:             oklch(0 0 0 / 8%);
   --sidebar-ring:               oklch(0.78 0.151 64);
+
+  /* Amarelo suave unificado (verificado WCAG sobre branco) */
+  --gold-soft:    #D9B45B; /* decorativo: halos, bordas, brilhos */
+  --gold:         #8F6E14; /* ícones e detalhes — 4.76:1 no branco */
+  --gold-ink:     #7A5E10; /* textos — 6.11:1 no branco */
+  --gold-surface: #FFFFFF; /* fundo dos botões/placas */
 }
+
 
 .dark {
   /* ── 60% Fundo ── preto mais próximo do cinza */
