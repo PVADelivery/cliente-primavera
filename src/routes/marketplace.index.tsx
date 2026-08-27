@@ -626,7 +626,7 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-primary border border-black/10 group-hover:border-black/20 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(217,180,91,0.45)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(249,160,63,0.45)]" : ""}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
@@ -636,9 +636,9 @@ function MarketplaceHome() {
                   <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
                   <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-primary-foreground skew-x-[6deg] relative z-10" strokeWidth={1.75} />
+                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10" strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-primary font-bold" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight text-primary`}>{c.label}</span>
 
               </motion.button>
             );
