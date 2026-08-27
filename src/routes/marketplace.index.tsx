@@ -614,7 +614,7 @@ function MarketplaceHome() {
         {/* Bandeira quadriculada correndo na base do hero */}
         <span
           aria-hidden
-          className="checker-run checker-fade-r absolute left-4 right-4 bottom-0 h-[10px] rounded-b-[6px] text-white/35 pointer-events-none"
+          className="checker-run checker-fade-x absolute left-6 right-6 bottom-1.5 h-[6px] rounded-full text-white/30 pointer-events-none"
         />
       </section>
 
