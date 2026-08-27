@@ -151,6 +151,17 @@
   --gold:         #8F6E14; /* ícones e detalhes — 4.76:1 no branco */
   --gold-ink:     #7A5E10; /* textos — 6.11:1 no branco */
   --gold-surface: #FFFFFF; /* fundo dos botões/placas */
+
+  /* ── Botões e chips (padrão pills) ── */
+  --btn-surface:       #FFFFFF;
+  --btn-surface-hover: #FFFFFF;
+  --btn-ink:           #4B5563; /* 7.0:1 no branco */
+  --btn-ink-soft:      #6B7280; /* 4.8:1 no branco */
+  --btn-line:          rgba(0, 0, 0, 0.10);
+  --btn-active:        var(--primary);
+  --btn-active-ink:    var(--primary-foreground); /* ~15:1 no amarelo */
+  --btn-disabled:      #F4F4F5;
+  --btn-disabled-ink:  #71717A;
 }
 
 
@@ -190,6 +201,17 @@
   --gold:         #8F6E14;
   --gold-ink:     #7A5E10;
   --gold-surface: #FFFFFF;
+
+  /* Botões seguem brancos no dark, com tinta cinza legível */
+  --btn-surface:       #FFFFFF;
+  --btn-surface-hover: #FFFFFF;
+  --btn-ink:           #3F3F46;
+  --btn-ink-soft:      #52525B;
+  --btn-line:          rgba(0, 0, 0, 0.12);
+  --btn-active:        var(--primary);
+  --btn-active-ink:    var(--primary-foreground);
+  --btn-disabled:      #E7E5E4;
+  --btn-disabled-ink:  #57534E;
 }
 
 
