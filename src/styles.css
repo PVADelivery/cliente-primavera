@@ -265,7 +265,7 @@ iframe[src*="lovable"],
 }
 
 @utility fire-glow {
-  background: radial-gradient(circle, rgba(249,160,63,0.55) 0%, rgba(239,68,68,0.45) 40%, rgba(220,38,38,0.18) 75%, transparent 100%);
+  background: radial-gradient(circle, rgba(255,222,33,0.55) 0%, rgba(239,68,68,0.45) 40%, rgba(220,38,38,0.18) 75%, transparent 100%);
   animation: fire-pulse-kf 3s ease-in-out infinite;
 }
 
