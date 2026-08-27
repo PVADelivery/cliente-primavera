@@ -262,7 +262,7 @@ function Addresses() {
             <motion.div key="list" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <Button 
                 onClick={openNew} 
-                className="w-full h-14 rounded-2xl bg-card/70 hover:bg-white/10 border border-primary/30 text-primary font-bold shadow-[0_0_15px_rgba(249,160,63,0.1)] transition-all"
+                className="w-full h-14 rounded-2xl bg-card/70 hover:bg-white/10 border border-primary/30 text-primary font-bold shadow-[0_0_15px_rgba(255,222,33,0.1)] transition-all"
               >
                 <Plus className="h-5 w-5 mr-2" /> 
                 Cadastrar Novo Endereço
@@ -301,7 +301,7 @@ function Addresses() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          className={cn("relative bg-card/70 backdrop-blur-md border rounded-2xl p-4 transition-all overflow-hidden", selectedAddressId === addr.id ? "border-primary shadow-[0_0_20px_rgba(249,160,63,0.15)]" : "border-border")}
+                          className={cn("relative bg-card/70 backdrop-blur-md border rounded-2xl p-4 transition-all overflow-hidden", selectedAddressId === addr.id ? "border-primary shadow-[0_0_20px_rgba(255,222,33,0.15)]" : "border-border")}
                         >
                           {selectedAddressId === addr.id && <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />}
                           
@@ -363,7 +363,7 @@ function Addresses() {
                           className={cn(
                             "px-4 py-2.5 flex items-center gap-2 text-sm font-bold rounded-xl border transition-all duration-200 active:scale-95",
                             active 
-                              ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(249,160,63,0.2)]" 
+                              ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,222,33,0.2)]" 
                               : "bg-card/70 border-border hover:border-white/20 text-foreground"
                           )}
                         >
@@ -463,7 +463,7 @@ function Addresses() {
               <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-background/95 backdrop-blur-xl border-t border-border z-50">
                 <div className="max-w-2xl mx-auto flex gap-3">
                   <Button variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl h-14 flex-1 text-muted-foreground hover:text-foreground bg-card/70 hover:bg-white/10">Cancelar</Button>
-                  <Button onClick={handleSave} className="rounded-xl h-14 flex-1 font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(249,160,63,0.2)]">
+                  <Button onClick={handleSave} className="rounded-xl h-14 flex-1 font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(255,222,33,0.2)]">
                     {editing ? 'Atualizar Endereço' : 'Salvar Endereço'}
                   </Button>
                 </div>

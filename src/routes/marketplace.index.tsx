@@ -534,7 +534,7 @@ function MarketplaceHome() {
         className="group rounded-[22px] p-4 sm:p-6 text-white relative z-20"
         style={{
           boxShadow:
-            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
+            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,222,33,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
         {/* Camada de fundo recortada para conter os efeitos visuais sem cortar o dropdown de busca */}
@@ -551,7 +551,7 @@ function MarketplaceHome() {
             className="absolute -top-32 -right-20 w-[320px] h-[320px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
+                "radial-gradient(circle, rgba(255,232,90,0.95) 0%, rgba(255,222,33,0.55) 25%, rgba(255,200,20,0.15) 55%, rgba(0,0,0,0) 75%)",
               filter: "blur(28px)",
             }}
           />
@@ -561,7 +561,7 @@ function MarketplaceHome() {
             className="absolute -top-14 -right-4 w-32 h-32 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
+                "radial-gradient(circle, rgba(255,240,170,1) 0%, rgba(255,222,33,0.7) 40%, rgba(255,222,33,0) 70%)",
               filter: "blur(6px)",
             }}
           />
@@ -626,7 +626,7 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(249,160,63,0.45)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(255,222,33,0.45)]" : ""}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}

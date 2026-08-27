@@ -82,10 +82,10 @@ export function AeroTile({
         <span
           aria-hidden
           className="absolute -top-8 -right-8 w-28 h-28 rotate-45 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ background: "linear-gradient(180deg, rgba(249,160,63,0.35), transparent)" }}
+          style={{ background: "linear-gradient(180deg, rgba(255,222,33,0.35), transparent)" }}
         />
         <div className="relative z-10 flex flex-col h-full">
-          <span className="w-11 h-11 mb-3 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/40 shadow-[inset_0_0_14px_rgba(249,160,63,0.22)] transition-transform duration-300 group-hover:scale-105">
+          <span className="w-11 h-11 mb-3 rounded-full grid place-items-center bg-black/60 ring-1 ring-primary/40 shadow-[inset_0_0_14px_rgba(255,222,33,0.22)] transition-transform duration-300 group-hover:scale-105">
             <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
           </span>
           <p className="font-display font-black italic text-base leading-tight tracking-tight">{title}</p>
@@ -111,7 +111,7 @@ export function AeroPlate({
       className={cx(
         "tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300",
         active
-          ? "bg-primary text-primary-foreground border-primary shadow-[0_10px_28px_-12px_rgba(249,160,63,0.8)]"
+          ? "bg-primary text-primary-foreground border-primary shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
           : "bg-card/70 border-border text-muted-foreground hover:text-foreground hover:border-primary/45",
         className,
       )}
@@ -137,7 +137,7 @@ export function AeroButton({
 }) {
   const styles: Record<string, string> = {
     primary:
-      "bg-primary text-primary-foreground hover:brightness-110 shadow-[0_14px_34px_-16px_rgba(249,160,63,0.9)]",
+      "bg-primary text-primary-foreground hover:brightness-110 shadow-[0_14px_34px_-16px_rgba(255,222,33,0.9)]",
     ghost: "bg-card/70 text-foreground border border-border hover:border-primary/50",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
   };
@@ -267,7 +267,7 @@ export function AeroHero({
       style={{
         background: "radial-gradient(120% 100% at 100% 0%, #1a1408 0%, #0a0803 40%, #000000 75%)",
         boxShadow:
-          "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
+          "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,222,33,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
       }}
     >
       <span
@@ -275,7 +275,7 @@ export function AeroHero({
         className="absolute -top-40 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none opacity-95"
         style={{
           background:
-            "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
+            "radial-gradient(circle, rgba(255,232,90,0.95) 0%, rgba(255,222,33,0.55) 25%, rgba(255,200,20,0.15) 55%, rgba(0,0,0,0) 75%)",
           filter: "blur(28px)",
         }}
       />
