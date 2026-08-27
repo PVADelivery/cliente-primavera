@@ -87,11 +87,12 @@ function AeroPanel({
       {/* Halo amarelo difuso atrás do botão */}
       <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
-      {/* Detalhe de bandeira quadriculada */}
+      {/* Detalhe de bandeira quadriculada (discreto, canto superior direito) */}
       <span
         aria-hidden
-        className={`checker-flag checker-fade-l absolute top-0 right-0 w-20 h-[10px] rounded-tr-3xl pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/70 opacity-80" : "text-btn-ink/25 opacity-70 group-hover:opacity-100"}`}
+        className={`checker-mini checker-fade-l absolute top-2.5 right-3 w-10 h-[6px] rounded-full pointer-events-none transition-opacity duration-300 ${active ? "text-btn-active-ink/60 opacity-90" : "text-primary/45 opacity-80 group-hover:opacity-100"}`}
       />
+
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
         <div className={`w-11 h-11 rounded-full grid place-items-center ring-1 mb-4 transition-colors ${active ? "bg-black/15 ring-black/25" : "bg-black/[0.04] ring-black/10 group-active:bg-black/15 group-active:ring-black/25"}`}>
