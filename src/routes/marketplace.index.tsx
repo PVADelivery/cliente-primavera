@@ -1,11 +1,11 @@
-import { createFileRoute, Link, useMatchRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
   SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car,
-  Users, Building2
+  Users, Building2, BookUser, ClipboardList, User, Store, ArrowRight, Sparkles, Bike
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -144,14 +144,121 @@ function SkeletonCarouselItem() {
   );
 }
 
+// ─── Funções e Serviços do App para Busca Universal ─────────────────────────
+interface AppFeature {
+  title: string;
+  subtitle: string;
+  to: string;
+  icon: any;
+  badge: string;
+  badgeBg: string;
+  keywords: string[];
+}
+
+const APP_FEATURES: AppFeature[] = [
+  {
+    title: "Táxi & Moto Táxi",
+    subtitle: "Solicitar corrida de carro ou moto táxi em Primavera",
+    to: "/marketplace/taxi",
+    icon: Car,
+    badge: "Corrida",
+    badgeBg: "bg-primary/20 text-primary border border-primary/30",
+    keywords: ["taxi", "táxi", "carro", "moto taxi", "mototaxi", "moto", "corrida", "uber", "viagem", "motorista", "passageiro", "transporte"],
+  },
+  {
+    title: "Solicitar Entrega (Motoboy)",
+    subtitle: "Entregas express, fretes rápidos e busca de encomendas",
+    to: "/marketplace/errands",
+    icon: Zap,
+    badge: "Express",
+    badgeBg: "bg-amber-500/20 text-amber-400 border border-amber-500/30",
+    keywords: ["entrega", "solicitar entrega", "motoboy", "frete", "buscar chave", "encomenda", "pacote", "transporte", "delivery moto", "carro aberto", "entregador"],
+  },
+  {
+    title: "PPP - Prestadores de Serviços",
+    subtitle: "Guia comercial, profissionais e contatos locais da cidade",
+    to: "/marketplace/directory",
+    icon: BookUser,
+    badge: "Agenda",
+    badgeBg: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+    keywords: ["ppp", "prestador", "prestadores", "serviço", "serviços", "servico", "guia", "diarista", "pedreiro", "eletricista", "encanador", "mecanico", "agenda", "telefones", "empresas", "comercio"],
+  },
+  {
+    title: "Espaço Social (Classificados)",
+    subtitle: "Classificados da cidade, vagas de emprego e comunidade",
+    to: "/marketplace/social",
+    icon: Users,
+    badge: "Classificados",
+    badgeBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+    keywords: ["social", "espaço social", "espaco social", "classificados", "vagas", "empregos", "trabalho", "doações", "doacoes", "comunidade", "anúncios", "anuncios", "achados e perdidos"],
+  },
+  {
+    title: "Central de Negócios (Imóveis)",
+    subtitle: "Casas, apartamentos e terrenos para aluguel e venda",
+    to: "/marketplace/business",
+    icon: Building2,
+    badge: "Imóveis",
+    badgeBg: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+    keywords: ["negócios", "negocios", "imóveis", "imoveis", "aluguel", "alugar", "casa", "apartamento", "kitnet", "comprar casa", "terreno", "imobiliária", "imobiliaria", "corretor"],
+  },
+  {
+    title: "Veículos à Venda",
+    subtitle: "Carros, motos e utilitários anunciados na cidade",
+    to: "/marketplace/business/vehicles",
+    icon: Car,
+    badge: "Veículos",
+    badgeBg: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+    keywords: ["veículos", "veiculos", "carros", "motos", "comprar carro", "comprar moto", "seminovos", "automotivo", "utilitários", "venda de carro"],
+  },
+  {
+    title: "Meus Pedidos",
+    subtitle: "Acompanhar status das compras e histórico de pedidos",
+    to: "/marketplace/orders",
+    icon: ClipboardList,
+    badge: "Pedidos",
+    badgeBg: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+    keywords: ["pedidos", "meu pedido", "meus pedidos", "histórico de pedidos", "compras", "pedidos em andamento"],
+  },
+  {
+    title: "Minhas Corridas",
+    subtitle: "Acompanhar motorista em tempo real ou histórico",
+    to: "/marketplace/rides",
+    icon: Car,
+    badge: "Corridas",
+    badgeBg: "bg-orange-500/20 text-orange-400 border border-orange-500/30",
+    keywords: ["minhas corridas", "minha corrida", "corridas ativas", "acompanhar taxi", "motorista a caminho", "historico de taxi"],
+  },
+  {
+    title: "Meu Carrinho",
+    subtitle: "Conferir sacola de itens e finalizar pedido",
+    to: "/marketplace/cart",
+    icon: ShoppingBag,
+    badge: "Sacola",
+    badgeBg: "bg-green-500/20 text-green-400 border border-green-500/30",
+    keywords: ["carrinho", "meu carrinho", "sacola", "itens", "checkout", "finalizar"],
+  },
+  {
+    title: "Meu Perfil & Endereços",
+    subtitle: "Minha conta, dados de entrega e configurações",
+    to: "/marketplace/profile",
+    icon: User,
+    badge: "Conta",
+    badgeBg: "bg-zinc-500/20 text-zinc-400 border border-zinc-500/30",
+    keywords: ["perfil", "meu perfil", "minha conta", "endereço", "enderecos", "dados", "configurações"],
+  },
+];
+
 // ─── Smart Search Bar ─────────────────────────────────────────────────────────
 function SmartSearchBar({
   searchTerm,
   setSearchTerm,
+  stores = [],
 }: {
   searchTerm: string;
   setSearchTerm: (v: string) => void;
+  stores?: Company[];
 }) {
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const recents = loadRecents();
@@ -167,11 +274,76 @@ function SmartSearchBar({
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  const q = searchTerm.trim().toLowerCase();
+
+  // 1. Filtragem das Funções do App
+  const matchingFeatures = useMemo(() => {
+    if (!q) return [];
+    return APP_FEATURES.filter(
+      (f) =>
+        f.title.toLowerCase().includes(q) ||
+        f.subtitle.toLowerCase().includes(q) ||
+        f.keywords.some((k) => k.includes(q))
+    );
+  }, [q]);
+
+  // 2. Filtragem de Lojas Cadastradas
+  const matchingStores = useMemo(() => {
+    if (!q) return [];
+    return stores
+      .filter(
+        (s) =>
+          s.name?.toLowerCase().includes(q) ||
+          s.category?.toLowerCase().includes(q) ||
+          s.description?.toLowerCase().includes(q)
+      )
+      .slice(0, 4);
+  }, [q, stores]);
+
+  // 3. Filtragem de Categorias
+  const matchingCategories = useMemo(() => {
+    if (!q) return [];
+    return CATEGORIES.filter((c) => c.label.toLowerCase().includes(q));
+  }, [q]);
+
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     if (term.trim()) pushRecent(term.trim());
     setFocused(false);
     inputRef.current?.blur();
+  };
+
+  const handleSelectFeature = (feat: AppFeature) => {
+    if (feat.title) pushRecent(feat.title);
+    setFocused(false);
+    inputRef.current?.blur();
+    navigate({ to: feat.to as any });
+  };
+
+  const handleSelectStore = (store: Company) => {
+    if (store.name) pushRecent(store.name);
+    setFocused(false);
+    inputRef.current?.blur();
+    navigate({ to: `/marketplace/store/${store.id}` as any });
+  };
+
+  const handleEnterKey = () => {
+    if (!q) return;
+
+    // Se bater exatamente ou prioritariamente com uma função do app, redireciona direto
+    if (matchingFeatures.length > 0) {
+      handleSelectFeature(matchingFeatures[0]);
+      return;
+    }
+
+    // Se bater diretamente com uma loja exclusiva, vai para ela
+    if (matchingStores.length === 1 && matchingStores[0].name?.toLowerCase() === q) {
+      handleSelectStore(matchingStores[0]);
+      return;
+    }
+
+    // Caso contrário, filtra a lista da home
+    handleSearch(searchTerm);
   };
 
   return (
@@ -191,12 +363,12 @@ function SmartSearchBar({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar lojas, pratos (ex: x tudo, pizza, açaí)…"
+            placeholder="Buscar lojas, pratos, táxi, entregas, serviços…"
             className="flex-1 bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/50 min-w-0"
             onFocus={() => setFocused(true)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleSearch(searchTerm);
+                handleEnterKey();
               }
             }}
           />
@@ -223,9 +395,100 @@ function SmartSearchBar({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-border rounded-2xl overflow-hidden z-50 shadow-2xl"
+              className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 text-white border border-border/80 rounded-2xl overflow-hidden z-50 shadow-2xl max-h-[80vh] overflow-y-auto"
             >
-              {recents.length > 0 && (
+              {/* ── SEÇÃO 1: RESULTADOS DE FUNÇÕES & SERVIÇOS DO APP ── */}
+              {matchingFeatures.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between px-4 pt-3 pb-1.5 border-b border-white/5 bg-white/[0.02]">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Serviços & Funções do App</span>
+                    </div>
+                    <span className="text-[10px] text-white/40 font-semibold">Direcionamento rápido</span>
+                  </div>
+                  <div className="p-1 space-y-0.5">
+                    {matchingFeatures.map((feat) => {
+                      const IconComp = feat.icon;
+                      return (
+                        <motion.button
+                          key={feat.to}
+                          type="button"
+                          className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl hover:bg-card/90 transition-all text-left group"
+                          onClick={() => handleSelectFeature(feat)}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center shrink-0 text-primary group-hover:border-primary/40 group-hover:scale-105 transition-all">
+                              <IconComp className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                                {feat.title}
+                                <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md ${feat.badgeBg}`}>
+                                  {feat.badge}
+                                </span>
+                              </p>
+                              <p className="text-[11px] text-muted-foreground truncate">{feat.subtitle}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                  <div className="h-px bg-white/10 mx-4 my-1" />
+                </div>
+              )}
+
+              {/* ── SEÇÃO 2: LOJAS & ESTABELECIMENTOS ── */}
+              {matchingStores.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 px-4 pt-2.5 pb-1.5">
+                    <Store className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Lojas & Restaurantes</span>
+                  </div>
+                  <div className="p-1 space-y-0.5">
+                    {matchingStores.map((s) => (
+                      <motion.button
+                        key={s.id}
+                        type="button"
+                        className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl hover:bg-card/90 transition-all text-left group"
+                        onClick={() => handleSelectStore(s)}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-xl bg-black/60 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                            {s.logo_url ? (
+                              <img src={s.logo_url} alt={s.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Store className="w-4 h-4 text-white/40" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                              {s.name}
+                            </p>
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <span>{s.category || "Geral"}</span>
+                              {s.rating && (
+                                <span className="flex items-center gap-0.5 text-amber-400 font-bold">
+                                  <Star className="w-3 h-3 fill-amber-400" /> {s.rating.toFixed(1)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                          Ver Loja →
+                        </span>
+                      </motion.button>
+                    ))}
+                  </div>
+                  <div className="h-px bg-white/10 mx-4 my-1" />
+                </div>
+              )}
+
+              {/* ── SEÇÃO 3: BUSCAS RECENTES (Se houver) ── */}
+              {!q && recents.length > 0 && (
                 <>
                   <div className="flex items-center gap-2 px-4 pt-3 pb-1.5">
                     <History className="w-3.5 h-3.5 text-white/50" />
@@ -236,7 +499,7 @@ function SmartSearchBar({
                       key={r}
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04 }}
+                      transition={{ delay: i * 0.03 }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
                       onClick={() => handleSearch(r)}
                     >
@@ -247,21 +510,87 @@ function SmartSearchBar({
                   <div className="h-px bg-white/10 mx-4 my-1" />
                 </>
               )}
+
+              {/* ── SEÇÃO 4: ATALHOS RÁPIDOS QUANDO VAZIO ── */}
+              {!q && (
+                <div className="p-3">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/50 px-1 mb-2 block">
+                    Serviços Populares
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectFeature(APP_FEATURES[0])}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card/60 hover:bg-card border border-white/5 hover:border-primary/40 transition-all text-left"
+                    >
+                      <Car className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-foreground leading-tight">Táxi & Moto</p>
+                        <p className="text-[10px] text-muted-foreground">Corridas</p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectFeature(APP_FEATURES[1])}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card/60 hover:bg-card border border-white/5 hover:border-primary/40 transition-all text-left"
+                    >
+                      <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-foreground leading-tight">Solicitar Entrega</p>
+                        <p className="text-[10px] text-muted-foreground">Motoboy</p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectFeature(APP_FEATURES[2])}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card/60 hover:bg-card border border-white/5 hover:border-primary/40 transition-all text-left"
+                    >
+                      <BookUser className="w-4 h-4 text-blue-400 shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-foreground leading-tight">PPP Serviços</p>
+                        <p className="text-[10px] text-muted-foreground">Profissionais</p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectFeature(APP_FEATURES[4])}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card/60 hover:bg-card border border-white/5 hover:border-primary/40 transition-all text-left"
+                    >
+                      <Building2 className="w-4 h-4 text-purple-400 shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-foreground leading-tight">Imóveis & Venda</p>
+                        <p className="text-[10px] text-muted-foreground">Negócios</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── SEÇÃO 5: CATEGORIAS & PRATOS POPULARES ── */}
               <div className="flex items-center gap-2 px-4 pt-2 pb-1.5">
                 <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Populares</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">
+                  {q ? "Buscar por Prato / Categoria" : "Pratos Populares"}
+                </span>
               </div>
-              {["X tudo", "Pizza", "Hambúrguer", "Açaí", "Lanches", "Mercado", "Farmácia"].map((s, i) => (
+              {(q ? matchingCategories.map((c) => c.label) : ["X tudo", "Pizza", "Hambúrguer", "Açaí", "Lanches", "Mercado", "Farmácia", "Bebidas"]).map((s, i) => (
                 <motion.button
                   key={s}
+                  type="button"
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.04 }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left"
+                  transition={{ delay: 0.05 + i * 0.03 }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium hover:bg-card/70 transition-colors text-left group"
                   onClick={() => handleSearch(s)}
                 >
-                  <TrendingUp className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                  {s}
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="w-3.5 h-3.5 text-white/40 shrink-0 group-hover:text-primary transition-colors" />
+                    <span className="group-hover:text-primary transition-colors">{s}</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Filtrar</span>
                 </motion.button>
               ))}
               <div className="h-3" />
@@ -615,7 +944,7 @@ function MarketplaceHome() {
             O que você quer pedir hoje na sua cidade?
           </p>
 
-          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} stores={allStores} />
         </motion.div>
       </section>
 
