@@ -655,9 +655,9 @@ function MarketplaceHome() {
                   <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
                   <span
                     aria-hidden
-                    className={`checker-flag absolute inset-x-0 bottom-0 h-[6px] pointer-events-none transition-colors ${isActive ? "text-btn-active-ink/70" : "text-btn-ink/20"}`}
-                    style={{ backgroundSize: "6px 6px" }}
+                    className={`checker-mini checker-fade-x absolute inset-x-3 bottom-1.5 h-[5px] rounded-full pointer-events-none transition-colors ${isActive ? "text-btn-active-ink/60" : "text-primary/40"}`}
                   />
+
                   <span aria-hidden className="spec-sheen" />
                   <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                 </div>
