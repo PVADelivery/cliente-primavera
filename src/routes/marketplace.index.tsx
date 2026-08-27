@@ -663,7 +663,7 @@ function MarketplaceHome() {
                   <span aria-hidden className="spec-sheen" />
                   <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight transition-colors ${isActive ? "text-primary" : "text-btn-ink"}`}>{c.label}</span>
+                <span className={`text-[12px] font-bold text-center leading-tight transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
 
               </motion.button>
             );
