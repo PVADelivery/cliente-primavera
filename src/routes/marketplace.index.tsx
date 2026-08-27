@@ -73,21 +73,22 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative block group clearcoat border border-[#C9A227]/25 hover:border-[#C9A227]/55 transition-colors bg-white"
+      className="p-5 rounded-3xl relative block group clearcoat border border-gold-soft/40 hover:border-gold/60 active:border-gold/70 transition-colors bg-gold-surface hover:bg-gold-surface active:bg-gold-surface"
       style={{
         boxShadow: "0 24px 40px -24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
     >
       {/* Nuvem dourada difusa atrás do botão */}
-      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-[#C9A227]/15 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-gold-soft/25 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-[#C9A227]/10 ring-1 ring-[#C9A227]/45 mb-4">
-          <Icon className="w-5 h-5 text-[#C9A227]" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-gold-soft/15 ring-1 ring-gold-soft/60 mb-4">
+          <Icon className="w-5 h-5 text-gold" strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-[#A8821C]">{title}</p>
-        <p className="text-xs text-[#9A7B1A] mt-1.5 font-medium">{subtitle}</p>
+        <p className="font-display font-bold italic text-base leading-tight text-gold-ink">{title}</p>
+        <p className="text-xs text-gold-ink/90 mt-1.5 font-medium">{subtitle}</p>
+
       </div>
     </Link>
   );
