@@ -73,21 +73,21 @@ function AeroPanel({
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative block group clearcoat border border-gold-soft/40 hover:border-gold/60 active:border-gold/70 transition-colors bg-gold-surface hover:bg-gold-surface active:bg-gold-surface"
+      className="p-5 rounded-3xl relative block group clearcoat border border-black/10 hover:border-black/20 active:border-black/30 transition-colors bg-primary hover:bg-primary active:bg-primary"
       style={{
-        boxShadow: "0 24px 40px -24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
+        boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
       }}
     >
-      {/* Nuvem dourada difusa atrás do botão */}
-      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-gold-soft/25 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
-      <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-3xl pointer-events-none" />
+      {/* Halo amarelo difuso atrás do botão */}
+      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+      <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-gold-soft/15 ring-1 ring-gold-soft/60 mb-4">
-          <Icon className="w-5 h-5 text-gold" strokeWidth={1.75} />
+        <div className="w-11 h-11 rounded-full grid place-items-center bg-black/15 ring-1 ring-black/25 mb-4">
+          <Icon className="w-5 h-5 text-primary-foreground" strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-gold-ink">{title}</p>
-        <p className="text-xs text-gold-ink/90 mt-1.5 font-medium">{subtitle}</p>
+        <p className="font-display font-bold italic text-base leading-tight text-primary-foreground">{title}</p>
+        <p className="text-xs text-primary-foreground/80 mt-1.5 font-medium">{subtitle}</p>
 
       </div>
     </Link>
@@ -626,19 +626,19 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-gold-surface border border-gold-soft/40 group-hover:border-gold/60 ${isActive ? "ring-2 ring-gold/60 shadow-[0_0_20px_rgba(217,180,91,0.35)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-primary border border-black/10 group-hover:border-black/20 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(217,180,91,0.45)]" : ""}`}
                   style={{
-                    boxShadow: "0 14px 26px -14px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
+                    boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
                 >
-                  {/* Nuvem dourada difusa atrás da placa */}
-                  <span aria-hidden className="absolute -inset-3 rounded-full bg-gold-soft/25 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
-                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-2xl" />
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-gold-soft/15 to-transparent rounded-2xl" />
+                  {/* Halo amarelo difuso atrás da placa */}
+                  <span aria-hidden className="absolute -inset-3 rounded-full bg-primary-glow/40 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-gold skew-x-[6deg] relative z-10" strokeWidth={1.75} />
+                  <Icon className="w-6 h-6 text-primary-foreground skew-x-[6deg] relative z-10" strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-gold-ink font-bold" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-primary font-bold" : "text-foreground"}`}>{c.label}</span>
 
               </motion.button>
             );
