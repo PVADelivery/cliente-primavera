@@ -74,7 +74,15 @@ function AeroPanel({
     <Link
       to={to}
       className="p-5 rounded-3xl relative block group clearcoat border border-black/10 hover:border-primary/40 active:border-primary transition-colors bg-white hover:bg-white active:bg-primary active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
-...
+      style={{
+        boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
+      }}
+    >
+      {/* Halo amarelo difuso atrás do botão */}
+      <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+      <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
+      <span aria-hidden className="spec-sheen" />
+      <div className="relative z-10">
         <div className="w-11 h-11 rounded-full grid place-items-center bg-black/[0.04] ring-1 ring-black/10 mb-4 group-active:bg-black/15 group-active:ring-black/25 transition-colors">
           <Icon className="w-5 h-5 text-neutral-500 group-active:text-primary-foreground transition-colors" strokeWidth={1.75} />
         </div>
