@@ -609,6 +609,12 @@ function MarketplaceHome() {
 
           <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </motion.div>
+
+        {/* Bandeira quadriculada correndo na base do hero */}
+        <span
+          aria-hidden
+          className="checker-run checker-fade-r absolute left-4 right-4 bottom-0 h-[10px] rounded-b-[6px] text-white/35 pointer-events-none"
+        />
       </section>
 
       {/* ── Categories ── */}
