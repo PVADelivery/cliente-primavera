@@ -658,25 +658,24 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/15 hover:border-black/30 transition-colors"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-[#C9A227]/25 hover:border-[#C9A227]/55 transition-colors bg-white"
           style={{
-            background: "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
-            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
+            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.6)",
           }}
         >
-          {/* Nuvem branca difusa atrás do botão */}
-          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-white/55 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
-          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-3xl" />
+          {/* Nuvem dourada difusa atrás do botão */}
+          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-[#C9A227]/15 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.05] rounded-3xl" />
           <span aria-hidden className="spec-sheen" />
-          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-black/[0.06] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
+          <div aria-hidden className="absolute -right-4 top-1/2 -translate-y-1/2 text-[90px] text-[#C9A227]/[0.08] font-black italic tracking-tighter pointer-events-none transition-transform group-hover:scale-110">TAXI</div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-white ring-1 ring-black/10 shadow-sm grid place-items-center">
+                <div className="w-10 h-10 rounded-full bg-[#C9A227]/10 ring-1 ring-[#C9A227]/45 shadow-sm grid place-items-center">
                 <Car className="w-5 h-5 text-[#C9A227]" />
               </div>
               <h2 className="font-display font-bold italic text-2xl leading-tight text-black">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-black/70 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-[#C9A227]/85 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
