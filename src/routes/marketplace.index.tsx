@@ -333,7 +333,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
-              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFBE5A 0%, #3B82F6 100%)" }} />
+              <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFDE21 0%, #3B82F6 100%)" }} />
             )}
 
             {/* Gradient overlays */}
@@ -358,7 +358,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             <div className="absolute top-3.5 left-3.5 right-3.5 flex items-start justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">
                 {(s.rating ?? 5) >= 4.7 && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F9A03F]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FFDE21]/90 text-yellow-950 px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg">
                     Melhor avaliado
                   </span>
                 )}
@@ -387,7 +387,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
           {/* Footer */}
           <div className="px-4 py-3 flex items-center gap-2.5 text-xs border-t border-border/30">
             <span className="flex items-center gap-1.5 font-black text-[14px] text-foreground">
-              <Star className="w-4 h-4 fill-[#F9A03F] text-[#F9A03F]" />
+              <Star className="w-4 h-4 fill-[#FFDE21] text-[#FFDE21]" />
               {(s.rating ?? 5).toFixed(1)}
             </span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
@@ -534,7 +534,7 @@ function MarketplaceHome() {
         className="group rounded-[22px] p-4 sm:p-6 text-white relative z-20"
         style={{
           boxShadow:
-            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(249,160,63,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
+            "0 40px 80px -32px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,222,33,0.10), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
         {/* Camada de fundo recortada para conter os efeitos visuais sem cortar o dropdown de busca */}
@@ -551,7 +551,7 @@ function MarketplaceHome() {
             className="absolute -top-32 -right-20 w-[320px] h-[320px] rounded-full pointer-events-none transition-[filter,opacity] duration-700 ease-out group-hover:opacity-100 opacity-95 will-change-[filter]"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,190,90,0.95) 0%, rgba(249,160,63,0.55) 25%, rgba(230,140,40,0.15) 55%, rgba(0,0,0,0) 75%)",
+                "radial-gradient(circle, rgba(255,232,90,0.95) 0%, rgba(255,222,33,0.55) 25%, rgba(255,200,20,0.15) 55%, rgba(0,0,0,0) 75%)",
               filter: "blur(28px)",
             }}
           />
@@ -561,7 +561,7 @@ function MarketplaceHome() {
             className="absolute -top-14 -right-4 w-32 h-32 rounded-full pointer-events-none opacity-80 transition-opacity duration-500 group-hover:opacity-100"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,214,150,1) 0%, rgba(249,160,63,0.7) 40%, rgba(249,160,63,0) 70%)",
+                "radial-gradient(circle, rgba(255,240,170,1) 0%, rgba(255,222,33,0.7) 40%, rgba(255,222,33,0) 70%)",
               filter: "blur(6px)",
             }}
           />
@@ -626,7 +626,7 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(249,160,63,0.45)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] bg-white border border-black/10 group-hover:border-primary/40 ${isActive ? "ring-2 ring-primary-glow/70 shadow-[0_0_20px_rgba(255,222,33,0.45)]" : ""}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}

@@ -367,7 +367,7 @@ function Checkout() {
             Retirada
           </button>
           <div 
-            className={cn("absolute top-1 bottom-1 w-[calc(50%-4px)] bg-primary rounded-xl transition-transform duration-300 ease-out shadow-[0_0_15px_rgba(249,160,63,0.4)]", fulfillmentMode === 'pickup' ? "translate-x-full left-1" : "left-1")} 
+            className={cn("absolute top-1 bottom-1 w-[calc(50%-4px)] bg-primary rounded-xl transition-transform duration-300 ease-out shadow-[0_0_15px_rgba(255,222,33,0.4)]", fulfillmentMode === 'pickup' ? "translate-x-full left-1" : "left-1")} 
           />
         </div>
 
@@ -441,7 +441,7 @@ function Checkout() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setPaymentMethod('card')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'card' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(249,160,63,0.15)]" : "bg-card border-border hover:border-primary/40")}
+              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'card' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(255,222,33,0.15)]" : "bg-card border-border hover:border-primary/40")}
             >
               {paymentMethod === 'card' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
               <CreditCard className={cn("w-6 h-6", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
@@ -453,7 +453,7 @@ function Checkout() {
             
             <button
               onClick={() => setPaymentMethod('money')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'money' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(249,160,63,0.15)]" : "bg-card border-border hover:border-primary/40")}
+              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'money' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(255,222,33,0.15)]" : "bg-card border-border hover:border-primary/40")}
             >
               {paymentMethod === 'money' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
               <Banknote className={cn("w-6 h-6", paymentMethod === 'money' ? "text-primary" : "text-muted-foreground")} />
@@ -588,7 +588,7 @@ function Checkout() {
             </div>
 
             <Button 
-              className="w-full h-14 rounded-2xl text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_20px_rgba(249,160,63,0.3)] border border-primary/50 relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-14 rounded-2xl text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_20px_rgba(255,222,33,0.3)] border border-primary/50 relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
               onClick={handleSubmit}
               disabled={loading || (fulfillmentMode === 'delivery' && loadingFee)}
             >
