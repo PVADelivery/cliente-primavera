@@ -582,6 +582,12 @@ function MarketplaceHome() {
           <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.5] mix-blend-overlay pointer-events-none" />
           {/* Verniz — reflexo de lataria */}
           <div aria-hidden className="absolute inset-0 clearcoat pointer-events-none mix-blend-screen opacity-70" />
+
+          {/* Bandeira quadriculada correndo na base do hero (100% contida dentro da curvatura) */}
+          <span
+            aria-hidden
+            className="checker-run checker-fade-x absolute inset-x-8 bottom-2.5 h-[6px] rounded-full text-white/30 pointer-events-none"
+          />
         </div>
 
         {/* Conteúdo do Hero e Barra de Busca */}
@@ -611,12 +617,6 @@ function MarketplaceHome() {
 
           <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </motion.div>
-
-        {/* Bandeira quadriculada correndo na base do hero */}
-        <span
-          aria-hidden
-          className="checker-run checker-fade-x absolute left-6 right-6 bottom-1.5 h-[6px] rounded-full text-white/30 pointer-events-none"
-        />
       </section>
 
       {/* ── Categories ── */}
