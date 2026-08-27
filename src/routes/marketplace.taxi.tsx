@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { AeroPageHeader } from "@/components/aero";
+import { createPickupPinElement, createDropoffPinElement, createUserLocationElement, registerMapEmojis } from "@/lib/map-markers";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
@@ -258,15 +259,10 @@ function TaxiPage() {
     const m = mapSmall.current;
     if (!m) return;
 
-    // Marcador da Localização do Usuário (Ponto Verde Pulsante)
+    // Marcador da Localização do Usuário (Ponto Pulsante)
     if (userLocation) {
       if (!userMarkerSmall.current) {
-        const el = document.createElement("div");
-        el.className = "w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow flex items-center justify-center animate-pulse";
-        const inner = document.createElement("div");
-        inner.className = "w-1.5 h-1.5 bg-white rounded-full";
-        el.appendChild(inner);
-        userMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(userLocation).addTo(m);
+        userMarkerSmall.current = new MapLibre.Marker({ element: createUserLocationElement() }).setLngLat(userLocation).addTo(m);
       } else {
         userMarkerSmall.current.setLngLat(userLocation);
       }
@@ -275,12 +271,10 @@ function TaxiPage() {
       userMarkerSmall.current = null;
     }
 
+    // Marcador de Partida (PIN VERDE)
     if (pickupCoords) {
       if (!pickupMarkerSmall.current) {
-        const el = document.createElement("div");
-        el.className = "w-5 h-5 bg-primary rounded-full border-2 border-white shadow flex items-center justify-center text-white font-bold text-[9px]";
-        el.innerText = "A";
-        pickupMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(pickupCoords).addTo(m);
+        pickupMarkerSmall.current = new MapLibre.Marker({ element: createPickupPinElement(), anchor: "bottom" }).setLngLat(pickupCoords).addTo(m);
       } else {
         pickupMarkerSmall.current.setLngLat(pickupCoords);
       }
@@ -289,12 +283,10 @@ function TaxiPage() {
       pickupMarkerSmall.current = null;
     }
 
+    // Marcador de Destino (PIN VERMELHO)
     if (dropoffCoords) {
       if (!dropoffMarkerSmall.current) {
-        const el = document.createElement("div");
-        el.className = "w-5 h-5 bg-emerald-500 rounded-full border-2 border-white shadow flex items-center justify-center text-white font-bold text-[9px]";
-        el.innerText = "B";
-        dropoffMarkerSmall.current = new MapLibre.Marker({ element: el }).setLngLat(dropoffCoords).addTo(m);
+        dropoffMarkerSmall.current = new MapLibre.Marker({ element: createDropoffPinElement(), anchor: "bottom" }).setLngLat(dropoffCoords).addTo(m);
       } else {
         dropoffMarkerSmall.current.setLngLat(dropoffCoords);
       }
@@ -317,15 +309,10 @@ function TaxiPage() {
     const m = mapFull.current;
     if (!m || !isMapFullscreen) return;
 
-    // Marcador da Localização do Usuário (Ponto Verde Pulsante)
+    // Marcador da Localização do Usuário (Ponto Pulsante)
     if (userLocation) {
       if (!userMarkerFull.current) {
-        const el = document.createElement("div");
-        el.className = "w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center animate-pulse";
-        const inner = document.createElement("div");
-        inner.className = "w-1.5 h-1.5 bg-white rounded-full";
-        el.appendChild(inner);
-        userMarkerFull.current = new MapLibre.Marker({ element: el }).setLngLat(userLocation).addTo(m);
+        userMarkerFull.current = new MapLibre.Marker({ element: createUserLocationElement() }).setLngLat(userLocation).addTo(m);
       } else {
         userMarkerFull.current.setLngLat(userLocation);
       }
@@ -334,13 +321,10 @@ function TaxiPage() {
       userMarkerFull.current = null;
     }
 
-    // Marcador A (Partida)
+    // Marcador de Partida (PIN VERDE)
     if (pickupCoords) {
       if (!pickupMarkerFull.current) {
-        const el = document.createElement("div");
-        el.className = "w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
-        el.innerText = "A";
-        pickupMarkerFull.current = new MapLibre.Marker({ element: el })
+        pickupMarkerFull.current = new MapLibre.Marker({ element: createPickupPinElement(), anchor: "bottom" })
           .setLngLat(pickupCoords)
           .addTo(m);
       } else {
@@ -351,13 +335,10 @@ function TaxiPage() {
       pickupMarkerFull.current = null;
     }
 
-    // Marcador B (Destino)
+    // Marcador de Destino (PIN VERMELHO)
     if (dropoffCoords) {
       if (!dropoffMarkerFull.current) {
-        const el = document.createElement("div");
-        el.className = "w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs";
-        el.innerText = "B";
-        dropoffMarkerFull.current = new MapLibre.Marker({ element: el })
+        dropoffMarkerFull.current = new MapLibre.Marker({ element: createDropoffPinElement(), anchor: "bottom" })
           .setLngLat(dropoffCoords)
           .addTo(m);
       } else {

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { createPickupPinElement, createDropoffPinElement, createVehicleMarkerElement, registerMapEmojis } from "@/lib/map-markers";
 
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 import { AeroSkeletonList } from "@/components/aero";
@@ -319,89 +320,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             .catch(() => {});
         };
 
-        // Marcador no padrão visual do Google Maps: gota sólida, centro branco e sombra curta.
-        const createPinElement = (opts: { color: string; icon: string; pulse?: boolean }) => {
-          const el = document.createElement("div");
-          el.className = "relative flex h-[52px] w-[40px] items-start justify-center pointer-events-none";
-          el.innerHTML = `
-            <div class="absolute bottom-[1px] left-1/2 h-[5px] w-[17px] -translate-x-1/2 rounded-full bg-black/25 blur-[2px]"></div>
-            <div class="relative h-[48px] w-[38px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.32)] ${opts.pulse ? "animate-pulse" : ""}">
-              <svg width="38" height="48" viewBox="0 0 38 48" fill="none" class="absolute inset-0" aria-hidden="true">
-                <path d="M19 1C9.06 1 1 8.98 1 18.83c0 13.16 15.72 27.13 16.39 27.72a2.43 2.43 0 0 0 3.22 0C21.28 45.96 37 32 37 18.83 37 8.98 28.94 1 19 1Z" fill="${opts.color}"/>
-                <path d="M19 1.75c-9.52 0-17.25 7.65-17.25 17.08 0 12.61 15.28 26.24 16.14 26.99.63.55 1.59.55 2.22 0 .86-.75 16.14-14.38 16.14-26.99C36.25 9.4 28.52 1.75 19 1.75Z" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
-                <circle cx="19" cy="18.5" r="11.5" fill="#ffffff"/>
-              </svg>
-              <div class="absolute left-[7px] top-[6.5px] flex h-[24px] w-[24px] items-center justify-center" style="color:${opts.color}">
-                ${opts.icon}
-              </div>
-            </div>
-          `;
-          return el;
-        };
-
-        // Motocicleta lateral simplificada para continuar legível dentro do marcador.
-        const MOTO_ICON = `
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="5" cy="17" r="3"/>
-            <circle cx="19" cy="17" r="3"/>
-            <path d="M5 17h5l3-6h3l3 6"/>
-            <path d="m9 17-2.5-6H4"/>
-            <path d="M13 11 11 8h4"/>
-            <path d="m16 11 1.5-4H20"/>
-          </svg>`;
-
-        const CAR_ICON = `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 15v-2.2c0-.5.2-1 .5-1.4l2-2.6c.4-.5 1-.8 1.6-.8h8.6c.6 0 1.2.3 1.6.8l2 2.6c.3.4.5.9.5 1.4V15"/>
-            <path d="M3 15h18"/>
-            <circle cx="7.5" cy="16.4" r="2.1"/>
-            <circle cx="16.5" cy="16.4" r="2.1"/>
-          </svg>`;
-
-        const FLAG_ICON = `
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 21V4"/>
-            <path d="M5 4h12l-2.2 3.5L17 11H5"/>
-          </svg>`;
-
-        const DOT_ICON = `
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/>
-            <circle cx="12" cy="12" r="9"/>
-          </svg>`;
-
-        const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
-          if (MarkerClass) {
-            try {
-              if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
-              pickupMarkerRef.current = new MarkerClass({
-                element: createPinElement({ color: "#188038", icon: DOT_ICON }),
-                anchor: "bottom",
-              })
-                .setLngLat([pickupLongitude, pickupLatitude])
-                .addTo(m);
-            } catch (e) {}
-
-            if (dropoffLatitude && dropoffLongitude) {
-              try {
-                if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
-                dropoffMarkerRef.current = new MarkerClass({
-                  element: createPinElement({ color: "#d93025", icon: FLAG_ICON }),
-                  anchor: "bottom",
-                })
-                  .setLngLat([dropoffLongitude, dropoffLatitude])
-                  .addTo(m);
-              } catch (e) {}
-
-              drawRouteLine(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-            }
-            fitMapBounds(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-          }
-        };
+        registerMapEmojis(m);
 
         const cleanStreetOnly = (addr: string): string => {
           if (!addr) return "";
@@ -443,14 +362,36 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           return null;
         };
 
-        const createVehicleMarkerElement = (vehType: string) => {
-          const isTaxi = vehType === "taxi" || vehType === "carro" || vehType === "car";
-          return createPinElement({
-            color: "#1a73e8",
-            icon: isTaxi ? CAR_ICON : MOTO_ICON,
-          });
-        };
+        const renderRouteMarkers = (pickupLatitude: number, pickupLongitude: number, dropoffLatitude?: number, dropoffLongitude?: number) => {
+          if (MarkerClass) {
+            // Pin Verde para o Local de Partida (Origem / Embarque)
+            try {
+              if (pickupMarkerRef.current) pickupMarkerRef.current.remove();
+              pickupMarkerRef.current = new MarkerClass({
+                element: createPickupPinElement(),
+                anchor: "bottom",
+              })
+                .setLngLat([pickupLongitude, pickupLatitude])
+                .addTo(m);
+            } catch (e) {}
 
+            // Pin Vermelho para o Local de Destino (Desembarque)
+            if (dropoffLatitude && dropoffLongitude) {
+              try {
+                if (dropoffMarkerRef.current) dropoffMarkerRef.current.remove();
+                dropoffMarkerRef.current = new MarkerClass({
+                  element: createDropoffPinElement(),
+                  anchor: "bottom",
+                })
+                  .setLngLat([dropoffLongitude, dropoffLatitude])
+                  .addTo(m);
+              } catch (e) {}
+
+              drawRouteLine(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
+            }
+            fitMapBounds(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
+          }
+        };
 
         const updateDriverMarker = (lat: number, lng: number) => {
           if (!m || !lat || !lng || !MarkerClass) return;
