@@ -110,9 +110,10 @@ export function AeroPlate({
       aria-pressed={active}
       className={cx(
         "tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-bold border whitespace-nowrap transition-all duration-300",
+        "disabled:bg-btn-disabled disabled:text-btn-disabled-ink disabled:border-btn-line disabled:shadow-none disabled:cursor-not-allowed",
         active
-          ? "bg-primary text-primary-foreground border-primary shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
-          : "bg-card/70 border-border text-muted-foreground hover:text-foreground hover:border-primary/45",
+          ? "bg-btn-active text-btn-active-ink border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+          : "bg-btn-surface border-btn-line text-btn-ink hover:bg-btn-surface-hover hover:text-btn-ink hover:border-primary/45 active:bg-btn-active active:text-btn-active-ink active:border-btn-active",
         className,
       )}
       {...(rest as Record<string, unknown>)}
@@ -137,8 +138,9 @@ export function AeroButton({
 }) {
   const styles: Record<string, string> = {
     primary:
-      "bg-primary text-primary-foreground hover:brightness-110 shadow-[0_14px_34px_-16px_rgba(255,222,33,0.9)]",
-    ghost: "bg-card/70 text-foreground border border-border hover:border-primary/50",
+      "bg-btn-active text-btn-active-ink hover:brightness-105 active:brightness-100 shadow-[0_14px_34px_-16px_rgba(255,222,33,0.9)]",
+    ghost:
+      "bg-btn-surface text-btn-ink border border-btn-line hover:border-primary/45 active:bg-btn-active active:text-btn-active-ink active:border-btn-active",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
   };
   const disabled = loading || rest.disabled;
@@ -148,7 +150,7 @@ export function AeroButton({
       whileHover={disabled ? undefined : { y: -1 }}
       aria-busy={loading || undefined}
       className={cx(
-        "tap-target aero-focus relative overflow-hidden group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:pointer-events-none",
+        "tap-target aero-focus relative overflow-hidden group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-colors disabled:bg-btn-disabled disabled:text-btn-disabled-ink disabled:cursor-not-allowed disabled:shadow-none disabled:pointer-events-none",
         styles[variant],
         className,
       )}

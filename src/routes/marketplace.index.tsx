@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useMatchRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
@@ -70,10 +70,16 @@ function AeroPanel({
   title: React.ReactNode;
   subtitle: string;
 }) {
+  const matchRoute = useMatchRoute();
+  const active = Boolean(matchRoute({ to, fuzzy: true }));
   return (
     <Link
       to={to}
-      className="p-5 rounded-3xl relative block group clearcoat border border-black/10 hover:border-primary/40 active:border-primary transition-colors bg-white hover:bg-white active:bg-primary active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+      className={`p-5 rounded-3xl relative block group clearcoat border transition-colors aero-focus ${
+        active
+          ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+          : "bg-btn-surface border-btn-line hover:bg-btn-surface-hover hover:border-primary/45 active:bg-btn-active active:border-btn-active active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+      }`}
       style={{
         boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
       }}
@@ -83,11 +89,11 @@ function AeroPanel({
       <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl pointer-events-none" />
       <span aria-hidden className="spec-sheen" />
       <div className="relative z-10">
-        <div className="w-11 h-11 rounded-full grid place-items-center bg-black/[0.04] ring-1 ring-black/10 mb-4 group-active:bg-black/15 group-active:ring-black/25 transition-colors">
-          <Icon className="w-5 h-5 text-neutral-500 group-active:text-primary-foreground transition-colors" strokeWidth={1.75} />
+        <div className={`w-11 h-11 rounded-full grid place-items-center ring-1 mb-4 transition-colors ${active ? "bg-black/15 ring-black/25" : "bg-black/[0.04] ring-black/10 group-active:bg-black/15 group-active:ring-black/25"}`}>
+          <Icon className={`w-5 h-5 transition-colors ${active ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
         </div>
-        <p className="font-display font-bold italic text-base leading-tight text-neutral-600 group-active:text-primary-foreground transition-colors">{title}</p>
-        <p className="text-xs text-neutral-500 mt-1.5 font-medium group-active:text-primary-foreground/80 transition-colors">{subtitle}</p>
+        <p className={`font-display font-bold italic text-base leading-tight transition-colors ${active ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`}>{title}</p>
+        <p className={`text-xs mt-1.5 font-medium transition-colors ${active ? "text-btn-active-ink/80" : "text-btn-ink-soft group-active:text-btn-active-ink/80"}`}>{subtitle}</p>
 
       </div>
     </Link>
@@ -626,7 +632,7 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-primary border-primary shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-white border-black/10 group-hover:border-primary/40"}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-btn-surface border-btn-line group-hover:border-primary/45 group-active:bg-btn-active group-active:border-btn-active"}`}
                   style={{
                     boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
@@ -636,9 +642,9 @@ function MarketplaceHome() {
                   <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
                   <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-primary-foreground" : "text-neutral-500"}`} strokeWidth={1.75} />
+                  <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight transition-colors ${isActive ? "text-primary-foreground" : "text-neutral-600"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight transition-colors ${isActive ? "text-primary" : "text-btn-ink"}`}>{c.label}</span>
 
               </motion.button>
             );
@@ -656,7 +662,7 @@ function MarketplaceHome() {
       <section>
         <Link
           to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat border border-black/10 hover:border-primary/40 active:border-primary transition-colors bg-white hover:bg-white active:bg-primary active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat aero-focus border border-btn-line hover:border-primary/45 active:border-btn-active transition-colors bg-btn-surface hover:bg-btn-surface-hover active:bg-btn-active active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
           style={{
             boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
           }}
@@ -669,11 +675,11 @@ function MarketplaceHome() {
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
-                <Car className="w-5 h-5 text-neutral-500 group-active:text-primary-foreground transition-colors" />
+                <Car className="w-5 h-5 text-btn-ink group-active:text-btn-active-ink transition-colors" />
               </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-neutral-600 group-active:text-primary-foreground transition-colors">Táxi &amp; Moto Táxi</h2>
+              <h2 className="font-display font-bold italic text-2xl leading-tight text-btn-ink group-active:text-btn-active-ink transition-colors">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-neutral-500 max-w-[70%] font-medium mt-2 group-active:text-primary-foreground/80 transition-colors">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-btn-ink-soft max-w-[70%] font-medium mt-2 group-active:text-btn-active-ink/80 transition-colors">Corridas rápidas e seguras na sua porta agora.</p>
 
           </div>
         </Link>
