@@ -87,7 +87,7 @@ function AeroPanel({
           <Icon className="w-5 h-5 text-[#C9A227]" strokeWidth={1.75} />
         </div>
         <p className="font-display font-bold italic text-base leading-tight text-[#A8821C]">{title}</p>
-        <p className="text-xs text-[#C9A227]/85 mt-1.5 font-medium">{subtitle}</p>
+        <p className="text-xs text-[#9A7B1A] mt-1.5 font-medium">{subtitle}</p>
       </div>
     </Link>
   );
@@ -671,7 +671,7 @@ function MarketplaceHome() {
               </div>
               <h2 className="font-display font-bold italic text-2xl leading-tight text-[#A8821C]">Táxi &amp; Moto Táxi</h2>
             </div>
-            <p className="text-sm text-[#C9A227]/85 max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
+            <p className="text-sm text-[#9A7B1A] max-w-[70%] font-medium mt-2">Corridas rápidas e seguras na sua porta agora.</p>
           </div>
         </Link>
       </section>
