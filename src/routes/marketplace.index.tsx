@@ -626,22 +626,23 @@ function MarketplaceHome() {
                 className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[68px] sm:w-auto cursor-pointer"
               >
                 <div
-                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] ${isActive ? "ring-2 ring-primary shadow-[0_0_20px_rgba(249,160,63,0.5)]" : ""}`}
+                  className={`aero-plate w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] ${isActive ? "ring-2 ring-black/50 shadow-[0_0_20px_rgba(0,0,0,0.3)]" : ""}`}
                   style={{
                     background: isActive
-                      ? "linear-gradient(150deg, #3d2a0f 0%, #17130c 55%, #000 100%)"
-                      : "linear-gradient(150deg, #17130c 0%, #0a0806 55%, #000 100%)",
+                      ? "linear-gradient(150deg, #E8892B 0%, #F9A03F 55%, #FFBE5A 100%)"
+                      : "linear-gradient(150deg, #FFBE5A 0%, #F9A03F 55%, #E8892B 100%)",
                     boxShadow:
-                      "0 14px 26px -14px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(249,160,63,0.22)",
+                      "0 14px 26px -14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4)",
                   }}
                 >
-                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-60" />
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/12 to-transparent" />
-                  <div aria-hidden className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full bg-primary/25 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Nuvem branca difusa atrás da placa */}
+                  <span aria-hidden className="absolute -inset-3 rounded-full bg-white/55 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.12] rounded-2xl" />
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent rounded-2xl" />
                   <span aria-hidden className="spec-sheen" />
-                  <Icon className="w-6 h-6 text-primary skew-x-[6deg] relative z-10 drop-shadow-[0_0_10px_rgba(249,160,63,0.45)]" strokeWidth={1.75} />
+                  <Icon className="w-6 h-6 text-black skew-x-[6deg] relative z-10" strokeWidth={1.75} />
                 </div>
-                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-primary font-bold" : "text-foreground"}`}>{c.label}</span>
+                <span className={`text-[12px] font-semibold text-center leading-tight ${isActive ? "text-black font-bold" : "text-foreground"}`}>{c.label}</span>
               </motion.button>
             );
           })}
