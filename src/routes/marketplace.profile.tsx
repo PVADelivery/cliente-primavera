@@ -19,8 +19,9 @@ import {
   Bike, FileText, ShieldCheck, Moon, Sun,
   Wallet, HelpCircle, X, Check, Phone,
   Package, Clock, CheckCircle2, XCircle, Truck, Ticket, Copy,
-  User, Settings, ArrowRight, History
+  User, Settings, ArrowRight, History, Sparkles, ArrowUpRight, ArrowDownLeft, PlusCircle
 } from 'lucide-react';
+import { useCustomerCredits, useCustomerCreditTransactions, openCreditRechargeWhatsApp } from '@/services/customerCredits';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
@@ -62,9 +63,15 @@ function Profile() {
   const [showOrdersHistory, setShowOrdersHistory] = useState(false);
   const [showRidesHistory, setShowRidesHistory] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
+  const [showCreditsModal, setShowCreditsModal] = useState(false);
   const [coupons, setCoupons] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
+
+  // Créditos do Cliente
+  const { data: customerCredits } = useCustomerCredits(user?.id);
+  const { data: creditTransactions = [] } = useCustomerCreditTransactions(user?.id);
+  const creditBalance = Number(customerCredits?.balance || 0);
 
   useEffect(() => {
     setFullName(profile?.full_name || '');
@@ -229,6 +236,50 @@ function Profile() {
 
       <div className="px-5 mt-8 space-y-6 max-w-md mx-auto">
         
+        {/* ── CARTEIRA DE CRÉDITOS (+10% BÔNUS) ── */}
+        <div className="bg-gradient-to-br from-zinc-900 via-black to-zinc-900 border border-primary/40 rounded-[2rem] p-5 text-white shadow-xl relative overflow-hidden">
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shadow-sm">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-white/60">Minha Carteira</p>
+                <p className="text-sm font-black text-white">Créditos do App</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> +10% Bônus
+            </span>
+          </div>
+
+          <div className="my-3 bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-sm">
+            <p className="text-[11px] text-white/60 font-semibold uppercase tracking-wider">Saldo Disponível</p>
+            <p className="text-3xl font-black text-primary tracking-tight mt-0.5">
+              R$ {creditBalance.toFixed(2).replace('.', ',')}
+            </p>
+            <p className="text-[11px] text-white/70 mt-1 font-medium leading-snug">
+              Economize em tudo! Ganhe <strong>+10%</strong> em cada recarga no WhatsApp.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5 pt-1">
+            <button
+              onClick={() => openCreditRechargeWhatsApp(profile?.full_name || user?.email, 100)}
+              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-md active:scale-95 cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" /> Recarregar (+10%)
+            </button>
+            <button
+              onClick={() => setShowCreditsModal(true)}
+              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition-all border border-white/10 active:scale-95 cursor-pointer"
+            >
+              <History className="w-4 h-4" /> Ver Extrato
+            </button>
+          </div>
+        </div>
+
         {/* QUICK STATS & HISTÓRICOS */}
         <div className="grid grid-cols-3 gap-3">
           <button 
@@ -552,6 +603,63 @@ function Profile() {
                 topic={supportType}
                 onClose={() => setSupportType(null)}
               />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* ── SHEET / MODAL DO EXTRATO DE CRÉDITOS ── */}
+      <Sheet open={showCreditsModal} onOpenChange={setShowCreditsModal}>
+        <SheetContent side="bottom" className="rounded-t-[2.5rem] p-6 max-h-[85vh] overflow-y-auto bg-background">
+          <SheetTitle className="text-lg font-black tracking-tight mb-1 flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-primary" /> Extrato de Créditos
+          </SheetTitle>
+          <p className="text-xs text-muted-foreground mb-4">
+            Saldo Atual: <strong className="text-foreground">R$ {creditBalance.toFixed(2).replace('.', ',')}</strong>
+          </p>
+
+          <div className="space-y-3">
+            {creditTransactions.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-2xl p-4">
+                <Wallet className="w-8 h-8 mx-auto mb-2 opacity-40 text-muted-foreground" />
+                <p className="font-bold text-sm text-foreground">Nenhuma movimentação ainda</p>
+                <p className="text-xs text-muted-foreground mt-1">Compre créditos com 10% de bônus e economize em todos os seus pedidos!</p>
+                <button
+                  onClick={() => {
+                    setShowCreditsModal(false);
+                    openCreditRechargeWhatsApp(profile?.full_name || user?.email, 100);
+                  }}
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-black font-bold text-xs shadow-sm hover:bg-primary/90 transition-all cursor-pointer"
+                >
+                  <PlusCircle className="w-4 h-4" /> Comprar Créditos no WhatsApp
+                </button>
+              </div>
+            ) : (
+              creditTransactions.map((tx) => {
+                const isPositive = Number(tx.amount) > 0;
+                return (
+                  <div key={tx.id} className="flex items-center justify-between p-3.5 bg-card border border-border rounded-2xl">
+                    <div className="flex items-center gap-3 min-w-0 pr-2">
+                      <div className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0",
+                        isPositive ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"
+                      )}>
+                        {isPositive ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-xs text-foreground leading-tight truncate">{tx.description}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {new Date(tx.created_at).toLocaleDateString('pt-BR')} às {new Date(tx.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          {tx.bonus_amount && Number(tx.bonus_amount) > 0 ? ` • +R$ ${Number(tx.bonus_amount).toFixed(2).replace('.', ',')} Bônus` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={cn("font-black text-sm shrink-0", isPositive ? "text-emerald-500" : "text-foreground")}>
+                      {isPositive ? '+' : ''}{Number(tx.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
+                  </div>
+                );
+              })
             )}
           </div>
         </SheetContent>

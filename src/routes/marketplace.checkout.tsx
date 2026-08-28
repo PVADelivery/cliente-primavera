@@ -12,7 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 import { reportErrorToTelegram } from '@/services/logger';
-import { MapPin, Banknote, AlertCircle, ArrowLeft, Loader2, FileText, Smartphone, Bike, CreditCard, ChevronRight, Plus } from 'lucide-react';
+import { MapPin, Banknote, AlertCircle, ArrowLeft, Loader2, FileText, Smartphone, Bike, CreditCard, ChevronRight, Plus, Wallet, Sparkles, PlusCircle } from 'lucide-react';
+import { useCustomerCredits, openCreditRechargeWhatsApp, deductCustomerCredits } from '@/services/customerCredits';
 import { cn } from '@/lib/utils';
 import { useOrderLock } from '@/hooks/useOrderLock';
 import { calculateDeliveryFee, calculateDeliveryFeeByNeighborhood } from '@/utils/freight';
@@ -43,7 +44,7 @@ function Checkout() {
       if (saved) setSelectedAddress(saved);
     }
   }, []);
-  const [paymentMethod, setPaymentMethod] = useState<'money' | 'card'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'money' | 'card' | 'credits'>('card');
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState('');
   const [cpf, setCpf] = useState('');
@@ -55,6 +56,10 @@ function Checkout() {
   const [fulfillmentMode, setFulfillmentMode] = useState<'delivery' | 'pickup'>('delivery');
   
   const [showAddressModal, setShowAddressModal] = useState(false);
+
+  // Créditos do Cliente
+  const { data: customerCredits, refetch: refetchCredits } = useCustomerCredits(user?.id);
+  const creditBalance = Number(customerCredits?.balance || 0);
   
   const {
     checkPhoneAndProceed,
@@ -270,6 +275,16 @@ function Checkout() {
 
       if (!acquireLock()) { setLoading(false); return; }
 
+      // Se for pagamento com Créditos do App, valida se possui saldo suficiente
+      if (paymentMethod === 'credits') {
+        if (creditBalance < finalTotal) {
+          toast.error(`Saldo de créditos insuficiente (R$ ${creditBalance.toFixed(2).replace('.', ',')}). Recarregue com 10% de bônus!`);
+          setLoading(false);
+          releaseLock();
+          return;
+        }
+      }
+
       const orderNotes = cpf ? `CPF na nota: ${cpf}` : null;
       const ik = generateIdempotencyKey(user!.id, items, `${companyId}|${selectedAddress}|${paymentMethod}`);
       
@@ -315,9 +330,25 @@ function Checkout() {
       const orderId = data?.order_id || data?.id;
       if (!orderId) throw new Error('Falha ao obter ID do pedido.');
 
+      // Se pagou com créditos, debita o saldo na tabela customer_credits
+      if (paymentMethod === 'credits') {
+        try {
+          await deductCustomerCredits({
+            customerId: user!.id,
+            amount: finalTotal,
+            type: 'payment_order',
+            referenceId: orderId,
+            description: `Pedido #${orderId.slice(0, 8)} no restaurante ${companyName || 'Lojista'}`,
+          });
+          refetchCredits();
+        } catch (creditErr: any) {
+          console.warn('[Checkout] Erro ao debitar créditos (RPC):', creditErr.message);
+        }
+      }
+
       clear();
       resetIdempotencyKey();
-      toast.success('Pedido realizado!');
+      toast.success('Pedido realizado com sucesso!');
       navigate({ to: `/marketplace/orders/${orderId}` });
     } catch (err: any) {
       toast.error(err?.message || 'Erro ao criar pedido');
@@ -434,35 +465,140 @@ function Checkout() {
           )}
         </AnimatePresence>
 
-        {/* ── PAYMENT METHOD ── */}
+        {/* ── FORMA DE PAGAMENTO ── */}
         <div className="space-y-3 pt-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Pagamento na Entrega</h2>
-          
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Forma de Pagamento</h2>
             <button
-              onClick={() => setPaymentMethod('card')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'card' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(255,222,33,0.15)]" : "bg-card border-border hover:border-primary/40")}
+              type="button"
+              onClick={() => openCreditRechargeWhatsApp(profile?.name || user?.email, 100)}
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20"
             >
-              {paymentMethod === 'card' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
-              <CreditCard className={cn("w-6 h-6", paymentMethod === 'card' ? "text-primary" : "text-muted-foreground")} />
+              <Sparkles className="w-3 h-3 text-primary" />
+              Recarregar (+10% Bônus)
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Opção 1: Créditos do App */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('credits')}
+              className={cn(
+                "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
+                paymentMethod === 'credits'
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  : "bg-card border-border hover:border-primary/40"
+              )}
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  +10% Bônus
+                </span>
+              </div>
               <div>
-                <p className="font-bold text-sm">Máquina</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Cartão ou PIX</p>
+                <p className="font-bold text-sm text-foreground">Crédito do App</p>
+                <p className="text-xs font-semibold text-primary mt-0.5">
+                  Saldo: R$ {creditBalance.toFixed(2).replace('.', ',')}
+                </p>
+              </div>
+            </button>
+
+            {/* Opção 2: Máquina */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('card')}
+              className={cn(
+                "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
+                paymentMethod === 'card'
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  : "bg-card border-border hover:border-primary/40"
+              )}
+            >
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-foreground">
+                <CreditCard className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-foreground">Máquina</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Cartão ou PIX na entrega</p>
               </div>
             </button>
             
+            {/* Opção 3: Dinheiro */}
             <button
+              type="button"
               onClick={() => setPaymentMethod('money')}
-              className={cn("p-4 rounded-2xl flex flex-col gap-3 border transition-all text-left relative overflow-hidden", paymentMethod === 'money' ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(255,222,33,0.15)]" : "bg-card border-border hover:border-primary/40")}
+              className={cn(
+                "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
+                paymentMethod === 'money'
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  : "bg-card border-border hover:border-primary/40"
+              )}
             >
-              {paymentMethod === 'money' && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full translate-x-1/2 -translate-y-1/2" />}
-              <Banknote className={cn("w-6 h-6", paymentMethod === 'money' ? "text-primary" : "text-muted-foreground")} />
+              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-foreground">
+                <Banknote className="w-5 h-5 text-primary" />
+              </div>
               <div>
-                <p className="font-bold text-sm">Dinheiro</p>
+                <p className="font-bold text-sm text-foreground">Dinheiro</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Nota em espécie</p>
               </div>
             </button>
           </div>
+
+          {/* Painel Informativo / Recarga quando Crédito do App é selecionado */}
+          <AnimatePresence>
+            {paymentMethod === 'credits' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className={cn(
+                  "border rounded-2xl p-4 mt-3 space-y-3 relative overflow-hidden",
+                  creditBalance >= finalTotal
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                )}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <Wallet className="w-5 h-5 shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-foreground">
+                          {creditBalance >= finalTotal ? "Saldo suficiente para este pedido!" : "Saldo insuficiente de créditos"}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Saldo atual: <span className="font-bold text-foreground">R$ {creditBalance.toFixed(2).replace('.', ',')}</span> • Total do pedido: <span className="font-bold text-foreground">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {creditBalance < finalTotal ? (
+                    <div className="pt-2 border-t border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <p className="text-xs text-amber-300">
+                        Faltam <strong>R$ {(finalTotal - creditBalance).toFixed(2).replace('.', ',')}</strong>. Recarregue no WhatsApp e ganhe <strong>+10% de bônus</strong>!
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => openCreditRechargeWhatsApp(profile?.name || user?.email, Math.max(50, Math.ceil(finalTotal - creditBalance)))}
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 text-black font-bold text-xs hover:bg-amber-400 transition-colors shrink-0 shadow-sm"
+                      >
+                        <PlusCircle className="w-4 h-4" /> Comprar Créditos no WhatsApp
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-emerald-400 font-medium">
+                      ✓ Após a confirmação, seu novo saldo será de <strong>R$ {(creditBalance - finalTotal).toFixed(2).replace('.', ',')}</strong>.
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence>
             {paymentMethod === 'money' && (
