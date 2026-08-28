@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import logoIcon from "@/assets/logo-icon-v3.png";
@@ -162,14 +162,14 @@ function SignupPage() {
 
           <button
             disabled={loading || !passwordValid || !confirmMatch}
-            className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold disabled:opacity-50 transition-opacity mt-2"
+            className="w-full py-3.5 rounded-xl bg-primary text-black font-black disabled:opacity-50 transition-opacity mt-2 cursor-pointer shadow-sm"
           >
             {loading ? "Criando conta…" : "Criar conta"}
           </button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          Já tem conta? <Link to="/login" className="text-primary font-medium">Entrar</Link>
+          Já tem conta? <Link to="/login" className="text-foreground font-black underline hover:text-black">Entrar</Link>
         </p>
       </div>
     </div>

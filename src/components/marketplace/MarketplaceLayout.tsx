@@ -218,7 +218,7 @@ export function MarketplaceLayout() {
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               {!user ? (
-                <Link to="/login" className="tap-target aero-focus inline-flex items-center px-4 rounded-full bg-primary text-primary-foreground text-sm font-bold">Entrar</Link>
+                <Link to="/login" className="tap-target aero-focus inline-flex items-center px-4 rounded-full bg-primary text-black text-sm font-black shadow-sm">Entrar</Link>
               ) : null}
             </div>
           </div>

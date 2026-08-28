@@ -56,13 +56,13 @@ function LoginPage() {
             </button>
           </div>
           {err && <p className="text-sm text-destructive">{err}</p>}
-          <button disabled={loading} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold disabled:opacity-50">
+          <button disabled={loading} className="w-full py-3.5 rounded-xl bg-primary text-black font-black disabled:opacity-50 cursor-pointer shadow-sm">
             {loading ? "Entrando…" : "Entrar"}
           </button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          Não tem conta? <Link to="/signup" className="text-primary font-medium">Criar conta</Link>
+          Não tem conta? <Link to="/signup" className="text-foreground font-black underline hover:text-black">Criar conta</Link>
         </p>
       </div>
     </div>
