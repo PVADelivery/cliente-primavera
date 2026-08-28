@@ -284,9 +284,9 @@ function Addresses() {
             <motion.div key="list" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <Button 
                 onClick={openNew} 
-                className="w-full h-14 rounded-2xl bg-card/70 hover:bg-white/10 border border-primary/30 text-primary font-bold shadow-[0_0_15px_rgba(255,222,33,0.1)] transition-all"
+                className="w-full h-14 rounded-2xl bg-primary text-black font-black hover:bg-primary/90 shadow-md transition-all text-sm cursor-pointer"
               >
-                <Plus className="h-5 w-5 mr-2" /> 
+                <Plus className="h-5 w-5 mr-2 text-black" /> 
                 Cadastrar Novo Endereço
               </Button>
 
@@ -297,9 +297,9 @@ function Addresses() {
               ) : addresses.length === 0 ? (
                 <div className="text-center py-16 bg-card/70 rounded-3xl border border-border backdrop-blur-md">
                   <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MapPin className="h-10 w-10 text-primary/50" />
+                    <MapPin className="h-10 w-10 text-primary" />
                   </div>
-                  <p className="text-lg font-bold text-foreground">Sem endereços</p>
+                  <p className="text-lg font-bold text-foreground">Sem endereços cadastrados</p>
                   <p className="text-sm text-muted-foreground mt-1 px-8">Adicione um endereço de entrega para começar a fazer seus pedidos.</p>
                 </div>
               ) : (
@@ -331,7 +331,7 @@ function Addresses() {
                             <RadioGroupItem value={addr.id} id={`addr-${addr.id}`} className="mt-1 shrink-0" />
                             <label htmlFor={`addr-${addr.id}`} className="flex-1 cursor-pointer min-w-0">
                               {addr.label && (
-                                <div className="flex items-center gap-1.5 mb-2 text-primary font-bold text-xs uppercase tracking-wider">
+                                <div className="flex items-center gap-1.5 mb-2 text-foreground font-extrabold text-xs uppercase tracking-wider">
                                   {getLabelIcon(addr.label)}
                                   {addr.label}
                                 </div>
@@ -383,9 +383,9 @@ function Addresses() {
                             }
                           }}
                           className={cn(
-                            "px-4 py-2.5 flex items-center gap-2 text-sm font-bold rounded-xl border transition-all duration-200 active:scale-95",
+                            "px-4 py-2.5 flex items-center gap-2 text-sm font-black rounded-xl border transition-all duration-200 active:scale-95 cursor-pointer",
                             active 
-                              ? "bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(255,222,33,0.2)]" 
+                              ? "bg-primary text-black border-primary shadow-sm" 
                               : "bg-card/70 border-border hover:border-white/20 text-foreground"
                           )}
                         >
@@ -485,7 +485,7 @@ function Addresses() {
               <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-background/95 backdrop-blur-xl border-t border-border z-50">
                 <div className="max-w-2xl mx-auto flex gap-3">
                   <Button variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl h-14 flex-1 text-muted-foreground hover:text-foreground bg-card/70 hover:bg-white/10">Cancelar</Button>
-                  <Button onClick={handleSave} className="rounded-xl h-14 flex-1 font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(255,222,33,0.2)]">
+                  <Button onClick={handleSave} className="rounded-xl h-14 flex-1 font-black bg-primary hover:bg-primary/90 text-black shadow-md cursor-pointer">
                     {editing ? 'Atualizar Endereço' : 'Salvar Endereço'}
                   </Button>
                 </div>
