@@ -61,6 +61,24 @@ export function useCustomerCredits(customerId?: string) {
           console.warn("[CustomerCredits] Erro ao buscar saldo ou tabela não encontrada:", error.message);
           return null;
         }
+
+        // Auto-sincroniza o e-mail da sessão se ainda estiver vazio
+        if (data && (!data.customer_email || !data.customer_name)) {
+          try {
+            const { data: authData } = await supabase.auth.getUser();
+            if (authData?.user?.email) {
+              void supabase
+                .from("customer_credits")
+                .update({
+                  customer_email: authData.user.email,
+                  customer_name: data.customer_name || authData.user.user_metadata?.full_name || authData.user.email.split("@")[0],
+                  updated_at: new Date().toISOString(),
+                } as any)
+                .eq("customer_id", customerId);
+            }
+          } catch (syncErr) {}
+        }
+
         return data as CustomerCredit;
       } catch (err) {
         console.warn("[CustomerCredits] Exceção ao consultar créditos:", err);
