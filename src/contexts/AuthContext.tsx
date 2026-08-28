@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp: AuthContextValue["signUp"] = async (email, password, fullName) => {
     const requestId = newRequestId();
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -80,10 +80,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: { full_name: fullName },
       },
     });
+
     if (error) {
+      const msg = (error.message || "").toLowerCase();
+      // Se o usuário já está registrado no banco em outro painel (ex: motorista, lojista, admin):
+      if (
+        msg.includes("already registered") ||
+        msg.includes("already exists") ||
+        msg.includes("user_already_exists")
+      ) {
+        // Tenta autenticar automaticamente com as credenciais fornecidas
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (!signInError && signInData.user) {
+          try {
+            await supabase.from("profiles").upsert(
+              {
+                user_id: signInData.user.id,
+                full_name: fullName,
+              },
+              { onConflict: "user_id" }
+            );
+          } catch (e) {}
+
+          await recordAuditLog({ request_id: requestId, event: "auth.cross_panel_signup_signin.success" });
+          return { error: null };
+        }
+
+        // Se a senha não coincidir com a conta pré-existente
+        await recordAuditLog({ request_id: requestId, event: "auth.cross_panel_signup.password_mismatch" });
+        return {
+          error: "Este e-mail já possui cadastro na MT 24horas. Acesse a tela de login com sua senha existente.",
+        };
+      }
+
       await recordAuditLog({ request_id: requestId, event: "auth.signup.failed", error_message: error.message });
       return { error: error.message };
     }
+
+    // Se Supabase retornou identidades vazias (usuário já existia sem erro explícito)
+    if (signUpData.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (!signInError && signInData.user) {
+        return { error: null };
+      }
+      return {
+        error: "Este e-mail já possui cadastro na MT 24horas. Acesse a tela de login com sua senha existente.",
+      };
+    }
+
     await recordAuditLog({ request_id: requestId, event: "auth.signup.success" });
     return { error: null };
   };

@@ -155,8 +155,16 @@ function SignupPage() {
           </div>
 
           {err && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
-              <p className="text-sm text-destructive">{err}</p>
+            <div className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3 space-y-2">
+              <p className="text-sm text-destructive font-medium">{err}</p>
+              {err.includes("já possui cadastro") && (
+                <Link
+                  to="/login"
+                  className="inline-block text-xs font-black text-foreground underline hover:text-black"
+                >
+                  👉 Clique aqui para entrar com sua senha
+                </Link>
+              )}
             </div>
           )}
 
