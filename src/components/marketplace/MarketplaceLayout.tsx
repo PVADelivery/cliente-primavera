@@ -23,7 +23,7 @@ export function MarketplaceLayout() {
   const router = useRouter();
   const path = router.state.location.pathname;
 
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const tabRefs = useRef<Array<HTMLAnchorElement | null>>([]);
   const activeIndex = Math.max(
     0,
@@ -55,13 +55,13 @@ export function MarketplaceLayout() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    // Default to dark to match driver/business apps
-    if (savedTheme === "light") {
-      document.documentElement.classList.remove("dark");
-      setTheme("light");
-    } else {
+    // PADRÃO É SEMPRE TEMA CLARO
+    if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
       setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      setTheme("light");
     }
   }, []);
 
