@@ -421,7 +421,7 @@ function Checkout() {
                   <MapPin className="w-8 h-8 mx-auto text-muted-foreground mb-3 opacity-50" />
                   <p className="text-sm text-foreground font-medium mb-1">Nenhum endereço cadastrado</p>
                   <p className="text-xs text-muted-foreground mb-4">Adicione um endereço para continuar</p>
-                  <Button onClick={() => navigate({ to: '/marketplace/addresses' })} className="w-full rounded-xl bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20">
+                  <Button onClick={() => navigate({ to: '/marketplace/addresses' })} className="w-full rounded-xl bg-primary text-black font-extrabold hover:bg-primary/90 shadow-sm cursor-pointer h-11">
                     <Plus className="w-4 h-4 mr-2" /> Novo Endereço
                   </Button>
                 </div>
@@ -431,8 +431,8 @@ function Checkout() {
                   className="group bg-gradient-to-br from-secondary to-card border border-border hover:border-primary/50 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all"
                 >
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <MapPin className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm">
+                      <MapPin className="w-5 h-5 text-black" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-bold text-foreground text-sm truncate">{selAddrObj?.street}, {selAddrObj?.number}</p>
@@ -453,8 +453,8 @@ function Checkout() {
             >
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1">Retirada na Loja</h2>
               <div className="bg-gradient-to-br from-secondary to-card border border-border rounded-2xl p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Bike className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm">
+                  <Bike className="w-5 h-5 text-black" />
                 </div>
                 <div>
                   <p className="font-bold text-foreground text-sm">Retirar no balcão</p>
@@ -472,9 +472,9 @@ function Checkout() {
             <button
               type="button"
               onClick={() => openCreditRechargeWhatsApp(profile?.name || user?.email, 100)}
-              className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20"
+              className="text-xs font-black text-black flex items-center gap-1.5 bg-primary px-3 py-1.5 rounded-full shadow-sm hover:bg-primary/90 transition-all cursor-pointer"
             >
-              <Sparkles className="w-3 h-3 text-primary" />
+              <Sparkles className="w-3.5 h-3.5 text-black" />
               Recarregar (+10% Bônus)
             </button>
           </div>
@@ -487,22 +487,22 @@ function Checkout() {
               className={cn(
                 "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
                 paymentMethod === 'credits'
-                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-2 ring-primary"
                   : "bg-card border-border hover:border-primary/40"
               )}
             >
               <div className="flex items-center justify-between w-full">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-primary flex items-center justify-center shadow-sm">
                   <Wallet className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                   +10% Bônus
                 </span>
               </div>
               <div>
                 <p className="font-bold text-sm text-foreground">Crédito do App</p>
-                <p className="text-xs font-semibold text-primary mt-0.5">
-                  Saldo: R$ {creditBalance.toFixed(2).replace('.', ',')}
+                <p className="text-xs font-bold text-foreground/90 mt-0.5">
+                  Saldo: <span className="font-black text-foreground">R$ {creditBalance.toFixed(2).replace('.', ',')}</span>
                 </p>
               </div>
             </button>
@@ -514,12 +514,12 @@ function Checkout() {
               className={cn(
                 "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
                 paymentMethod === 'card'
-                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-2 ring-primary"
                   : "bg-card border-border hover:border-primary/40"
               )}
             >
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-foreground">
-                <CreditCard className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-primary flex items-center justify-center shadow-sm">
+                <CreditCard className="w-5 h-5" />
               </div>
               <div>
                 <p className="font-bold text-sm text-foreground">Máquina</p>
@@ -534,12 +534,12 @@ function Checkout() {
               className={cn(
                 "p-4 rounded-2xl flex flex-col justify-between gap-3 border transition-all text-left relative overflow-hidden",
                 paymentMethod === 'money'
-                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-1 ring-primary"
+                  ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(255,222,33,0.2)] ring-2 ring-primary"
                   : "bg-card border-border hover:border-primary/40"
               )}
             >
-              <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-foreground">
-                <Banknote className="w-5 h-5 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-primary flex items-center justify-center shadow-sm">
+                <Banknote className="w-5 h-5" />
               </div>
               <div>
                 <p className="font-bold text-sm text-foreground">Dinheiro</p>
@@ -650,7 +650,11 @@ function Checkout() {
                 <FileText className="w-5 h-5 text-muted-foreground" />
                 <p className="text-sm font-medium">CPF na nota (Opcional)</p>
               </div>
-              <button onClick={() => setShowCpfInput(!showCpfInput)} className="text-xs font-bold text-primary px-3 py-1.5 rounded-lg bg-primary/10">
+              <button 
+                type="button"
+                onClick={() => setShowCpfInput(!showCpfInput)} 
+                className="text-xs font-black text-black px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary/90 shadow-sm transition-all cursor-pointer"
+              >
                 {cpf ? 'Alterar' : 'Adicionar'}
               </button>
             </div>
