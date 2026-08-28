@@ -75,35 +75,50 @@ function Checkout() {
   const { data: addresses = [], isLoading: loadingAddresses } = useQuery({
     queryKey: ['addresses', user?.id],
     enabled: !!user?.id,
-    staleTime: 0,
+    staleTime: 1000 * 10,
     queryFn: async () => {
       if (!user?.id) return [];
+      
+      // 1. Tenta buscar por user_id
       try {
-        let { data, error } = await supabase
+        const { data, error } = await supabase
           .from('addresses')
           .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-        
-        if (error && (error.code === 'PGRST204' || error.message?.includes('user_id') || error.message?.includes('column') || error.code === '42703')) {
-          const res2 = await supabase
-            .from('addresses')
-            .select('*')
-            .eq('customer_id', user.id);
-          data = res2.data;
+          .eq('user_id', user.id);
+        if (!error && data && data.length > 0) {
+          return (data as Address[]).sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          );
         }
+        if (!error && data) return [];
+      } catch (e) {}
 
-        if (error && (error.message?.includes('created_at') || error.code === '42703')) {
-          const res3 = await supabase
-            .from('addresses')
-            .select('*')
-            .or(`user_id.eq.${user.id},customer_id.eq.${user.id}`);
-          data = res3.data;
+      // 2. Fallback: busca por customer_id caso o schema use customer_id
+      try {
+        const { data, error } = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('customer_id', user.id);
+        if (!error && data && data.length > 0) {
+          return (data as Address[]).sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          );
         }
-        return (data ?? []) as Address[];
-      } catch (e) {
-        return [] as Address[];
-      }
+      } catch (e) {}
+
+      // 3. Fallback seguro: select simples e filtro em memória
+      try {
+        const { data, error } = await supabase.from('addresses').select('*');
+        if (!error && data) {
+          return ((data as any[]).filter(
+            (a) => a.user_id === user.id || a.customer_id === user.id
+          ) as Address[]).sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          );
+        }
+      } catch (e) {}
+
+      return [] as Address[];
     },
   });
 

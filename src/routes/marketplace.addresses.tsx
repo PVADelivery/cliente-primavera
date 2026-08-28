@@ -109,38 +109,60 @@ function Addresses() {
 
   const fetchAddresses = async (userId: string) => {
     try {
-      let { data, error } = await supabase
-        .from('addresses')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      
-      if (error && (error.code === 'PGRST204' || error.message?.includes('user_id') || error.message?.includes('column') || error.code === '42703')) {
-        const res2 = await supabase
+      // 1. Tenta por user_id
+      try {
+        const { data, error } = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('user_id', userId);
+        if (!error && data && data.length > 0) {
+          setAddresses((data as Address[]).sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          ));
+          setLoading(false);
+          return;
+        }
+        if (!error && data) {
+          setAddresses([]);
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
+
+      // 2. Fallback: tenta por customer_id
+      try {
+        const { data, error } = await supabase
           .from('addresses')
           .select('*')
           .eq('customer_id', userId);
-        data = res2.data;
-        error = res2.error;
-      }
+        if (!error && data && data.length > 0) {
+          setAddresses((data as Address[]).sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          ));
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
 
-      if (error && (error.message?.includes('created_at') || error.code === '42703')) {
-        const res3 = await supabase
-          .from('addresses')
-          .select('*')
-          .or(`user_id.eq.${userId},customer_id.eq.${userId}`);
-        data = res3.data;
-        error = res3.error;
-      }
+      // 3. Fallback: select geral com filtro em memória
+      try {
+        const { data, error } = await supabase.from('addresses').select('*');
+        if (!error && data) {
+          const filtered = (data as any[]).filter(
+            (a) => a.user_id === userId || a.customer_id === userId
+          ) as Address[];
+          setAddresses(filtered.sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          ));
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
 
-      if (error) {
-        console.warn("[Addresses] Erro ao buscar endereços:", error);
-        setAddresses([]);
-      } else {
-        setAddresses(data || []);
-      }
+      setAddresses([]);
     } catch (e) {
       console.warn("[Addresses] Falha:", e);
+      setAddresses([]);
     } finally {
       setLoading(false);
     }
