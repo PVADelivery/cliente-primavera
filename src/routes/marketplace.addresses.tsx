@@ -205,18 +205,20 @@ function Addresses() {
       if (existingCust?.id) {
         customerId = existingCust.id;
       } else {
-        const { data: newCust } = await supabase
+        const { data: newCust, error: newCustErr } = await supabase
           .from('customers')
           .insert({
             user_id: user.id,
-            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Cliente',
-            email: user.email,
-            phone: user.user_metadata?.phone || null,
+            name: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Cliente',
+            phone: profile?.phone || user.user_metadata?.phone || null,
           })
           .select('id')
           .single();
+
         if (newCust?.id) {
           customerId = newCust.id;
+        } else if (newCustErr) {
+          console.warn('[Addresses] Aviso ao provisionar customer:', newCustErr);
         }
       }
     } catch (custErr) {
