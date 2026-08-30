@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Address } from '@/types/database';
+import { getOrCreateCustomer, fetchCustomerAddressesList } from '@/services/customerService';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -78,45 +79,7 @@ function Checkout() {
     staleTime: 1000 * 10,
     queryFn: async () => {
       if (!user?.id) return [];
-      
-      // 1. Resolve o customer_id real na tabela customers
-      let customerId = user.id;
-      try {
-        const { data: cust } = await supabase
-          .from('customers')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        if (cust?.id) customerId = cust.id;
-      } catch (e) {}
-
-      // 2. Busca os endereços vinculados
-      try {
-        const { data, error } = await supabase
-          .from('addresses')
-          .select('*')
-          .or(`customer_id.eq.${customerId},customer_id.eq.${user.id}`);
-        if (!error && data && data.length > 0) {
-          return (data as Address[]).sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          );
-        }
-      } catch (e) {}
-
-      // 3. Fallback geral com RLS
-      try {
-        const { data, error } = await supabase.from('addresses').select('*');
-        if (!error && data) {
-          const filtered = (data as any[]).filter(
-            (a) => a.customer_id === customerId || a.customer_id === user.id || a.user_id === user.id
-          ) as Address[];
-          return filtered.sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          );
-        }
-      } catch (e) {}
-
-      return [] as Address[];
+      return await fetchCustomerAddressesList();
     },
   });
 
@@ -308,11 +271,10 @@ function Checkout() {
           void supabase.auth.updateUser({
             data: { phone: phoneInput || currentPhone }
           });
-          void supabase.from('customers').upsert({
-            user_id: user!.id,
-            phone: phoneInput || currentPhone,
-            name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
-          }, { onConflict: 'user_id' });
+          void getOrCreateCustomer(
+            profile?.full_name || user?.user_metadata?.full_name,
+            phoneInput || currentPhone
+          );
           void supabase.from('customer_credits').update({
             customer_phone: phoneInput || currentPhone,
             updated_at: new Date().toISOString(),

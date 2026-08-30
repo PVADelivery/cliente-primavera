@@ -3,6 +3,7 @@ import { useNavigate, useRouter, createFileRoute, useSearch } from '@tanstack/re
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Address } from '@/types/database';
+import { getOrCreateCustomer, fetchCustomerAddressesList } from '@/services/customerService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -107,45 +108,11 @@ function Addresses() {
     !form.neighborhood.trim() || h.name.toLowerCase().includes(form.neighborhood.trim().toLowerCase())
   ).slice(0, 15);
 
-  const fetchAddresses = async (userId: string) => {
+  const fetchAddresses = async (_userId?: string) => {
     try {
-      // 1. Resolve o customer_id real do usuário na tabela customers
-      let customerId = userId;
-      try {
-        const { data: cust } = await supabase
-          .from('customers')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
-        if (cust?.id) customerId = cust.id;
-      } catch (e) {}
-
-      // 2. Busca os endereços vinculados a esse customer
-      const { data, error } = await supabase
-        .from('addresses')
-        .select('*')
-        .or(`customer_id.eq.${customerId},customer_id.eq.${userId}`);
-
-      if (!error && data && data.length > 0) {
-        setAddresses((data as Address[]).sort((a: any, b: any) => 
-          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-        ));
-        setLoading(false);
-        return;
-      }
-
-      // 3. Fallback geral
-      const { data: fallbackData } = await supabase.from('addresses').select('*');
-      if (fallbackData) {
-        const filtered = (fallbackData as any[]).filter(
-          (a) => a.customer_id === customerId || a.customer_id === userId || a.user_id === userId
-        ) as Address[];
-        setAddresses(filtered.sort((a: any, b: any) => 
-          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-        ));
-      } else {
-        setAddresses([]);
-      }
+      setLoading(true);
+      const list = await fetchCustomerAddressesList();
+      setAddresses(list);
     } catch (e) {
       console.warn("[Addresses] Falha ao carregar endereços:", e);
       setAddresses([]);
@@ -186,50 +153,29 @@ function Addresses() {
   };
 
   const handleSave = async () => {
-    if (!user) {
-      toast.error('Usuário não identificado. Faça login novamente.'); return;
+    // 1. Validação estrita da sessão de autenticação ativa
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) {
+      toast.error('Usuário não autenticado ou sessão expirada. Faça login novamente.');
+      return;
     }
-    if (!form.street || !form.number || !form.neighborhood || !form.city) {
-      toast.error('Preencha os campos obrigatórios (Rua, Nº, Bairro, Cidade)'); return;
-    }
-
-    // 1. Resolve ou cria o registro de customer na tabela customers (necessário para a FK e RLS de addresses)
-    let customerId: string | null = null;
-    try {
-      const { data: existingCust } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (existingCust?.id) {
-        customerId = existingCust.id;
-      } else {
-        const { data: newCust, error: newCustErr } = await supabase
-          .from('customers')
-          .insert({
-            user_id: user.id,
-            name: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Cliente',
-            phone: profile?.phone || user.user_metadata?.phone || null,
-          })
-          .select('id')
-          .single();
-
-        if (newCust?.id) {
-          customerId = newCust.id;
-        } else if (newCustErr) {
-          console.warn('[Addresses] Aviso ao provisionar customer:', newCustErr);
-        }
-      }
-    } catch (custErr) {
-      console.warn('[Addresses] Falha ao resolver customer_id:', custErr);
+    if (!form.street.trim() || !form.number.trim() || !form.neighborhood.trim() || !form.city.trim()) {
+      toast.error('Preencha os campos obrigatórios (Rua, Nº, Bairro, Cidade)');
+      return;
     }
 
-    if (!customerId) {
-      customerId = user.id;
+    // 2. Obtém ou provisiona atomicamente o customer_id via RPC get_or_create_customer
+    const { customerId, error: custErr } = await getOrCreateCustomer(
+      profile?.full_name || currentUser.user_metadata?.full_name,
+      profile?.phone || currentUser.user_metadata?.phone
+    );
+
+    if (custErr || !customerId) {
+      toast.error('Não foi possível identificar o perfil de cliente: ' + (custErr?.message || 'Tente novamente.'));
+      return;
     }
 
-    const complementText = [form.complement, form.reference ? `Ref: ${form.reference}` : ''].filter(Boolean).join(' - ') || null;
+    const complementText = [form.complement.trim(), form.reference.trim() ? `Ref: ${form.reference.trim()}` : ''].filter(Boolean).join(' - ') || null;
 
     const payload: any = {
       customer_id: customerId,
@@ -238,7 +184,7 @@ function Addresses() {
       neighborhood: form.neighborhood.trim(), 
       city: form.city.trim(),
       complement: complementText,
-      label: form.label || null,
+      label: form.label || selectedLabel || 'Casa',
     };
     
     let savedAddressId: string | null = null;
@@ -272,7 +218,7 @@ function Addresses() {
 
     setShowForm(false);
     queryClient.invalidateQueries({ queryKey: ['addresses'] });
-    fetchAddresses(user.id);
+    await fetchAddresses(currentUser.id);
 
     if (returnTo) {
       setTimeout(() => {
