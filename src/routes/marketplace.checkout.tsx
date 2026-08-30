@@ -79,26 +79,23 @@ function Checkout() {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      // 1. Tenta buscar por user_id
+      // 1. Resolve o customer_id real na tabela customers
+      let customerId = user.id;
       try {
-        const { data, error } = await supabase
-          .from('addresses')
-          .select('*')
-          .eq('user_id', user.id);
-        if (!error && data && data.length > 0) {
-          return (data as Address[]).sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          );
-        }
-        if (!error && data) return [];
+        const { data: cust } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (cust?.id) customerId = cust.id;
       } catch (e) {}
 
-      // 2. Fallback: busca por customer_id caso o schema use customer_id
+      // 2. Busca os endereços vinculados
       try {
         const { data, error } = await supabase
           .from('addresses')
           .select('*')
-          .eq('customer_id', user.id);
+          .or(`customer_id.eq.${customerId},customer_id.eq.${user.id}`);
         if (!error && data && data.length > 0) {
           return (data as Address[]).sort((a: any, b: any) => 
             new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
@@ -106,13 +103,14 @@ function Checkout() {
         }
       } catch (e) {}
 
-      // 3. Fallback seguro: select simples e filtro em memória
+      // 3. Fallback geral com RLS
       try {
         const { data, error } = await supabase.from('addresses').select('*');
         if (!error && data) {
-          return ((data as any[]).filter(
-            (a) => a.user_id === user.id || a.customer_id === user.id
-          ) as Address[]).sort((a: any, b: any) => 
+          const filtered = (data as any[]).filter(
+            (a) => a.customer_id === customerId || a.customer_id === user.id || a.user_id === user.id
+          ) as Address[];
+          return filtered.sort((a: any, b: any) => 
             new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
           );
         }

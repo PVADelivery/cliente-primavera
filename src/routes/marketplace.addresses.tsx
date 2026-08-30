@@ -109,59 +109,45 @@ function Addresses() {
 
   const fetchAddresses = async (userId: string) => {
     try {
-      // 1. Tenta por user_id
+      // 1. Resolve o customer_id real do usuário na tabela customers
+      let customerId = userId;
       try {
-        const { data, error } = await supabase
-          .from('addresses')
-          .select('*')
-          .eq('user_id', userId);
-        if (!error && data && data.length > 0) {
-          setAddresses((data as Address[]).sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          ));
-          setLoading(false);
-          return;
-        }
-        if (!error && data) {
-          setAddresses([]);
-          setLoading(false);
-          return;
-        }
+        const { data: cust } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+        if (cust?.id) customerId = cust.id;
       } catch (e) {}
 
-      // 2. Fallback: tenta por customer_id
-      try {
-        const { data, error } = await supabase
-          .from('addresses')
-          .select('*')
-          .eq('customer_id', userId);
-        if (!error && data && data.length > 0) {
-          setAddresses((data as Address[]).sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          ));
-          setLoading(false);
-          return;
-        }
-      } catch (e) {}
+      // 2. Busca os endereços vinculados a esse customer
+      const { data, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .or(`customer_id.eq.${customerId},customer_id.eq.${userId}`);
 
-      // 3. Fallback: select geral com filtro em memória
-      try {
-        const { data, error } = await supabase.from('addresses').select('*');
-        if (!error && data) {
-          const filtered = (data as any[]).filter(
-            (a) => a.user_id === userId || a.customer_id === userId
-          ) as Address[];
-          setAddresses(filtered.sort((a: any, b: any) => 
-            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-          ));
-          setLoading(false);
-          return;
-        }
-      } catch (e) {}
+      if (!error && data && data.length > 0) {
+        setAddresses((data as Address[]).sort((a: any, b: any) => 
+          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        ));
+        setLoading(false);
+        return;
+      }
 
-      setAddresses([]);
+      // 3. Fallback geral
+      const { data: fallbackData } = await supabase.from('addresses').select('*');
+      if (fallbackData) {
+        const filtered = (fallbackData as any[]).filter(
+          (a) => a.customer_id === customerId || a.customer_id === userId || a.user_id === userId
+        ) as Address[];
+        setAddresses(filtered.sort((a: any, b: any) => 
+          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+        ));
+      } else {
+        setAddresses([]);
+      }
     } catch (e) {
-      console.warn("[Addresses] Falha:", e);
+      console.warn("[Addresses] Falha ao carregar endereços:", e);
       setAddresses([]);
     } finally {
       setLoading(false);
@@ -207,38 +193,81 @@ function Addresses() {
       toast.error('Preencha os campos obrigatórios (Rua, Nº, Bairro, Cidade)'); return;
     }
 
+    // 1. Resolve ou cria o registro de customer na tabela customers (necessário para a FK e RLS de addresses)
+    let customerId: string | null = null;
+    try {
+      const { data: existingCust } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existingCust?.id) {
+        customerId = existingCust.id;
+      } else {
+        const { data: newCust } = await supabase
+          .from('customers')
+          .insert({
+            user_id: user.id,
+            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Cliente',
+            email: user.email,
+            phone: user.user_metadata?.phone || null,
+          })
+          .select('id')
+          .single();
+        if (newCust?.id) {
+          customerId = newCust.id;
+        }
+      }
+    } catch (custErr) {
+      console.warn('[Addresses] Falha ao resolver customer_id:', custErr);
+    }
+
+    if (!customerId) {
+      customerId = user.id;
+    }
+
     const complementText = [form.complement, form.reference ? `Ref: ${form.reference}` : ''].filter(Boolean).join(' - ') || null;
 
     const payload: any = {
-      user_id: user.id,
-      customer_id: user.id,
-      street: form.street,
-      number: form.number,
-      neighborhood: form.neighborhood, 
-      city: form.city,
+      customer_id: customerId,
+      street: form.street.trim(),
+      number: form.number.trim(),
+      neighborhood: form.neighborhood.trim(), 
+      city: form.city.trim(),
       complement: complementText,
       label: form.label || null,
     };
     
+    let savedAddressId: string | null = null;
+
     if (editing) {
-      let { error } = await supabase.from('addresses').update(payload).eq('id', editing.id);
-      if (error && (error.message.includes('customer_id') || error.code === 'PGRST204')) {
-        delete payload.customer_id;
-        const res2 = await supabase.from('addresses').update(payload).eq('id', editing.id);
-        error = res2.error;
-      }
-      if (error) { toast.error('Erro ao atualizar: ' + error.message); return; }
-      toast.success('Endereço atualizado');
+      const { data: updatedAddr, error } = await supabase
+        .from('addresses')
+        .update(payload)
+        .eq('id', editing.id)
+        .select('id')
+        .maybeSingle();
+
+      if (error) { toast.error('Erro ao atualizar endereço: ' + error.message); return; }
+      savedAddressId = updatedAddr?.id || editing.id;
+      toast.success('Endereço atualizado com sucesso!');
     } else {
-      let { error } = await supabase.from('addresses').insert(payload);
-      if (error && (error.message.includes('customer_id') || error.code === 'PGRST204')) {
-        delete payload.customer_id;
-        const res2 = await supabase.from('addresses').insert(payload);
-        error = res2.error;
-      }
-      if (error) { toast.error('Erro ao salvar: ' + error.message); return; }
-      toast.success('Endereço adicionado');
+      const { data: insertedAddr, error } = await supabase
+        .from('addresses')
+        .insert(payload)
+        .select('id')
+        .maybeSingle();
+
+      if (error) { toast.error('Erro ao salvar endereço: ' + error.message); return; }
+      savedAddressId = insertedAddr?.id || null;
+      toast.success('Endereço adicionado com sucesso!');
     }
+
+    if (savedAddressId) {
+      localStorage.setItem('@epraja_selected_address', savedAddressId);
+    }
+
     setShowForm(false);
     queryClient.invalidateQueries({ queryKey: ['addresses'] });
     fetchAddresses(user.id);
