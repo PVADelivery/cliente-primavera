@@ -189,9 +189,9 @@ function StoreDetail() {
   const deliveryFee = store?.delivery_fee ?? 4.99;
 
   return (
-    <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen">
+    <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen" suppressHydrationWarning>
       {/* 1. Hero / Cover (Floating Logo, Header Limpo) */}
-      <div className="relative h-64 sm:h-80 overflow-hidden bg-neutral-950 isolate">
+      <div className="relative h-64 sm:h-80 overflow-hidden bg-neutral-950 isolate" suppressHydrationWarning>
         {/* Background neutro escuro com gradiente elegante */}
         <div
           aria-hidden
@@ -223,6 +223,7 @@ function StoreDetail() {
             alt={name}
             decoding="async"
             fetchPriority="high"
+            initial={false}
             onLoad={() => setCoverLoaded(true)}
             onError={() => setCoverFailed(true)}
             className="absolute inset-0 w-full h-full object-cover will-change-transform"
