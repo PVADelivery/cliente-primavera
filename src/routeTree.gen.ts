@@ -21,12 +21,12 @@ import { Route as MarketplaceSearchRouteImport } from './routes/marketplace.sear
 import { Route as MarketplaceRidesRouteImport } from './routes/marketplace.rides'
 import { Route as MarketplaceProfileRouteImport } from './routes/marketplace.profile'
 import { Route as MarketplacePrivacyRouteImport } from './routes/marketplace.privacy'
-import { Route as MarketplaceOrdersRouteImport } from './routes/marketplace.orders'
 import { Route as MarketplaceErrandsRouteImport } from './routes/marketplace.errands'
 import { Route as MarketplaceDirectoryRouteImport } from './routes/marketplace.directory'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceCartRouteImport } from './routes/marketplace.cart'
 import { Route as MarketplaceAddressesRouteImport } from './routes/marketplace.addresses'
+import { Route as MarketplaceOrdersIndexRouteImport } from './routes/marketplace.orders.index'
 import { Route as MarketplaceBusinessIndexRouteImport } from './routes/marketplace.business.index'
 import { Route as MarketplaceStoreStoreIdRouteImport } from './routes/marketplace.store.$storeId'
 import { Route as MarketplaceOrdersOrderIdRouteImport } from './routes/marketplace.orders.$orderId'
@@ -93,11 +93,6 @@ const MarketplacePrivacyRoute = MarketplacePrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => MarketplaceRoute,
 } as any)
-const MarketplaceOrdersRoute = MarketplaceOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => MarketplaceRoute,
-} as any)
 const MarketplaceErrandsRoute = MarketplaceErrandsRouteImport.update({
   id: '/errands',
   path: '/errands',
@@ -123,6 +118,11 @@ const MarketplaceAddressesRoute = MarketplaceAddressesRouteImport.update({
   path: '/addresses',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const MarketplaceOrdersIndexRoute = MarketplaceOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const MarketplaceBusinessIndexRoute =
   MarketplaceBusinessIndexRouteImport.update({
     id: '/business/',
@@ -136,9 +136,9 @@ const MarketplaceStoreStoreIdRoute = MarketplaceStoreStoreIdRouteImport.update({
 } as any)
 const MarketplaceOrdersOrderIdRoute =
   MarketplaceOrdersOrderIdRouteImport.update({
-    id: '/$orderId',
-    path: '/$orderId',
-    getParentRoute: () => MarketplaceOrdersRoute,
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => MarketplaceRoute,
   } as any)
 const MarketplaceBusinessVehiclesRoute =
   MarketplaceBusinessVehiclesRouteImport.update({
@@ -163,7 +163,6 @@ export interface FileRoutesByFullPath {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
   '/marketplace/errands': typeof MarketplaceErrandsRoute
-  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/rides': typeof MarketplaceRidesRoute
@@ -177,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business/': typeof MarketplaceBusinessIndexRoute
+  '/marketplace/orders/': typeof MarketplaceOrdersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -187,7 +187,6 @@ export interface FileRoutesByTo {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
   '/marketplace/errands': typeof MarketplaceErrandsRoute
-  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/rides': typeof MarketplaceRidesRoute
@@ -201,6 +200,7 @@ export interface FileRoutesByTo {
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business': typeof MarketplaceBusinessIndexRoute
+  '/marketplace/orders': typeof MarketplaceOrdersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,7 +213,6 @@ export interface FileRoutesById {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/marketplace/directory': typeof MarketplaceDirectoryRoute
   '/marketplace/errands': typeof MarketplaceErrandsRoute
-  '/marketplace/orders': typeof MarketplaceOrdersRouteWithChildren
   '/marketplace/privacy': typeof MarketplacePrivacyRoute
   '/marketplace/profile': typeof MarketplaceProfileRoute
   '/marketplace/rides': typeof MarketplaceRidesRoute
@@ -227,6 +226,7 @@ export interface FileRoutesById {
   '/marketplace/orders/$orderId': typeof MarketplaceOrdersOrderIdRoute
   '/marketplace/store/$storeId': typeof MarketplaceStoreStoreIdRoute
   '/marketplace/business/': typeof MarketplaceBusinessIndexRoute
+  '/marketplace/orders/': typeof MarketplaceOrdersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -240,7 +240,6 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/marketplace/directory'
     | '/marketplace/errands'
-    | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/rides'
@@ -254,6 +253,7 @@ export interface FileRouteTypes {
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business/'
+    | '/marketplace/orders/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -264,7 +264,6 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/marketplace/directory'
     | '/marketplace/errands'
-    | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/rides'
@@ -278,6 +277,7 @@ export interface FileRouteTypes {
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business'
+    | '/marketplace/orders'
   id:
     | '__root__'
     | '/'
@@ -289,7 +289,6 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/marketplace/directory'
     | '/marketplace/errands'
-    | '/marketplace/orders'
     | '/marketplace/privacy'
     | '/marketplace/profile'
     | '/marketplace/rides'
@@ -303,6 +302,7 @@ export interface FileRouteTypes {
     | '/marketplace/orders/$orderId'
     | '/marketplace/store/$storeId'
     | '/marketplace/business/'
+    | '/marketplace/orders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -398,13 +398,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplacePrivacyRouteImport
       parentRoute: typeof MarketplaceRoute
     }
-    '/marketplace/orders': {
-      id: '/marketplace/orders'
-      path: '/orders'
-      fullPath: '/marketplace/orders'
-      preLoaderRoute: typeof MarketplaceOrdersRouteImport
-      parentRoute: typeof MarketplaceRoute
-    }
     '/marketplace/errands': {
       id: '/marketplace/errands'
       path: '/errands'
@@ -440,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceAddressesRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/marketplace/orders/': {
+      id: '/marketplace/orders/'
+      path: '/orders'
+      fullPath: '/marketplace/orders/'
+      preLoaderRoute: typeof MarketplaceOrdersIndexRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/business/': {
       id: '/marketplace/business/'
       path: '/business'
@@ -456,10 +456,10 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/orders/$orderId': {
       id: '/marketplace/orders/$orderId'
-      path: '/$orderId'
+      path: '/orders/$orderId'
       fullPath: '/marketplace/orders/$orderId'
       preLoaderRoute: typeof MarketplaceOrdersOrderIdRouteImport
-      parentRoute: typeof MarketplaceOrdersRoute
+      parentRoute: typeof MarketplaceRoute
     }
     '/marketplace/business/vehicles': {
       id: '/marketplace/business/vehicles'
@@ -478,24 +478,12 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MarketplaceOrdersRouteChildren {
-  MarketplaceOrdersOrderIdRoute: typeof MarketplaceOrdersOrderIdRoute
-}
-
-const MarketplaceOrdersRouteChildren: MarketplaceOrdersRouteChildren = {
-  MarketplaceOrdersOrderIdRoute: MarketplaceOrdersOrderIdRoute,
-}
-
-const MarketplaceOrdersRouteWithChildren =
-  MarketplaceOrdersRoute._addFileChildren(MarketplaceOrdersRouteChildren)
-
 interface MarketplaceRouteChildren {
   MarketplaceAddressesRoute: typeof MarketplaceAddressesRoute
   MarketplaceCartRoute: typeof MarketplaceCartRoute
   MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
   MarketplaceDirectoryRoute: typeof MarketplaceDirectoryRoute
   MarketplaceErrandsRoute: typeof MarketplaceErrandsRoute
-  MarketplaceOrdersRoute: typeof MarketplaceOrdersRouteWithChildren
   MarketplacePrivacyRoute: typeof MarketplacePrivacyRoute
   MarketplaceProfileRoute: typeof MarketplaceProfileRoute
   MarketplaceRidesRoute: typeof MarketplaceRidesRoute
@@ -506,8 +494,10 @@ interface MarketplaceRouteChildren {
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   MarketplaceBusinessPropertyIdRoute: typeof MarketplaceBusinessPropertyIdRoute
   MarketplaceBusinessVehiclesRoute: typeof MarketplaceBusinessVehiclesRoute
+  MarketplaceOrdersOrderIdRoute: typeof MarketplaceOrdersOrderIdRoute
   MarketplaceStoreStoreIdRoute: typeof MarketplaceStoreStoreIdRoute
   MarketplaceBusinessIndexRoute: typeof MarketplaceBusinessIndexRoute
+  MarketplaceOrdersIndexRoute: typeof MarketplaceOrdersIndexRoute
 }
 
 const MarketplaceRouteChildren: MarketplaceRouteChildren = {
@@ -516,7 +506,6 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
   MarketplaceDirectoryRoute: MarketplaceDirectoryRoute,
   MarketplaceErrandsRoute: MarketplaceErrandsRoute,
-  MarketplaceOrdersRoute: MarketplaceOrdersRouteWithChildren,
   MarketplacePrivacyRoute: MarketplacePrivacyRoute,
   MarketplaceProfileRoute: MarketplaceProfileRoute,
   MarketplaceRidesRoute: MarketplaceRidesRoute,
@@ -527,8 +516,10 @@ const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   MarketplaceBusinessPropertyIdRoute: MarketplaceBusinessPropertyIdRoute,
   MarketplaceBusinessVehiclesRoute: MarketplaceBusinessVehiclesRoute,
+  MarketplaceOrdersOrderIdRoute: MarketplaceOrdersOrderIdRoute,
   MarketplaceStoreStoreIdRoute: MarketplaceStoreStoreIdRoute,
   MarketplaceBusinessIndexRoute: MarketplaceBusinessIndexRoute,
+  MarketplaceOrdersIndexRoute: MarketplaceOrdersIndexRoute,
 }
 
 const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(

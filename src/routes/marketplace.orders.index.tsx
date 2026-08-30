@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
-import { AeroSkeletonList, AeroEmptyState } from "@/components/aero";
+import { AeroSkeletonList } from "@/components/aero";
 
-export const Route = createFileRoute("/marketplace/orders")({
+export const Route = createFileRoute("/marketplace/orders/")({
   head: () => ({ meta: [{ title: "Meus pedidos — MT 24horas express" }] }),
   component: () => (
     <RequireAuth>
@@ -37,7 +37,7 @@ function OrdersList() {
         .from("orders")
         .select(`id, status, total, created_at, company:companies(name, logo_url)`)
         .eq("user_id", user.id)
-        .in("status", ["pending", "preparing", "ready", "in_route"])
+        .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -59,12 +59,12 @@ function OrdersList() {
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="text-center py-16 space-y-3">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2 text-primary">
+      <div className="text-center py-16 space-y-3 max-w-md mx-auto">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2 text-primary text-2xl">
           🍔
         </div>
         <h1 className="font-display text-2xl font-bold">Nenhum pedido ativo no momento</h1>
-        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+        <p className="text-sm text-muted-foreground">
           Seus pedidos em preparo ou a caminho aparecem aqui. Para ver pedidos anteriores, acesse seu Perfil.
         </p>
         <div className="flex items-center justify-center gap-3 pt-2">
@@ -94,9 +94,13 @@ function OrdersList() {
       <ul className="space-y-3">
         {orders.map((o: any) => (
           <li key={o.id}>
-            <Link to="/marketplace/orders/$orderId" params={{ orderId: o.id }} className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 transition-all">
+            <Link
+              to="/marketplace/orders/$orderId"
+              params={{ orderId: o.id }}
+              className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99]"
+            >
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold truncate text-foreground">{o.company?.name ?? "Restaurante"}</p>
+                <p className="text-base font-bold truncate text-foreground">{o.company?.name ?? "Restaurante"}</p>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/15 text-primary border border-primary/20 animate-pulse">
                   {STATUS_LABEL[o.status] ?? o.status}
                 </span>
