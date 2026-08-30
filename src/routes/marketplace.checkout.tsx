@@ -244,50 +244,79 @@ function Checkout() {
   const finalTotal = Math.max(0, subtotal) + (fulfillmentMode === 'pickup' ? 0 : (deliveryFee || 0));
 
   const handleSubmit = async () => {
-    const numericPhoneInput = (phoneInput ?? '').replace(/\D/g, '');
-    if (!profile?.phone || profile.phone.replace(/\D/g, '').length < 10) {
-      if (numericPhoneInput.length < 10 || numericPhoneInput.length > 11) {
-        toast.error('Por favor, informe um número de WhatsApp/Telefone válido com DDD.');
+    // 1. Validação de Endereço de Entrega
+    if (fulfillmentMode === 'delivery') {
+      if (!selectedAddress || addresses.length === 0) {
+        toast.error('📍 Por favor, cadastre ou selecione um endereço para entrega.');
+        if (addresses.length === 0) {
+          navigate({ to: '/marketplace/addresses', search: { returnTo: '/marketplace/checkout' } as any });
+        } else {
+          setShowAddressModal(true);
+        }
         return;
       }
+      if (loadingFee) {
+        toast.error('⏳ Calculando a taxa de entrega... Por favor, aguarde um instante.');
+        return;
+      }
+      if (unavailable) {
+        toast.error('🚫 Este estabelecimento não entrega no endereço selecionado. Altere o endereço ou selecione Retirada.');
+        return;
+      }
+    }
+
+    // 2. Validação de WhatsApp / Telefone
+    const numericPhoneInput = (phoneInput ?? '').replace(/\D/g, '');
+    const profileNumeric = (profile?.phone ?? '').replace(/\D/g, '');
+    const currentPhone = numericPhoneInput || profileNumeric;
+
+    if (!currentPhone || currentPhone.length < 10 || currentPhone.length > 11) {
+      toast.error('📱 Por favor, informe um número de WhatsApp válido com DDD.');
+      const el = document.getElementById('checkout-phone-input');
+      if (el) {
+        el.focus();
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    if (currentPhone !== profileNumeric) {
       setLoading(true);
       try {
-        // Tenta atualizar diretamente o perfil existente do usuário
+        // Atualiza perfil existente do usuário
         const { error: updateErr } = await supabase
           .from('profiles')
           .update({
-            phone: phoneInput,
+            phone: phoneInput || currentPhone,
             full_name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
             updated_at: new Date().toISOString(),
           })
           .or(`id.eq.${user!.id},user_id.eq.${user!.id}`);
 
         if (updateErr) {
-          // Fallback de insert com status pending compatível com RLS
           await supabase
             .from('profiles')
             .insert({
               id: user!.id,
               user_id: user!.id,
-              phone: phoneInput,
+              phone: phoneInput || currentPhone,
               full_name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
               role: 'customer',
               status: 'pending' as any,
             });
         }
 
-        // Sincroniza metadados no Auth, tabela customers e carteira
         try {
           void supabase.auth.updateUser({
-            data: { phone: phoneInput }
+            data: { phone: phoneInput || currentPhone }
           });
           void supabase.from('customers').upsert({
             user_id: user!.id,
-            phone: phoneInput,
+            phone: phoneInput || currentPhone,
             name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
           }, { onConflict: 'user_id' });
           void supabase.from('customer_credits').update({
-            customer_phone: phoneInput,
+            customer_phone: phoneInput || currentPhone,
             updated_at: new Date().toISOString(),
           } as any).eq('customer_id', user!.id);
         } catch (syncErr) {}
@@ -298,12 +327,6 @@ function Checkout() {
       } finally {
         setLoading(false);
       }
-    }
-
-    if (fulfillmentMode === 'delivery') {
-      if (!selectedAddress) { toast.error('Selecione um endereço'); return; }
-      if (unavailable) { toast.error('Entrega não disponível'); return; }
-      if (loadingFee) { toast.error('Calculando frete, aguarde'); return; }
     }
 
     if (!companyId || items.length === 0) return;
@@ -729,11 +752,17 @@ function Checkout() {
                 </div>
               </div>
               <input
+                id="checkout-phone-input"
                 type="tel"
                 value={phoneInput ?? ''}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="(11) 99999-9999"
-                className="w-full h-11 bg-background border border-border rounded-xl px-4 text-sm font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                className={cn(
+                  "w-full h-11 bg-background border rounded-xl px-4 text-sm font-medium focus:outline-none transition-all",
+                  !phoneInput || phoneInput.replace(/\D/g, '').length < 10
+                    ? "border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                    : "border-border focus:border-primary focus:ring-1 focus:ring-primary"
+                )}
                 required
               />
             </div>
@@ -746,8 +775,54 @@ function Checkout() {
       <div className="sticky bottom-0 z-40 px-4 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
         <div className="max-w-2xl mx-auto">
           <div className="bg-card/95 backdrop-blur-2xl border border-border rounded-3xl p-5 shadow-2xl relative overflow-hidden">
-            {/* Glossy highlight */}
             
+            {/* ── AVISOS DE CAMPOS PENDENTES EM TEMPO REAL ── */}
+            {fulfillmentMode === 'delivery' && (!selectedAddress || addresses.length === 0) && (
+              <div className="mb-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex items-center justify-between gap-3 text-xs text-amber-500 font-semibold">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MapPin className="w-5 h-5 shrink-0 text-amber-400" />
+                  <span className="truncate">Falta informar o local de entrega</span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="shrink-0 bg-primary text-black font-extrabold rounded-xl h-8 text-xs cursor-pointer hover:bg-primary/90"
+                  onClick={() => {
+                    if (addresses.length === 0) {
+                      navigate({ to: '/marketplace/addresses', search: { returnTo: '/marketplace/checkout' } as any });
+                    } else {
+                      setShowAddressModal(true);
+                    }
+                  }}
+                >
+                  {addresses.length === 0 ? 'Cadastrar' : 'Selecionar'}
+                </Button>
+              </div>
+            )}
+
+            {fulfillmentMode === 'delivery' && selectedAddress && unavailable && (
+              <div className="mb-4 bg-destructive/10 border border-destructive/30 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-destructive font-semibold">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>Entrega indisponível para este endereço. Altere o endereço ou selecione 'Retirada'.</span>
+              </div>
+            )}
+
+            {paymentMethod === 'credits' && creditBalance < finalTotal && (
+              <div className="mb-4 bg-destructive/10 border border-destructive/30 rounded-2xl p-3.5 flex items-center justify-between gap-3 text-xs text-destructive font-semibold">
+                <div className="flex items-center gap-2 min-w-0">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Saldo insuficiente (Faltam R$ {(finalTotal - creditBalance).toFixed(2).replace('.', ',')})</span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="shrink-0 bg-primary text-black font-extrabold rounded-xl h-8 text-xs cursor-pointer hover:bg-primary/90"
+                  onClick={() => openCreditRechargeWhatsApp(profile?.full_name || user?.email, Math.ceil(finalTotal - creditBalance))}
+                >
+                  Recarregar (+10%)
+                </Button>
+              </div>
+            )}
             
             <div className="relative z-10 space-y-3 mb-4">
               <div className="flex justify-between items-center text-sm">
@@ -759,7 +834,7 @@ function Checkout() {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Taxa de entrega</span>
                   <span className="font-medium">
-                    {loadingFee ? <Loader2 className="w-4 h-4 animate-spin inline" /> : (deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : 'A calcular')}
+                    {loadingFee ? <Loader2 className="w-4 h-4 animate-spin inline" /> : (deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : (!selectedAddress ? 'Endereço pendente' : 'A calcular'))}
                   </span>
                 </div>
               )}
@@ -773,11 +848,11 @@ function Checkout() {
             </div>
 
             <Button 
-              className="w-full h-14 rounded-2xl text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_20px_rgba(255,222,33,0.3)] border border-primary/50 relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-14 rounded-2xl text-base font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_4px_20px_rgba(255,222,33,0.3)] border border-primary/50 relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               onClick={handleSubmit}
               disabled={loading || (fulfillmentMode === 'delivery' && loadingFee)}
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Confirmar Pedido'}
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (fulfillmentMode === 'delivery' && (!selectedAddress || addresses.length === 0) ? 'Adicionar Endereço de Entrega' : 'Confirmar Pedido')}
             </Button>
           </div>
         </div>

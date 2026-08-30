@@ -242,6 +242,12 @@ function Addresses() {
     setShowForm(false);
     queryClient.invalidateQueries({ queryKey: ['addresses'] });
     fetchAddresses(user.id);
+
+    if (returnTo) {
+      setTimeout(() => {
+        navigate({ to: returnTo as any });
+      }, 400);
+    }
   };
 
   const handleDelete = async (id: string) => {
