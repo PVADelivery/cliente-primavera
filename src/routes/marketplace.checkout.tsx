@@ -30,7 +30,7 @@ export const Route = createFileRoute('/marketplace/checkout')({
 function Checkout() {
   const router = useRouter();
   const navigate = useNavigate();
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, loading: authLoading } = useAuth();
   
   // Use the CORRECT CartContext from the new project
   const { items, companyId, companyName, clear, total: subtotal, count } = useCart();
@@ -425,6 +425,14 @@ function Checkout() {
       releaseLock(); 
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-background">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!user) { return <Navigate to="/login" />; }
   if (items.length === 0) { return <Navigate to="/marketplace/cart" />; }
