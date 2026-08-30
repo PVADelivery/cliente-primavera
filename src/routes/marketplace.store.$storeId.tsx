@@ -19,10 +19,6 @@ import {
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useCart } from "@/contexts/CartContext";
 import type { Company, Product } from "@/types/database";
-import coverItalian from "@/assets/cover-italian.jpg";
-import dishLasagna from "@/assets/dish-lasagna.jpg";
-import dishGnocchi from "@/assets/dish-gnocchi.jpg";
-import dishTiramisu from "@/assets/dish-tiramisu.jpg";
 import {
   Drawer,
   DrawerContent,
@@ -37,13 +33,6 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/marketplace/store/$storeId")({
   component: StoreDetail,
 });
-
-const MOCK_PRODUCTS: (Product & { promo?: number })[] = [
-  { id: "p1", company_id: "m1", name: "Lasanha à Bolonhesa", price: 42.9, description: "Massa fresca, molho da casa, queijo gratinado por 40min no forno a lenha.", category: "Pratos Principais", image_url: dishLasagna, image_urls: null, is_active: true, promo: 20 },
-  { id: "p2", company_id: "m1", name: "Nhoque ao Sugo", price: 36.0, description: "Receita tradicional da nona, molho de tomate San Marzano e manjericão fresco.", category: "Pratos Principais", image_url: dishGnocchi, image_urls: null, is_active: true },
-  { id: "p3", company_id: "m1", name: "Tiramisu", price: 18.0, description: "Sobremesa italiana clássica com mascarpone, café espresso e cacau em pó.", category: "Sobremesas", image_url: dishTiramisu, image_urls: null, is_active: true },
-  { id: "p4", company_id: "m1", name: "Refrigerante Cola", price: 6.0, description: "Lata 350ml bem gelada.", category: "Bebidas", image_url: null, image_urls: null, is_active: true },
-];
 
 function parseImages(imageUrl: string | null): string[] {
   if (!imageUrl) return [];
@@ -145,7 +134,7 @@ function StoreDetail() {
     },
   });
 
-  const name = store?.name ?? "Cantina da Nona";
+  const name = store?.name ?? "";
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return products;
@@ -201,20 +190,20 @@ function StoreDetail() {
 
   return (
     <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen">
-      {/* 1. Hero / Cover (Premium, Parallax, Floating Logo) */}
+      {/* 1. Hero / Cover (Floating Logo, Header Limpo) */}
       <div className="relative h-64 sm:h-80 overflow-hidden bg-neutral-950 isolate">
-        {/* Premium gradient fallback: visível enquanto a foto carrega ou se ela falhar */}
+        {/* Background neutro escuro com gradiente elegante */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 80% at 30% 20%, oklch(0.42 0.18 30 / 0.9), transparent 60%), radial-gradient(100% 80% at 80% 80%, oklch(0.32 0.12 40 / 0.9), transparent 60%), linear-gradient(135deg, oklch(0.22 0.05 30), oklch(0.14 0.03 30))",
+              "radial-gradient(120% 80% at 30% 20%, oklch(0.25 0.05 30 / 0.9), transparent 60%), radial-gradient(100% 80% at 80% 80%, oklch(0.20 0.04 40 / 0.9), transparent 60%), linear-gradient(135deg, oklch(0.18 0.02 30), oklch(0.12 0.01 30))",
           }}
         />
 
-        {/* Shimmer leve enquanto a imagem não carrega (sem flash branco) */}
-        {!coverLoaded && !coverFailed && (
+        {/* Shimmer leve apenas se houver foto cadastrada carregando */}
+        {store?.cover_url && !coverLoaded && !coverFailed && (
           <div
             aria-hidden
             className="absolute inset-0 opacity-60"
@@ -227,10 +216,10 @@ function StoreDetail() {
           />
         )}
 
-        {!coverFailed && (
+        {store?.cover_url && !coverFailed && (
           <motion.img
             ref={coverImgRef}
-            src={store?.cover_url || coverItalian}
+            src={store.cover_url}
             alt={name}
             decoding="async"
             fetchPriority="high"
@@ -248,7 +237,7 @@ function StoreDetail() {
           />
         )}
 
-        {/* Overlays sutis — apenas o suficiente para legibilidade do nome */}
+        {/* Overlays sutis para legibilidade do nome */}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/35 to-transparent pointer-events-none" />
 
@@ -302,12 +291,14 @@ function StoreDetail() {
             >
               {name}
             </h1>
-            <p
-              className="text-white/95 text-sm font-medium mt-1 truncate"
-              style={{ textShadow: "0 1px 8px rgba(0,0,0,0.55)" }}
-            >
-              {store?.description ?? "Massas artesanais"} · {store?.category ?? "Italiana"}
-            </p>
+            {(store?.description || store?.category) && (
+              <p
+                className="text-white/95 text-sm font-medium mt-1 truncate"
+                style={{ textShadow: "0 1px 8px rgba(0,0,0,0.55)" }}
+              >
+                {[store?.description, store?.category].filter(Boolean).join(" · ")}
+              </p>
+            )}
           </div>
         </motion.div>
       </div>
