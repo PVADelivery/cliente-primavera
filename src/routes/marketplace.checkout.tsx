@@ -115,7 +115,11 @@ function Checkout() {
       setLoadingFee(true);
       setUnavailable(false);
       try {
-        const { data: dbCompany } = await supabase.from('companies').select('delivery_fee, delivery_mode, pricing_table_id, region_id, delivery_regions_pricing').eq('id', companyId).single();
+        const { data: dbCompany } = await supabase
+          .from('companies')
+          .select('delivery_fee, delivery_mode, pricing_table_id, region_id, delivery_regions_pricing')
+          .eq('id', companyId)
+          .maybeSingle();
         if (!dbCompany) return;
         
         let destRegionId = (addr as any).region_id;
@@ -173,7 +177,11 @@ function Checkout() {
               }
            }
            
-           const { data: destRegion } = await supabase.from('regions').select('delivery_fee, price').eq('id', destRegionId).single();
+           const { data: destRegion } = await supabase
+             .from('regions')
+             .select('delivery_fee, price')
+             .eq('id', destRegionId)
+             .maybeSingle();
            if (destRegion) {
               const rPrice = Number(destRegion.delivery_fee || destRegion.price || 0);
               if (rPrice > 0) {
@@ -294,8 +302,13 @@ function Checkout() {
     
     setLoading(true);
     try {
-      const { data: storeStatus } = await supabase.from('companies').select('is_open, active, is_active, business_hours').eq('id', companyId).single();
-      if (!storeStatus || !isStoreOpenNow(storeStatus as any)) {
+      const { data: storeStatus } = await supabase
+        .from('companies')
+        .select('is_open, active, is_active, business_hours')
+        .eq('id', companyId)
+        .maybeSingle();
+
+      if (storeStatus && !isStoreOpenNow(storeStatus as any)) {
         toast.error('Este restaurante ainda não abriu ou já fechou.');
         setLoading(false);
         return;
