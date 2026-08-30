@@ -114,13 +114,57 @@ function Profile() {
   };
 
   const fetchOrders = async () => {
-    const { data, error } = await supabase
+    try {
+      const { data: custs } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('user_id', user.id);
+
+      const cIds = (custs || []).map((c) => c.id).filter(Boolean);
+      if (cIds.length === 0) cIds.push(user.id);
+
+      const { data, error } = await supabase
         .from('orders')
-        .select(`id, status, total, created_at, company:companies(name, logo_url)`)
-        .eq('user_id', user.id)
+        .select('id, status, total, created_at, company_id, companies(name, logo_url)')
+        .in('customer_id', cIds)
         .order('created_at', { ascending: false });
-    if (error) throw error;
-    setOrders(data || []);
+
+      if (error) {
+        const { data: fallbackData } = await supabase
+          .from('orders')
+          .select('id, status, total, created_at, company_id')
+          .in('customer_id', cIds)
+          .order('created_at', { ascending: false });
+
+        if (fallbackData && fallbackData.length > 0) {
+          const compIds = Array.from(new Set(fallbackData.map((o) => o.company_id).filter(Boolean)));
+          const { data: compList } = await supabase
+            .from('companies')
+            .select('id, name, logo_url')
+            .in('id', compIds);
+
+          const compMap = new Map((compList || []).map((c) => [c.id, c]));
+          setOrders(
+            fallbackData.map((o) => ({
+              ...o,
+              company: compMap.get(o.company_id) || { name: 'Restaurante', logo_url: null },
+            }))
+          );
+          return;
+        }
+        setOrders([]);
+        return;
+      }
+      setOrders(
+        (data || []).map((o: any) => ({
+          ...o,
+          company: o.companies || o.company || { name: 'Restaurante', logo_url: null },
+        }))
+      );
+    } catch (e) {
+      console.warn('Erro ao carregar historico de pedidos:', e);
+      setOrders([]);
+    }
   };
 
   const fetchRides = async () => {

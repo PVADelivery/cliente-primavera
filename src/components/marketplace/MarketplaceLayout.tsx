@@ -72,10 +72,18 @@ export function MarketplaceLayout() {
       try {
         // 1. Pedidos ativos
         if (user?.id) {
+          const { data: custs } = await supabase
+            .from("customers")
+            .select("id")
+            .eq("user_id", user.id);
+
+          const cIds = (custs || []).map((c) => c.id).filter(Boolean);
+          if (cIds.length === 0) cIds.push(user.id);
+
           const { count: ordersCount, error: ordersErr } = await supabase
             .from("orders")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", user.id)
+            .in("customer_id", cIds)
             .in("status", ["pending", "preparing", "ready", "in_route"]);
 
           if (!ordersErr && typeof ordersCount === "number") {

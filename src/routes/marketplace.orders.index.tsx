@@ -31,20 +31,69 @@ function OrdersList() {
     queryKey: ["active-orders", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      if (!isSupabaseConfigured || !user) return [];
-      // Filtra estritamente pedidos ATIVOS (em andamento)
-      const { data, error } = await supabase
-        .from("orders")
-        .select(`id, status, total, created_at, company:companies(name, logo_url)`)
-        .eq("user_id", user.id)
-        .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
-        .order("created_at", { ascending: false });
+      if (!isSupabaseConfigured || !user?.id) return [];
+      try {
+        // 1. Obter os customer_ids vinculados ao usuário
+        const { data: customers } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("user_id", user.id);
 
-      if (error) {
-        console.error("Error fetching active orders:", error);
+        const customerIds = (customers || []).map((c) => c.id).filter(Boolean);
+
+        // Se não tiver registro em customers, tenta usar o próprio user.id
+        if (customerIds.length === 0) {
+          customerIds.push(user.id);
+        }
+
+        // 2. Buscar pedidos ativos vinculados aos customer_ids
+        let query = supabase
+          .from("orders")
+          .select(`
+            id, status, total, created_at, company_id,
+            companies(name, logo_url)
+          `)
+          .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
+          .order("created_at", { ascending: false });
+
+        if (customerIds.length > 0) {
+          query = query.in("customer_id", customerIds);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.warn("[OrdersList] Falha na query primária, tentando fallback:", error);
+          // Fallback sem join caso a relação companies esteja inacessível
+          const { data: fallbackData } = await supabase
+            .from("orders")
+            .select("id, status, total, created_at, company_id")
+            .in("customer_id", customerIds)
+            .in("status", ["pending", "preparing", "ready", "in_route", "accepted"])
+            .order("created_at", { ascending: false });
+
+          if (fallbackData && fallbackData.length > 0) {
+            // Busca os nomes das empresas separadamente
+            const compIds = Array.from(new Set(fallbackData.map((o) => o.company_id).filter(Boolean)));
+            const { data: compList } = await supabase
+              .from("companies")
+              .select("id, name, logo_url")
+              .in("id", compIds);
+
+            const compMap = new Map((compList || []).map((c) => [c.id, c]));
+            return fallbackData.map((o) => ({
+              ...o,
+              companies: compMap.get(o.company_id) || { name: "Restaurante", logo_url: null },
+            }));
+          }
+          return [];
+        }
+
+        return data ?? [];
+      } catch (err) {
+        console.error("Error fetching active orders:", err);
         return [];
       }
-      return data ?? [];
     },
   });
 
@@ -92,26 +141,29 @@ function OrdersList() {
       </div>
 
       <ul className="space-y-3">
-        {orders.map((o: any) => (
-          <li key={o.id}>
-            <Link
-              to="/marketplace/orders/$orderId"
-              params={{ orderId: o.id }}
-              className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99]"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-base font-bold truncate text-foreground">{o.company?.name ?? "Restaurante"}</p>
-                <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400 text-black border border-amber-500 shadow-sm">
-                  {STATUS_LABEL[o.status] ?? o.status}
-                </span>
-              </div>
-              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{new Date(o.created_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
-                <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace(".", ",")}</span>
-              </div>
-            </Link>
-          </li>
-        ))}
+        {orders.map((o: any) => {
+          const companyName = o.companies?.name || o.company?.name || "Restaurante";
+          return (
+            <li key={o.id}>
+              <Link
+                to="/marketplace/orders/$orderId"
+                params={{ orderId: o.id }}
+                className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99]"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-base font-bold truncate text-foreground">{companyName}</p>
+                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400 text-black border border-amber-500 shadow-sm">
+                    {STATUS_LABEL[o.status] ?? o.status}
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{new Date(o.created_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace(".", ",")}</span>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
