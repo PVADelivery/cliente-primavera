@@ -266,14 +266,14 @@ export function MarketplaceLayout() {
                   onClick={() => {
                     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(8);
                   }}
-                  className={`aero-focus relative z-10 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold transition-all duration-200 active:scale-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  className={`aero-focus relative z-10 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 py-2 text-[11px] transition-all duration-200 active:scale-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                    active ? "text-black dark:text-white font-black" : "text-zinc-700 dark:text-zinc-300 font-bold hover:text-black dark:hover:text-white"
                   }`}
                 >
                   <span className="relative">
                     <Icon
                       className={`w-5 h-5 transition-transform duration-300 ${
-                        active ? "-translate-y-0.5 scale-110 drop-shadow-[0_0_8px_var(--primary)]" : ""
+                        active ? "-translate-y-0.5 scale-110 text-black dark:text-white stroke-[2.4]" : "text-zinc-700 dark:text-zinc-300 stroke-[1.8]"
                       }`}
                     />
                     {t.to === "/marketplace/cart" && count > 0 && (
