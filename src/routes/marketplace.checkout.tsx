@@ -336,14 +336,22 @@ function Checkout() {
         return;
       }
 
+      // Obtém ou provisiona atomicamente o customer_id seguro
+      const { customerId: resolvedCustomerId } = await getOrCreateCustomer(
+        profile?.full_name || user?.user_metadata?.full_name,
+        phoneInput || profile?.phone || user?.user_metadata?.phone
+      );
+
       const requestBody = {
         items: validItems.map((it) => ({
           product_id: it.productId,
-          quantity: it.quantity,
+          quantity: Number(it.quantity) || 1,
           notes: it.notes || null,
           options: [],
         })),
         company_id: companyId,
+        store_id: companyId,
+        customer_id: resolvedCustomerId || undefined,
         address_id: fulfillmentMode === 'pickup' ? null : selectedAddress,
         payment_method: paymentMethod,
         coupon_code: null,
@@ -354,14 +362,33 @@ function Checkout() {
         fulfillment_mode: fulfillmentMode,
       };
 
+      console.log('[Checkout] create-order payload:', {
+        customer_id: resolvedCustomerId,
+        company_id: companyId,
+        fulfillment_mode: fulfillmentMode,
+        address_id: requestBody.address_id,
+        items_count: requestBody.items.length,
+        payment_method: paymentMethod,
+      });
+
       const { data, error: functionError } = await supabase.functions.invoke('create-order', { body: requestBody });
 
       if (functionError) {
+        let realErrMsg = functionError.message;
+        try {
+          if ('context' in functionError && typeof (functionError as any).context?.json === 'function') {
+            const errBody = await (functionError as any).context.json();
+            if (errBody?.error || errBody?.message) {
+              realErrMsg = errBody.error || errBody.message;
+            }
+          }
+        } catch (e) {}
+        console.error('[Checkout] create-order error:', realErrMsg, functionError);
         reportErrorToTelegram({
-          error_message: `[Checkout] Erro na Edge Function: ${functionError.message}`,
+          error_message: `[Checkout] Erro na Edge Function: ${realErrMsg}`,
           url: window.location.href,
         });
-        throw new Error('Falha de conexão. Verifique sua internet e tente novamente.');
+        throw new Error(realErrMsg || 'Falha ao processar o pedido. Tente novamente.');
       }
       
       if (data?.error) {
