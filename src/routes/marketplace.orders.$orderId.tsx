@@ -126,10 +126,10 @@ function OrderDetailPage() {
               </p>
             </div>
           </div>
-          <span className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-full border ${
+          <span className={`text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border shadow-sm ${
             isCancelled 
-              ? "bg-destructive/10 text-destructive border-destructive/20" 
-              : "bg-primary/15 text-primary border-primary/20 animate-pulse"
+              ? "bg-rose-500 text-white border-rose-600" 
+              : "bg-amber-400 text-black border-amber-500"
           }`}>
             {LABEL[order.status] ?? order.status}
           </span>
@@ -139,7 +139,7 @@ function OrderDetailPage() {
       {/* Timeline de Status */}
       {!isCancelled && (
         <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Status do Pedido</h2>
+          <h2 className="text-xs font-black uppercase tracking-wider text-muted-foreground mb-4">Status do Pedido</h2>
           <ol className="space-y-4">
             {TIMELINE.map((s, i) => {
               const reached = i <= currentIdx;
@@ -149,11 +149,11 @@ function OrderDetailPage() {
                   <span className={`w-8 h-8 rounded-full grid place-items-center shrink-0 transition-all ${
                     reached 
                       ? isCurrent 
-                        ? "bg-primary text-primary-foreground ring-4 ring-primary/20" 
-                        : "bg-primary text-primary-foreground" 
+                        ? "bg-amber-400 text-black ring-4 ring-amber-400/30" 
+                        : "bg-amber-400 text-black" 
                       : "bg-secondary text-muted-foreground"
                   }`}>
-                    {reached ? <CheckCircle2 className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
+                    {reached ? <CheckCircle2 className="w-4 h-4 text-black" /> : <Clock className="w-4 h-4" />}
                   </span>
                   <div className="flex-1">
                     <p className={`text-sm ${reached ? "font-bold text-foreground" : "text-muted-foreground font-medium"}`}>

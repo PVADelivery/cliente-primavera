@@ -86,7 +86,7 @@ function OrdersList() {
           <h1 className="font-display text-2xl font-black italic tracking-tight">Pedidos Ativos</h1>
           <p className="text-xs text-muted-foreground">Acompanhe seus pedidos em andamento</p>
         </div>
-        <Link to="/marketplace/profile" className="text-xs font-bold text-primary hover:underline">
+        <Link to="/marketplace/profile" className="text-xs font-black text-foreground hover:text-primary bg-secondary px-3 py-1.5 rounded-lg border border-border transition-colors">
           Ver Histórico
         </Link>
       </div>
@@ -101,7 +101,7 @@ function OrdersList() {
             >
               <div className="flex items-center justify-between">
                 <p className="text-base font-bold truncate text-foreground">{o.company?.name ?? "Restaurante"}</p>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/15 text-primary border border-primary/20 animate-pulse">
+                <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400 text-black border border-amber-500 shadow-sm">
                   {STATUS_LABEL[o.status] ?? o.status}
                 </span>
               </div>
