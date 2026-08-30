@@ -23,7 +23,7 @@ function Addresses() {
   const queryClient = useQueryClient();
   const search = useSearch({ from: '/marketplace/addresses' }) as any;
   const returnTo = search?.returnTo;
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const router = useRouter();
   
