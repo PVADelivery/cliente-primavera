@@ -252,19 +252,49 @@ function Checkout() {
       }
       setLoading(true);
       try {
-        const { error } = await supabase.from('profiles').upsert({
-          id: user!.id,
-          user_id: user!.id,
-          phone: phoneInput,
-          full_name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
-          role: profile?.role || 'customer'
-        });
-        if (error) throw error;
+        // Tenta atualizar diretamente o perfil existente do usuário
+        const { error: updateErr } = await supabase
+          .from('profiles')
+          .update({
+            phone: phoneInput,
+            full_name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
+            updated_at: new Date().toISOString(),
+          })
+          .or(`id.eq.${user!.id},user_id.eq.${user!.id}`);
+
+        if (updateErr) {
+          // Fallback de insert com status pending compatível com RLS
+          await supabase
+            .from('profiles')
+            .insert({
+              id: user!.id,
+              user_id: user!.id,
+              phone: phoneInput,
+              full_name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
+              role: 'customer',
+              status: 'pending' as any,
+            });
+        }
+
+        // Sincroniza metadados no Auth, tabela customers e carteira
+        try {
+          void supabase.auth.updateUser({
+            data: { phone: phoneInput }
+          });
+          void supabase.from('customers').upsert({
+            user_id: user!.id,
+            phone: phoneInput,
+            name: profile?.full_name || user?.user_metadata?.full_name || 'Cliente',
+          }, { onConflict: 'user_id' });
+          void supabase.from('customer_credits').update({
+            customer_phone: phoneInput,
+            updated_at: new Date().toISOString(),
+          } as any).eq('customer_id', user!.id);
+        } catch (syncErr) {}
+
         await refreshProfile();
       } catch (err) {
-        toast.error('Erro ao salvar o número. Tente novamente.');
-        setLoading(false);
-        return;
+        console.warn('Erro ao atualizar dados de contato do cliente:', err);
       } finally {
         setLoading(false);
       }

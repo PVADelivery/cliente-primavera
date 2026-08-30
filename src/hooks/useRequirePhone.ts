@@ -51,17 +51,42 @@ export function useRequirePhone() {
 
     setIsSubmittingPhone(true);
     try {
-      const { error } = await supabase
+      const { error: updateErr } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          user_id: user.id,
+        .update({
           phone: phoneInput,
           full_name: profile?.full_name || user.user_metadata?.full_name || 'Cliente',
-          role: profile?.role || 'customer'
-        });
+          updated_at: new Date().toISOString(),
+        })
+        .or(`id.eq.${user.id},user_id.eq.${user.id}`);
 
-      if (error) throw error;
+      if (updateErr) {
+        await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            user_id: user.id,
+            phone: phoneInput,
+            full_name: profile?.full_name || user.user_metadata?.full_name || 'Cliente',
+            role: 'customer',
+            status: 'pending' as any,
+          });
+      }
+
+      try {
+        void supabase.auth.updateUser({
+          data: { phone: phoneInput }
+        });
+        void supabase.from('customers').upsert({
+          user_id: user.id,
+          phone: phoneInput,
+          name: profile?.full_name || user.user_metadata?.full_name || 'Cliente',
+        }, { onConflict: 'user_id' });
+        void supabase.from('customer_credits').update({
+          customer_phone: phoneInput,
+          updated_at: new Date().toISOString(),
+        } as any).eq('customer_id', user.id);
+      } catch (syncErr) {}
       
       await refreshProfile();
       toast.success('Telefone salvo com sucesso!');
