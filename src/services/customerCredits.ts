@@ -37,7 +37,7 @@ export function openCreditRechargeWhatsApp(customerName?: string, amount: number
   const bonus = amount * BONUS_PERCENTAGE;
   const totalCredits = amount + bonus;
   const nameStr = customerName ? `Meu nome: ${customerName}.\n` : "";
-  const text = `Olá, Administrador do MT 24horas express! 👋\n\nGostaria de comprar *R$ ${amount.toFixed(2).replace(".", ",")} em créditos* para minha conta do App com o *Bônus de 10%* (+R$ ${bonus.toFixed(2).replace(".", ",")} de bônus = Total de *R$ ${totalCredits.toFixed(2).replace(".", ",")} em créditos*).\n\n${nameStr}Por favor, me informe a chave Pix para pagamento!`;
+  const text = `Olá, Administrador do MT 24horas express!\n\nGostaria de comprar *R$ ${amount.toFixed(2).replace(".", ",")} em créditos* para minha conta do App com o *Bônus de 10%* (+R$ ${bonus.toFixed(2).replace(".", ",")} de bônus = Total de *R$ ${totalCredits.toFixed(2).replace(".", ",")} em créditos*).\n\n${nameStr}Por favor, me informe a chave Pix para pagamento!`;
   
   const url = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   window.open(url, "_blank", "noopener,noreferrer");
