@@ -1,10 +1,12 @@
+import React, { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { RequireAuth } from "@/components/marketplace/RequireAuth";
 import { AeroSkeletonList } from "@/components/aero";
-import { Package, Clock, CheckCircle2, XCircle, ArrowRight, Store } from "lucide-react";
+import { ClientOrderDetailModal } from "@/components/marketplace/ClientOrderDetailModal";
+import { Package, Clock, CheckCircle2, Store } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/orders/")({
   head: () => ({ meta: [{ title: "Meus pedidos — MT 24horas express" }] }),
@@ -26,6 +28,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 function OrdersList() {
   const { user } = useAuth();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
   const { data: allOrders = [], isLoading } = useQuery({
     queryKey: ["client-orders-all", user?.id],
     enabled: !!user,
@@ -43,7 +47,7 @@ function OrdersList() {
           customerIds.push(user.id);
         }
 
-        // 2. Buscar todos os pedidos vinculados ao customer_id (sem o status inválido 'accepted')
+        // 2. Buscar todos os pedidos vinculados ao customer_id
         const { data, error } = await supabase
           .from("orders")
           .select(`
@@ -55,7 +59,6 @@ function OrdersList() {
           .limit(50);
 
         if (error) {
-          // Fallback sem join
           const { data: fallbackData } = await supabase
             .from("orders")
             .select("id, status, total, created_at, company_id")
@@ -143,10 +146,10 @@ function OrdersList() {
               const companyName = o.companies?.name || o.company?.name || "Restaurante";
               return (
                 <li key={o.id}>
-                  <Link
-                    to="/marketplace/orders/$orderId"
-                    params={{ orderId: o.id }}
-                    className="block p-4 bg-card rounded-2xl border-2 border-primary/40 shadow-md hover:border-primary transition-all active:scale-[0.99]"
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOrderId(o.id)}
+                    className="w-full text-left block p-4 bg-card rounded-2xl border-2 border-primary/40 shadow-md hover:border-primary transition-all active:scale-[0.99] cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <p className="text-base font-bold truncate text-foreground">{companyName}</p>
@@ -158,7 +161,7 @@ function OrdersList() {
                       <span>{new Date(o.created_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
                       <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace(".", ",")}</span>
                     </div>
-                  </Link>
+                  </button>
                 </li>
               );
             })}
@@ -180,10 +183,10 @@ function OrdersList() {
               const isDelivered = o.status === "delivered";
               return (
                 <li key={o.id}>
-                  <Link
-                    to="/marketplace/orders/$orderId"
-                    params={{ orderId: o.id }}
-                    className="block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99]"
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOrderId(o.id)}
+                    className="w-full text-left block p-4 bg-card rounded-2xl border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99] cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -202,13 +205,20 @@ function OrdersList() {
                       <span>{new Date(o.created_at).toLocaleDateString("pt-BR")} às {new Date(o.created_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</span>
                       <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace(".", ",")}</span>
                     </div>
-                  </Link>
+                  </button>
                 </li>
               );
             })}
           </ul>
         </div>
       )}
+
+      {/* MODAL DE DETALHES DO PEDIDO */}
+      <ClientOrderDetailModal
+        orderId={selectedOrderId}
+        isOpen={!!selectedOrderId}
+        onClose={() => setSelectedOrderId(null)}
+      />
     </div>
   );
 }

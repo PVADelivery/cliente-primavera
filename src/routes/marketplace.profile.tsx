@@ -26,6 +26,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import { ClientOrderDetailModal } from "@/components/marketplace/ClientOrderDetailModal";
 
 function Profile() {
   const { user, profile, signOut, refreshProfile, loading: authLoading } = useAuth();
@@ -64,6 +65,7 @@ function Profile() {
   const [showRidesHistory, setShowRidesHistory] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [coupons, setCoupons] = useState<any[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
@@ -552,12 +554,11 @@ function Profile() {
                 </div>
               ) : (
                 orders.map((o) => (
-                  <Link 
+                  <button 
                     key={o.id} 
-                    to="/marketplace/orders/$orderId" 
-                    params={{ orderId: o.id }} 
-                    onClick={() => setShowOrdersHistory(false)}
-                    className="border border-border bg-card rounded-2xl p-4 flex flex-col gap-2.5 shadow-sm hover:border-primary/50 transition-all block"
+                    type="button"
+                    onClick={() => setSelectedOrderId(o.id)}
+                    className="w-full text-left border border-border bg-card rounded-2xl p-4 flex flex-col gap-2.5 shadow-sm hover:border-primary/50 hover:shadow-md transition-all active:scale-[0.99] cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <p className="font-bold text-sm text-foreground truncate">{o.company?.name || "Restaurante"}</p>
@@ -573,7 +574,7 @@ function Profile() {
                       <span>{new Date(o.created_at).toLocaleDateString('pt-BR')} às {new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                       <span className="font-black text-sm text-foreground">R$ {Number(o.total || 0).toFixed(2).replace('.', ',')}</span>
                     </div>
-                  </Link>
+                  </button>
                 ))
               )}
             </div>
@@ -708,6 +709,13 @@ function Profile() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* MODAL DE DETALHES DO PEDIDO */}
+      <ClientOrderDetailModal
+        orderId={selectedOrderId}
+        isOpen={!!selectedOrderId}
+        onClose={() => setSelectedOrderId(null)}
+      />
 
     </div>
   );
