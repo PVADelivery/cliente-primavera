@@ -496,9 +496,23 @@ function StoreDetail() {
             className="fixed bottom-[64px] inset-x-0 z-40 p-4 pb-6 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"
           >
             <div className="max-w-xl mx-auto w-full pointer-events-auto">
-              <Drawer open={cartOpen} onOpenChange={setCartOpen}>
+              <Drawer
+                open={cartOpen}
+                onOpenChange={(open) => {
+                  if (open && typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur();
+                  }
+                  setCartOpen(open);
+                }}
+              >
                 <DrawerTrigger asChild>
-                  <button className="w-full h-14 bg-btn-surface text-btn-ink border border-btn-line rounded-2xl flex items-center justify-between px-5 font-bold shadow-lg hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink transition-colors aero-focus tap-target">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      (e.currentTarget as HTMLElement).blur();
+                    }}
+                    className="w-full h-14 bg-btn-surface text-btn-ink border border-btn-line rounded-2xl flex items-center justify-between px-5 font-bold shadow-lg hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink transition-colors aero-focus tap-target"
+                  >
                     <div className="flex items-center gap-2 bg-black/10 px-2 py-1 rounded-lg">
                       <ShoppingBag className="w-4 h-4" />
                       <span>{count}</span>
