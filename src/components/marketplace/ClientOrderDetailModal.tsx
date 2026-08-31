@@ -45,27 +45,36 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
 
     async function loadOrder() {
       try {
-        const { data, error } = await supabase
+        // 1. Carrega o pedido e a empresa
+        const { data: orderData, error: orderErr } = await supabase
           .from("orders")
           .select(`
             *,
-            companies(id, name, logo_url, phone, address),
-            order_items(id, product_name, quantity, price, notes)
+            companies(id, name, logo_url, phone, address)
           `)
           .eq("id", orderId)
           .maybeSingle();
 
-        if (isMounted) {
-          if (data) {
-            setOrder(data);
-          } else {
-            // Fallback simples
-            const { data: fallback } = await supabase
-              .from("orders")
-              .select("*")
-              .eq("id", orderId)
-              .maybeSingle();
-            setOrder(fallback);
+        if (orderErr) {
+          console.warn("[ClientOrderDetailModal] Erro ao carregar pedido:", orderErr);
+        }
+
+        const resolvedOrder = orderData || (
+          await supabase.from("orders").select("*").eq("id", orderId).maybeSingle()
+        ).data;
+
+        if (resolvedOrder) {
+          // 2. Carrega explicitamente os itens do pedido para garantir que sempre apareçam
+          const { data: itemsData } = await supabase
+            .from("order_items")
+            .select("*")
+            .eq("order_id", orderId);
+
+          if (isMounted) {
+            setOrder({
+              ...resolvedOrder,
+              order_items: (itemsData && itemsData.length > 0) ? itemsData : (resolvedOrder.order_items || []),
+            });
           }
         }
       } catch (err) {
@@ -88,6 +97,12 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
   const paymentInfo = PAYMENT_METHOD_LABEL[order?.payment_method] || { label: order?.payment_method || "Não informado", icon: CreditCard };
   const PaymentIcon = paymentInfo.icon;
 
+  const deliveryFeeNum = Number(order?.delivery_fee || 0);
+  const totalNum = Number(order?.total || 0);
+  const subtotalNum = order?.subtotal != null 
+    ? Number(order.subtotal) 
+    : (totalNum > deliveryFeeNum ? totalNum - deliveryFeeNum : totalNum);
+
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="bottom" hideClose className="h-[90vh] sm:h-[85vh] rounded-t-[2.5rem] border-none p-0 overflow-hidden bg-background shadow-2xl">
@@ -98,44 +113,41 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Pedido</span>
-                <p className="font-black text-lg text-foreground">#{orderId?.slice(-6).toUpperCase()}</p>
+                <span className="font-mono text-sm font-black text-foreground">
+                  #{order?.id?.slice(0, 6)?.toUpperCase() || "..."}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">Detalhes completos da sua compra</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Detalhes completos da sua compra</p>
             </div>
-            <button 
+            <button
               onClick={onClose}
-              className="p-2.5 rounded-full bg-secondary text-foreground hover:bg-secondary/80 transition-colors cursor-pointer"
+              className="w-10 h-10 rounded-2xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Body */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Body Content */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {loading ? (
-              <div className="py-24 text-center">
-                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm font-bold text-muted-foreground">Carregando informações do pedido...</p>
+              <div className="py-20 flex flex-col items-center justify-center space-y-3">
+                <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-xs font-bold text-muted-foreground">Carregando detalhes...</p>
               </div>
             ) : !order ? (
-              <div className="py-24 text-center text-muted-foreground space-y-2">
-                <AlertCircle className="w-12 h-12 mx-auto text-rose-500 opacity-60" />
-                <p className="font-bold text-foreground">Pedido não encontrado</p>
-                <p className="text-xs">Não foi possível carregar os detalhes deste pedido.</p>
+              <div className="py-20 text-center text-muted-foreground">
+                <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm font-bold">Pedido não encontrado.</p>
               </div>
             ) : (
               <>
                 {/* Status Card */}
                 <div className={cn("p-5 rounded-2xl border flex items-center justify-between", statusInfo.bg)}>
                   <div className="flex items-center gap-3">
-                    <div className={cn("p-2 rounded-xl bg-background/60 shadow-sm", statusInfo.color)}>
-                      {order.status === "delivered" ? <CheckCircle2 className="w-5 h-5" /> : 
-                       order.status === "cancelled" ? <XCircle className="w-5 h-5" /> : 
-                       <Clock className="w-5 h-5 animate-pulse" />}
-                    </div>
+                    <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status Atual</p>
-                      <p className={cn("font-black text-sm", statusInfo.color)}>{statusInfo.label}</p>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Status Atual</p>
+                      <p className={cn("text-sm font-black mt-0.5", statusInfo.color)}>{statusInfo.label}</p>
                     </div>
                   </div>
                   <span className="text-xs font-bold text-muted-foreground">
@@ -173,26 +185,32 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
                     <p className="text-xs text-muted-foreground italic py-2">Lista de itens não disponível para este pedido.</p>
                   ) : (
                     <div className="space-y-3 divide-y divide-border/40">
-                      {items.map((item: any, idx: number) => (
-                        <div key={idx} className={cn("flex items-start justify-between gap-3", idx > 0 && "pt-3")}>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-black text-xs">
-                                {item.quantity}x
-                              </span>
-                              <p className="font-bold text-sm text-foreground truncate">{item.product_name || "Item"}</p>
+                      {items.map((item: any, idx: number) => {
+                        const itemName = item.product_name || item.name || item.title || item.products?.name || "Item";
+                        const itemPrice = Number(item.price ?? item.unit_price ?? 0);
+                        const itemQty = Number(item.quantity || 1);
+
+                        return (
+                          <div key={idx} className={cn("flex items-start justify-between gap-3", idx > 0 && "pt-3")}>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-black text-xs">
+                                  {itemQty}x
+                                </span>
+                                <p className="font-bold text-sm text-foreground truncate">{itemName}</p>
+                              </div>
+                              {item.notes && (
+                                <p className="text-xs text-muted-foreground bg-muted/40 p-1.5 rounded-lg mt-1 ml-7">
+                                  Obs: {item.notes}
+                                </p>
+                              )}
                             </div>
-                            {item.notes && (
-                              <p className="text-xs text-muted-foreground bg-muted/40 p-1.5 rounded-lg mt-1 ml-7">
-                                Obs: {item.notes}
-                              </p>
-                            )}
+                            <span className="font-bold text-sm text-foreground shrink-0">
+                              R$ {(itemPrice * itemQty).toFixed(2).replace(".", ",")}
+                            </span>
                           </div>
-                          <span className="font-bold text-sm text-foreground shrink-0">
-                            R$ {(Number(item.price || 0) * (item.quantity || 1)).toFixed(2).replace(".", ",")}
-                          </span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -224,18 +242,18 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
                 <div className="bg-secondary/40 rounded-2xl border border-border p-5 space-y-2">
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Subtotal</span>
-                    <span className="font-bold">R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}</span>
+                    <span className="font-bold">R$ {subtotalNum.toFixed(2).replace(".", ",")}</span>
                   </div>
-                  {order.delivery_fee > 0 && (
+                  {deliveryFeeNum > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Taxa de Entrega</span>
-                      <span className="font-bold">R$ {Number(order.delivery_fee).toFixed(2).replace(".", ",")}</span>
+                      <span className="font-bold">R$ {deliveryFeeNum.toFixed(2).replace(".", ",")}</span>
                     </div>
                   )}
                   <div className="border-t border-border/60 pt-3 flex justify-between items-center">
                     <span className="font-black text-sm text-foreground uppercase tracking-wider">Total</span>
                     <span className="font-black text-xl text-slate-900 dark:text-white">
-                      R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}
+                      R$ {totalNum.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
                 </div>
