@@ -370,15 +370,6 @@ function Checkout() {
         fulfillment_mode: fulfillmentMode,
       };
 
-      console.log('[Checkout] create-order payload:', {
-        customer_id: resolvedCustomerId,
-        company_id: companyId,
-        fulfillment_mode: fulfillmentMode,
-        address_id: requestBody.address_id,
-        items_count: requestBody.items.length,
-        payment_method: paymentMethod,
-      });
-
       const { data, error: functionError } = await supabase.functions.invoke('create-order', { body: requestBody });
 
       if (functionError) {

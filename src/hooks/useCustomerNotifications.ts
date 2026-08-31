@@ -46,7 +46,6 @@ export function useCustomerNotifications() {
         };
 
         PushNotifications.addListener("registration", (token) => {
-          console.log("[FCM Cliente] Token:", token.value);
           syncFcmToken(token.value);
         }).catch(() => {});
 
