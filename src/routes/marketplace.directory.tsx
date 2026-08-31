@@ -10,7 +10,6 @@ import {
   MessageCircle, 
   Star, 
   Clock, 
-  Mail, 
   Navigation, 
   Copy, 
   Check, 
@@ -18,7 +17,11 @@ import {
   ShieldCheck, 
   Sparkles,
   Briefcase,
-  X
+  X,
+  SlidersHorizontal,
+  PlusCircle,
+  ExternalLink,
+  Flame
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -59,11 +62,34 @@ type Business = {
   card_style?: string | null;
 };
 
+const CATEGORY_ICONS: Record<string, string> = {
+  Tudo: "✨",
+  Restaurante: "🍔",
+  Hamburgueria: "🍟",
+  Mercado: "🛒",
+  Farmácia: "💊",
+  Padaria: "🥖",
+  "Pet Shop": "🐾",
+  Beleza: "💇",
+  Saúde: "🩺",
+  DENTISTAS: "🦷",
+  Dentistas: "🦷",
+  Odontologia: "🦷",
+  Automotivo: "🚗",
+  Construção: "🛠️",
+  Serviços: "⚡",
+  Moda: "👗",
+  Tecnologia: "💻",
+  Advocacia: "⚖️",
+  Imobiliária: "🏠",
+  Geral: "🏢",
+};
+
 const onlyDigits = (v: string) => v.replace(/\D/g, "");
 const waLink = (v: string, name?: string) => {
   const d = onlyDigits(v);
   const clean = d.startsWith("55") ? d : `55${d}`;
-  const text = encodeURIComponent(`Olá${name ? ` ${name}` : ""}, vi seu contato no PPP do MT 24horas express e gostaria de mais informações!`);
+  const text = encodeURIComponent(`Olá${name ? ` *${name}*` : ""}! Encontrei seu contato no *PPP do app MT 24horas express* e gostaria de solicitar um orçamento/informações.`);
   return `https://wa.me/${clean}?text=${text}`;
 };
 const mapsLink = (addr: string) =>
@@ -72,6 +98,8 @@ const mapsLink = (addr: string) =>
 export function DirectoryPage() {
   const [q, setQ] = useState("");
   const [selectedCat, setSelectedCat] = useState("Tudo");
+  const [onlyWithWhatsapp, setOnlyWithWhatsapp] = useState(false);
+  const [onlyFeatured, setOnlyFeatured] = useState(false);
 
   const { data: businesses = [], isLoading } = useQuery<Business[]>({
     queryKey: ["directory"],
@@ -106,17 +134,17 @@ export function DirectoryPage() {
           .maybeSingle();
 
         if (!data || !data.value) {
-          return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo", "Construção", "Serviços"];
+          return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Dentistas", "Automotivo", "Construção", "Serviços"];
         }
         return ["Tudo", ...(data.value as string[])];
       } catch (err) {
-        return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo", "Construção", "Serviços"];
+        return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Dentistas", "Automotivo", "Construção", "Serviços"];
       }
     },
     retry: 1,
   });
 
-  // Categorias únicas com contagem
+  // Categorias com ícones e contagens
   const categoriesWithCounts = useMemo(() => {
     const counts = new Map<string, number>();
     businesses.forEach((b) => {
@@ -127,11 +155,12 @@ export function DirectoryPage() {
     const set = new Set(["Tudo", ...dynamicCategories, ...Array.from(counts.keys())]);
     return Array.from(set).map((cat) => ({
       name: cat,
+      icon: CATEGORY_ICONS[cat] || "💼",
       count: cat === "Tudo" ? businesses.length : counts.get(cat) || 0,
     }));
   }, [businesses, dynamicCategories]);
 
-  // Filtro
+  // Filtros combinados
   const filtered = useMemo(() => {
     return businesses.filter((b) => {
       const matchCat = selectedCat === "Tudo" || (b.category || "Geral").toLowerCase() === selectedCat.toLowerCase();
@@ -143,16 +172,18 @@ export function DirectoryPage() {
         (b.category || "").toLowerCase().includes(term) ||
         (b.whatsapp || "").includes(term) ||
         (b.phone || "").includes(term);
-      return matchCat && matchQ;
+      const matchWa = !onlyWithWhatsapp || Boolean(b.whatsapp);
+      const matchFeat = !onlyFeatured || Boolean(b.featured);
+      return matchCat && matchQ && matchWa && matchFeat;
     });
-  }, [businesses, q, selectedCat]);
+  }, [businesses, q, selectedCat, onlyWithWhatsapp, onlyFeatured]);
 
   const featuredList = useMemo(() => {
     return businesses.filter((b) => b.featured);
   }, [businesses]);
 
   const handleShare = async (b: Business) => {
-    const text = `Confira ${b.name} (${b.category}) no PPP — MT 24horas express!`;
+    const text = `Confira *${b.name}* (${b.category}) no PPP — MT 24horas express!`;
     const url = window.location.href;
     if (navigator.share) {
       try {
@@ -167,104 +198,174 @@ export function DirectoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-28 selection:bg-amber-500/20">
-      {/* ─── HERO BANNER PREMIUM ─── */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-background border-b border-border/40 px-4 pt-7 pb-8 sm:px-6">
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 pb-28 selection:bg-amber-400 selection:text-black">
+      {/* ─── LUXURY HERO HEADER ─── */}
+      <div className="relative overflow-hidden bg-gradient-to-b from-black via-zinc-950 to-zinc-900 border-b border-white/10 px-4 pt-8 pb-10 sm:px-6">
+        {/* Glow de fundo */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-amber-500/10 blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-emerald-500/10 blur-[90px] pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider mb-3.5 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>PPP • Painel Profissional Prestador</span>
+        <div className="max-w-4xl mx-auto relative z-10 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-inner">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Painel Profissional Prestador</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Primavera do Leste — MT</span>
+            </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-2 leading-tight">
-            Guia de Prestadores & <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">Serviços da Cidade</span>
-          </h1>
-          <p className="text-sm sm:text-base text-zinc-400 max-w-2xl leading-relaxed">
-            Encontre eletricistas, diaristas, oficinas, clínicas, autônomos e empresas locais com WhatsApp direto e localização rápida.
-          </p>
+          <div>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-none">
+              Toda a Cidade <br />
+              <span className="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 bg-clip-text text-transparent">
+                Ao Seu Alcance.
+              </span>
+            </h1>
+            <p className="text-sm sm:text-base text-zinc-400 mt-2.5 max-w-2xl leading-relaxed">
+              Consulte profissionais autônomos, clínicas, oficinas e estabelecimentos locais com WhatsApp direto e rota rápida.
+            </p>
+          </div>
 
-          {/* ─── BUSCA EM TEMPO REAL ─── */}
-          <div className="mt-5 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nome, profissão, serviço ou bairro..."
-              className="w-full h-13 pl-12 pr-10 rounded-2xl bg-zinc-900/90 border border-zinc-700/70 text-white placeholder:text-zinc-500 text-sm sm:text-base font-medium shadow-xl focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
-            />
-            {q && (
+          {/* ─── BARRA DE BUSCA INTELIGENTE ─── */}
+          <div className="pt-2">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-amber-400 transition-colors" />
+              <input
+                type="text"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Buscar por eletricista, mecânico, dentista, nome..."
+                className="w-full h-14 pl-12 pr-11 rounded-2xl bg-zinc-900/90 border border-zinc-700/80 text-white placeholder:text-zinc-500 text-sm sm:text-base font-medium shadow-2xl focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/15 transition-all"
+              />
+              {q && (
+                <button
+                  type="button"
+                  onClick={() => setQ("")}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ─── FILTROS RÁPIDOS (CHIPS) ─── */}
+          <div className="flex items-center gap-2 pt-1 flex-wrap text-xs">
+            <button
+              type="button"
+              onClick={() => setOnlyWithWhatsapp(!onlyWithWhatsapp)}
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
+                onlyWithWhatsapp
+                  ? "bg-emerald-500 text-black shadow-md shadow-emerald-500/20"
+                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+              }`}
+            >
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+              <span>Apenas com WhatsApp</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setOnlyFeatured(!onlyFeatured)}
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all ${
+                onlyFeatured
+                  ? "bg-amber-400 text-black shadow-md shadow-amber-400/20"
+                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span>Destaques VIP</span>
+            </button>
+
+            {(q || selectedCat !== "Tudo" || onlyWithWhatsapp || onlyFeatured) && (
               <button
                 type="button"
-                onClick={() => setQ("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                onClick={() => {
+                  setQ("");
+                  setSelectedCat("Tudo");
+                  setOnlyWithWhatsapp(false);
+                  setOnlyFeatured(false);
+                }}
+                className="text-zinc-500 hover:text-white underline underline-offset-4 ml-auto"
               >
-                <X className="w-4 h-4" />
+                Limpar filtros
               </button>
             )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 space-y-6">
-        {/* ─── BARRA DE CATEGORIAS ROLÁVEL ─── */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-          {categoriesWithCounts.map((c) => {
-            const isActive = selectedCat.toLowerCase() === c.name.toLowerCase();
-            return (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => setSelectedCat(c.name)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                  isActive
-                    ? "bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20 scale-[1.02]"
-                    : "bg-card border border-border/80 text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                }`}
-              >
-                <span>{c.name}</span>
-                {c.count > 0 && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-                      isActive ? "bg-zinc-950/20 text-zinc-950" : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {c.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-8">
+        {/* ─── CARROSSEL DE CATEGORIAS COM EMOJIS ─── */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Categorias</span>
+            <span className="text-xs text-zinc-500 font-mono">{categoriesWithCounts.length} categorias</span>
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto pb-3 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            {categoriesWithCounts.map((c) => {
+              const isActive = selectedCat.toLowerCase() === c.name.toLowerCase();
+              return (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => setSelectedCat(c.name)}
+                  className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 shadow-lg shadow-amber-500/25 scale-[1.03]"
+                      : "bg-zinc-900/90 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 hover:bg-zinc-850"
+                  }`}
+                >
+                  <span className="text-base">{c.icon}</span>
+                  <span>{c.name}</span>
+                  {c.count > 0 && (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+                        isActive ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
+                      }`}
+                    >
+                      {c.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ─── DESTAQUES VIP (SE HOUVER) ─── */}
-        {featuredList.length > 0 && selectedCat === "Tudo" && !q && (
-          <div className="space-y-3 pt-1">
-            <div className="flex items-center gap-2 text-amber-400 font-bold text-sm tracking-wide uppercase">
-              <Star className="w-4 h-4 fill-amber-400" />
-              <span>Destaques Recomendados</span>
+        {/* ─── DESTAQUES VIP CAROUSEL (SE HOUVER) ─── */}
+        {featuredList.length > 0 && selectedCat === "Tudo" && !q && !onlyWithWhatsapp && (
+          <div className="space-y-3.5 bg-gradient-to-r from-amber-500/10 via-zinc-900/80 to-amber-500/5 p-5 rounded-3xl border border-amber-500/20 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-400 font-black text-sm tracking-wide uppercase">
+                <Star className="w-4 h-4 fill-amber-400 animate-pulse" />
+                <span>Profissionais em Destaque</span>
+              </div>
+              <span className="text-[11px] text-amber-400/80 font-bold bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+                VIP
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {featuredList.map((b) => (
-                <BusinessCard key={b.id} business={b} onShare={handleShare} isVip />
+                <BusinessCard key={`vip-${b.id}`} business={b} onShare={handleShare} isVip />
               ))}
             </div>
           </div>
         )}
 
-        {/* ─── LISTA PRINCIPAL DE PRESTADORES ─── */}
+        {/* ─── GRADE PRINCIPAL DE PRESTADORES ─── */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80">
+            <h2 className="text-base font-extrabold text-white flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-amber-400" />
               <span>
                 {selectedCat === "Tudo" ? "Todos os Prestadores & Empresas" : `Categoria: ${selectedCat}`}
               </span>
             </h2>
-            <span className="text-xs text-muted-foreground font-medium">
+            <span className="text-xs text-zinc-400 font-mono">
               {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"}
             </span>
           </div>
@@ -272,27 +373,32 @@ export function DirectoryPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-48 rounded-2xl bg-card/60 animate-pulse border border-border/50" />
+                <div key={n} className="h-56 rounded-3xl bg-zinc-900/60 animate-pulse border border-zinc-800" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-border bg-card/40">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-3">
-                <Search className="w-7 h-7" />
+            <div className="text-center py-20 px-6 rounded-3xl border border-dashed border-zinc-800 bg-zinc-900/40">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <Search className="w-8 h-8" />
               </div>
-              <h3 className="text-base font-bold text-foreground mb-1">Nenhum prestador encontrado</h3>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
-                {q ? `Não encontramos resultados para "${q}".` : "Nenhum prestador cadastrado nesta categoria ainda."}
+              <h3 className="text-lg font-bold text-white mb-1">Nenhum resultado encontrado</h3>
+              <p className="text-xs text-zinc-400 max-w-md mx-auto mb-5 leading-relaxed">
+                {q
+                  ? `Não encontramos nenhum prestador ou empresa para o termo "${q}".`
+                  : "Nenhum profissional cadastrado com os filtros selecionados."}
               </p>
-              {(q || selectedCat !== "Tudo") && (
-                <button
-                  type="button"
-                  onClick={() => { setQ(""); setSelectedCat("Tudo"); }}
-                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:brightness-110 transition-all"
-                >
-                  Limpar filtros de busca
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setSelectedCat("Tudo");
+                  setOnlyWithWhatsapp(false);
+                  setOnlyFeatured(false);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-amber-400 text-zinc-950 text-xs font-extrabold hover:brightness-110 transition-all shadow-md"
+              >
+                Limpar todos os filtros
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -304,12 +410,39 @@ export function DirectoryPage() {
             </div>
           )}
         </div>
+
+        {/* ─── BANNER CALL TO ACTION: ANUNCIE NO PPP ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/20 via-zinc-900 to-zinc-900 border border-amber-500/30 p-6 sm:p-8">
+          <div className="max-w-xl space-y-2 relative z-10">
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400">
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Divulgue seus serviços</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              Você é prestador de serviços ou tem uma empresa em Primavera?
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Receba contatos e pedidos de orçamentos diretamente no seu WhatsApp todos os dias anunciando no PPP.
+            </p>
+            <div className="pt-2">
+              <a
+                href="https://wa.me/5566999426656?text=Ol%C3%A1%2C%20gostaria%20de%20anunciar%20meus%20servi%C3%A7os%20no%20PPP%20do%20MT%2024horas%20express!"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs sm:text-sm shadow-lg shadow-amber-400/20 active:scale-98 transition-all"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>Cadastrar Minha Empresa / Serviço</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── CARD DE PRESTADOR ULTRA-PREMIUM ───
+// ─── CARD DE PRESTADOR SUPER PREMIUM COM 3D FINISH ───
 function BusinessCard({ 
   business: b, 
   onShare, 
@@ -325,132 +458,157 @@ function BusinessCard({
   const handleCopyPhone = (phone: string) => {
     navigator.clipboard?.writeText(phone);
     setCopied(true);
-    toast.success("Telefone copiado!");
+    toast.success("Telefone copiado para a área de transferência!");
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const initial = (b.name || "P").trim().charAt(0).toUpperCase();
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.25 }}
       className={`group relative rounded-3xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
         isVip
-          ? "border-amber-500/50 bg-gradient-to-b from-amber-500/5 via-card to-card shadow-lg shadow-amber-500/5 hover:border-amber-400"
-          : "border-border/80 bg-card hover:border-amber-400/50 hover:shadow-md"
+          ? "border-amber-400/60 bg-gradient-to-b from-amber-500/10 via-zinc-900 to-zinc-900 shadow-xl shadow-amber-500/5 hover:border-amber-400"
+          : "border-zinc-800/90 bg-zinc-900/90 hover:border-zinc-700 hover:bg-zinc-900 hover:shadow-2xl"
       }`}
     >
-      {/* ─── ARTE DO CARTÃO (SE CADASTRADA) ─── */}
+      {/* ─── ARTE PERSONALIZADA DO CARTÃO (SE CADASTRADA) ─── */}
       {b.card_image_url ? (
-        <div className="w-full aspect-[1.78] bg-zinc-950 relative overflow-hidden border-b border-border/40">
+        <div className="w-full aspect-[16/9] bg-black relative overflow-hidden border-b border-zinc-800">
           <img
             src={b.card_image_url}
             alt={b.name}
-            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
           />
-          <div className="absolute top-3 right-3 flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-zinc-950/80 backdrop-blur-md text-amber-400 border border-amber-400/30">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/80 backdrop-blur-md text-amber-400 border border-amber-400/40 shadow-lg">
               {b.category}
             </span>
           </div>
+          {b.featured && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-black flex items-center gap-1 shadow-md">
+                <Star className="w-3 h-3 fill-black" /> VIP
+              </span>
+            </div>
+          )}
         </div>
       ) : (
-        /* ─── CARTÃO ESTILIZADO AUTOMATICAMENTE ─── */
+        /* ─── CARTÃO ESTILIZADO OBSIDIAN & GOLD ─── */
         <div
-          className={`p-5 pb-4 border-b border-border/40 relative overflow-hidden ${
+          className={`p-5 pb-4 border-b border-zinc-800/80 relative overflow-hidden ${
             isDark 
-              ? "bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white" 
-              : "bg-gradient-to-br from-slate-50 to-zinc-100 text-zinc-900"
+              ? "bg-gradient-to-br from-zinc-900 via-zinc-950 to-black text-white" 
+              : "bg-gradient-to-br from-zinc-100 to-zinc-200 text-zinc-900"
           }`}
         >
+          {/* Micro weave background pattern */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/5 rounded-full blur-2xl pointer-events-none" />
+
           <div className="flex items-start justify-between gap-3 relative z-10">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-400 border border-amber-400/30">
-                  {b.category}
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-400/15 text-amber-400 border border-amber-400/30">
+                  {b.category || "Serviços"}
                 </span>
                 {b.featured && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">
-                    <Star className="w-3 h-3 fill-amber-400" /> VIP
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-lg border border-amber-400/20">
+                    <Star className="w-3 h-3 fill-amber-400" /> Destaque
+                  </span>
+                )}
+                {b.rating != null && (
+                  <span className="text-[11px] font-bold flex items-center gap-1 text-amber-400">
+                    <Star className="w-3 h-3 fill-amber-400" /> {b.rating.toFixed(1)}
                   </span>
                 )}
               </div>
-              <h3 className="font-extrabold text-lg sm:text-xl leading-tight truncate tracking-tight">
+
+              <h3 className="font-black text-lg sm:text-xl leading-tight truncate tracking-tight text-white">
                 {b.name}
               </h3>
             </div>
-            
-            {/* Ícone de Avatar com Inicial */}
-            <div className="w-11 h-11 rounded-2xl bg-amber-400/15 border border-amber-400/30 text-amber-400 flex items-center justify-center font-black text-lg shrink-0 shadow-inner">
-              {(b.name || "P").charAt(0).toUpperCase()}
+
+            {/* Emblema Avatar Luxury */}
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/25 via-amber-400/10 to-transparent border border-amber-400/40 text-amber-400 flex items-center justify-center font-black text-xl shrink-0 shadow-inner">
+              {initial}
             </div>
           </div>
 
-          {/* Horário de Funcionamento no Header */}
+          {/* Horário no header */}
           {b.hours && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2 relative z-10 font-medium">
-              <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex items-center gap-1.5 text-xs text-zinc-400 mt-2.5 relative z-10 font-medium">
+              <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="truncate">{b.hours}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* ─── CORPO COM INFORMAÇÕES LIMPAS ─── */}
-      <div className="p-4 space-y-2.5 flex-1">
-        {/* Nome quando tem foto do cartão */}
+      {/* ─── INFORMAÇÕES DE CONTATO E LOCALIZAÇÃO ─── */}
+      <div className="p-4 space-y-2.5 flex-1 text-xs">
+        {/* Título abaixo da imagem do cartão */}
         {b.card_image_url && (
-          <div className="flex items-center justify-between gap-2 pb-1 border-b border-border/40">
-            <h3 className="font-extrabold text-base leading-tight truncate text-foreground">
+          <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
+            <h3 className="font-black text-base leading-tight truncate text-white">
               {b.name}
             </h3>
             {b.hours && (
-              <span className="text-[11px] text-muted-foreground flex items-center gap-1 shrink-0">
-                <Clock className="w-3 h-3" /> {b.hours}
+              <span className="text-[11px] text-zinc-400 flex items-center gap-1 shrink-0">
+                <Clock className="w-3 h-3 text-amber-400" /> {b.hours}
               </span>
             )}
           </div>
         )}
 
         {/* Endereço */}
-        {b.address && (
+        {b.address ? (
           <a
             href={mapsLink(b.address)}
             target="_blank"
             rel="noreferrer"
-            className="flex items-start gap-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors group/addr"
+            className="flex items-start gap-2 text-zinc-400 hover:text-amber-400 transition-colors group/addr"
           >
             <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 group-hover/addr:scale-110 transition-transform" />
             <span className="line-clamp-2 leading-relaxed">{b.address}</span>
           </a>
+        ) : (
+          <div className="flex items-center gap-2 text-zinc-500">
+            <MapPin className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            <span>Atende Primavera do Leste e Região</span>
+          </div>
         )}
 
-        {/* Telefone / WhatsApp exibido em texto */}
+        {/* Telefone / WhatsApp com Cópia Rápida */}
         {(b.whatsapp || b.phone) && (
-          <div className="flex items-center justify-between gap-2 pt-1 text-xs font-mono text-muted-foreground">
+          <div className="flex items-center justify-between gap-2 pt-1 font-mono text-zinc-400">
             <div className="flex items-center gap-1.5 truncate">
-              <Phone className="w-3.5 h-3.5 text-primary" />
+              <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{b.whatsapp || b.phone}</span>
             </div>
             <button
               type="button"
               onClick={() => handleCopyPhone(b.whatsapp || b.phone || "")}
               title="Copiar número"
-              className="p-1 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
           </div>
         )}
 
-        {/* Site / Link */}
+        {/* Website Link */}
         {b.website && (
           <a
             href={b.website.startsWith("http") ? b.website : `https://${b.website}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 text-xs text-blue-400 hover:underline truncate"
+            className="flex items-center gap-2 text-blue-400 hover:underline truncate"
           >
             <Globe className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{b.website.replace(/^https?:\/\//, "")}</span>
@@ -459,14 +617,14 @@ function BusinessCard({
       </div>
 
       {/* ─── BOTÕES DE AÇÃO DIRETA ─── */}
-      <div className="p-3 pt-0 grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+      <div className="p-3.5 pt-0 grid grid-cols-[1fr_auto_auto] gap-2 items-center">
         {/* Botão de WhatsApp */}
         {b.whatsapp ? (
           <a
             href={waLink(b.whatsapp, b.name)}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs shadow-md shadow-[#25D366]/20 active:scale-98 transition-all"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-black text-xs sm:text-sm shadow-lg shadow-[#25D366]/20 active:scale-98 transition-all"
           >
             <MessageCircle className="w-4 h-4 fill-current" />
             <span>Falar no WhatsApp</span>
@@ -474,14 +632,14 @@ function BusinessCard({
         ) : b.phone ? (
           <a
             href={`tel:${onlyDigits(b.phone)}`}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-primary hover:brightness-110 text-primary-foreground font-bold text-xs shadow-md active:scale-98 transition-all"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs sm:text-sm shadow-md active:scale-98 transition-all"
           >
             <Phone className="w-4 h-4" />
             <span>Ligar Agora</span>
           </a>
         ) : (
-          <div className="py-2.5 px-3 rounded-2xl bg-muted text-muted-foreground text-center text-xs font-semibold">
-            Sem contato direto
+          <div className="py-3 px-4 rounded-2xl bg-zinc-800 text-zinc-500 text-center text-xs font-semibold">
+            Sem WhatsApp cadastrado
           </div>
         )}
 
@@ -492,7 +650,7 @@ function BusinessCard({
             target="_blank"
             rel="noreferrer"
             title="Como Chegar"
-            className="w-10 h-10 rounded-2xl border border-border bg-card hover:bg-muted/80 text-foreground flex items-center justify-center transition-colors shadow-sm"
+            className="w-11 h-11 rounded-2xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white flex items-center justify-center transition-colors shadow-sm"
           >
             <Navigation className="w-4 h-4 text-amber-400" />
           </a>
@@ -502,8 +660,8 @@ function BusinessCard({
         <button
           type="button"
           onClick={() => onShare(b)}
-          title="Compartilhar"
-          className="w-10 h-10 rounded-2xl border border-border bg-card hover:bg-muted/80 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shadow-sm"
+          title="Compartilhar no WhatsApp"
+          className="w-11 h-11 rounded-2xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors shadow-sm"
         >
           <Share2 className="w-4 h-4" />
         </button>
