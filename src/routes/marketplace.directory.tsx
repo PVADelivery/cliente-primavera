@@ -11,7 +11,13 @@ export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
     meta: [
       { title: "PPP — Painel Profissional Prestador de Serviços | MT 24horas express" },
-      { name: "description", content: "Painel Profissional Prestador de Serviços: endereço, telefone, WhatsApp e horário das empresas da cidade." },
+      { name: "description", content: "Painel Profissional Prestador de Serviços: catálogo oficial de empresas, profissionais e prestadores de serviços da cidade no MT 24horas express." },
+      { property: "og:title", content: "PPP — Painel Profissional Prestador de Serviços" },
+      { property: "og:description", content: "Painel Profissional Prestador de Serviços: catálogo oficial de empresas, profissionais e prestadores de serviços da cidade no MT 24horas express." },
+      { property: "og:image", content: "https://www.mt24horasexpress.com/pwa-512x512-v3.png" },
+      { name: "twitter:title", content: "PPP — Painel Profissional Prestador de Serviços" },
+      { name: "twitter:description", content: "Painel Profissional Prestador de Serviços: catálogo oficial de empresas, profissionais e prestadores de serviços da cidade no MT 24horas express." },
+      { name: "twitter:image", content: "https://www.mt24horasexpress.com/pwa-512x512-v3.png" },
     ],
   }),
   component: DirectoryPage,
