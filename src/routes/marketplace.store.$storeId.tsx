@@ -420,7 +420,7 @@ function StoreDetail() {
                         <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1.5">{p.description}</p>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="text-base sm:text-lg font-black text-primary whitespace-nowrap">
+                        <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white whitespace-nowrap">
                           R$ {finalPrice.toFixed(2).replace(".", ",")}
                         </span>
                         {hasPromo && (
@@ -535,7 +535,7 @@ function StoreDetail() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-bold text-sm leading-tight truncate">{it.name}</p>
-                                <p className="text-primary font-black text-sm mt-0.5">R$ {(it.price * it.quantity).toFixed(2).replace(".", ",")}</p>
+                                <p className="text-slate-900 dark:text-white font-black text-sm mt-0.5">R$ {(it.price * it.quantity).toFixed(2).replace(".", ",")}</p>
                                 <div className="flex items-center gap-3 mt-2">
                                   <div className="flex items-center border border-border rounded-lg bg-background overflow-hidden h-8">
                                     <button onClick={() => { if (it.quantity > 1) setQty(it.productId, it.quantity - 1); else remove(it.productId); }} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-muted-foreground transition-colors"><Minus className="w-3 h-3" /></button>
@@ -561,7 +561,7 @@ function StoreDetail() {
                           </div>
                           <div className="flex justify-between text-lg pt-2 font-black border-t border-border mt-2">
                             <span>Total</span>
-                            <span className="text-primary">R$ {(total + deliveryFee).toFixed(2).replace(".", ",")}</span>
+                            <span className="text-slate-900 dark:text-white">R$ {(total + deliveryFee).toFixed(2).replace(".", ",")}</span>
                           </div>
                         </div>
                       )}

@@ -221,7 +221,7 @@ function OrderDetailPage() {
 
         <div className="border-t border-border/60 pt-3 flex items-center justify-between">
           <span className="font-bold text-foreground text-base">Total Pago</span>
-          <span className="font-black text-xl text-primary">
+          <span className="font-black text-xl text-slate-900 dark:text-white">
             R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}
           </span>
         </div>

@@ -883,8 +883,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
               <span className="font-bold text-foreground">{distance} km</span>
             </div>
             <div className="flex justify-between items-center border-t border-border/50 pt-2">
-              <span className="text-sm font-semibold">Preço da Entrega</span>
-              <span className="text-lg font-black text-primary">
+              <span className="text-sm font-semibold text-foreground">Preço da Entrega</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">
                 R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>

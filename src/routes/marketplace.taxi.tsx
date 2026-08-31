@@ -901,7 +901,7 @@ function TaxiPage() {
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground font-semibold">Preço da Corrida</p>
-              <p className="text-lg font-display font-black text-primary">R$ {price.toFixed(2).replace(".", ",")}</p>
+              <p className="text-xl font-display font-black text-slate-900 dark:text-white">R$ {price.toFixed(2).replace(".", ",")}</p>
             </div>
           </div>
         )}
