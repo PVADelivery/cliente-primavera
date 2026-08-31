@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -113,30 +113,43 @@ function DirectoryPage() {
     queryKey: ["directory"],
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
-      const { data, error } = await (supabase as any)
-        .from("business_directory")
-        .select("*")
-        .order("name");
-      if (error || !data) return [];
-      return data as Business[];
+      try {
+        const { data, error } = await (supabase as any)
+          .from("business_directory")
+          .select("*")
+          .order("name");
+        if (error || !data) {
+          console.warn("[Directory] Não foi possível carregar o diretório comercial:", error?.message);
+          return [];
+        }
+        return data as Business[];
+      } catch (err) {
+        return [];
+      }
     },
+    retry: false,
   });
 
   const { data: dynamicCategories = [] } = useQuery<string[]>({
     queryKey: ["directory_categories"],
     queryFn: async () => {
       if (!isSupabaseConfigured) return [];
-      const { data, error } = await (supabase as any)
-        .from("platform_settings")
-        .select("value")
-        .eq("key", "directory_categories")
-        .maybeSingle();
+      try {
+        const { data, error } = await (supabase as any)
+          .from("platform_settings")
+          .select("value")
+          .eq("key", "directory_categories")
+          .maybeSingle();
 
-      if (error || !data || !data.value) {
+        if (error || !data || !data.value) {
+          return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo"];
+        }
+        return ["Tudo", ...(data.value as string[])];
+      } catch (err) {
         return ["Tudo", "Restaurante", "Hamburgueria", "Mercado", "Farmácia", "Padaria", "Pet Shop", "Beleza", "Saúde", "Automotivo"];
       }
-      return ["Tudo", ...(data.value as string[])];
     },
+    retry: false,
   });
 
   const filtered = useMemo(() => {
