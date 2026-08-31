@@ -91,7 +91,7 @@ function OrdersList() {
   });
 
   const activeOrders = allOrders.filter((o: any) => ["pending", "preparing", "ready", "in_route"].includes(o.status));
-  const pastOrders = allOrders.filter((o: any) => ["delivered", "cancelled"].includes(o.status));
+  const pastOrders = allOrders.filter((o: any) => ["delivered", "cancelled"].includes(o.status)).slice(0, 10);
 
   if (isLoading) {
     return (
