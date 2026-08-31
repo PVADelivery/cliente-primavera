@@ -540,7 +540,7 @@ function StoreDetail() {
                                   <div className="flex items-center border border-border rounded-lg bg-background overflow-hidden h-8">
                                     <button onClick={() => { if (it.quantity > 1) setQty(it.productId, it.quantity - 1); else remove(it.productId); }} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-muted-foreground transition-colors"><Minus className="w-3 h-3" /></button>
                                     <span className="w-8 text-center text-sm font-bold">{it.quantity}</span>
-                                    <button onClick={() => setQty(it.productId, it.quantity + 1)} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-primary transition-colors"><Plus className="w-3 h-3" /></button>
+                                    <button onClick={() => setQty(it.productId, it.quantity + 1)} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-foreground transition-colors"><Plus className="w-3 h-3" /></button>
                                   </div>
                                 </div>
                               </div>

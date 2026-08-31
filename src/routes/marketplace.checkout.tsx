@@ -851,7 +851,7 @@ function Checkout() {
               
               <div className="flex justify-between items-end">
                 <span className="text-base font-medium">Total</span>
-                <span className="text-2xl font-bold tracking-tight text-primary">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
+                <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
 
