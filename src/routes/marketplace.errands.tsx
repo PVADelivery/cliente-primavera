@@ -354,18 +354,6 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         }
         
         setDistance(dist);
-        
-        // Tarifas por tipo de veículo (Avulso Errands)
-        // Moto: R$ 5.99 base + R$ 2.00/KM
-        // Carro / Carro Aberto: R$ 9.99 base + R$ 3.00/KM
-        let baseFee = 5.99;
-        let rate = 2.0;
-        if (vehicleType === "carro" || vehicleType === "carro_aberto") {
-          baseFee = 9.99;
-          rate = 3.0;
-        }
-        
-        setPrice(baseFee + dist * rate);
 
         // Atualizar rota no mapa
         const drawRoute = (mapRef: any) => {
@@ -404,7 +392,6 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         }
       } else {
         setDistance(0);
-        setPrice(0);
         // Limpar rota
         const clearRoute = (mapRef: any) => {
           if (mapRef.current && mapRef.current.getSource("route")) {
@@ -418,7 +405,25 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
 
     updateRoute();
     return () => { active = false; };
-  }, [pickupCoords, dropoffCoords, vehicleType, MapLibre]);
+  }, [pickupCoords, dropoffCoords, MapLibre]);
+
+  // Recálculo imediato do preço da entrega sempre que a distância ou o tipo de veículo mudar
+  useEffect(() => {
+    if (distance > 0) {
+      // Tarifas por tipo de veículo (Avulso Errands)
+      // Moto: R$ 5,99 base + R$ 2,00/KM
+      // Carro / Carro Aberto: R$ 9,99 base + R$ 3,00/KM
+      let baseFee = 5.99;
+      let rate = 2.0;
+      if (vehicleType === "carro" || vehicleType === "carro_aberto") {
+        baseFee = 9.99;
+        rate = 3.0;
+      }
+      setPrice(Number((baseFee + distance * rate).toFixed(2)));
+    } else {
+      setPrice(0);
+    }
+  }, [distance, vehicleType]);
 
   if (!mounted) {
     return (
