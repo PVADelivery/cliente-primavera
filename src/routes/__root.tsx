@@ -102,6 +102,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "MT 24horas express — Peça em minutos" },
       { name: "twitter:description", content: "Marketplace de delivery multi-loja: restaurantes, mercados e farmácias da sua cidade em um só app." },
       { property: "og:image", content: "https://www.mt24horasexpress.com/pwa-512x512-v3.png" },
+      { property: "og:image:secure_url", content: "https://www.mt24horasexpress.com/pwa-512x512-v3.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "512" },
+      { property: "og:image:height", content: "512" },
       { name: "twitter:image", content: "https://www.mt24horasexpress.com/pwa-512x512-v3.png" },
     ],
     links: [
