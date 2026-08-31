@@ -21,12 +21,12 @@ export function useAeroMotion(index = 0) {
 const SURFACE =
   "relative overflow-hidden rounded-3xl aero-surface aero-rim aero-focus text-foreground";
 
-/** Textura padrão (carbono + verniz + varredura de luz) */
+/** Textura padrão (carbono + verniz no dark mode) */
 export function AeroTexture({ sheen = true }: { sheen?: boolean }) {
   return (
     <>
-      <span aria-hidden className="absolute inset-0 carbon-weave opacity-50 pointer-events-none" />
-      <span aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-60 pointer-events-none" />
+      <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none hidden dark:block" />
+      <span aria-hidden className="absolute inset-0 clearcoat mix-blend-screen opacity-50 pointer-events-none hidden dark:block" />
       {sheen && <span aria-hidden className="spec-sheen" />}
     </>
   );
@@ -438,19 +438,18 @@ export function AeroEmptyState({
     <div
       role="status"
       className={cx(
-        "relative overflow-hidden rounded-3xl aero-surface px-6 py-12 text-center flex flex-col items-center gap-3",
+        "relative overflow-hidden rounded-3xl bg-card border border-border px-6 py-12 text-center flex flex-col items-center gap-3 shadow-md",
         className,
       )}
     >
-      <AeroTexture sheen={false} />
       <div className="relative z-10 flex flex-col items-center gap-3">
         {Icon && (
-          <span className="grid h-16 w-16 place-items-center rounded-full bg-primary/12 ring-1 ring-primary/30">
-            <Icon className="h-7 w-7 text-primary" aria-hidden />
+          <span className="grid h-16 w-16 place-items-center rounded-full bg-primary/20 ring-1 ring-primary/40 text-slate-900 dark:text-yellow-400">
+            <Icon className="h-7 w-7" aria-hidden />
           </span>
         )}
-        <p className="font-display text-lg font-black italic tracking-tight">{title}</p>
-        {description && <p className="max-w-sm text-[13px] text-muted-foreground">{description}</p>}
+        <p className="font-display text-lg font-black tracking-tight text-foreground">{title}</p>
+        {description && <p className="max-w-sm text-[13px] text-muted-foreground font-medium">{description}</p>}
         {action}
       </div>
     </div>
