@@ -85,8 +85,7 @@ export async function calculateDeliveryFee(
   try {
     const { data: regions, error } = await supabase
       .from('regions')
-      .select('id, name, geometry')
-      .or('active.is.null,active.eq.true');
+      .select('id, name, geometry, price, delivery_fee');
 
     if (error || !regions || regions.length === 0) {
       console.warn('[freight] Nenhuma região encontrada ou erro:', error?.message);
@@ -97,7 +96,8 @@ export async function calculateDeliveryFee(
     const merchantPricing: Record<string, number> = {};
     if (Array.isArray(companyDeliveryRegionsPricing)) {
       for (const entry of companyDeliveryRegionsPricing) {
-        const price = Number(String(entry.customer_price).replace(',', '.'));
+        let price = Number(String(entry.customer_price).replace(',', '.'));
+        if (price >= 100 && price % 100 === 0) price = price / 100;
         if (entry.region_id && !isNaN(price) && price >= 0) {
           merchantPricing[entry.region_id] = price;
         }
@@ -119,7 +119,8 @@ export async function calculateDeliveryFee(
           };
         }
         // Fallback para o valor padrão da Região definido pelo Admin
-        const defaultFee = Number(region.price ?? region.delivery_fee ?? 0);
+        let defaultFee = Number((region.price != null && Number(region.price) > 0) ? region.price : (region.delivery_fee ?? 0));
+        if (defaultFee >= 100 && defaultFee % 100 === 0) defaultFee = defaultFee / 100;
         return {
           fee: defaultFee,
           regionId: region.id,
@@ -158,14 +159,17 @@ export async function calculateDeliveryFeeByNeighborhood(
 
     if (hoods && hoods.length > 0 && hoods[0].regions) {
       const r: any = hoods[0].regions;
-      let fee = Number(r.price ?? r.delivery_fee ?? 0);
+      let fee = Number((r.price != null && Number(r.price) > 0) ? r.price : (r.delivery_fee ?? 0));
+      if (fee >= 100 && fee % 100 === 0) fee = fee / 100;
 
       if (Array.isArray(deliveryRegionsPricing) && deliveryRegionsPricing.length > 0) {
         const match = deliveryRegionsPricing.find((m: any) => m.region_id === r.id || m.to === r.id);
         if (match) {
           const rawPrice = match.customer_price ?? match.price;
           if (rawPrice != null && String(rawPrice).trim() !== '') {
-            fee = Number(String(rawPrice).replace(',', '.'));
+            let pVal = Number(String(rawPrice).replace(',', '.'));
+            if (pVal >= 100 && pVal % 100 === 0) pVal = pVal / 100;
+            fee = pVal;
           }
         }
       }
@@ -197,7 +201,7 @@ export async function geocodeAddress(
   try {
     const query = encodeURIComponent(address + ', Brasil');
     const res = await fetch(
-      `https://nãominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&countrycodes=br`,
+      `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&countrycodes=br`,
       { headers: { 'Accept-Language': 'pt-BR' } }
     );
     if (!res.ok) return null;

@@ -151,7 +151,8 @@ function Checkout() {
                if (match) {
                  const rawPrice = match.customer_price ?? match.price ?? '';
                  if (String(rawPrice).trim() !== '') {
-                   const price = Number(String(rawPrice).replace(',', '.'));
+                   let price = Number(String(rawPrice).replace(',', '.'));
+                   if (price >= 100 && price % 100 === 0) price = price / 100;
                    if (!isNaN(price) && price >= 0) {
                      setDeliveryFee(price);
                      setLoadingFee(false);
@@ -171,7 +172,9 @@ function Checkout() {
                  .eq('destination_region_id', destRegionId)
                  .maybeSingle();
               if (rule && rule.base_value != null) {
-                 setDeliveryFee(Number(rule.base_value));
+                 let ruleVal = Number(rule.base_value);
+                 if (ruleVal >= 100 && ruleVal % 100 === 0) ruleVal = ruleVal / 100;
+                 setDeliveryFee(ruleVal);
                  setLoadingFee(false);
                  return;
               }
@@ -179,11 +182,12 @@ function Checkout() {
            
            const { data: destRegion } = await supabase
              .from('regions')
-             .select('delivery_fee, price')
+             .select('price, delivery_fee')
              .eq('id', destRegionId)
              .maybeSingle();
            if (destRegion) {
-              const rPrice = Number(destRegion.delivery_fee || destRegion.price || 0);
+              let rPrice = Number((destRegion.price != null && Number(destRegion.price) > 0) ? destRegion.price : (destRegion.delivery_fee ?? 0));
+              if (rPrice >= 100 && rPrice % 100 === 0) rPrice = rPrice / 100;
               if (rPrice > 0) {
                  setDeliveryFee(rPrice);
                  setLoadingFee(false);
@@ -193,12 +197,16 @@ function Checkout() {
         }
 
         if (dbCompany?.delivery_mode === 'fixed_fee' && dbCompany?.delivery_fee != null) {
-          setDeliveryFee(Number(dbCompany.delivery_fee));
+          let fFee = Number(dbCompany.delivery_fee);
+          if (fFee >= 100 && fFee % 100 === 0) fFee = fFee / 100;
+          setDeliveryFee(fFee);
           setLoadingFee(false);
           return;
         }
 
-        setDeliveryFee(Number(dbCompany?.delivery_fee || 0));
+        let compFee = Number(dbCompany?.delivery_fee || 0);
+        if (compFee >= 100 && compFee % 100 === 0) compFee = compFee / 100;
+        setDeliveryFee(compFee);
       } catch (error) {
         console.error("Erro ao calcular frete:", error);
         setDeliveryFee(0);
