@@ -864,7 +864,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
                 : "border-border bg-card text-muted-foreground hover:bg-muted active:scale-95"
             }`}
           >
-            <span className="text-xl mb-1">🛻</span>
+            <span className="text-xl mb-1">🚚</span>
             <span className="text-xs font-bold block">Carro Aberto</span>
             <span className="text-[9px] opacity-75 mt-0.5 whitespace-nowrap">R$ 9,99 + 3,00/KM</span>
           </button>
