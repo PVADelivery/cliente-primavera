@@ -347,18 +347,17 @@ export function DirectoryPage() {
 
         {/* ─── DESTAQUES VIP (SE HOUVER) ─── */}
         {featuredList.length > 0 && selectedCat === "Tudo" && !q && !onlyWithWhatsapp && (
-          <div className="space-y-3 bg-gradient-to-b from-amber-500/10 via-zinc-900 to-zinc-900 p-4 sm:p-5 rounded-3xl border border-amber-500/25 shadow-xl">
-            <div className="flex items-center justify-between pb-1">
-              <div className="flex items-center gap-2 text-amber-400 font-black text-xs sm:text-sm tracking-wide uppercase">
-                <Star className="w-4 h-4 fill-amber-400 animate-pulse" />
-                <span>Profissionais em Destaque VIP</span>
+          <div className="space-y-2.5 bg-gradient-to-b from-amber-500/8 via-zinc-900 to-zinc-900 p-3.5 sm:p-4 rounded-2xl border border-amber-500/20 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-amber-400 font-black text-[11px] tracking-wide uppercase">
+                <Star className="w-3.5 h-3.5 fill-amber-400 animate-pulse" />
+                <span>Destaques VIP</span>
               </div>
-              <span className="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+              <span className="text-[9px] text-amber-400 font-bold bg-amber-400/10 px-1.5 py-0.5 rounded-full border border-amber-400/20">
                 VIP
               </span>
             </div>
-            {/* Feed vertical 1 coluna para destaques */}
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {featuredList.map((b) => (
                 <BusinessCard key={`vip-${b.id}`} business={b} onShare={handleShare} isVip />
               ))}
@@ -367,7 +366,7 @@ export function DirectoryPage() {
         )}
 
         {/* ─── LISTA PRINCIPAL (1 COLUNA VERTICAL: UM EMBAIXO DO OUTRO) ─── */}
-        <div className="space-y-4">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between pb-1 border-b border-zinc-800/80">
             <h2 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-amber-400" />
@@ -381,9 +380,9 @@ export function DirectoryPage() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="h-44 rounded-3xl bg-zinc-900/60 animate-pulse border border-zinc-800" />
+                <div key={n} className="h-24 rounded-2xl bg-zinc-900/60 animate-pulse border border-zinc-800" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -412,7 +411,7 @@ export function DirectoryPage() {
             </div>
           ) : (
             /* FEED VERTICAL: 1 COLUNA PERFEITA UM ABAIXO DO OUTRO */
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2.5">
               <AnimatePresence mode="popLayout">
                 {filtered.map((b) => (
                   <BusinessCard key={b.id} business={b} onShare={handleShare} />
@@ -453,7 +452,7 @@ export function DirectoryPage() {
   );
 }
 
-// ─── CARD DE PRESTADOR ULTRA-MODERNO (LAYOUT FEED VERTICAL) ───
+// ─── CARD COMPACTO E ELEGANTE ───
 function BusinessCard({ 
   business: b, 
   onShare, 
@@ -468,207 +467,249 @@ function BusinessCard({
   const handleCopyPhone = (phone: string) => {
     navigator.clipboard?.writeText(phone);
     setCopied(true);
-    toast.success("Telefone copiado para a área de transferência!");
+    toast.success("Telefone copiado!");
     setTimeout(() => setCopied(false), 2000);
   };
 
   const initial = (b.name || "P").trim().charAt(0).toUpperCase();
   const phoneDisplay = b.whatsapp || b.phone;
 
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.2 }}
-      className={`w-full rounded-3xl border transition-all duration-200 overflow-hidden bg-zinc-900/95 shadow-xl ${
-        isVip
-          ? "border-amber-400/60 shadow-amber-500/5 hover:border-amber-400"
-          : "border-zinc-800 hover:border-zinc-700"
-      }`}
-    >
-      {/* ─── ARTE PERSONALIZADA DO CARTÃO (SE HOUVER FOTO) ─── */}
-      {b.card_image_url && (
-        <div className="w-full aspect-[16/9] sm:aspect-[2/1] bg-black relative overflow-hidden border-b border-zinc-800">
+  // Card com imagem personalizada
+  if (b.card_image_url) {
+    return (
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.18 }}
+        className={`w-full rounded-2xl border overflow-hidden bg-zinc-900/95 transition-all duration-200 ${
+          isVip
+            ? "border-amber-400/50 shadow-md shadow-amber-500/5 hover:border-amber-400"
+            : "border-zinc-800/80 hover:border-zinc-700"
+        }`}
+      >
+        <div className="w-full aspect-[2.8/1] bg-black relative overflow-hidden">
           <img
             src={b.card_image_url}
             alt={b.name}
-            className="w-full h-full object-cover hover:scale-102 transition-transform duration-300"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-black/30 pointer-events-none" />
-          
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/80 backdrop-blur-md text-amber-400 border border-amber-400/40 shadow-lg">
-              {b.category || "Geral"}
-            </span>
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-black/20 pointer-events-none" />
+          <div className="absolute bottom-2 left-3 right-3 z-10 flex items-end justify-between">
+            <div>
+              <h3 className="font-black text-sm text-white drop-shadow-lg leading-tight">{b.name}</h3>
+              <span className="text-[10px] text-zinc-300/90">{b.category || "Serviços"}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {b.featured && (
+                <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-400 text-black flex items-center gap-0.5">
+                  <Star className="w-2.5 h-2.5 fill-black" /> VIP
+                </span>
+              )}
+              {b.rating != null && (
+                <span className="text-[10px] font-bold flex items-center gap-0.5 text-amber-400 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-md">
+                  <Star className="w-2.5 h-2.5 fill-amber-400" /> {b.rating.toFixed(1)}
+                </span>
+              )}
+            </div>
           </div>
-
-          {b.featured && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-black flex items-center gap-1 shadow-md">
-                <Star className="w-3 h-3 fill-black" /> VIP
-              </span>
+        </div>
+        {/* Mini barra de ações */}
+        <div className="px-3 py-2.5 flex items-center gap-2">
+          {b.whatsapp ? (
+            <a
+              href={waLink(b.whatsapp, b.name)}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-black text-[11px] active:scale-[0.98] transition-all"
+            >
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+              <span>WhatsApp</span>
+            </a>
+          ) : b.phone ? (
+            <a
+              href={`tel:${onlyDigits(b.phone)}`}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-[11px] active:scale-[0.98] transition-all"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span>Ligar</span>
+            </a>
+          ) : (
+            <div className="flex-1 py-2 rounded-xl bg-zinc-800 text-zinc-500 text-center text-[11px] font-semibold">
+              Sem WhatsApp
             </div>
           )}
+          {b.address && (
+            <a
+              href={mapsLink(b.address)}
+              target="_blank"
+              rel="noreferrer"
+              className="h-8 w-8 rounded-xl border border-zinc-700/80 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors"
+            >
+              <Navigation className="w-3.5 h-3.5 text-amber-400" />
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => onShare(b)}
+            className="h-8 w-8 rounded-xl border border-zinc-700/80 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors shrink-0"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
         </div>
-      )}
+      </motion.div>
+    );
+  }
 
-      {/* ─── CORPO PRINCIPAL DO CARD ─── */}
-      <div className="p-4 sm:p-5 space-y-3.5">
-        {/* Cabeçalho do Card: Nome, Categoria, Badge, Avatar */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-400/15 text-amber-400 border border-amber-400/30">
+  // Card padrão compacto (sem imagem)
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.18 }}
+      className={`w-full rounded-2xl border overflow-hidden bg-zinc-900/95 transition-all duration-200 ${
+        isVip
+          ? "border-amber-400/50 shadow-md shadow-amber-500/5 hover:border-amber-400"
+          : "border-zinc-800/80 hover:border-zinc-700"
+      }`}
+    >
+      <div className="px-3.5 py-3 space-y-2.5">
+        {/* ── Cabeçalho: Avatar + Info ── */}
+        <div className="flex items-center gap-3">
+          {/* Avatar compacto */}
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-base shrink-0 ${
+            isVip
+              ? "bg-gradient-to-br from-amber-400/25 to-amber-500/10 border border-amber-400/40 text-amber-400"
+              : "bg-gradient-to-br from-zinc-800 to-zinc-800/60 border border-zinc-700/80 text-zinc-300"
+          }`}>
+            {initial}
+          </div>
+
+          {/* Nome e meta */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="font-extrabold text-sm text-white truncate leading-tight">{b.name}</h3>
+              {b.featured && (
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-md border border-amber-400/20">
+                  <Star className="w-2.5 h-2.5 fill-amber-400" /> VIP
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400/80">
                 {b.category || "Serviços"}
               </span>
-              
-              {b.featured && !b.card_image_url && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                  <Star className="w-3 h-3 fill-amber-400" /> VIP
-                </span>
-              )}
-
               {b.rating != null && (
-                <span className="text-[11px] font-bold flex items-center gap-1 text-amber-400">
-                  <Star className="w-3 h-3 fill-amber-400" /> {b.rating.toFixed(1)}
+                <span className="text-[10px] font-bold flex items-center gap-0.5 text-amber-400">
+                  <Star className="w-2.5 h-2.5 fill-amber-400" /> {b.rating.toFixed(1)}
+                </span>
+              )}
+              {b.hours && (
+                <span className="text-[10px] text-zinc-500 flex items-center gap-1 truncate">
+                  <Clock className="w-2.5 h-2.5" /> {b.hours}
                 </span>
               )}
             </div>
-
-            <h3 className="font-black text-lg sm:text-xl text-white tracking-tight leading-snug">
-              {b.name}
-            </h3>
-
-            {/* Horário */}
-            {b.hours && (
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-medium pt-0.5">
-                <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">{b.hours}</span>
-              </div>
-            )}
           </div>
-
-          {/* Avatar com Inicial Elegante */}
-          {!b.card_image_url && (
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/20 via-amber-400/10 to-transparent border border-amber-400/30 text-amber-400 flex items-center justify-center font-black text-xl shrink-0 shadow-inner">
-              {initial}
-            </div>
-          )}
         </div>
 
-        {/* ─── DADOS DE CONTATO E LOCALIZAÇÃO ─── */}
-        <div className="pt-2 border-t border-zinc-800/80 space-y-2 text-xs">
+        {/* ── Info compacta ── */}
+        <div className="space-y-1.5 text-[11px]">
           {/* Endereço */}
           {b.address ? (
             <a
               href={mapsLink(b.address)}
               target="_blank"
               rel="noreferrer"
-              className="flex items-start gap-2 text-zinc-400 hover:text-amber-400 transition-colors group/addr"
+              className="flex items-center gap-1.5 text-zinc-400 hover:text-amber-400 transition-colors"
             >
-              <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 group-hover/addr:scale-110 transition-transform" />
-              <span className="line-clamp-2 leading-relaxed">{b.address}</span>
+              <MapPin className="w-3 h-3 text-amber-400/70 shrink-0" />
+              <span className="truncate">{b.address}</span>
             </a>
           ) : (
-            <div className="flex items-center gap-2 text-zinc-500">
-              <MapPin className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            <div className="flex items-center gap-1.5 text-zinc-500">
+              <MapPin className="w-3 h-3 text-zinc-600 shrink-0" />
               <span>Atende Primavera do Leste e Região</span>
             </div>
           )}
 
-          {/* Telefone / WhatsApp com Botão Copiar */}
+          {/* Telefone inline */}
           {phoneDisplay && (
-            <div className="flex items-center justify-between gap-2 text-zinc-300 font-mono bg-zinc-950/60 px-3 py-2 rounded-xl border border-zinc-800/80">
-              <div className="flex items-center gap-2 truncate">
-                <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="font-semibold text-xs">{formatPhone(phoneDisplay)}</span>
-              </div>
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <Phone className="w-3 h-3 text-emerald-400/80 shrink-0" />
+              <span className="font-mono font-semibold">{formatPhone(phoneDisplay)}</span>
               <button
                 type="button"
                 onClick={() => handleCopyPhone(phoneDisplay)}
-                title="Copiar número"
-                className="flex items-center gap-1 text-[11px] font-sans font-bold text-zinc-400 hover:text-white px-2 py-0.5 rounded-md hover:bg-zinc-800 transition-colors"
+                className="ml-auto text-zinc-500 hover:text-white transition-colors p-0.5"
               >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-400">Copiado</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copiar</span>
-                  </>
-                )}
+                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           )}
 
-          {/* Website Link */}
+          {/* Website */}
           {b.website && (
             <a
               href={b.website.startsWith("http") ? b.website : `https://${b.website}`}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 text-blue-400 hover:underline truncate pt-0.5"
+              className="flex items-center gap-1.5 text-blue-400 hover:underline truncate"
             >
-              <Globe className="w-3.5 h-3.5 shrink-0" />
+              <Globe className="w-3 h-3 shrink-0" />
               <span className="truncate">{b.website.replace(/^https?:\/\//, "")}</span>
             </a>
           )}
         </div>
 
-        {/* ─── BARRA DE AÇÕES: BOTÕES DE 1 TOQUE ─── */}
-        <div className="pt-2 flex items-center gap-2">
-          {/* Botão de WhatsApp Principal */}
+        {/* ── Barra de ações compacta ── */}
+        <div className="flex items-center gap-1.5 pt-0.5">
           {b.whatsapp ? (
             <a
               href={waLink(b.whatsapp, b.name)}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-black text-xs sm:text-sm shadow-lg shadow-[#25D366]/20 active:scale-98 transition-all"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-black text-[11px] shadow-sm shadow-[#25D366]/15 active:scale-[0.98] transition-all"
             >
-              <MessageCircle className="w-4 h-4 fill-current" />
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
               <span>Chamar no WhatsApp</span>
             </a>
           ) : b.phone ? (
             <a
               href={`tel:${onlyDigits(b.phone)}`}
-              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs sm:text-sm shadow-md active:scale-98 transition-all"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-[11px] active:scale-[0.98] transition-all"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-3.5 h-3.5" />
               <span>Ligar Agora</span>
             </a>
           ) : (
-            <div className="flex-1 py-3 px-4 rounded-2xl bg-zinc-800 text-zinc-500 text-center text-xs font-semibold">
+            <div className="flex-1 py-2 rounded-xl bg-zinc-800/80 text-zinc-500 text-center text-[11px] font-semibold">
               Sem WhatsApp cadastrado
             </div>
           )}
 
-          {/* Botão Rota Google Maps */}
           {b.address && (
             <a
               href={mapsLink(b.address)}
               target="_blank"
               rel="noreferrer"
-              title="Abrir no Google Maps"
-              className="h-11 px-3.5 rounded-2xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white flex items-center justify-center gap-1.5 text-xs font-bold transition-colors shadow-sm"
+              title="Rota"
+              className="h-8 w-8 rounded-xl border border-zinc-700/80 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors"
             >
-              <Navigation className="w-4 h-4 text-amber-400" />
-              <span className="hidden sm:inline">Rota</span>
+              <Navigation className="w-3.5 h-3.5 text-amber-400" />
             </a>
           )}
 
-          {/* Botão Compartilhar */}
           <button
             type="button"
             onClick={() => onShare(b)}
-            title="Compartilhar no WhatsApp"
-            className="w-11 h-11 rounded-2xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors shadow-sm shrink-0"
+            title="Compartilhar"
+            className="h-8 w-8 rounded-xl border border-zinc-700/80 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition-colors shrink-0"
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
