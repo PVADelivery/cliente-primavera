@@ -124,21 +124,58 @@ export function DirectoryPage() {
   });
 
   const categoriesWithCounts = useMemo(() => {
+    const cleanCat = (str: string) => 
+      (str || "").replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u, "").trim().toLowerCase();
+
     const counts = new Map<string, number>();
     businesses.forEach((b) => {
       const cat = b.category || "Geral";
-      counts.set(cat, (counts.get(cat) || 0) + 1);
+      const clean = cleanCat(cat);
+      counts.set(clean, (counts.get(clean) || 0) + 1);
     });
-    const set = new Set(["Tudo", ...dynamicCategories, ...Array.from(counts.keys())]);
-    return Array.from(set).map((cat) => ({
-      name: cat,
-      count: cat === "Tudo" ? businesses.length : counts.get(cat) || 0,
-    }));
+
+    const seenClean = new Set<string>();
+    const list: string[] = ["Tudo"];
+    seenClean.add("tudo");
+
+    dynamicCategories.forEach((cat) => {
+      const clean = cleanCat(cat);
+      if (!seenClean.has(clean)) {
+        seenClean.add(clean);
+        list.push(cat);
+      }
+    });
+
+    businesses.forEach((b) => {
+      const cat = b.category || "Geral";
+      const clean = cleanCat(cat);
+      if (!seenClean.has(clean)) {
+        seenClean.add(clean);
+        list.push(cat);
+      }
+    });
+
+    return list.map((cat) => {
+      const clean = cleanCat(cat);
+      return {
+        name: cat,
+        count: cat === "Tudo" ? businesses.length : counts.get(clean) || 0,
+      };
+    });
   }, [businesses, dynamicCategories]);
 
   const filtered = useMemo(() => {
+    const cleanCat = (str: string) => 
+      (str || "").replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u, "").trim().toLowerCase();
+
     return businesses.filter((b) => {
-      const matchCat = selectedCat === "Tudo" || (b.category || "Geral").toLowerCase() === selectedCat.toLowerCase();
+      const catClean = cleanCat(b.category || "Geral");
+      const selClean = cleanCat(selectedCat);
+      const matchCat =
+        selectedCat === "Tudo" ||
+        selClean === "tudo" ||
+        catClean === selClean ||
+        (b.category || "Geral").toLowerCase() === selectedCat.toLowerCase();
       const term = q.trim().toLowerCase();
       const matchQ =
         !term ||
