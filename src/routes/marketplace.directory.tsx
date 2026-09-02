@@ -135,14 +135,15 @@ export function DirectoryPage() {
     });
 
     const seenClean = new Set<string>();
-    const list: string[] = ["Tudo"];
     seenClean.add("tudo");
+
+    const dynamicList: string[] = [];
 
     dynamicCategories.forEach((cat) => {
       const clean = cleanCat(cat);
       if (!seenClean.has(clean)) {
         seenClean.add(clean);
-        list.push(cat);
+        dynamicList.push(cat);
       }
     });
 
@@ -151,11 +152,20 @@ export function DirectoryPage() {
       const clean = cleanCat(cat);
       if (!seenClean.has(clean)) {
         seenClean.add(clean);
-        list.push(cat);
+        dynamicList.push(cat);
       }
     });
 
-    return list.map((cat) => {
+    // Ordenação estritamente alfabética ignorando emojis
+    dynamicList.sort((a, b) => {
+      const aClean = cleanCat(a);
+      const bClean = cleanCat(b);
+      return aClean.localeCompare(bClean, "pt-BR", { sensitivity: "base" });
+    });
+
+    const finalList = ["Tudo", ...dynamicList];
+
+    return finalList.map((cat) => {
       const clean = cleanCat(cat);
       return {
         name: cat,
