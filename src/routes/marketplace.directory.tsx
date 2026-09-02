@@ -283,7 +283,6 @@ export function DirectoryPage() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Categorias</span>
-          <span className="text-[11px] text-muted-foreground font-mono">{categoriesWithCounts.length} categorias</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4">
           {categoriesWithCounts.map((c) => {
@@ -295,11 +294,6 @@ export function DirectoryPage() {
                 onClick={() => setSelectedCat(c.name)}
               >
                 {c.name}
-                {c.count > 0 && (
-                  <span className={`text-[10px] font-mono ml-0.5 ${isActive ? "opacity-70" : "opacity-50"}`}>
-                    {c.count}
-                  </span>
-                )}
               </AeroPlate>
             );
           })}
