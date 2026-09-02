@@ -383,7 +383,7 @@ export function DirectoryPage() {
           Receba orçamentos e clientes no seu WhatsApp anunciando no PPP do MT 24horas express!
         </p>
         <a
-          href="https://wa.me/5566999426656?text=Ol%C3%A1%2C%20gostaria%20de%20anunciar%20meus%20servi%C3%A7os%20no%20PPP%20do%20MT%2024horas%20express!"
+          href="https://wa.me/556697196937?text=Ol%C3%A1%2C%20gostaria%20de%20anunciar%20meus%20servi%C3%A7os%20no%20PPP%20do%20MT%2024horas%20express!"
           target="_blank"
           rel="noreferrer"
         >
