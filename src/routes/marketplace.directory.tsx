@@ -7,7 +7,6 @@ import {
   MapPin,
   Search,
   Globe,
-  MessageCircle,
   Star,
   Clock,
   Navigation,
@@ -22,6 +21,7 @@ import {
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { toast } from "sonner";
 import { AeroHero, AeroPlate, AeroSection, AeroButton, AeroEmptyState, AeroSkeletonList } from "@/components/aero";
+import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
@@ -256,11 +256,11 @@ export function DirectoryPage() {
             onClick={() => setOnlyWithWhatsapp(!onlyWithWhatsapp)}
             className={`px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all border ${
               onlyWithWhatsapp
-                ? "bg-emerald-500 text-white border-emerald-400"
+                ? "bg-[#25D366] text-white border-[#20bd5a] shadow-sm"
                 : "bg-white/10 border-white/15 text-white/70 hover:text-white"
             }`}
           >
-            <MessageCircle className="w-3 h-3" />
+            <WhatsappIcon className={`w-3.5 h-3.5 ${onlyWithWhatsapp ? "text-white" : "text-[#25D366]"}`} />
             <span>Com WhatsApp</span>
           </button>
 
@@ -381,8 +381,8 @@ export function DirectoryPage() {
           target="_blank"
           rel="noreferrer"
         >
-          <AeroButton className="mt-1">
-            <MessageCircle className="w-4 h-4" />
+          <AeroButton className="mt-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold border-0 shadow-md flex items-center justify-center gap-2">
+            <WhatsappIcon className="w-4 h-4" />
             Quero Anunciar no PPP
           </AeroButton>
         </a>
@@ -512,7 +512,11 @@ function BusinessCard({
 
           {phoneDisplay && (
             <div className="flex items-center gap-1.5 text-foreground">
-              <Phone className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              {b.whatsapp ? (
+                <WhatsappIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
+              ) : (
+                <Phone className="w-3 h-3 text-muted-foreground shrink-0" />
+              )}
               <span className="font-mono font-semibold tracking-tight">{formatPhone(phoneDisplay)}</span>
               <button
                 type="button"
@@ -520,7 +524,7 @@ function BusinessCard({
                 aria-label="Copiar telefone"
                 className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-[#25D366]" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           )}
@@ -545,9 +549,9 @@ function BusinessCard({
               href={waLink(b.whatsapp, b.name)}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-[#25D366] hover:bg-[#1fb457] text-white font-bold text-[11px] active:scale-[0.97] transition-all shadow-[0_2px_10px_-2px_rgba(37,211,102,0.5)]"
+              className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl bg-[#25D366] hover:bg-[#1fb457] text-white font-bold text-[11px] active:scale-[0.97] transition-all shadow-[0_2px_10px_-2px_rgba(37,211,102,0.5)]"
             >
-              <MessageCircle className="w-3.5 h-3.5" />
+              <WhatsappIcon className="w-4 h-4" />
               <span>Chamar no WhatsApp</span>
             </a>
           ) : b.phone ? (
@@ -559,8 +563,9 @@ function BusinessCard({
               <span>Ligar Agora</span>
             </a>
           ) : (
-            <div className="flex-1 h-9 rounded-xl bg-muted/70 text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
-              Sem WhatsApp cadastrado
+            <div className="flex-1 h-9 rounded-xl bg-muted/70 text-muted-foreground flex items-center justify-center gap-1.5 text-[10px] font-semibold">
+              <WhatsappIcon className="w-3.5 h-3.5 opacity-30 text-muted-foreground" />
+              <span>Sem WhatsApp cadastrado</span>
             </div>
           )}
 
