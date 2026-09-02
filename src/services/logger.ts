@@ -48,6 +48,7 @@ export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Ma
     msg.includes("email ou senha incorretos") ||
     msg.includes("credenciais inválidas") ||
     msg.includes("email not confirmed") ||
+    msg.includes("useauth must be used inside <authprovider>") ||
     msg.includes("minified react error");
 
   if (isIgnored) return;

@@ -214,8 +214,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const defaultAuthValue: AuthContextType = {
+  user: null,
+  session: null,
+  loading: true,
+  profile: null,
+  refreshProfile: async () => {},
+  signIn: async () => ({ error: "AuthProvider não inicializado" }),
+  signUp: async () => ({ error: "AuthProvider não inicializado" }),
+  signInWithGoogle: async () => {},
+  signOut: async () => {},
+};
+
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+  if (!ctx) {
+    return defaultAuthValue;
+  }
   return ctx;
 }
