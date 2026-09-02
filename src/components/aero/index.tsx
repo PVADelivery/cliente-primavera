@@ -233,8 +233,8 @@ export function AeroSection({
         <div className="min-w-0">
           {tag && (
             <span className="inline-flex items-center gap-2 mb-1">
-              <span aria-hidden className="h-px w-5 bg-primary/60" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-primary/80">{tag}</span>
+              <span aria-hidden className="h-px w-5 bg-muted-foreground/50" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">{tag}</span>
             </span>
           )}
           <h2 className="font-display text-lg sm:text-xl font-black italic tracking-tight leading-tight truncate">

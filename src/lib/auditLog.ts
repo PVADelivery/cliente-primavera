@@ -11,7 +11,9 @@ export type AuditEvent =
   | "auth.signin.success"
   | "auth.signin.failed"
   | "auth.signup.success"
-  | "auth.signup.failed";
+  | "auth.signup.failed"
+  | "auth.cross_panel_signup_signin.success"
+  | "auth.cross_panel_signup.password_mismatch";
 
 export interface AuditLogPayload {
   request_id: string;
