@@ -74,8 +74,27 @@ const waLink = (v: string, name?: string) => {
   return `https://wa.me/${clean}?text=${text}`;
 };
 
-const mapsLink = (addr: string) =>
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+const getMapsUrl = (addr: string) => {
+  const cleanAddr = addr.trim();
+  const full = cleanAddr.toLowerCase().includes("primavera")
+    ? cleanAddr
+    : `${cleanAddr}, Primavera do Leste - MT`;
+  return `https://maps.google.com/?q=${encodeURIComponent(full)}`;
+};
+
+const handleOpenMaps = (addr: string, e?: React.MouseEvent) => {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const url = getMapsUrl(addr);
+  if (typeof window !== "undefined") {
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+      window.location.href = url;
+    }
+  }
+};
 
 export function DirectoryPage() {
   const [q, setQ] = useState("");
@@ -495,13 +514,15 @@ function BusinessCard({
         <div className="space-y-1 text-[11px]">
           {b.address ? (
             <a
-              href={mapsLink(b.address)}
+              href={getMapsUrl(b.address)}
+              onClick={(e) => handleOpenMaps(b.address, e)}
               target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
+              title="Abrir no Google Maps"
             >
-              <MapPin className="w-3 h-3 text-primary shrink-0" />
-              <span className="truncate">{b.address}</span>
+              <MapPin className="w-3 h-3 text-primary shrink-0 group-hover:scale-110 transition-transform" />
+              <span className="truncate underline-offset-2 group-hover:underline">{b.address}</span>
             </a>
           ) : (
             <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -571,14 +592,15 @@ function BusinessCard({
 
           {b.address && (
             <a
-              href={mapsLink(b.address)}
+              href={getMapsUrl(b.address)}
+              onClick={(e) => handleOpenMaps(b.address, e)}
               target="_blank"
-              rel="noreferrer"
-              title="Abrir rota no mapa"
-              aria-label="Abrir rota no mapa"
-              className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0"
+              rel="noopener noreferrer"
+              title="Abrir rota no Google Maps"
+              aria-label="Abrir rota no Google Maps"
+              className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0 cursor-pointer active:scale-95"
             >
-              <Navigation className="w-3.5 h-3.5" />
+              <Navigation className="w-3.5 h-3.5 text-primary" />
             </a>
           )}
 
