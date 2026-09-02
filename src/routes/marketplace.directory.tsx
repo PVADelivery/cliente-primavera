@@ -452,33 +452,33 @@ function BusinessCard({
         </div>
       )}
 
-      <div className="px-3.5 py-3 space-y-2">
+      <div className="px-3 py-2.5 space-y-2">
         {/* Cabeçalho */}
         {!b.card_image_url && (
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-base shrink-0 ${
+          <div className="flex items-center gap-2.5">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 shadow-inner ${
               isVip
-                ? "bg-primary/15 border border-primary/30 text-gold-ink"
-                : "bg-muted border border-border text-foreground/70"
+                ? "bg-primary/15 border border-primary/40 text-gold-ink"
+                : "bg-gradient-to-br from-muted to-muted/60 border border-border text-foreground/70"
             }`}>
               {initial}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="font-extrabold text-sm text-foreground truncate">{b.name}</h3>
+                <h3 className="font-extrabold text-[13px] text-foreground truncate leading-tight">{b.name}</h3>
                 {b.featured && (
-                  <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-gold-ink bg-primary/12 px-1.5 py-0.5 rounded-md border border-primary/20">
-                    <Star className="w-2.5 h-2.5" /> VIP
+                  <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-black bg-primary px-1.5 py-px rounded-full shadow-sm">
+                    <Star className="w-2.5 h-2.5 fill-black" /> VIP
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/70 px-1.5 py-px rounded-md">
                   {b.category || "Serviços"}
                 </span>
                 {b.rating != null && (
-                  <span className="text-[10px] font-bold flex items-center gap-0.5 text-gold-ink">
-                    <Star className="w-2.5 h-2.5 text-primary" /> {b.rating.toFixed(1)}
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-gold-ink">
+                    <Star className="w-3 h-3 text-primary fill-primary" /> {b.rating.toFixed(1)}
                   </span>
                 )}
                 {b.hours && (
@@ -513,11 +513,12 @@ function BusinessCard({
           {phoneDisplay && (
             <div className="flex items-center gap-1.5 text-foreground">
               <Phone className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span className="font-mono font-semibold">{formatPhone(phoneDisplay)}</span>
+              <span className="font-mono font-semibold tracking-tight">{formatPhone(phoneDisplay)}</span>
               <button
                 type="button"
                 onClick={() => handleCopyPhone(phoneDisplay)}
-                className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-0.5"
+                aria-label="Copiar telefone"
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1"
               >
                 {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
               </button>
@@ -538,13 +539,13 @@ function BusinessCard({
         </div>
 
         {/* Ações */}
-        <div className="flex items-center gap-1.5 pt-1">
+        <div className="flex items-center gap-1.5 pt-0.5">
           {b.whatsapp ? (
             <a
               href={waLink(b.whatsapp, b.name)}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[11px] active:scale-[0.98] transition-all shadow-sm"
+              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-[#25D366] hover:bg-[#1fb457] text-white font-bold text-[11px] active:scale-[0.97] transition-all shadow-[0_2px_10px_-2px_rgba(37,211,102,0.5)]"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               <span>Chamar no WhatsApp</span>
@@ -552,13 +553,13 @@ function BusinessCard({
           ) : b.phone ? (
             <a
               href={`tel:${onlyDigits(b.phone)}`}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary text-black font-bold text-[11px] active:scale-[0.98] transition-all"
+              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-primary text-black font-bold text-[11px] active:scale-[0.97] transition-all shadow-sm"
             >
               <Phone className="w-3.5 h-3.5" />
               <span>Ligar Agora</span>
             </a>
           ) : (
-            <div className="flex-1 py-2 rounded-xl bg-muted text-muted-foreground text-center text-[11px] font-semibold">
+            <div className="flex-1 h-9 rounded-xl bg-muted/70 text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
               Sem WhatsApp cadastrado
             </div>
           )}
@@ -568,8 +569,9 @@ function BusinessCard({
               href={mapsLink(b.address)}
               target="_blank"
               rel="noreferrer"
-              title="Rota"
-              className="h-8 w-8 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
+              title="Abrir rota no mapa"
+              aria-label="Abrir rota no mapa"
+              className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0"
             >
               <Navigation className="w-3.5 h-3.5" />
             </a>
@@ -579,7 +581,8 @@ function BusinessCard({
             type="button"
             onClick={() => onShare(b)}
             title="Compartilhar"
-            className="h-8 w-8 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0"
+            aria-label="Compartilhar prestador"
+            className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0"
           >
             <Share2 className="w-3.5 h-3.5" />
           </button>
