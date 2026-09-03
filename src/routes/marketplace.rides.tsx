@@ -178,7 +178,6 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
     if (typeof window === "undefined" || !mapContainerRef.current || !activeRide) return;
 
     let isMounted = true;
-    let pollInterval: any = null;
     let locSub: any = null;
 
     import("maplibre-gl").then((mod: any) => {
@@ -455,9 +454,11 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           if (isMounted) {
             renderRouteMarkers(pLat, pLng, dLat, dLng);
 
-            // Se já tiver latitude do motorista salva na corrida, posiciona imediatamente
-            if (activeRide?.driver_latitude && activeRide?.driver_longitude) {
-              updateDriverMarker(Number(activeRide.driver_latitude), Number(activeRide.driver_longitude));
+            // Se já tiver coordenadas do motorista disponíveis no objeto, posiciona
+            const drvInitialLat = Number(activeRide?.driver?.latitude || activeRide?.driver?.current_latitude || 0);
+            const drvInitialLng = Number(activeRide?.driver?.longitude || activeRide?.driver?.current_longitude || 0);
+            if (drvInitialLat && drvInitialLng && isCoordInPVA(drvInitialLat, drvInitialLng)) {
+              updateDriverMarker(drvInitialLat, drvInitialLng);
             }
 
             fitMapBounds(pLat, pLng, dLat, dLng);
@@ -467,25 +468,26 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         setupRouteAndMarkers();
 
         // Se houver corrida/motorista, busca e sincroniza localização em tempo real no Supabase
+        // Se houver corrida/motorista, busca e sincroniza localização em tempo real no Supabase
         if (activeRide?.id || activeRide?.driver_id) {
           const fetchDriverLoc = async () => {
             try {
-              // 1. Busca primeiro em ride_requests
-              if (activeRide?.id) {
+              let drvId = activeRide?.driver_id;
+
+              // Se não tiver driver_id nas props, verifica se a corrida já possui motorista atribuído
+              if (!drvId && activeRide?.id) {
                 const { data: rData } = await (supabase as any)
                   .from("ride_requests")
-                  .select("driver_latitude, driver_longitude, driver_id")
+                  .select("driver_id")
                   .eq("id", activeRide.id)
                   .maybeSingle();
-                
-                if (rData?.driver_latitude && rData?.driver_longitude) {
-                  updateDriverMarker(Number(rData.driver_latitude), Number(rData.driver_longitude));
-                  return;
+
+                if (rData?.driver_id) {
+                  drvId = rData.driver_id;
                 }
               }
 
-              // 2. Busca na tabela delivery_drivers
-              const drvId = activeRide?.driver_id;
+              // Busca a localização do motorista na tabela delivery_drivers
               if (drvId) {
                 const { data: d1 } = await (supabase as any)
                   .from("delivery_drivers")
@@ -503,25 +505,26 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
             } catch (e) {}
           };
 
+          // Execução única ao abrir o mapa da corrida (sem loop de setInterval)
           fetchDriverLoc();
-          pollInterval = setInterval(fetchDriverLoc, 2000);
 
           try {
             const channelName = `driver_loc_${activeRide.id || activeRide.driver_id}_${Math.random().toString(36).slice(2, 8)}`;
             locSub = supabase.channel(channelName);
             locSub
-              .on("postgres_changes", { event: "*", schema: "public", table: "ride_requests", filter: `id=eq.${activeRide.id}` }, (payload: any) => {
-                const newLat = Number(payload.new?.driver_latitude);
-                const newLng = Number(payload.new?.driver_longitude);
-                if (newLat && newLng) {
-                  updateDriverMarker(newLat, newLng);
+              .on("postgres_changes", { event: "UPDATE", schema: "public", table: "ride_requests", filter: `id=eq.${activeRide.id}` }, (payload: any) => {
+                if (payload.new?.driver_id) {
+                  fetchDriverLoc();
                 }
               })
-              .on("postgres_changes", { event: "*", schema: "public", table: "delivery_drivers" }, (payload: any) => {
-                const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
-                const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
-                if (newLat && newLng) {
-                  updateDriverMarker(newLat, newLng);
+              .on("postgres_changes", { event: "UPDATE", schema: "public", table: "delivery_drivers" }, (payload: any) => {
+                const drvId = activeRide?.driver_id;
+                if (!drvId || payload.new?.id === drvId || payload.new?.user_id === drvId) {
+                  const newLat = Number(payload.new?.latitude || payload.new?.current_latitude);
+                  const newLng = Number(payload.new?.longitude || payload.new?.current_longitude);
+                  if (newLat && newLng && isCoordInPVA(newLat, newLng)) {
+                    updateDriverMarker(newLat, newLng);
+                  }
                 }
               })
               .subscribe();
@@ -537,7 +540,6 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
 
     return () => {
       isMounted = false;
-      if (pollInterval) clearInterval(pollInterval);
       if (locSub) {
         try { supabase.removeChannel(locSub); } catch (e) {}
       }
