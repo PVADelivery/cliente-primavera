@@ -193,13 +193,13 @@ const APP_FEATURES: AppFeature[] = [
     keywords: ["social", "espaço social", "espaco social", "classificados", "vagas", "empregos", "trabalho", "doações", "doacoes", "comunidade", "anúncios", "anuncios", "achados e perdidos"],
   },
   {
-    title: "Central de Negócios (Imóveis)",
-    subtitle: "Casas, apartamentos e terrenos para aluguel e venda",
+    title: "Central de Negócios (Imóveis e Venda de Carros)",
+    subtitle: "Imóveis para aluguel e venda, e venda de veículos (carros, motos e utilitários)",
     to: "/marketplace/business",
     icon: Building2,
-    badge: "Imóveis",
+    badge: "Negócios",
     badgeBg: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
-    keywords: ["negócios", "negocios", "imóveis", "imoveis", "aluguel", "alugar", "casa", "apartamento", "kitnet", "comprar casa", "terreno", "imobiliária", "imobiliaria", "corretor"],
+    keywords: ["negócios", "negocios", "imóveis", "imoveis", "aluguel", "alugar", "casa", "apartamento", "kitnet", "comprar casa", "terreno", "imobiliária", "imobiliaria", "corretor", "carros", "veículos", "veiculos", "motos", "venda de carros", "venda de veículos"],
   },
   {
     title: "Veículos à Venda",
@@ -1021,7 +1021,7 @@ function MarketplaceHome() {
       <section className="grid grid-cols-3 gap-2 sm:gap-3">
         <AeroPanel to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
         <AeroPanel to="/marketplace/directory" icon={Tag} title="PPP" subtitle="Prestadores" />
-        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e Veículos" />
+        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e Carros" />
       </section>
 
       {/* ── Taxi ── */}
@@ -1056,10 +1056,10 @@ function MarketplaceHome() {
         </Link>
       </section>
 
-      {/* ── Espaço Social & Central de Negócios ── */}
+      {/* ── Espaço Social & Central de Negócios (Imóveis e Venda de Carros) ── */}
       <section className="grid grid-cols-2 gap-3">
         <AeroPanel to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
-        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e locação" />
+        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e Venda de Carros" />
       </section>
 
       {/* ── Destaque carousel (Mais bem avaliados) ── */}

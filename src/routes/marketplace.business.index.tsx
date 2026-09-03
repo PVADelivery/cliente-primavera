@@ -14,10 +14,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
     meta: [
-      { title: "Central de Negócios — Imóveis em Primavera do Leste" },
-      { name: "description", content: "Casas, apartamentos, kitnets, salas comerciais e terrenos para locação e venda em Primavera do Leste, MT." },
-      { property: "og:title", content: "Central de Negócios — Imóveis e locação" },
-      { property: "og:description", content: "Casas, apartamentos, kitnets, salas e terrenos para locação e venda na sua cidade." },
+      { title: "Central de Negócios — Imóveis e Venda de Veículos em Primavera do Leste" },
+      { name: "description", content: "Casas, apartamentos, salas comerciais para locação e venda, e venda de veículos (carros, motos e utilitários) em Primavera do Leste, MT." },
+      { property: "og:title", content: "Central de Negócios — Imóveis e Venda de Carros" },
+      { property: "og:description", content: "Casas, apartamentos, kitnets, salas, terrenos e venda de carros, motos e veículos na sua cidade." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -181,19 +181,19 @@ function BusinessPage() {
     <div className="space-y-5 pb-6">
       <AeroPageHeader
         title="Central de Negócios"
-        subtitle="Imóveis para locação e venda"
+        subtitle="Imóveis e Venda de Veículos (Carros e Motos)"
         onBack={() => navigate({ to: "/marketplace" })}
       />
 
       <div className="grid grid-cols-2 gap-2">
-        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm">
-          Imóveis
+        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm flex items-center justify-center gap-1.5">
+          <Building2 className="w-4 h-4" /> Imóveis & Locação
         </span>
         <Link
           to="/marketplace/business/vehicles"
-          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors"
+          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors flex items-center justify-center gap-1.5"
         >
-          Veículos
+          <Car className="w-4 h-4 text-primary" /> Venda de Carros & Veículos
         </Link>
       </div>
 

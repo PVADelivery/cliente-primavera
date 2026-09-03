@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle, Building2 } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -99,20 +99,20 @@ function VehiclesPage() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="font-display text-xl font-bold leading-tight">Veículos</h1>
-          <p className="text-xs text-muted-foreground">Carros, motos e utilitários à venda</p>
+          <h1 className="font-display text-xl font-bold leading-tight">Central de Negócios — Veículos</h1>
+          <p className="text-xs text-muted-foreground">Venda de carros, motos e utilitários na sua cidade</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <Link
           to="/marketplace/business"
-          className="aero-focus h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors"
+          className="aero-focus h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors flex items-center justify-center gap-1.5"
         >
-          Imóveis
+          <Building2 className="w-4 h-4" /> Imóveis & Locação
         </Link>
-        <span className="h-11 rounded-2xl grid place-items-center text-xs font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm">
-          Veículos
+        <span className="h-11 rounded-2xl grid place-items-center text-xs font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm flex items-center justify-center gap-1.5">
+          <Car className="w-4 h-4 text-primary" /> Venda de Carros & Veículos
         </span>
       </div>
 
