@@ -107,12 +107,14 @@ function VehiclesPage() {
       <div className="grid grid-cols-2 gap-2">
         <Link
           to="/marketplace/business"
-          className="aero-focus h-11 rounded-2xl grid place-items-center text-xs font-semibold bg-card border border-border/60 text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors flex items-center justify-center gap-1.5"
+          className="aero-focus min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-bold bg-card border border-border text-foreground hover:bg-muted active:scale-[0.98] transition-all flex items-center justify-center gap-2 px-2.5 text-center"
         >
-          <Building2 className="w-4 h-4" /> Imóveis & Locação
+          <Building2 className="w-4 h-4 shrink-0 text-foreground" />
+          <span>Imóveis & Locação</span>
         </Link>
-        <span className="h-11 rounded-2xl grid place-items-center text-xs font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm flex items-center justify-center gap-1.5">
-          <Car className="w-4 h-4 text-primary" /> Carros, Motos & Caminhões
+        <span className="min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-black bg-primary text-black border border-primary/40 shadow-sm flex items-center justify-center gap-2 px-2.5 text-center">
+          <Car className="w-4 h-4 shrink-0 text-black" />
+          <span>Carros, Motos & Caminhões</span>
         </span>
       </div>
 

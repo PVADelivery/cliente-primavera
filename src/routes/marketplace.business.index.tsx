@@ -186,14 +186,16 @@ function BusinessPage() {
       />
 
       <div className="grid grid-cols-2 gap-2">
-        <span className="h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm flex items-center justify-center gap-1.5">
-          <Building2 className="w-4 h-4" /> Imóveis & Locação
+        <span className="min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-black bg-primary text-black border border-primary/40 shadow-sm flex items-center justify-center gap-2 px-2.5 text-center">
+          <Building2 className="w-4 h-4 shrink-0 text-black" />
+          <span>Imóveis & Locação</span>
         </span>
         <Link
           to="/marketplace/business/vehicles"
-          className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors flex items-center justify-center gap-1.5"
+          className="aero-focus min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-bold bg-card border border-border text-foreground hover:bg-muted active:scale-[0.98] transition-all flex items-center justify-center gap-2 px-2.5 text-center"
         >
-          <Car className="w-4 h-4 text-primary" /> Carros, Motos & Caminhões
+          <Car className="w-4 h-4 shrink-0 text-foreground" />
+          <span>Carros, Motos & Caminhões</span>
         </Link>
       </div>
 
@@ -212,11 +214,10 @@ function BusinessPage() {
           <button
             key={d.key}
             onClick={() => setDeal(d.key)}
-            className={`tap-target aero-focus shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
-              deal === d.key
+            className={`tap-target aero-focus shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${deal === d.key
                 ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
                 : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
-            }`}
+              }`}
           >
             {d.label}
           </button>
@@ -224,11 +225,10 @@ function BusinessPage() {
         <button
           onClick={() => setOnlyFavorites((v) => !v)}
           aria-pressed={onlyFavorites}
-          className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${
-            onlyFavorites
+          className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${onlyFavorites
               ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
               : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
-          }`}
+            }`}
         >
           <Heart className={`w-3.5 h-3.5 ${onlyFavorites ? "fill-current" : ""}`} />
           Favoritos{hydrated && favorites.length > 0 ? ` (${favorites.length})` : ""}
@@ -240,11 +240,10 @@ function BusinessPage() {
           <button
             key={t.key}
             onClick={() => setType(t.key)}
-            className={`shrink-0 px-3.5 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${
-              type === t.key
+            className={`shrink-0 px-3.5 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${type === t.key
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card text-muted-foreground border-border/60"
-            }`}
+              }`}
           >
             {t.label}
           </button>
@@ -336,148 +335,148 @@ function BusinessPage() {
         />
       ) : (
         <>
-        <ul className="space-y-4">
-          {pageItems.map((p) => {
-            const cover = p.images?.[0] || null;
-            const waNumber = p.contact_phone ? p.contact_phone.replace(/\D/g, "") : "";
-            const fullWa = waNumber ? (waNumber.startsWith("55") ? waNumber : `55${waNumber}`) : "";
-            const waText = encodeURIComponent(
-              `Olá! Tenho interesse no imóvel *${TYPE_LABEL[p.property_type] ?? p.property_type}* (${p.deal_type === "venda" ? "Venda" : "Locação"}) no bairro *${p.neighborhood ?? "Primavera do Leste"}* anunciado na Central de Negócios do MT 24horas express.`
-            );
+          <ul className="space-y-4">
+            {pageItems.map((p) => {
+              const cover = p.images?.[0] || null;
+              const waNumber = p.contact_phone ? p.contact_phone.replace(/\D/g, "") : "";
+              const fullWa = waNumber ? (waNumber.startsWith("55") ? waNumber : `55${waNumber}`) : "";
+              const waText = encodeURIComponent(
+                `Olá! Tenho interesse no imóvel *${TYPE_LABEL[p.property_type] ?? p.property_type}* (${p.deal_type === "venda" ? "Venda" : "Locação"}) no bairro *${p.neighborhood ?? "Primavera do Leste"}* anunciado na Central de Negócios do MT 24horas express.`
+              );
 
-            return (
-              <li key={p.id} className="relative group">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleFavorite(p.id);
-                  }}
-                  aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
-                  aria-pressed={isFavorite(p.id)}
-                  className="absolute top-3.5 right-3.5 z-20 w-10 h-10 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur shadow-sm transition-transform active:scale-90"
-                >
-                  <Heart
-                    className={`w-4 h-4 transition-colors ${isFavorite(p.id) ? "text-rose-500 fill-rose-500" : "text-muted-foreground"}`}
-                  />
-                </button>
+              return (
+                <li key={p.id} className="relative group">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(p.id);
+                    }}
+                    aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
+                    aria-pressed={isFavorite(p.id)}
+                    className="absolute top-3.5 right-3.5 z-20 w-10 h-10 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur shadow-sm transition-transform active:scale-90"
+                  >
+                    <Heart
+                      className={`w-4 h-4 transition-colors ${isFavorite(p.id) ? "text-rose-500 fill-rose-500" : "text-muted-foreground"}`}
+                    />
+                  </button>
 
-                <div className="overflow-hidden rounded-3xl border border-border/60 bg-card hover:border-primary/50 transition-all shadow-sm">
-                  {/* Carrossel de Fotos com navegação e badges */}
-                  <PropertyImageCarousel
-                    images={p.images}
-                    propertyId={p.id}
-                    dealType={p.deal_type}
-                    propertyType={p.property_type}
-                  />
+                  <div className="overflow-hidden rounded-3xl border border-border/60 bg-card hover:border-primary/50 transition-all shadow-sm">
+                    {/* Carrossel de Fotos com navegação e badges */}
+                    <PropertyImageCarousel
+                      images={p.images}
+                      propertyId={p.id}
+                      dealType={p.deal_type}
+                      propertyType={p.property_type}
+                    />
 
-                  {/* Conteúdo do Card */}
-                  <div className="p-4 space-y-3">
-                    <Link
-                      to="/marketplace/business/$propertyId"
-                      params={{ propertyId: p.id }}
-                      className="block group-hover:text-primary transition-colors"
-                    >
-                      <h2 className="font-display font-bold text-base leading-tight">
-                        {TYPE_LABEL[p.property_type]} em {p.neighborhood ?? "Primavera do Leste"}
-                      </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-primary shrink-0" />
-                        {[p.city, p.state].filter(Boolean).join(", ")}
-                      </p>
-                    </Link>
-
-                    {p.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {p.description}
-                      </p>
-                    )}
-
-                    <PropertyAttrs property={p} />
-
-                    <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2 flex-wrap">
-                      <div>
-                        <p className="text-xs font-semibold text-muted-foreground">Valor:</p>
-                        <p className="font-display font-black text-xl text-black dark:text-white leading-tight">
-                          {formatPrice(p.price)}
-                          {p.deal_type === "locacao" && <span className="text-xs font-normal text-muted-foreground"> /mês</span>}
+                    {/* Conteúdo do Card */}
+                    <div className="p-4 space-y-3">
+                      <Link
+                        to="/marketplace/business/$propertyId"
+                        params={{ propertyId: p.id }}
+                        className="block group-hover:text-primary transition-colors"
+                      >
+                        <h2 className="font-display font-bold text-base leading-tight">
+                          {TYPE_LABEL[p.property_type]} em {p.neighborhood ?? "Primavera do Leste"}
+                        </h2>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-primary shrink-0" />
+                          {[p.city, p.state].filter(Boolean).join(", ")}
                         </p>
+                      </Link>
+
+                      {p.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          {p.description}
+                        </p>
+                      )}
+
+                      <PropertyAttrs property={p} />
+
+                      <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2 flex-wrap">
+                        <div>
+                          <p className="text-xs font-semibold text-muted-foreground">Valor:</p>
+                          <p className="font-display font-black text-xl text-black dark:text-white leading-tight">
+                            {formatPrice(p.price)}
+                            {p.deal_type === "locacao" && <span className="text-xs font-normal text-muted-foreground"> /mês</span>}
+                          </p>
+                        </div>
+
+                        {fullWa ? (
+                          <a
+                            href={`https://wa.me/${fullWa}?text=${waText}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                            title="Falar direto no WhatsApp"
+                          >
+                            <WhatsappIcon className="w-4 h-4" />
+                            <span>WhatsApp</span>
+                          </a>
+                        ) : (
+                          <Link
+                            to="/marketplace/business/$propertyId"
+                            params={{ propertyId: p.id }}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                          >
+                            Ver detalhes <ChevronRight className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
                       </div>
 
-                      {fullWa ? (
-                        <a
-                          href={`https://wa.me/${fullWa}?text=${waText}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
-                          title="Falar direto no WhatsApp"
-                        >
-                          <WhatsappIcon className="w-4 h-4" />
-                          <span>WhatsApp</span>
-                        </a>
-                      ) : (
-                        <Link
-                          to="/marketplace/business/$propertyId"
-                          params={{ propertyId: p.id }}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
-                        >
-                          Ver detalhes <ChevronRight className="w-3.5 h-3.5" />
-                        </Link>
+                      {p.contact_phone && (
+                        <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5 pt-1">
+                          <WhatsappIcon className="w-3 h-3 text-[#25D366]" />
+                          <span>Contato: {p.contact_phone}</span>
+                        </p>
                       )}
                     </div>
-
-                    {p.contact_phone && (
-                      <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5 pt-1">
-                        <WhatsappIcon className="w-3 h-3 text-[#25D366]" />
-                        <span>Contato: {p.contact_phone}</span>
-                      </p>
-                    )}
                   </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                </li>
+              );
+            })}
+          </ul>
 
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between gap-3 pt-1">
-            <button
-              onClick={() => setPage((v) => Math.max(1, v - 1))}
-              disabled={page === 1}
-              className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
-            >
-              Anterior
-            </button>
-            <span className="text-xs font-semibold text-muted-foreground">
-              Página {page} de {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
-              disabled={page === totalPages}
-              className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
-            >
-              Próxima
-            </button>
-          </div>
-        )}
-        {/* Botão Flutuante: Anunciar Imóvel */}
-        <button
-          onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
-          className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
-        >
-          <Plus className="w-4 h-4" /> Anunciar Imóvel
-        </button>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <button
+                onClick={() => setPage((v) => Math.max(1, v - 1))}
+                disabled={page === 1}
+                className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+              >
+                Anterior
+              </button>
+              <span className="text-xs font-semibold text-muted-foreground">
+                Página {page} de {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
+                disabled={page === totalPages}
+                className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
+          {/* Botão Flutuante: Anunciar Imóvel */}
+          <button
+            onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
+            className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
+          >
+            <Plus className="w-4 h-4" /> Anunciar Imóvel
+          </button>
 
-        {showForm && (
-          <NewPropertySheet
-            onClose={() => setShowForm(false)}
-            onCreated={() => {
-              setShowForm(false);
-              queryClient.invalidateQueries({ queryKey: ["properties"] });
-            }}
-          />
-        )}
+          {showForm && (
+            <NewPropertySheet
+              onClose={() => setShowForm(false)}
+              onCreated={() => {
+                setShowForm(false);
+                queryClient.invalidateQueries({ queryKey: ["properties"] });
+              }}
+            />
+          )}
         </>
       )}
     </div>
@@ -625,12 +624,12 @@ function NewPropertySheet({ onClose, onCreated }: { onClose: () => void; onCreat
     const propId = insertedProp.id;
     const shortId = `#IMV-${propId.slice(0, 8).toUpperCase()}`;
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
-    
+
     const periodoStr = planMonths === 1 ? "1 mês" : planMonths === 12 ? "1 ano" : `${planMonths} meses`;
-    
+
     // Mensagem limpa enviando os dados do imóvel e combinando mensalidade com o Admin
     const msg =
-`Olá Administrador! Cadastrei um anúncio de Imóvel no MT 24horas express e solicito a ativação:
+      `Olá Administrador! Cadastrei um anúncio de Imóvel no MT 24horas express e solicito a ativação:
 
 *ID do Anúncio:* ${shortId} (${propId})
 *Modalidade:* ${dealType === "venda" ? "Venda" : "Locação"}
@@ -661,7 +660,7 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
   return (
     <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="w-full sm:max-w-xl bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] sm:max-h-[85vh] flex flex-col">
-        
+
         {/* Header Fixo */}
         <div className="p-4 sm:p-5 border-b border-border/60 bg-gradient-to-r from-muted/40 via-card to-muted/40 flex items-center justify-between shrink-0">
           <div>
@@ -673,9 +672,9 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             <h2 className="font-display font-extrabold text-lg sm:text-xl text-foreground mt-0.5">Anunciar Imóvel</h2>
             <p className="text-xs text-muted-foreground">Preencha os detalhes e envie para ativação</p>
           </div>
-          <button 
-            onClick={onClose} 
-            aria-label="Fechar" 
+          <button
+            onClick={onClose}
+            aria-label="Fechar"
             className="h-9 w-9 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
           >
             <X className="w-5 h-5" />
@@ -684,7 +683,7 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
 
         {/* Corpo Rolável */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm flex-1">
-          
+
           {/* SEÇÃO 1: Finalidade & Categoria */}
           <div className="space-y-3">
             <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
@@ -694,11 +693,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
               <button
                 type="button"
                 onClick={() => setDealType("locacao")}
-                className={`py-3 px-4 rounded-2xl text-xs font-black border transition-all flex flex-col items-center gap-1 ${
-                  dealType === "locacao" 
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.01]" 
+                className={`py-3 px-4 rounded-2xl text-xs font-black border transition-all flex flex-col items-center gap-1 ${dealType === "locacao"
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.01]"
                     : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                }`}
+                  }`}
               >
                 <span>🔑 Locação (Aluguel)</span>
                 <span className="text-[10px] font-medium opacity-80">Valor mensal recorrente</span>
@@ -706,11 +704,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
               <button
                 type="button"
                 onClick={() => setDealType("venda")}
-                className={`py-3 px-4 rounded-2xl text-xs font-black border transition-all flex flex-col items-center gap-1 ${
-                  dealType === "venda" 
-                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/20 scale-[1.01]" 
+                className={`py-3 px-4 rounded-2xl text-xs font-black border transition-all flex flex-col items-center gap-1 ${dealType === "venda"
+                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/20 scale-[1.01]"
                     : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                }`}
+                  }`}
               >
                 <span>🏷️ Venda</span>
                 <span className="text-[10px] font-medium opacity-80">Valor total do imóvel</span>
@@ -726,11 +723,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                     key={t}
                     type="button"
                     onClick={() => setPropertyType(t)}
-                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center truncate ${
-                      propertyType === t
+                    className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center truncate ${propertyType === t
                         ? "bg-primary text-primary-foreground border-primary shadow-sm"
                         : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                    }`}
+                      }`}
                   >
                     {TYPE_LABEL[t]}
                   </button>
@@ -747,21 +743,21 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <span className="text-xs font-bold text-foreground block mb-1">Bairro <span className="text-destructive">*</span></span>
-                <input 
-                  value={neighborhood} 
-                  onChange={(e) => setNeighborhood(e.target.value)} 
-                  placeholder="Ex: Centro, Castelândia, Milano..." 
-                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" 
+                <input
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  placeholder="Ex: Centro, Castelândia, Milano..."
+                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                   required
                 />
               </div>
               <div>
                 <span className="text-xs font-bold text-foreground block mb-1">Cidade</span>
-                <input 
-                  value={city} 
-                  onChange={(e) => setCity(e.target.value)} 
-                  placeholder="Cidade" 
-                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                <input
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Cidade"
+                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all"
                 />
               </div>
             </div>
@@ -779,12 +775,12 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                 </span>
                 <div className="relative">
                   <span className="absolute left-3.5 top-3 text-xs font-black text-muted-foreground pointer-events-none">R$</span>
-                  <input 
-                    value={price} 
-                    onChange={(e) => handlePriceChange(e.target.value)} 
-                    inputMode="numeric" 
-                    placeholder="0,00" 
-                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold text-foreground outline-none focus:border-primary transition-all" 
+                  <input
+                    value={price}
+                    onChange={(e) => handlePriceChange(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="0,00"
+                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold text-foreground outline-none focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -792,12 +788,12 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                 <span className="text-xs font-bold text-foreground block mb-1">Área Total (m²)</span>
                 <div className="relative">
                   <Ruler className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <input 
-                    value={totalArea} 
-                    onChange={(e) => setTotalArea(e.target.value.replace(/\D/g, ""))} 
-                    inputMode="numeric" 
-                    placeholder="Ex: 80" 
-                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                  <input
+                    value={totalArea}
+                    onChange={(e) => setTotalArea(e.target.value.replace(/\D/g, ""))}
+                    inputMode="numeric"
+                    placeholder="Ex: 80"
+                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all"
                   />
                 </div>
               </div>
@@ -818,11 +814,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                         key={num}
                         type="button"
                         onClick={() => setBedrooms(num)}
-                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${
-                          bedrooms === num 
-                            ? "bg-primary text-primary-foreground border-primary shadow-xs" 
+                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${bedrooms === num
+                            ? "bg-primary text-primary-foreground border-primary shadow-xs"
                             : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                        }`}
+                          }`}
                       >
                         {num}
                       </button>
@@ -841,11 +836,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                         key={num}
                         type="button"
                         onClick={() => setBathrooms(num)}
-                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${
-                          bathrooms === num 
-                            ? "bg-primary text-primary-foreground border-primary shadow-xs" 
+                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${bathrooms === num
+                            ? "bg-primary text-primary-foreground border-primary shadow-xs"
                             : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                        }`}
+                          }`}
                       >
                         {num}
                       </button>
@@ -864,11 +858,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                         key={num}
                         type="button"
                         onClick={() => setParking(num)}
-                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${
-                          parking === num 
-                            ? "bg-primary text-primary-foreground border-primary shadow-xs" 
+                        className={`flex-1 py-1 rounded-xl text-xs font-bold border transition-all ${parking === num
+                            ? "bg-primary text-primary-foreground border-primary shadow-xs"
                             : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                        }`}
+                          }`}
                       >
                         {num}
                       </button>
@@ -963,23 +956,23 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <span className="text-xs font-bold text-foreground block mb-1">Seu Nome / Imobiliária</span>
-                <input 
-                  value={agencyName} 
-                  onChange={(e) => setAgencyName(e.target.value)} 
-                  placeholder="Ex: Particular ou Imobiliária X" 
-                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                <input
+                  value={agencyName}
+                  onChange={(e) => setAgencyName(e.target.value)}
+                  placeholder="Ex: Particular ou Imobiliária X"
+                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all"
                 />
               </div>
               <div>
                 <span className="text-xs font-bold text-foreground block mb-1">WhatsApp de Contato <span className="text-destructive">*</span></span>
                 <div className="relative">
                   <Phone className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <input 
-                    value={contact} 
-                    onChange={(e) => handleContactChange(e.target.value)} 
+                  <input
+                    value={contact}
+                    onChange={(e) => handleContactChange(e.target.value)}
                     inputMode="tel"
-                    placeholder="(66) 99999-9999" 
-                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold outline-none focus:border-primary transition-all" 
+                    placeholder="(66) 99999-9999"
+                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold outline-none focus:border-primary transition-all"
                     required
                   />
                 </div>
@@ -1004,11 +997,10 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                   key={opt.months}
                   type="button"
                   onClick={() => setPlanMonths(opt.months)}
-                  className={`py-3 px-1 rounded-xl text-xs font-black border transition-all text-center cursor-pointer ${
-                    planMonths === opt.months
+                  className={`py-3 px-1 rounded-xl text-xs font-black border transition-all text-center cursor-pointer ${planMonths === opt.months
                       ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.02]"
                       : "bg-background text-muted-foreground border-border/70 hover:border-border"
-                  }`}
+                    }`}
                 >
                   {opt.label}
                 </button>
@@ -1045,12 +1037,12 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
           >
             {saving ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> 
+                <Loader2 className="w-5 h-5 animate-spin" />
                 <span>Registrando anúncio...</span>
               </>
             ) : (
               <>
-                <WhatsappIcon className="w-5 h-5" /> 
+                <WhatsappIcon className="w-5 h-5" />
                 <span>Combinar Mensalidade ({planMonths === 1 ? "1 mês" : planMonths === 12 ? "1 ano" : `${planMonths} meses`}) no WhatsApp</span>
               </>
             )}
@@ -1113,9 +1105,8 @@ export function PropertyImageCarousel({
       {/* Badges de Modalidade e Tipo */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 pointer-events-none">
         <span
-          className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
-            dealType === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
-          }`}
+          className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${dealType === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
+            }`}
         >
           {dealType === "venda" ? "Venda" : "Locação"}
         </span>
@@ -1159,9 +1150,8 @@ export function PropertyImageCarousel({
           {list.map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
-              }`}
+              className={`h-1.5 rounded-full transition-all ${i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
+                }`}
             />
           ))}
         </div>
