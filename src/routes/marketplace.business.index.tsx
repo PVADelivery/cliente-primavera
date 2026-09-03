@@ -659,8 +659,8 @@ Por favor, me envie a chave Pix para eu efetuar o pagamento da taxa de ${selecte
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="w-full sm:max-w-xl bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-xl bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] sm:max-h-[85vh] flex flex-col">
         
         {/* Header Fixo */}
         <div className="p-4 sm:p-5 border-b border-border/60 bg-gradient-to-r from-muted/40 via-card to-muted/40 flex items-center justify-between shrink-0">
@@ -1053,7 +1053,7 @@ Por favor, me envie a chave Pix para eu efetuar o pagamento da taxa de ${selecte
         </div>
 
         {/* Footer Fixo com Botão de Ação */}
-        <div className="p-4 sm:p-5 border-t border-border/60 bg-card shrink-0 space-y-2">
+        <div className="p-4 sm:p-5 border-t border-border/60 bg-card shrink-0 space-y-2 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
           <button
             onClick={submit}
             disabled={saving || uploadingPhotos || !neighborhood.trim() || !contact.trim()}

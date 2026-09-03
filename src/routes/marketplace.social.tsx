@@ -162,6 +162,19 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleContactChange = (val: string) => {
+    const digits = val.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) {
+      setContact(digits);
+    } else if (digits.length <= 6) {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
+    } else if (digits.length <= 10) {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
+    } else {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`);
+    }
+  };
+
   const submit = async () => {
     if (!title.trim() || !user) return;
     setSaving(true);
@@ -183,60 +196,106 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full sm:max-w-md bg-card border border-border/60 rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-lg">Novo classificado</h2>
-          <button onClick={onClose} aria-label="Fechar" className="text-muted-foreground">
+    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-md bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] sm:max-h-[85vh] flex flex-col">
+        
+        {/* Header Fixo */}
+        <div className="p-4 sm:p-5 border-b border-border/60 bg-gradient-to-r from-muted/40 via-card to-muted/40 flex items-center justify-between shrink-0">
+          <div>
+            <span className="text-[10px] uppercase tracking-widest font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              Espaço Social
+            </span>
+            <h2 className="font-display font-black text-lg sm:text-xl text-foreground mt-0.5">Novo Classificado</h2>
+          </div>
+          <button 
+            onClick={onClose} 
+            aria-label="Fechar" 
+            className="h-9 w-9 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(CATEGORY_LABEL) as SocialCategory[]).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCategory(c)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                category === c
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background text-muted-foreground border-border/60"
-              }`}
-            >
-              {CATEGORY_LABEL[c]}
-            </button>
-          ))}
+        {/* Corpo com Rolagem Livre */}
+        <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+          <div>
+            <span className="text-xs font-bold text-foreground block mb-2">Categoria</span>
+            <div className="flex flex-wrap gap-2">
+              {(Object.keys(CATEGORY_LABEL) as SocialCategory[]).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCategory(c)}
+                  className={`px-3.5 py-2 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                    category === c
+                      ? "bg-primary text-black border-primary shadow-sm shadow-primary/20 scale-[1.02]"
+                      : "bg-background text-muted-foreground border-border/70 hover:border-border"
+                  }`}
+                >
+                  {CATEGORY_LABEL[c]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-xs font-bold text-foreground block mb-1">Título <span className="text-destructive">*</span></span>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Carteira encontrada, Vaga atendente..."
+              className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all"
+              required
+            />
+          </div>
+
+          <div>
+            <span className="text-xs font-bold text-foreground block mb-1">Descrição Detalhada</span>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Descreva as informações do classificado..."
+              rows={4}
+              className="w-full p-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary resize-none transition-all"
+            />
+          </div>
+
+          <div>
+            <span className="text-xs font-bold text-foreground block mb-1">Telefone / WhatsApp para Contato</span>
+            <input
+              value={contact}
+              onChange={(e) => handleContactChange(e.target.value)}
+              inputMode="tel"
+              placeholder="(66) 99999-9999"
+              className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all"
+            />
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-bold">
+              {error}
+            </div>
+          )}
         </div>
 
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título"
-          className="w-full h-11 px-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary"
-        />
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Descrição"
-          rows={4}
-          className="w-full p-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary resize-none"
-        />
-        <input
-          value={contact}
-          onChange={(e) => setContact(e.target.value)}
-          placeholder="Telefone / WhatsApp"
-          className="w-full h-11 px-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary"
-        />
+        {/* Footer Fixo com Botão Sempre Visível */}
+        <div className="p-4 sm:p-5 border-t border-border/60 bg-card shrink-0 space-y-2 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+          <button
+            onClick={submit}
+            disabled={saving || !title.trim()}
+            className="w-full h-13 rounded-2xl bg-primary hover:bg-primary/90 text-black font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Publicando classificado...</span>
+              </>
+            ) : (
+              <span>Publicar Classificado</span>
+            )}
+          </button>
+        </div>
 
-        {error && <p className="text-xs text-destructive">{error}</p>}
-
-        <button
-          onClick={submit}
-          disabled={saving || !title.trim()}
-          className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          {saving && <Loader2 className="w-4 h-4 animate-spin" />} Publicar
-        </button>
       </div>
     </div>
   );

@@ -233,7 +233,7 @@ export function MarketplaceLayout() {
         </header>
       )}
 
-      <main className={`relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 ${['/marketplace/checkout', '/marketplace/addresses'].includes(path) ? '' : 'pb-24 pt-4'}`}>
+      <main className={`relative flex-1 mx-auto w-full max-w-2xl px-4 ${['/marketplace/checkout', '/marketplace/addresses'].includes(path) ? '' : 'pb-24 pt-4'}`}>
         <Outlet />
       </main>
 

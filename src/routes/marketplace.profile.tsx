@@ -466,7 +466,7 @@ function Profile() {
               <h2 className="text-xl font-bold">Editar Perfil</h2>
               <button onClick={() => setEditing(false)} className="p-2 bg-muted rounded-full"><X className="w-5 h-5" /></button>
             </div>
-            <div className="p-6 space-y-5 flex-1">
+            <div className="p-6 space-y-5 flex-1 overflow-y-auto">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-muted-foreground ml-1">Nome Completo</label>
                 <input
@@ -484,11 +484,11 @@ function Profile() {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-border/50">
+            <div className="p-6 border-t border-border/50 shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full py-4 rounded-xl bg-primary text-white font-bold flex justify-center items-center gap-2"
+                className="w-full py-4 rounded-xl bg-primary text-black font-bold flex justify-center items-center gap-2 cursor-pointer shadow-md"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                 {saving ? 'Salvando...' : 'Salvar Alterações'}
