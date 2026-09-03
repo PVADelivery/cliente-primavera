@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -270,6 +270,31 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Formatação de telefone / WhatsApp com máscara
+  const handleContactChange = (val: string) => {
+    const digits = val.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) {
+      setContact(digits);
+    } else if (digits.length <= 6) {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2)}`);
+    } else if (digits.length <= 10) {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`);
+    } else {
+      setContact(`(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`);
+    }
+  };
+
+  // Formatação de Moeda (R$)
+  const handlePriceChange = (val: string) => {
+    const digits = val.replace(/\D/g, "");
+    if (!digits) {
+      setPrice("");
+      return;
+    }
+    const num = Number(digits) / 100;
+    setPrice(num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  };
+
   const handleUploadPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -311,7 +336,7 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
   const submit = async () => {
     if (!model.trim() || !user) return;
     if (!contact.trim()) {
-      setError("Por favor, informe seu telefone / WhatsApp de contato.");
+      setError("Por favor, informe seu telefone ou WhatsApp de contato.");
       return;
     }
     setSaving(true);
@@ -332,7 +357,7 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
         description: description.trim() || null,
         contact_phone: contact.trim() || null,
         images: images.length > 0 ? images : null,
-        is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
+        is_active: false, // Ativação após confirmação e aprovação do Administrador
       })
       .select("id")
       .single();
@@ -340,7 +365,7 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     setSaving(false);
 
     if (err || !insertedVeh) {
-      setError("Não foi possível enviar agora. Tente novamente.");
+      setError("Não foi possível enviar o anúncio no momento. Tente novamente.");
       console.info("[vehicles insert]", err?.code, err?.message);
       return;
     }
@@ -348,17 +373,17 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     const vehId = insertedVeh.id;
     const shortId = `#VEH-${vehId.slice(0, 8).toUpperCase()}`;
 
-    // Monta a mensagem limpa com ID e emojis reduzidos para o WhatsApp da administração
+    // Mensagem limpa e estruturada com ID para o Administrador
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
     const msg = 
-`Olá Administrador! Cadastrei um anúncio de Veículo no MT 24horas express e solicito a liberação:
+`Olá Administrador! Cadastrei um anúncio de Veículo no MT 24horas express e solicito a ativação:
 
 *ID do Anúncio:* ${shortId} (${vehId})
 *Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
 *Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
 *Quilometragem:* ${km ? `${km} km` : "Não informado"}
 *Preço Pedido:* ${valorFormatado}
-*Tempo de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
+*Permanência Desejada:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
 *Objetivo:* Combinar valor da mensalidade e efetuar pagamento Pix para liberação.
 
 *WhatsApp:* ${contact.trim()}
@@ -370,185 +395,310 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
     const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
     window.open(adminWaUrl, "_blank", "noopener,noreferrer");
 
-    toast.success(`Anúncio ${shortId} enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.`, {
+    toast.success(`Veículo ${shortId} cadastrado com sucesso! Enviando para o WhatsApp do Administrador.`, {
       duration: 6000,
     });
 
     onCreated();
   };
 
-  const field = "w-full h-11 px-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary";
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full sm:max-w-md bg-card border border-border/60 rounded-t-3xl sm:rounded-3xl p-5 space-y-3 max-h-[88vh] overflow-y-auto">
-        <div className="flex items-center justify-between">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="w-full sm:max-w-xl bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+        
+        {/* Header Fixo */}
+        <div className="p-4 sm:p-5 border-b border-border/60 bg-gradient-to-r from-muted/40 via-card to-muted/40 flex items-center justify-between shrink-0">
           <div>
-            <h2 className="font-display font-bold text-lg">Anunciar veículo</h2>
-            <p className="text-[11px] text-muted-foreground">O anúncio será revisado pelo administrador antes de ir ao ar</p>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-widest font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                Central de Negócios
+              </span>
+            </div>
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-foreground mt-0.5">Anunciar Veículo</h2>
+            <p className="text-xs text-muted-foreground">Carros, motos, caminhões e utilitários à venda</p>
           </div>
-          <button onClick={onClose} aria-label="Fechar" className="text-muted-foreground p-1">
+          <button 
+            onClick={onClose} 
+            aria-label="Fechar" 
+            className="h-9 w-9 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 pt-1">
-          {(Object.keys(TYPE_LABEL) as VehicleType[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setVehicleType(t)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                vehicleType === t
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background text-muted-foreground border-border/60"
-              }`}
-            >
-              {TYPE_LABEL[t]}
-            </button>
-          ))}
-        </div>
-
-        <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Marca (ex.: Fiat, Honda, Toyota)" className={field} />
-        <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Modelo (ex.: Strada 1.4 Freedom, CG 160)" className={field} />
-        
-        <div className="grid grid-cols-2 gap-2">
-          <input value={year} onChange={(e) => setYear(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Ano (ex: 2022)" className={field} />
-          <input value={km} onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Quilometragem (km)" className={field} />
-        </div>
-        
-        <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="Preço pedido (R$)" className={field} />
-        
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descreva opcionais, estado dos pneus, revisões, documentação..."
-          rows={3}
-          className="w-full p-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary resize-none"
-        />
-
-        <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Seu Telefone / WhatsApp de contato *" className={field} />
-
-        {/* Upload de Fotos do Veículo */}
-        <div className="space-y-2 pt-1 border-t border-border/50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <ImageIcon className="w-4 h-4 text-primary" /> Fotos do Veículo ({images.length})
-            </span>
-            <span className="text-[10px] text-muted-foreground">1ª foto será a capa</span>
-          </div>
-
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleUploadPhotos}
-            className="hidden"
-          />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingPhotos}
-            className="w-full border-2 border-dashed border-primary/40 hover:border-primary rounded-2xl p-3 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center gap-2 text-xs font-bold text-foreground"
-          >
-            {uploadingPhotos ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                <span>Enviando fotos...</span>
-              </>
-            ) : (
-              <>
-                <UploadCloud className="w-4 h-4 text-primary" />
-                <span>Selecionar fotos do celular / galeria</span>
-              </>
-            )}
-          </button>
-
-          {images.length > 0 && (
-            <div className="grid grid-cols-4 gap-2 pt-1">
-              {images.map((img, idx) => (
-                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted group">
-                  <img src={img} alt={`Veículo ${idx + 1}`} className="w-full h-full object-cover" />
-                  {idx === 0 && (
-                    <span className="absolute top-1 left-1 px-1 py-0.5 rounded bg-primary text-primary-foreground font-black text-[8px] uppercase">
-                      Capa
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(idx)}
-                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-destructive/90 text-white flex items-center justify-center text-xs shadow hover:scale-110 transition-transform"
-                    title="Remover"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
+        {/* Corpo Rolável */}
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm flex-1">
+          
+          {/* SEÇÃO 1: Categoria do Veículo */}
+          <div className="space-y-3">
+            <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-primary" /> 1. Tipo de Veículo
+            </label>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+              {(Object.keys(TYPE_LABEL) as VehicleType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setVehicleType(t)}
+                  className={`py-2.5 px-2 rounded-xl text-xs font-black border transition-all text-center truncate ${
+                    vehicleType === t
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.01]"
+                      : "bg-background text-muted-foreground border-border/60 hover:border-border"
+                  }`}
+                >
+                  {TYPE_LABEL[t]}
+                </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Escolha do Tempo de Permanência / Mensalidade */}
-        <div className="space-y-2 pt-2 border-t border-border/50">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <CalendarClock className="w-4 h-4 text-emerald-500" />
-              Tempo que deseja manter ativo:
+          {/* SEÇÃO 2: Marca & Modelo */}
+          <div className="space-y-3 pt-2 border-t border-border/60">
+            <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+              <Car className="w-3.5 h-3.5 text-primary" /> 2. Identificação do Veículo
             </label>
-            <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-              {planMonths} {planMonths === 1 ? "Mês" : "Meses"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-5 gap-1.5">
-            {[1, 2, 3, 6, 12].map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setPlanMonths(m)}
-                className={`py-2 px-1 rounded-xl text-xs font-bold border transition-all text-center ${
-                  planMonths === m
-                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm scale-[1.02]"
-                    : "bg-background text-muted-foreground border-border/60 hover:border-border"
-                }`}
-              >
-                {m === 12 ? "1 Ano" : `${m} ${m === 1 ? "mês" : "meses"}`}
-              </button>
-            ))}
-          </div>
-
-          {/* Card explicativo sobre Mensalidade e Pagamento com Admin */}
-          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 space-y-1">
-            <div className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 text-xs">
-              <Sparkles className="w-4 h-4 shrink-0" />
-              <span>Mensalidade & Ativação no Sistema</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <span className="text-xs font-bold text-foreground block mb-1">Marca</span>
+                <input 
+                  value={brand} 
+                  onChange={(e) => setBrand(e.target.value)} 
+                  placeholder="Ex: Fiat, Honda, Toyota, VW..." 
+                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-foreground block mb-1">Modelo / Versão <span className="text-destructive">*</span></span>
+                <input 
+                  value={model} 
+                  onChange={(e) => setModel(e.target.value)} 
+                  placeholder="Ex: Strada 1.4 Freedom, CG 160..." 
+                  className="w-full h-11 px-4 rounded-2xl bg-background border border-border/70 text-sm font-bold outline-none focus:border-primary transition-all" 
+                  required
+                />
+              </div>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Você falará diretamente com o Administrador no WhatsApp para combinar os <strong>{planMonths} {planMonths === 1 ? "mês" : "meses"}</strong> que seu anúncio ficará ativo e efetuar o <strong>pagamento da mensalidade via Pix</strong>. Após a confirmação, seu veículo será liberado imediatamente!
-            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <span className="text-xs font-bold text-foreground block mb-1">Ano de Fabricação / Modelo</span>
+                <div className="relative">
+                  <Calendar className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input 
+                    value={year} 
+                    onChange={(e) => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))} 
+                    inputMode="numeric" 
+                    placeholder="Ex: 2022" 
+                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                  />
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-foreground block mb-1">Quilometragem (km)</span>
+                <div className="relative">
+                  <Gauge className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input 
+                    value={km} 
+                    onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} 
+                    inputMode="numeric" 
+                    placeholder="Ex: 45000" 
+                    className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
+                  />
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* SEÇÃO 3: Preço Pedido */}
+          <div className="space-y-3 pt-2 border-t border-border/60">
+            <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+              <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> 3. Preço Pedido
+            </label>
+            <div>
+              <span className="text-xs font-bold text-foreground block mb-1">Valor de Venda (R$)</span>
+              <div className="relative">
+                <span className="absolute left-3.5 top-3 text-xs font-black text-muted-foreground pointer-events-none">R$</span>
+                <input 
+                  value={price} 
+                  onChange={(e) => handlePriceChange(e.target.value)} 
+                  inputMode="numeric" 
+                  placeholder="0,00" 
+                  className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold text-foreground outline-none focus:border-primary transition-all" 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SEÇÃO 4: Fotos do Veículo */}
+          <div className="space-y-3 pt-2 border-t border-border/60">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+                <Camera className="w-3.5 h-3.5 text-primary" /> 4. Fotos do Veículo ({images.length})
+              </label>
+              <span className="text-[10px] text-muted-foreground font-semibold">1ª foto será a capa</span>
+            </div>
+
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleUploadPhotos}
+              className="hidden"
+            />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhotos}
+              className="w-full border-2 border-dashed border-primary/40 hover:border-primary rounded-2xl p-4 bg-primary/5 hover:bg-primary/10 transition-all flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-foreground cursor-pointer"
+            >
+              {uploadingPhotos ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  <span>Enviando fotos selecionadas...</span>
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="w-6 h-6 text-primary" />
+                  <span className="text-sm font-black">Selecionar fotos do celular / galeria</span>
+                  <span className="text-[11px] font-normal text-muted-foreground">Toque para adicionar fotos de vários ângulos</span>
+                </>
+              )}
+            </button>
+
+            {images.length > 0 && (
+              <div className="grid grid-cols-4 gap-2 pt-1">
+                {images.map((img, idx) => (
+                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-sm group">
+                    <img src={img} alt={`Veículo ${idx + 1}`} className="w-full h-full object-cover" />
+                    {idx === 0 && (
+                      <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-black text-[9px] uppercase tracking-wider shadow">
+                        Capa
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(idx)}
+                      className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-destructive text-white flex items-center justify-center text-xs shadow-md hover:scale-110 active:scale-90 transition-transform"
+                      title="Excluir foto"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* SEÇÃO 5: Descrição & Opcionais */}
+          <div className="space-y-2 pt-2 border-t border-border/60">
+            <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-primary" /> 5. Opcionais & Observações (Opcional)
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descreva opcionais, estado dos pneus, revisões feitas, se aceita troca ou financiamento..."
+              rows={3}
+              className="w-full p-3.5 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary resize-none transition-all"
+            />
+          </div>
+
+          {/* SEÇÃO 6: Contato */}
+          <div className="space-y-3 pt-2 border-t border-border/60">
+            <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-primary" /> 6. Dados do Vendedor
+            </label>
+            <div>
+              <span className="text-xs font-bold text-foreground block mb-1">WhatsApp de Contato <span className="text-destructive">*</span></span>
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <input 
+                  value={contact} 
+                  onChange={(e) => handleContactChange(e.target.value)} 
+                  inputMode="tel"
+                  placeholder="(66) 99999-9999" 
+                  className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-bold outline-none focus:border-primary transition-all" 
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SEÇÃO 7: Período de Ativação / Mensalidade */}
+          <div className="space-y-3 pt-2 border-t border-border/60">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] uppercase tracking-wider font-extrabold text-muted-foreground flex items-center gap-1.5">
+                <CalendarClock className="w-3.5 h-3.5 text-emerald-500" /> 7. Período de Permanência do Anúncio
+              </label>
+              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                {planMonths === 1 ? "1 Mês" : planMonths === 12 ? "1 Ano" : `${planMonths} Meses`}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-5 gap-1.5">
+              {[1, 2, 3, 6, 12].map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setPlanMonths(m)}
+                  className={`py-2.5 px-1 rounded-xl text-xs font-black border transition-all text-center ${
+                    planMonths === m
+                      ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.02]"
+                      : "bg-background text-muted-foreground border-border/60 hover:border-border"
+                  }`}
+                >
+                  {m === 1 ? "1 Mês" : m === 12 ? "1 Ano" : `${m} Meses`}
+                </button>
+              ))}
+            </div>
+
+            {/* Card Explicativo de Ativação com Admin */}
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 font-black text-emerald-600 dark:text-emerald-400 text-xs">
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <span>Ativação Direta com o Administrador via Pix</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Ao publicar, seu veículo receberá um <strong>ID Único</strong> e você falará diretamente com o Administrador no WhatsApp para combinar a mensalidade do período (<strong>{planMonths === 1 ? "1 mês" : planMonths === 12 ? "1 ano" : `${planMonths} meses`}</strong>). Após o Pix, seu anúncio é aprovado e liberado imediatamente!
+              </p>
+            </div>
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
         </div>
 
-        {error && <p className="text-xs text-destructive font-medium">{error}</p>}
-
-        <div className="pt-2">
+        {/* Footer Fixo com Botão de Ação */}
+        <div className="p-4 sm:p-5 border-t border-border/60 bg-card shrink-0 space-y-2">
           <button
             onClick={submit}
-            disabled={saving || uploadingPhotos || !model.trim()}
-            className="w-full h-12 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-md active:scale-98 transition-all"
+            disabled={saving || uploadingPhotos || !model.trim() || !contact.trim()}
+            className="w-full h-13 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 disabled:opacity-50 shadow-lg shadow-[#25D366]/20 active:scale-[0.98] transition-all cursor-pointer"
           >
             {saving ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Enviando anúncio...
+                <Loader2 className="w-5 h-5 animate-spin" /> 
+                <span>Enviando anúncio...</span>
               </>
             ) : (
               <>
-                <WhatsappIcon className="w-4 h-4" /> Combinar Mensalidade ({planMonths} {planMonths === 1 ? "mês" : "meses"}) no WhatsApp
+                <WhatsappIcon className="w-5 h-5" /> 
+                <span>Publicar Anúncio & Combinar no WhatsApp</span>
               </>
             )}
           </button>
+          <p className="text-[11px] text-center text-muted-foreground">
+            O anúncio será revisado e liberado pelo Administrador após o contato via WhatsApp.
+          </p>
         </div>
+
       </div>
     </div>
   );
