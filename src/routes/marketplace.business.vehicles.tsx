@@ -253,6 +253,14 @@ function VehiclesPage() {
   );
 }
 
+const AD_PLANS = [
+  { months: 1, label: "1 Mês", price: 30, priceStr: "R$ 30,00", monthlyPrice: "R$ 30,00/mês" },
+  { months: 2, label: "2 Meses", price: 55, priceStr: "R$ 55,00", monthlyPrice: "R$ 27,50/mês" },
+  { months: 3, label: "3 Meses", price: 75, priceStr: "R$ 75,00", monthlyPrice: "R$ 25,00/mês", badge: "Mais popular" },
+  { months: 6, label: "6 Meses", price: 130, priceStr: "R$ 130,00", monthlyPrice: "R$ 21,66/mês" },
+  { months: 12, label: "1 Ano", price: 220, priceStr: "R$ 220,00", monthlyPrice: "R$ 18,33/mês", badge: "Melhor valor" },
+];
+
 function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const { user } = useAuth();
   const [vehicleType, setVehicleType] = useState<VehicleType>("carro");
@@ -270,7 +278,9 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Formatação de telefone / WhatsApp com máscara
+  const selectedPlan = AD_PLANS.find((p) => p.months === planMonths) || AD_PLANS[0];
+
+  // Formatação de telefone / WhatsApp com máscara e pontuação correta
   const handleContactChange = (val: string) => {
     const digits = val.replace(/\D/g, "").slice(0, 11);
     if (digits.length <= 2) {
@@ -284,7 +294,17 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     }
   };
 
-  // Formatação de Moeda (R$)
+  // Formatação de Quilometragem com separador de milhar (ex: 45.000)
+  const handleKmChange = (val: string) => {
+    const digits = val.replace(/\D/g, "");
+    if (!digits) {
+      setKm("");
+      return;
+    }
+    setKm(Number(digits).toLocaleString("pt-BR"));
+  };
+
+  // Formatação de Moeda com pontuação correta (R$ 0,00)
   const handlePriceChange = (val: string) => {
     const digits = val.replace(/\D/g, "");
     if (!digits) {
@@ -352,12 +372,12 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
         brand: brand.trim() || null,
         model: model.trim(),
         year: year ? Number(year) : null,
-        km: km ? Number(km) : null,
+        km: km ? Number(km.replace(/\D/g, "")) : null,
         price: cleanPrice,
         description: description.trim() || null,
         contact_phone: contact.trim() || null,
         images: images.length > 0 ? images : null,
-        is_active: false, // Ativação após confirmação e aprovação do Administrador
+        is_active: false, // Ativação após confirmação do pagamento com o Administrador
       })
       .select("id")
       .single();
@@ -373,24 +393,25 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     const vehId = insertedVeh.id;
     const shortId = `#VEH-${vehId.slice(0, 8).toUpperCase()}`;
 
-    // Mensagem limpa e estruturada com ID para o Administrador
+    // Mensagem com valores monetários explícitos e pontuação correta para o WhatsApp
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
+    const kmFormatado = km ? `${km} km` : "Não informado";
     const msg = 
 `Olá Administrador! Cadastrei um anúncio de Veículo no MT 24horas express e solicito a ativação:
 
 *ID do Anúncio:* ${shortId} (${vehId})
 *Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
 *Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
-*Quilometragem:* ${km ? `${km} km` : "Não informado"}
+*Quilometragem:* ${kmFormatado}
 *Preço Pedido:* ${valorFormatado}
-*Permanência Desejada:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
-*Objetivo:* Combinar valor da mensalidade e efetuar pagamento Pix para liberação.
+*Plano Selecionado:* ${selectedPlan.label} — ${selectedPlan.priceStr} (${selectedPlan.monthlyPrice})
+*Valor a Pagar:* ${selectedPlan.priceStr} via Pix
 
 *WhatsApp:* ${contact.trim()}
-*Detalhes:* ${description.trim() || "Sem observações adicionais"}
+*Descrição:* ${description.trim() || "Sem observações adicionais"}
 ${images.length > 0 ? `*Fotos:* ${images.length} foto(s) anexada(s)` : ""}
 
-Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento.`;
+Por favor, me envie a chave Pix para eu efetuar o pagamento da taxa de ${selectedPlan.priceStr} e liberar o anúncio.`;
 
     const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
     window.open(adminWaUrl, "_blank", "noopener,noreferrer");
@@ -499,9 +520,9 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                   <Gauge className="absolute left-3.5 top-3.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                   <input 
                     value={km} 
-                    onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} 
+                    onChange={(e) => handleKmChange(e.target.value)} 
                     inputMode="numeric" 
-                    placeholder="Ex: 45000" 
+                    placeholder="Ex: 45.000" 
                     className="w-full h-11 pl-10 pr-4 rounded-2xl bg-background border border-border/70 text-sm font-medium outline-none focus:border-primary transition-all" 
                   />
                 </div>
@@ -633,35 +654,51 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
                 <CalendarClock className="w-3.5 h-3.5 text-emerald-500" /> 7. Período de Permanência do Anúncio
               </label>
               <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
-                {planMonths === 1 ? "1 Mês" : planMonths === 12 ? "1 Ano" : `${planMonths} Meses`}
+                {selectedPlan.label} — {selectedPlan.priceStr}
               </span>
             </div>
 
-            <div className="grid grid-cols-5 gap-1.5">
-              {[1, 2, 3, 6, 12].map((m) => (
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {AD_PLANS.map((plan) => (
                 <button
-                  key={m}
+                  key={plan.months}
                   type="button"
-                  onClick={() => setPlanMonths(m)}
-                  className={`py-2.5 px-1 rounded-xl text-xs font-black border transition-all text-center ${
-                    planMonths === m
+                  onClick={() => setPlanMonths(plan.months)}
+                  className={`relative p-2.5 rounded-2xl border transition-all text-center flex flex-col items-center justify-center gap-0.5 ${
+                    planMonths === plan.months
                       ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.02]"
-                      : "bg-background text-muted-foreground border-border/60 hover:border-border"
+                      : "bg-background text-muted-foreground border-border/70 hover:border-border"
                   }`}
                 >
-                  {m === 1 ? "1 Mês" : m === 12 ? "1 Ano" : `${m} Meses`}
+                  {plan.badge && (
+                    <span className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-full ${
+                      planMonths === plan.months ? "bg-amber-400 text-slate-950" : "bg-primary/10 text-primary"
+                    }`}>
+                      {plan.badge}
+                    </span>
+                  )}
+                  <span className="text-xs font-extrabold">{plan.label}</span>
+                  <span className={`text-sm font-black ${planMonths === plan.months ? "text-white" : "text-foreground"}`}>
+                    {plan.priceStr}
+                  </span>
+                  <span className="text-[10px] opacity-80 font-medium">{plan.monthlyPrice}</span>
                 </button>
               ))}
             </div>
 
             {/* Card Explicativo de Ativação com Admin */}
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-1.5">
-              <div className="flex items-center gap-2 font-black text-emerald-600 dark:text-emerald-400 text-xs">
-                <Sparkles className="w-4 h-4 shrink-0" />
-                <span>Ativação Direta com o Administrador via Pix</span>
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2">
+              <div className="flex items-center justify-between font-black text-emerald-600 dark:text-emerald-400 text-xs">
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 shrink-0" />
+                  Ativação Direta via Pix com Administrador
+                </span>
+                <span className="text-sm font-black text-emerald-700 dark:text-emerald-300">
+                  {selectedPlan.priceStr}
+                </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Ao publicar, seu veículo receberá um <strong>ID Único</strong> e você falará diretamente com o Administrador no WhatsApp para combinar a mensalidade do período (<strong>{planMonths === 1 ? "1 mês" : planMonths === 12 ? "1 ano" : `${planMonths} meses`}</strong>). Após o Pix, seu anúncio é aprovado e liberado imediatamente!
+                Ao publicar, seu veículo receberá um <strong>ID Único</strong> e você falará diretamente com o Administrador no WhatsApp para efetuar o pagamento da taxa de <strong>{selectedPlan.priceStr}</strong> referente ao período de <strong>{selectedPlan.label}</strong> ({selectedPlan.monthlyPrice}). Após a confirmação do Pix, seu anúncio é liberado imediatamente no sistema!
               </p>
             </div>
           </div>
@@ -685,17 +722,17 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             {saving ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" /> 
-                <span>Enviando anúncio...</span>
+                <span>Registrando anúncio...</span>
               </>
             ) : (
               <>
                 <WhatsappIcon className="w-5 h-5" /> 
-                <span>Publicar Anúncio & Combinar no WhatsApp</span>
+                <span>Contratar Anúncio ({selectedPlan.priceStr}) no WhatsApp</span>
               </>
             )}
           </button>
           <p className="text-[11px] text-center text-muted-foreground">
-            O anúncio será revisado e liberado pelo Administrador após o contato via WhatsApp.
+            Taxa de ativação do anúncio: {selectedPlan.priceStr} para o período de {selectedPlan.label}.
           </p>
         </div>
 
