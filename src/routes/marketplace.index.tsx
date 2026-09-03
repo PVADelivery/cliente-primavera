@@ -1018,10 +1018,9 @@ function MarketplaceHome() {
       </AeroSection>
 
       {/* ── Quick banners ── */}
-      <section className="grid grid-cols-3 gap-2 sm:gap-3">
+      <section className="grid grid-cols-2 gap-3">
         <AeroPanel to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
         <AeroPanel to="/marketplace/directory" icon={Tag} title="PPP" subtitle="Prestadores" />
-        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e Carros" />
       </section>
 
       {/* ── Taxi ── */}
