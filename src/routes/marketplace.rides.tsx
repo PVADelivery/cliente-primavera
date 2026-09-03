@@ -468,7 +468,6 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         setupRouteAndMarkers();
 
         // Se houver corrida/motorista, busca e sincroniza localização em tempo real no Supabase
-        // Se houver corrida/motorista, busca e sincroniza localização em tempo real no Supabase
         if (activeRide?.id || activeRide?.driver_id) {
           const fetchDriverLoc = async () => {
             try {
