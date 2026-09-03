@@ -14,10 +14,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
     meta: [
-      { title: "Central de Negócios — Imóveis e Venda de Veículos em Primavera do Leste" },
-      { name: "description", content: "Casas, apartamentos, salas comerciais para locação e venda, e venda de veículos (carros, motos e utilitários) em Primavera do Leste, MT." },
-      { property: "og:title", content: "Central de Negócios — Imóveis e Venda de Carros" },
-      { property: "og:description", content: "Casas, apartamentos, kitnets, salas, terrenos e venda de carros, motos e veículos na sua cidade." },
+      { title: "Central de Negócios — Imóveis, Carros, Motos e Caminhões" },
+      { name: "description", content: "Casas, apartamentos, salas comerciais para locação e venda, carros, motos, caminhões e utilitários em Primavera do Leste, MT." },
+      { property: "og:title", content: "Central de Negócios — Imóveis, Carros e Motos" },
+      { property: "og:description", content: "Casas, apartamentos, kitnets, salas, terrenos, carros, motos e caminhões na sua cidade." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -181,7 +181,7 @@ function BusinessPage() {
     <div className="space-y-5 pb-6">
       <AeroPageHeader
         title="Central de Negócios"
-        subtitle="Imóveis e Venda de Veículos (Carros e Motos)"
+        subtitle="Imóveis, Carros, Motos e Caminhões"
         onBack={() => navigate({ to: "/marketplace" })}
       />
 
@@ -193,7 +193,7 @@ function BusinessPage() {
           to="/marketplace/business/vehicles"
           className="aero-focus h-11 rounded-2xl grid place-items-center text-[13px] font-bold bg-card border border-border text-muted-foreground hover:bg-muted active:bg-btn-active active:text-btn-active-ink transition-colors flex items-center justify-center gap-1.5"
         >
-          <Car className="w-4 h-4 text-primary" /> Venda de Carros & Veículos
+          <Car className="w-4 h-4 text-primary" /> Carros, Motos & Caminhões
         </Link>
       </div>
 

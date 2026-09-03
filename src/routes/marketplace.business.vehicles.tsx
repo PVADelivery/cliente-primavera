@@ -99,8 +99,8 @@ function VehiclesPage() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="font-display text-xl font-bold leading-tight">Central de Negócios — Veículos</h1>
-          <p className="text-xs text-muted-foreground">Venda de carros, motos e utilitários na sua cidade</p>
+          <h1 className="font-display text-xl font-bold leading-tight">Central de Negócios</h1>
+          <p className="text-xs text-muted-foreground">Carros, motos, caminhões e utilitários na sua cidade</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ function VehiclesPage() {
           <Building2 className="w-4 h-4" /> Imóveis & Locação
         </Link>
         <span className="h-11 rounded-2xl grid place-items-center text-xs font-bold bg-btn-surface text-btn-ink border border-btn-line shadow-sm flex items-center justify-center gap-1.5">
-          <Car className="w-4 h-4 text-primary" /> Venda de Carros & Veículos
+          <Car className="w-4 h-4 text-primary" /> Carros, Motos & Caminhões
         </span>
       </div>
 

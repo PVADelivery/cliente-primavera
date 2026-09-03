@@ -193,13 +193,13 @@ const APP_FEATURES: AppFeature[] = [
     keywords: ["social", "espaço social", "espaco social", "classificados", "vagas", "empregos", "trabalho", "doações", "doacoes", "comunidade", "anúncios", "anuncios", "achados e perdidos"],
   },
   {
-    title: "Central de Negócios (Imóveis e Venda de Carros)",
-    subtitle: "Imóveis para aluguel e venda, e venda de veículos (carros, motos e utilitários)",
+    title: "Central de Negócios (Imóveis, Carros e Motos)",
+    subtitle: "Imóveis para aluguel e venda, carros, motos e caminhões",
     to: "/marketplace/business",
     icon: Building2,
     badge: "Negócios",
     badgeBg: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
-    keywords: ["negócios", "negocios", "imóveis", "imoveis", "aluguel", "alugar", "casa", "apartamento", "kitnet", "comprar casa", "terreno", "imobiliária", "imobiliaria", "corretor", "carros", "veículos", "veiculos", "motos", "venda de carros", "venda de veículos"],
+    keywords: ["negócios", "negocios", "imóveis", "imoveis", "aluguel", "alugar", "casa", "apartamento", "kitnet", "comprar casa", "terreno", "imobiliária", "imobiliaria", "corretor", "carros", "veículos", "veiculos", "motos", "caminhões", "venda de carros", "venda de motos"],
   },
   {
     title: "Veículos à Venda",
@@ -1054,10 +1054,10 @@ function MarketplaceHome() {
         </Link>
       </section>
 
-      {/* ── Espaço Social & Central de Negócios (Imóveis e Venda de Carros) ── */}
+      {/* ── Espaço Social & Central de Negócios (Imóveis, Carros e Motos) ── */}
       <section className="grid grid-cols-2 gap-3">
         <AeroPanel to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
-        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis e Venda de Carros" />
+        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis, Carros e Motos" />
       </section>
 
       {/* ── Destaque carousel (Mais bem avaliados) ── */}
