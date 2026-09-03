@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2 } from "lucide-react";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2 } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -364,31 +364,13 @@ function BusinessPage() {
                 </button>
 
                 <div className="overflow-hidden rounded-3xl border border-border/60 bg-card hover:border-primary/50 transition-all shadow-sm">
-                  {/* Foto de Capa ou Placeholder elegante */}
-                  <Link
-                    to="/marketplace/business/$propertyId"
-                    params={{ propertyId: p.id }}
-                    className="block relative aspect-[16/9] w-full bg-muted overflow-hidden cursor-pointer"
-                  >
-                    {cover ? (
-                      <img src={cover} alt={p.property_type} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
-                        <Home className="h-10 w-10 text-muted-foreground/30" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos</span>
-                      </div>
-                    )}
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
-                        p.deal_type === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
-                      }`}>
-                        {p.deal_type === "venda" ? "Venda" : "Locação"}
-                      </span>
-                      <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
-                        {TYPE_LABEL[p.property_type] ?? p.property_type}
-                      </span>
-                    </div>
-                  </Link>
+                  {/* Carrossel de Fotos com navegação e badges */}
+                  <PropertyImageCarousel
+                    images={p.images}
+                    propertyId={p.id}
+                    dealType={p.deal_type}
+                    propertyType={p.property_type}
+                  />
 
                   {/* Conteúdo do Card */}
                   <div className="p-4 space-y-3">
@@ -417,7 +399,7 @@ function BusinessPage() {
                     <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2 flex-wrap">
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground">Valor:</p>
-                        <p className="font-display font-black text-lg text-primary leading-tight">
+                        <p className="font-display font-black text-xl text-black dark:text-white leading-tight">
                           {formatPrice(p.price)}
                           {p.deal_type === "locacao" && <span className="text-xs font-normal text-muted-foreground"> /mês</span>}
                         </p>
@@ -797,6 +779,111 @@ Solicito a aprovação e liberação do meu imóvel na Central de Negócios!`;
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function PropertyImageCarousel({
+  images,
+  propertyId,
+  dealType,
+  propertyType,
+}: {
+  images?: string[] | null;
+  propertyId: string;
+  dealType: PropertyDeal;
+  propertyType: PropertyType;
+}) {
+  const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+  const list = useMemo(() => (images || []).filter(Boolean), [images]);
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((curr) => (curr === 0 ? list.length - 1 : curr - 1));
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((curr) => (curr === list.length - 1 ? 0 : curr + 1));
+  };
+
+  return (
+    <div
+      onClick={() => navigate({ to: "/marketplace/business/$propertyId", params: { propertyId } })}
+      className="relative aspect-[16/9] w-full bg-muted overflow-hidden cursor-pointer select-none group/carousel"
+    >
+      {list.length > 0 ? (
+        <img
+          src={list[index]}
+          alt={propertyType}
+          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
+          <Home className="h-10 w-10 text-muted-foreground/30" />
+          <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos</span>
+        </div>
+      )}
+
+      {/* Badges de Modalidade e Tipo */}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 pointer-events-none">
+        <span
+          className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
+            dealType === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
+          }`}
+        >
+          {dealType === "venda" ? "Venda" : "Locação"}
+        </span>
+        <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
+          {TYPE_LABEL[propertyType] ?? propertyType}
+        </span>
+      </div>
+
+      {/* Carrossel: Contador de Fotos */}
+      {list.length > 1 && (
+        <span className="absolute bottom-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-full bg-black/75 text-white text-[10px] font-black tracking-wider backdrop-blur-sm pointer-events-none shadow">
+          {index + 1} / {list.length}
+        </span>
+      )}
+
+      {/* Botões de Navegação Anterior / Próxima */}
+      {list.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Foto anterior"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Próxima foto"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Indicador de Bolinhas */}
+      {list.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 pointer-events-none">
+          {list.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

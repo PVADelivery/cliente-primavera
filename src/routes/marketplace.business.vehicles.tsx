@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -170,9 +170,11 @@ function VehiclesPage() {
           {list.map((v) => (
             <li
               key={v.id}
-              className="rounded-3xl border border-border/50 bg-card p-5"
+              className="rounded-3xl border border-border/50 bg-card p-4 sm:p-5"
               style={{ boxShadow: "var(--shadow-card)" }}
             >
+              <VehicleImageCarousel images={v.images} vehicleType={v.vehicle_type} />
+
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
                   Venda
@@ -185,7 +187,7 @@ function VehiclesPage() {
               </h2>
               <p className="text-xs text-muted-foreground">{[v.city, v.state].filter(Boolean).join(", ")}</p>
 
-              {v.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{v.description}</p>}
+              {v.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{v.description}</p>}
 
               <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
                 {v.year && (
@@ -210,8 +212,8 @@ function VehiclesPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between mt-3 gap-3">
-                <p className="font-display font-bold text-primary">{formatPrice(v.price)}</p>
+              <div className="flex items-center justify-between mt-3 gap-3 pt-2 border-t border-border/50">
+                <p className="font-display font-black text-xl text-black dark:text-white leading-tight">{formatPrice(v.price)}</p>
                 {v.contact_phone && (
                   <a
                     href={`https://wa.me/55${v.contact_phone.replace(/\D/g, "")}?text=${encodeURIComponent(
@@ -499,6 +501,84 @@ Solicito a aprovação e liberação do meu anúncio na Central de Negócios!`;
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function VehicleImageCarousel({
+  images,
+  vehicleType,
+}: {
+  images?: string[] | null;
+  vehicleType: VehicleType;
+}) {
+  const [index, setIndex] = useState(0);
+  const list = useMemo(() => (images || []).filter(Boolean), [images]);
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((curr) => (curr === 0 ? list.length - 1 : curr - 1));
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIndex((curr) => (curr === list.length - 1 ? 0 : curr + 1));
+  };
+
+  if (list.length === 0) return null;
+
+  return (
+    <div className="relative aspect-[16/9] w-full bg-muted rounded-2xl overflow-hidden select-none mb-3 group/carousel">
+      <img
+        src={list[index]}
+        alt={vehicleType}
+        className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+      />
+
+      {/* Carrossel: Contador de Fotos */}
+      {list.length > 1 && (
+        <span className="absolute bottom-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-full bg-black/75 text-white text-[10px] font-black tracking-wider backdrop-blur-sm pointer-events-none shadow">
+          {index + 1} / {list.length}
+        </span>
+      )}
+
+      {/* Botões de Navegação Anterior / Próxima */}
+      {list.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Foto anterior"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Próxima foto"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Indicador de Bolinhas */}
+      {list.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 pointer-events-none">
+          {list.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

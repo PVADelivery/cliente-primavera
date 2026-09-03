@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Phone, MapPin, Heart, Home } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Heart, Home, ChevronLeft, ChevronRight } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/database";
@@ -86,27 +87,12 @@ function PropertyDetail() {
           className="rounded-3xl border border-border/50 bg-card overflow-hidden"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
-          {/* Foto de Capa ou Placeholder */}
-          <div className="relative aspect-[16/9] w-full bg-muted overflow-hidden">
-            {property.images?.[0] ? (
-              <img src={property.images[0]} alt={property.property_type} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
-                <Home className="h-12 w-12 text-muted-foreground/30" />
-                <span className="text-xs uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos cadastradas</span>
-              </div>
-            )}
-            <div className="absolute top-3 left-3 flex items-center gap-1.5">
-              <span className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
-                property.deal_type === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
-              }`}>
-                {property.deal_type === "venda" ? "Venda" : "Locação"}
-              </span>
-              <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
-                {TYPE_LABEL[property.property_type] ?? property.property_type}
-              </span>
-            </div>
-          </div>
+          {/* Carrossel de Fotos do Imóvel */}
+          <PropertyDetailCarousel
+            images={property.images}
+            dealType={property.deal_type}
+            propertyType={property.property_type}
+          />
 
           <div className="p-6">
             <h2 className="font-display font-bold text-xl mt-1 leading-tight">
@@ -124,7 +110,7 @@ function PropertyDetail() {
               <PropertyAttrs property={property} />
             </div>
 
-            <p className="font-display font-black text-2xl text-primary mt-5">
+            <p className="font-display font-black text-2xl text-black dark:text-white mt-5">
               {formatPrice(property.price)}
               {property.deal_type === "locacao" && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
             </p>
@@ -146,6 +132,101 @@ function PropertyDetail() {
               </a>
             )}
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PropertyDetailCarousel({
+  images,
+  dealType,
+  propertyType,
+}: {
+  images?: string[] | null;
+  dealType: "locacao" | "venda";
+  propertyType: string;
+}) {
+  const [index, setIndex] = useState(0);
+  const list = useMemo(() => (images || []).filter(Boolean), [images]);
+
+  const handlePrev = () => {
+    setIndex((curr) => (curr === 0 ? list.length - 1 : curr - 1));
+  };
+
+  const handleNext = () => {
+    setIndex((curr) => (curr === list.length - 1 ? 0 : curr + 1));
+  };
+
+  return (
+    <div className="relative aspect-[16/9] w-full bg-muted overflow-hidden select-none">
+      {list.length > 0 ? (
+        <img
+          src={list[index]}
+          alt={propertyType}
+          className="w-full h-full object-cover transition-all duration-300"
+        />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
+          <Home className="h-12 w-12 text-muted-foreground/30" />
+          <span className="text-xs uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos cadastradas</span>
+        </div>
+      )}
+
+      {/* Badges de Modalidade e Tipo */}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 pointer-events-none">
+        <span
+          className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
+            dealType === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
+          }`}
+        >
+          {dealType === "venda" ? "Venda" : "Locação"}
+        </span>
+        <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
+          {TYPE_LABEL[propertyType] ?? propertyType}
+        </span>
+      </div>
+
+      {/* Carrossel: Contador de Fotos */}
+      {list.length > 1 && (
+        <span className="absolute bottom-3 right-3 z-10 px-2.5 py-0.5 rounded-full bg-black/75 text-white text-[11px] font-black tracking-wider backdrop-blur-sm pointer-events-none shadow">
+          {index + 1} / {list.length}
+        </span>
+      )}
+
+      {/* Botões de Navegação Anterior / Próxima */}
+      {list.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Foto anterior"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Próxima foto"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
+
+      {/* Indicador de Bolinhas */}
+      {list.length > 1 && (
+        <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 pointer-events-none">
+          {list.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-5 bg-white shadow-sm" : "w-1.5 bg-white/50"
+              }`}
+            />
+          ))}
         </div>
       )}
     </div>
