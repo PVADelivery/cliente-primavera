@@ -319,50 +319,58 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
 
     const cleanPrice = price ? Number(price.replace(/\./g, "").replace(",", ".")) : null;
 
-    const { error: err } = await supabase.from("vehicles").insert({
-      owner_id: user.id,
-      vehicle_type: vehicleType,
-      brand: brand.trim() || null,
-      model: model.trim(),
-      year: year ? Number(year) : null,
-      km: km ? Number(km) : null,
-      price: cleanPrice,
-      description: description.trim() || null,
-      contact_phone: contact.trim() || null,
-      images: images.length > 0 ? images : null,
-      is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
-    });
+    const { data: insertedVeh, error: err } = await supabase
+      .from("vehicles")
+      .insert({
+        owner_id: user.id,
+        vehicle_type: vehicleType,
+        brand: brand.trim() || null,
+        model: model.trim(),
+        year: year ? Number(year) : null,
+        km: km ? Number(km) : null,
+        price: cleanPrice,
+        description: description.trim() || null,
+        contact_phone: contact.trim() || null,
+        images: images.length > 0 ? images : null,
+        is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
+      })
+      .select("id")
+      .single();
 
     setSaving(false);
 
-    if (err) {
+    if (err || !insertedVeh) {
       setError("Não foi possível enviar agora. Tente novamente.");
-      console.info("[vehicles insert]", err.code, err.message);
+      console.info("[vehicles insert]", err?.code, err?.message);
       return;
     }
 
-    // Monta a mensagem para o WhatsApp da administração
+    const vehId = insertedVeh.id;
+    const shortId = `#VEH-${vehId.slice(0, 8).toUpperCase()}`;
+
+    // Monta a mensagem limpa com ID e emojis reduzidos para o WhatsApp da administração
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
     const msg = 
-`Olá Administrador! Acabei de cadastrar meu anúncio de *Veículo* no app MT 24horas express e quero combinar a mensalidade para ativá-lo:
+`Olá Administrador! Cadastrei um anúncio de Veículo no MT 24horas express e solicito a liberação:
 
-🚗 *Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
-🏷️ *Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
-🛣️ *Quilometragem:* ${km ? `${km} km` : "Não informado"}
-💰 *Preço Pedido:* ${valorFormatado}
-📅 *Período Desejado de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
-💳 *Objetivo:* Combinar o valor da mensalidade e pagar via Pix para liberar meu anúncio!
+*ID do Anúncio:* ${shortId} (${vehId})
+*Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
+*Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
+*Quilometragem:* ${km ? `${km} km` : "Não informado"}
+*Preço Pedido:* ${valorFormatado}
+*Tempo de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
+*Objetivo:* Combinar valor da mensalidade e efetuar pagamento Pix para liberação.
 
-📱 *Meu WhatsApp:* ${contact.trim()}
-📝 *Detalhes:* ${description.trim() || "Sem observações adicionais"}
-${images.length > 0 ? `📸 *Fotos anexadas:* ${images.length} foto(s)` : ""}
+*WhatsApp:* ${contact.trim()}
+*Detalhes:* ${description.trim() || "Sem observações adicionais"}
+${images.length > 0 ? `*Fotos:* ${images.length} foto(s) anexada(s)` : ""}
 
-Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento e ativar meu anúncio!`;
+Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento.`;
 
     const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
     window.open(adminWaUrl, "_blank", "noopener,noreferrer");
 
-    toast.success("Anúncio enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.", {
+    toast.success(`Anúncio ${shortId} enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.`, {
       duration: 6000,
     });
 

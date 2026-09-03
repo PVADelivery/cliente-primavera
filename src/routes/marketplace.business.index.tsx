@@ -558,56 +558,65 @@ function NewPropertySheet({ onClose, onCreated }: { onClose: () => void; onCreat
 
     const cleanPrice = price ? Number(price.replace(/\./g, "").replace(",", ".")) : null;
 
-    const { error: err } = await supabase.from("properties").insert({
-      owner_id: user.id,
-      deal_type: dealType,
-      property_type: propertyType,
-      neighborhood: neighborhood.trim(),
-      city: city.trim() || "Primavera do Leste",
-      state: "MT",
-      price: cleanPrice,
-      bedrooms: bedrooms ? Number(bedrooms) : null,
-      bathrooms: bathrooms ? Number(bathrooms) : null,
-      parking: parking ? Number(parking) : null,
-      total_area: totalArea ? Number(totalArea) : null,
-      agency_name: agencyName.trim() || null,
-      contact_phone: contact.trim() || null,
-      description: description.trim() || null,
-      images: images.length > 0 ? images : null,
-      is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
-    });
+    const { data: insertedProp, error: err } = await supabase
+      .from("properties")
+      .insert({
+        owner_id: user.id,
+        deal_type: dealType,
+        property_type: propertyType,
+        neighborhood: neighborhood.trim(),
+        city: city.trim() || "Primavera do Leste",
+        state: "MT",
+        price: cleanPrice,
+        bedrooms: bedrooms ? Number(bedrooms) : null,
+        bathrooms: bathrooms ? Number(bathrooms) : null,
+        parking: parking ? Number(parking) : null,
+        total_area: totalArea ? Number(totalArea) : null,
+        agency_name: agencyName.trim() || null,
+        contact_phone: contact.trim() || null,
+        description: description.trim() || null,
+        images: images.length > 0 ? images : null,
+        is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
+      })
+      .select("id")
+      .single();
 
     setSaving(false);
 
-    if (err) {
+    if (err || !insertedProp) {
       setError("Não foi possível cadastrar agora. Tente novamente.");
-      console.info("[properties insert]", err.code, err.message);
+      console.info("[properties insert]", err?.code, err?.message);
       return;
     }
 
+    const propId = insertedProp.id;
+    const shortId = `#IMV-${propId.slice(0, 8).toUpperCase()}`;
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
+    
+    // Mensagem limpa, profissional e com ID para o Administrador localizar imediatamente no painel
     const msg =
-`Olá Administrador! Acabei de cadastrar meu anúncio de *Imóvel* no MT 24horas express e quero combinar a mensalidade para ativá-lo:
+`Olá Administrador! Cadastrei um anúncio de Imóvel no MT 24horas express e solicito a liberação:
 
-🏠 *Modalidade:* ${dealType === "venda" ? "Venda" : "Locação"}
-🏢 *Tipo:* ${TYPE_LABEL[propertyType] ?? propertyType} em ${neighborhood.trim()} (${city.trim() || "Primavera do Leste"})
-💰 *Valor do Imóvel:* ${valorFormatado}${dealType === "locacao" ? " /mês" : ""}
-📅 *Período Desejado de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
-💳 *Objetivo:* Combinar o valor da mensalidade e pagar via Pix para liberar meu anúncio!
+*ID do Anúncio:* ${shortId} (${propId})
+*Modalidade:* ${dealType === "venda" ? "Venda" : "Locação"}
+*Tipo:* ${TYPE_LABEL[propertyType] ?? propertyType} em ${neighborhood.trim()} (${city.trim() || "Primavera do Leste"})
+*Valor do Imóvel:* ${valorFormatado}${dealType === "locacao" ? " /mês" : ""}
+*Tempo de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
+*Objetivo:* Combinar valor da mensalidade e efetuar pagamento Pix para liberação.
 
-🛏️ *Quartos:* ${bedrooms || "0"} | 🚿 *Banheiros:* ${bathrooms || "0"} | 🚗 *Vagas:* ${parking || "0"}
-📐 *Área:* ${totalArea ? `${totalArea} m²` : "Não informada"}
-👤 *Anunciante:* ${agencyName.trim() || "Particular"}
-📱 *Meu WhatsApp:* ${contact.trim()}
-📝 *Descrição:* ${description.trim() || "Sem observações adicionais"}
-${images.length > 0 ? `📸 *Fotos anexadas:* ${images.length} foto(s)` : ""}
+*Quartos:* ${bedrooms || "0"} | *Banheiros:* ${bathrooms || "0"} | *Vagas:* ${parking || "0"}
+*Área:* ${totalArea ? `${totalArea} m²` : "Não informada"}
+*Anunciante:* ${agencyName.trim() || "Particular"}
+*WhatsApp:* ${contact.trim()}
+*Detalhes:* ${description.trim() || "Sem observações adicionais"}
+${images.length > 0 ? `*Fotos:* ${images.length} foto(s) anexada(s)` : ""}
 
-Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento e ativar meu anúncio!`;
+Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento.`;
 
     const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
     window.open(adminWaUrl, "_blank", "noopener,noreferrer");
 
-    toast.success("Imóvel enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.", {
+    toast.success(`Imóvel ${shortId} enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.`, {
       duration: 6000,
     });
 
