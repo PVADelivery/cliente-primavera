@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car } from "lucide-react";
+import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/property";
@@ -212,12 +213,15 @@ function VehiclesPage() {
                 <p className="font-display font-bold text-primary">{formatPrice(v.price)}</p>
                 {v.contact_phone && (
                   <a
-                    href={`https://wa.me/55${v.contact_phone.replace(/\D/g, "")}`}
+                    href={`https://wa.me/55${v.contact_phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Olá! Tenho interesse no veículo *${v.brand ? `${v.brand} ` : ""}${v.model}* anunciado na Central de Negócios do MT 24horas express.`
+                    )}`}
                     target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-semibold"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                    title="Chamar no WhatsApp"
                   >
-                    <Phone className="w-3.5 h-3.5" /> Falar
+                    <WhatsappIcon className="w-3.5 h-3.5" /> WhatsApp
                   </a>
                 )}
               </div>

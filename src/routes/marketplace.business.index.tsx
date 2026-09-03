@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart } from "lucide-react";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart, MapPin, Home } from "lucide-react";
+import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import type { Property, PropertyType } from "@/types/database";
 import { formatPrice } from "@/lib/property";
@@ -330,52 +331,126 @@ function BusinessPage() {
         />
       ) : (
         <>
-        <ul className="space-y-3">
-          {pageItems.map((p) => (
-            <li key={p.id} className="relative">
-              <button
-                onClick={() => toggleFavorite(p.id)}
-                aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
-                aria-pressed={isFavorite(p.id)}
-                className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur"
-              >
-                <Heart
-                  className={`w-4 h-4 ${isFavorite(p.id) ? "text-primary fill-current" : "text-muted-foreground"}`}
-                />
-              </button>
-              <Link
-                to="/marketplace/business/$propertyId"
-                params={{ propertyId: p.id }}
-                className="block rounded-3xl border border-border/50 bg-card p-5 hover:border-primary/50 transition-colors"
-                style={{ boxShadow: "var(--shadow-card)" }}
-              >
-                <div className="flex items-center gap-2 pr-10">
-                  <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
-                    {p.deal_type === "venda" ? "Venda" : "Locação"}
-                  </span>
-                  <span className="text-[11px] font-semibold text-muted-foreground">{TYPE_LABEL[p.property_type]}</span>
+        <ul className="space-y-4">
+          {pageItems.map((p) => {
+            const cover = p.images?.[0] || null;
+            const waNumber = p.contact_phone ? p.contact_phone.replace(/\D/g, "") : "";
+            const fullWa = waNumber ? (waNumber.startsWith("55") ? waNumber : `55${waNumber}`) : "";
+            const waText = encodeURIComponent(
+              `Olá! Tenho interesse no imóvel *${TYPE_LABEL[p.property_type] ?? p.property_type}* (${p.deal_type === "venda" ? "Venda" : "Locação"}) no bairro *${p.neighborhood ?? "Primavera do Leste"}* anunciado na Central de Negócios do MT 24horas express.`
+            );
+
+            return (
+              <li key={p.id} className="relative group">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleFavorite(p.id);
+                  }}
+                  aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
+                  aria-pressed={isFavorite(p.id)}
+                  className="absolute top-3.5 right-3.5 z-20 w-10 h-10 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur shadow-sm transition-transform active:scale-90"
+                >
+                  <Heart
+                    className={`w-4 h-4 transition-colors ${isFavorite(p.id) ? "text-rose-500 fill-rose-500" : "text-muted-foreground"}`}
+                  />
+                </button>
+
+                <div className="overflow-hidden rounded-3xl border border-border/60 bg-card hover:border-primary/50 transition-all shadow-sm">
+                  {/* Foto de Capa ou Placeholder elegante */}
+                  <Link
+                    to="/marketplace/business/$propertyId"
+                    params={{ propertyId: p.id }}
+                    className="block relative aspect-[16/9] w-full bg-muted overflow-hidden cursor-pointer"
+                  >
+                    {cover ? (
+                      <img src={cover} alt={p.property_type} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
+                        <Home className="h-10 w-10 text-muted-foreground/30" />
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                      <span className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
+                        p.deal_type === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
+                      }`}>
+                        {p.deal_type === "venda" ? "Venda" : "Locação"}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
+                        {TYPE_LABEL[p.property_type] ?? p.property_type}
+                      </span>
+                    </div>
+                  </Link>
+
+                  {/* Conteúdo do Card */}
+                  <div className="p-4 space-y-3">
+                    <Link
+                      to="/marketplace/business/$propertyId"
+                      params={{ propertyId: p.id }}
+                      className="block group-hover:text-primary transition-colors"
+                    >
+                      <h2 className="font-display font-bold text-base leading-tight">
+                        {TYPE_LABEL[p.property_type]} em {p.neighborhood ?? "Primavera do Leste"}
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-primary shrink-0" />
+                        {[p.city, p.state].filter(Boolean).join(", ")}
+                      </p>
+                    </Link>
+
+                    {p.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {p.description}
+                      </p>
+                    )}
+
+                    <PropertyAttrs property={p} />
+
+                    <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2 flex-wrap">
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground">Valor:</p>
+                        <p className="font-display font-black text-lg text-primary leading-tight">
+                          {formatPrice(p.price)}
+                          {p.deal_type === "locacao" && <span className="text-xs font-normal text-muted-foreground"> /mês</span>}
+                        </p>
+                      </div>
+
+                      {fullWa ? (
+                        <a
+                          href={`https://wa.me/${fullWa}?text=${waText}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                          title="Falar direto no WhatsApp"
+                        >
+                          <WhatsappIcon className="w-4 h-4" />
+                          <span>WhatsApp</span>
+                        </a>
+                      ) : (
+                        <Link
+                          to="/marketplace/business/$propertyId"
+                          params={{ propertyId: p.id }}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                        >
+                          Ver detalhes <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                    </div>
+
+                    {p.contact_phone && (
+                      <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5 pt-1">
+                        <WhatsappIcon className="w-3 h-3 text-[#25D366]" />
+                        <span>Contato: {p.contact_phone}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
-
-                <h2 className="font-display font-bold text-base mt-2.5 leading-tight">
-                  {p.neighborhood ?? "Bairro não informado"}
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  {[p.city, p.state].filter(Boolean).join(", ")}
-                </p>
-
-                {p.description && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{p.description}</p>
-                )}
-
-                <PropertyAttrs property={p} />
-
-                <div className="flex items-center justify-between mt-3">
-                  <p className="font-display font-bold text-primary">{formatPrice(p.price)}</p>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </Link>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
 
         {totalPages > 1 && (

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Phone, MapPin, Heart } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Heart, Home } from "lucide-react";
+import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/database";
 import { formatPrice } from "@/lib/property";
@@ -82,47 +83,69 @@ function PropertyDetail() {
         </div>
       ) : (
         <div
-          className="rounded-3xl border border-border/50 bg-card p-6"
+          className="rounded-3xl border border-border/50 bg-card overflow-hidden"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
-              {property.deal_type === "venda" ? "Venda" : "Locação"}
-            </span>
-            <span className="text-[11px] font-semibold text-muted-foreground">
-              {TYPE_LABEL[property.property_type] ?? property.property_type}
-            </span>
+          {/* Foto de Capa ou Placeholder */}
+          <div className="relative aspect-[16/9] w-full bg-muted overflow-hidden">
+            {property.images?.[0] ? (
+              <img src={property.images[0]} alt={property.property_type} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
+                <Home className="h-12 w-12 text-muted-foreground/30" />
+                <span className="text-xs uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos cadastradas</span>
+              </div>
+            )}
+            <div className="absolute top-3 left-3 flex items-center gap-1.5">
+              <span className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
+                property.deal_type === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
+              }`}>
+                {property.deal_type === "venda" ? "Venda" : "Locação"}
+              </span>
+              <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
+                {TYPE_LABEL[property.property_type] ?? property.property_type}
+              </span>
+            </div>
           </div>
 
-          <h2 className="font-display font-bold text-xl mt-3 leading-tight">
-            {property.neighborhood ?? "Bairro não informado"}
-          </h2>
-          <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-1">
-            <MapPin className="w-3.5 h-3.5" /> {[property.city, property.state].filter(Boolean).join(", ")}
-          </p>
+          <div className="p-6">
+            <h2 className="font-display font-bold text-xl mt-1 leading-tight">
+              {TYPE_LABEL[property.property_type] ?? property.property_type} em {property.neighborhood ?? "Bairro não informado"}
+            </h2>
+            <p className="text-xs text-muted-foreground inline-flex items-center gap-1 mt-1">
+              <MapPin className="w-3.5 h-3.5 text-primary" /> {[property.city, property.state].filter(Boolean).join(", ")}
+            </p>
 
-          {property.description && (
-            <p className="text-sm text-muted-foreground mt-4 whitespace-pre-line">{property.description}</p>
-          )}
+            {property.description && (
+              <p className="text-sm text-muted-foreground mt-4 whitespace-pre-line leading-relaxed">{property.description}</p>
+            )}
 
-          <PropertyAttrs property={property} />
+            <div className="mt-4">
+              <PropertyAttrs property={property} />
+            </div>
 
-          <p className="font-display font-bold text-2xl text-primary mt-5">{formatPrice(property.price)}</p>
+            <p className="font-display font-black text-2xl text-primary mt-5">
+              {formatPrice(property.price)}
+              {property.deal_type === "locacao" && <span className="text-sm font-normal text-muted-foreground"> /mês</span>}
+            </p>
 
-          {property.agency_name && (
-            <p className="text-xs text-muted-foreground mt-2">Anunciado por {property.agency_name}</p>
-          )}
+            {property.agency_name && (
+              <p className="text-xs text-muted-foreground mt-2">Anunciado por: <span className="font-bold text-foreground">{property.agency_name}</span></p>
+            )}
 
-          {property.contact_phone && (
-            <a
-              href={`https://wa.me/55${property.contact_phone.replace(/\D/g, "")}`}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-5 w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2"
-            >
-              <Phone className="w-4 h-4" /> Falar com a imobiliária
-            </a>
-          )}
+            {property.contact_phone && (
+              <a
+                href={`https://wa.me/55${property.contact_phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                  `Olá! Tenho interesse no imóvel *${TYPE_LABEL[property.property_type] ?? property.property_type}* (${property.deal_type === "venda" ? "Venda" : "Locação"}) no bairro *${property.neighborhood ?? "Primavera do Leste"}* anunciado na Central de Negócios do MT 24horas express.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 w-full h-12 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98]"
+              >
+                <WhatsappIcon className="w-5 h-5" /> Falar no WhatsApp ({property.contact_phone})
+              </a>
+            )}
+          </div>
         </div>
       )}
     </div>
