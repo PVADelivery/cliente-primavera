@@ -155,13 +155,13 @@
   /* ── Botões e chips (Sempre Amarelo por padrão, Branco quando clica) ── */
   --btn-surface:       var(--primary);
   --btn-surface-hover: var(--primary);
-  --btn-ink:           #111827; /* Contraste preto nítido sobre o amarelo */
-  --btn-ink-soft:      #374151; /* Contraste secundário no amarelo */
-  --btn-line:          rgba(0, 0, 0, 0.12);
+  --btn-ink:           #000000; /* Contraste preto absoluto 100% nítido sobre amarelo */
+  --btn-ink-soft:      #111827; /* Preto/cinza ultra escuro para subtítulos */
+  --btn-line:          rgba(0, 0, 0, 0.15);
   --btn-active:        #FFFFFF; /* Fica branco ao clicar */
-  --btn-active-ink:    #111827; /* Contraste no branco */
+  --btn-active-ink:    #000000; /* Contraste no branco */
   --btn-disabled:      #E5E7EB;
-  --btn-disabled-ink:  #9CA3AF;
+  --btn-disabled-ink:  #6B7280;
 }
 
 
@@ -205,13 +205,13 @@
   /* Botões no dark: Sempre Amarelo, Branco quando clica */
   --btn-surface:       var(--primary);
   --btn-surface-hover: var(--primary);
-  --btn-ink:           #111827;
-  --btn-ink-soft:      #374151;
+  --btn-ink:           #000000;
+  --btn-ink-soft:      #111827;
   --btn-line:          rgba(0, 0, 0, 0.15);
   --btn-active:        #FFFFFF; /* Fica branco ao clicar */
-  --btn-active-ink:    #111827;
+  --btn-active-ink:    #000000;
   --btn-disabled:      #3F3F46;
-  --btn-disabled-ink:  #71717A;
+  --btn-disabled-ink:  #9CA3AF;
 }
 
 
