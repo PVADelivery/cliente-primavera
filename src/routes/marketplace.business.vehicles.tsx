@@ -1,13 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2 } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/property";
 import type { Vehicle, VehicleType } from "@/types/database";
 import { AeroSkeletonList, AeroEmptyState, AeroPageHeader } from "@/components/aero";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/business/vehicles")({
   head: () => ({
@@ -260,13 +261,61 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [contact, setContact] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingPhotos(true);
+    try {
+      const bucketName = "avatars";
+      const uploaded: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `veh_${Math.random().toString(36).substring(2, 9)}_${Date.now()}.${ext}`;
+        const filePath = user?.id ? `${user.id}/${fileName}` : fileName;
+
+        const { error: uploadError } = await supabase.storage.from(bucketName).upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: file.type || undefined,
+        });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+        if (urlData?.publicUrl) uploaded.push(urlData.publicUrl);
+      }
+      setImages((prev) => [...prev, ...uploaded]);
+      toast.success(`${uploaded.length} foto(s) adicionada(s)!`);
+    } catch (err: any) {
+      toast.error("Erro ao enviar foto: " + (err.message || "Tente novamente"));
+    } finally {
+      setUploadingPhotos(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removePhoto = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const submit = async () => {
     if (!model.trim() || !user) return;
+    if (!contact.trim()) {
+      setError("Por favor, informe seu telefone / WhatsApp de contato.");
+      return;
+    }
     setSaving(true);
     setError(null);
+
+    const cleanPrice = price ? Number(price.replace(/\./g, "").replace(",", ".")) : null;
+
     const { error: err } = await supabase.from("vehicles").insert({
       owner_id: user.id,
       vehicle_type: vehicleType,
@@ -274,16 +323,43 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
       model: model.trim(),
       year: year ? Number(year) : null,
       km: km ? Number(km) : null,
-      price: price ? Number(price.replace(/\./g, "").replace(",", ".")) : null,
+      price: cleanPrice,
       description: description.trim() || null,
       contact_phone: contact.trim() || null,
+      images: images.length > 0 ? images : null,
+      is_active: false, // Só fica visível no app após aprovação do admin!
     });
+
     setSaving(false);
+
     if (err) {
-      setError("Não foi possível publicar agora. Tente novamente.");
+      setError("Não foi possível enviar agora. Tente novamente.");
       console.info("[vehicles insert]", err.code, err.message);
       return;
     }
+
+    // Monta a mensagem para o WhatsApp da administração
+    const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
+    const msg = 
+`Olá Administrador! Acabei de cadastrar meu anúncio de *Veículo* no app MT 24horas express e aguardo aprovação:
+
+🚗 *Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
+🏷️ *Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
+🛣️ *Quilometragem:* ${km ? `${km} km` : "Não informado"}
+💰 *Preço:* ${valorFormatado}
+📱 *Meu WhatsApp:* ${contact.trim()}
+📝 *Detalhes:* ${description.trim() || "Sem observações adicionais"}
+${images.length > 0 ? `📸 *Fotos anexadas:* ${images.length} foto(s)` : ""}
+
+Solicito a aprovação e liberação do meu anúncio na Central de Negócios!`;
+
+    const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
+    window.open(adminWaUrl, "_blank", "noopener,noreferrer");
+
+    toast.success("Anúncio enviado com sucesso! Aguarde a aprovação do administrador para aparecer no aplicativo.", {
+      duration: 6000,
+    });
+
     onCreated();
   };
 
@@ -293,13 +369,16 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="w-full sm:max-w-md bg-card border border-border/60 rounded-t-3xl sm:rounded-3xl p-5 space-y-3 max-h-[88vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-lg">Anunciar veículo</h2>
-          <button onClick={onClose} aria-label="Fechar" className="text-muted-foreground">
+          <div>
+            <h2 className="font-display font-bold text-lg">Anunciar veículo</h2>
+            <p className="text-[11px] text-muted-foreground">O anúncio será revisado pelo administrador antes de ir ao ar</p>
+          </div>
+          <button onClick={onClose} aria-label="Fechar" className="text-muted-foreground p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pt-1">
           {(Object.keys(TYPE_LABEL) as VehicleType[]).map((t) => (
             <button
               key={t}
@@ -315,31 +394,110 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
           ))}
         </div>
 
-        <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Marca (ex.: Fiat)" className={field} />
-        <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Modelo (ex.: Strada 1.4)" className={field} />
+        <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Marca (ex.: Fiat, Honda, Toyota)" className={field} />
+        <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="Modelo (ex.: Strada 1.4 Freedom, CG 160)" className={field} />
+        
         <div className="grid grid-cols-2 gap-2">
-          <input value={year} onChange={(e) => setYear(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Ano" className={field} />
-          <input value={km} onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Km" className={field} />
+          <input value={year} onChange={(e) => setYear(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Ano (ex: 2022)" className={field} />
+          <input value={km} onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Quilometragem (km)" className={field} />
         </div>
-        <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="Valor (R$)" className={field} />
+        
+        <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="Preço pedido (R$)" className={field} />
+        
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Detalhes: estado, opcionais, documentação..."
-          rows={4}
+          placeholder="Descreva opcionais, estado dos pneus, revisões, documentação..."
+          rows={3}
           className="w-full p-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary resize-none"
         />
-        <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Telefone / WhatsApp" className={field} />
 
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Seu Telefone / WhatsApp de contato *" className={field} />
 
-        <button
-          onClick={submit}
-          disabled={saving || !model.trim()}
-          className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          {saving && <Loader2 className="w-4 h-4 animate-spin" />} Publicar anúncio
-        </button>
+        {/* Upload de Fotos do Veículo */}
+        <div className="space-y-2 pt-1 border-t border-border/50">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <ImageIcon className="w-4 h-4 text-primary" /> Fotos do Veículo ({images.length})
+            </span>
+            <span className="text-[10px] text-muted-foreground">1ª foto será a capa</span>
+          </div>
+
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleUploadPhotos}
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingPhotos}
+            className="w-full border-2 border-dashed border-primary/40 hover:border-primary rounded-2xl p-3 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center gap-2 text-xs font-bold text-foreground"
+          >
+            {uploadingPhotos ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                <span>Enviando fotos...</span>
+              </>
+            ) : (
+              <>
+                <UploadCloud className="w-4 h-4 text-primary" />
+                <span>Selecionar fotos do celular / galeria</span>
+              </>
+            )}
+          </button>
+
+          {images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 pt-1">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted group">
+                  <img src={img} alt={`Veículo ${idx + 1}`} className="w-full h-full object-cover" />
+                  {idx === 0 && (
+                    <span className="absolute top-1 left-1 px-1 py-0.5 rounded bg-primary text-primary-foreground font-black text-[8px] uppercase">
+                      Capa
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-destructive/90 text-white flex items-center justify-center text-xs shadow hover:scale-110 transition-transform"
+                    title="Remover"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-destructive font-medium">{error}</p>}
+
+        <div className="pt-2">
+          <p className="text-[11px] text-muted-foreground text-center pb-2">
+            📲 Ao enviar, você será direcionado ao WhatsApp da Administração para validar seu anúncio.
+          </p>
+
+          <button
+            onClick={submit}
+            disabled={saving || uploadingPhotos || !model.trim()}
+            className="w-full h-12 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-md active:scale-98 transition-all"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Enviando anúncio...
+              </>
+            ) : (
+              <>
+                <WhatsappIcon className="w-4 h-4" /> Enviar e Falar com Admin no WhatsApp
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

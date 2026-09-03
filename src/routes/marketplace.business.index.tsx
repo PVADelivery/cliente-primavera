@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart, MapPin, Home } from "lucide-react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2 } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
-import type { Property, PropertyType } from "@/types/database";
+import { useAuth } from "@/contexts/AuthContext";
+import type { Property, PropertyType, PropertyDeal } from "@/types/database";
 import { formatPrice } from "@/lib/property";
 import { usePropertyFavorites } from "@/hooks/usePropertyFavorites";
 import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
@@ -58,6 +60,9 @@ const PAGE_SIZE = 8;
 
 function BusinessPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
   const [deal, setDeal] = useState<"all" | "locacao" | "venda">("all");
   const [type, setType] = useState<PropertyType | "all">("all");
   const [q, setQ] = useState("");
@@ -474,8 +479,324 @@ function BusinessPage() {
             </button>
           </div>
         )}
+        {/* Botão Flutuante: Anunciar Imóvel */}
+        <button
+          onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
+          className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
+        >
+          <Plus className="w-4 h-4" /> Anunciar Imóvel
+        </button>
+
+        {showForm && (
+          <NewPropertySheet
+            onClose={() => setShowForm(false)}
+            onCreated={() => {
+              setShowForm(false);
+              queryClient.invalidateQueries({ queryKey: ["properties"] });
+            }}
+          />
+        )}
         </>
       )}
+    </div>
+  );
+}
+
+function NewPropertySheet({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const { user } = useAuth();
+  const [dealType, setDealType] = useState<PropertyDeal>("locacao");
+  const [propertyType, setPropertyType] = useState<PropertyType>("casa");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [city, setCity] = useState("Primavera do Leste");
+  const [price, setPrice] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+  const [bathrooms, setBathrooms] = useState("");
+  const [parking, setParking] = useState("");
+  const [totalArea, setTotalArea] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [contact, setContact] = useState("");
+  const [description, setDescription] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingPhotos(true);
+    try {
+      const bucketName = "avatars";
+      const uploaded: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `prop_${Math.random().toString(36).substring(2, 9)}_${Date.now()}.${ext}`;
+        const filePath = user?.id ? `${user.id}/${fileName}` : fileName;
+
+        const { error: uploadError } = await supabase.storage.from(bucketName).upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: file.type || undefined,
+        });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+        if (urlData?.publicUrl) uploaded.push(urlData.publicUrl);
+      }
+      setImages((prev) => [...prev, ...uploaded]);
+      toast.success(`${uploaded.length} foto(s) adicionada(s)!`);
+    } catch (err: any) {
+      toast.error("Erro ao enviar foto: " + (err.message || "Tente novamente"));
+    } finally {
+      setUploadingPhotos(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removePhoto = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const submit = async () => {
+    if (!user) return;
+    if (!neighborhood.trim()) {
+      setError("Por favor, informe o bairro do imóvel.");
+      return;
+    }
+    if (!contact.trim()) {
+      setError("Por favor, informe seu telefone / WhatsApp de contato.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+
+    const cleanPrice = price ? Number(price.replace(/\./g, "").replace(",", ".")) : null;
+
+    const { error: err } = await supabase.from("properties").insert({
+      owner_id: user.id,
+      deal_type: dealType,
+      property_type: propertyType,
+      neighborhood: neighborhood.trim(),
+      city: city.trim() || "Primavera do Leste",
+      state: "MT",
+      price: cleanPrice,
+      bedrooms: bedrooms ? Number(bedrooms) : null,
+      bathrooms: bathrooms ? Number(bathrooms) : null,
+      parking: parking ? Number(parking) : null,
+      total_area: totalArea ? Number(totalArea) : null,
+      agency_name: agencyName.trim() || null,
+      contact_phone: contact.trim() || null,
+      description: description.trim() || null,
+      images: images.length > 0 ? images : null,
+      is_active: false, // Só fica visível no app após aprovação do admin!
+    });
+
+    setSaving(false);
+
+    if (err) {
+      setError("Não foi possível cadastrar agora. Tente novamente.");
+      console.info("[properties insert]", err.code, err.message);
+      return;
+    }
+
+    const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
+    const msg =
+`Olá Administrador! Acabei de cadastrar meu anúncio de *Imóvel* no app MT 24horas express e aguardo aprovação:
+
+🏠 *Modalidade:* ${dealType === "venda" ? "Venda" : "Locação"}
+🏢 *Tipo:* ${TYPE_LABEL[propertyType] ?? propertyType} em ${neighborhood.trim()} (${city.trim() || "Primavera do Leste"})
+💰 *Valor:* ${valorFormatado}${dealType === "locacao" ? " /mês" : ""}
+🛏️ *Quartos:* ${bedrooms || "0"} | 🚿 *Banheiros:* ${bathrooms || "0"} | 🚗 *Vagas:* ${parking || "0"}
+📐 *Área:* ${totalArea ? `${totalArea} m²` : "Não informada"}
+👤 *Anunciante:* ${agencyName.trim() || "Particular"}
+📱 *Meu WhatsApp:* ${contact.trim()}
+📝 *Descrição:* ${description.trim() || "Sem observações adicionais"}
+${images.length > 0 ? `📸 *Fotos anexadas:* ${images.length} foto(s)` : ""}
+
+Solicito a aprovação e liberação do meu imóvel na Central de Negócios!`;
+
+    const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
+    window.open(adminWaUrl, "_blank", "noopener,noreferrer");
+
+    toast.success("Imóvel enviado com sucesso! Aguarde a aprovação do administrador para aparecer no aplicativo.", {
+      duration: 6000,
+    });
+
+    onCreated();
+  };
+
+  const field = "w-full h-11 px-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary";
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="w-full sm:max-w-md bg-card border border-border/60 rounded-t-3xl sm:rounded-3xl p-5 space-y-3 max-h-[88vh] overflow-y-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display font-bold text-lg">Anunciar imóvel</h2>
+            <p className="text-[11px] text-muted-foreground">O anúncio será revisado pelo administrador antes de ir ao ar</p>
+          </div>
+          <button onClick={onClose} aria-label="Fechar" className="text-muted-foreground p-1">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modalidade */}
+        <div className="flex gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => setDealType("locacao")}
+            className={`flex-1 py-2 rounded-2xl text-xs font-bold border transition-all ${
+              dealType === "locacao" ? "bg-emerald-600 text-white border-emerald-600 shadow-sm" : "bg-background text-muted-foreground border-border/60"
+            }`}
+          >
+            Locação (Aluguel)
+          </button>
+          <button
+            type="button"
+            onClick={() => setDealType("venda")}
+            className={`flex-1 py-2 rounded-2xl text-xs font-bold border transition-all ${
+              dealType === "venda" ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm" : "bg-background text-muted-foreground border-border/60"
+            }`}
+          >
+            Venda
+          </button>
+        </div>
+
+        {/* Tipo de Imóvel */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {(Object.keys(TYPE_LABEL) as PropertyType[]).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setPropertyType(t)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                propertyType === t
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-muted-foreground border-border/60"
+              }`}
+            >
+              {TYPE_LABEL[t]}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <input value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} placeholder="Bairro *" className={field} />
+          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Cidade" className={field} />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <input value={bedrooms} onChange={(e) => setBedrooms(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Quartos" className={field} />
+          <input value={bathrooms} onChange={(e) => setBathrooms(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Banh." className={field} />
+          <input value={parking} onChange={(e) => setParking(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Vagas" className={field} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <input value={totalArea} onChange={(e) => setTotalArea(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Área Total (m²)" className={field} />
+          <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder={dealType === "locacao" ? "Valor /mês (R$)" : "Valor (R$)"} className={field} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <input value={agencyName} onChange={(e) => setAgencyName(e.target.value)} placeholder="Seu nome / Imobiliária" className={field} />
+          <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="WhatsApp de contato *" className={field} />
+        </div>
+
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Descreva detalhes como armários embutidos, portão eletrônico, sacada, etc..."
+          rows={3}
+          className="w-full p-4 rounded-2xl bg-background border border-border/60 text-sm outline-none focus:border-primary resize-none"
+        />
+
+        {/* Upload de Fotos do Imóvel */}
+        <div className="space-y-2 pt-1 border-t border-border/50">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <Home className="w-4 h-4 text-primary" /> Fotos do Imóvel ({images.length})
+            </span>
+            <span className="text-[10px] text-muted-foreground">1ª foto será a capa</span>
+          </div>
+
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleUploadPhotos}
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingPhotos}
+            className="w-full border-2 border-dashed border-primary/40 hover:border-primary rounded-2xl p-3 bg-primary/5 hover:bg-primary/10 transition-all flex items-center justify-center gap-2 text-xs font-bold text-foreground"
+          >
+            {uploadingPhotos ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                <span>Enviando fotos...</span>
+              </>
+            ) : (
+              <>
+                <UploadCloud className="w-4 h-4 text-primary" />
+                <span>Selecionar fotos do imóvel</span>
+              </>
+            )}
+          </button>
+
+          {images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 pt-1">
+              {images.map((img, idx) => (
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border bg-muted group">
+                  <img src={img} alt={`Imóvel ${idx + 1}`} className="w-full h-full object-cover" />
+                  {idx === 0 && (
+                    <span className="absolute top-1 left-1 px-1 py-0.5 rounded bg-primary text-primary-foreground font-black text-[8px] uppercase">
+                      Capa
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-destructive/90 text-white flex items-center justify-center text-xs shadow hover:scale-110 transition-transform"
+                    title="Remover"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-destructive font-medium">{error}</p>}
+
+        <div className="pt-2">
+          <p className="text-[11px] text-muted-foreground text-center pb-2">
+            📲 Ao enviar, você será direcionado ao WhatsApp da Administração para validar seu imóvel.
+          </p>
+
+          <button
+            onClick={submit}
+            disabled={saving || uploadingPhotos || !neighborhood.trim()}
+            className="w-full h-12 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-md active:scale-98 transition-all"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Enviando imóvel...
+              </>
+            ) : (
+              <>
+                <WhatsappIcon className="w-4 h-4" /> Enviar e Falar com Admin no WhatsApp
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
