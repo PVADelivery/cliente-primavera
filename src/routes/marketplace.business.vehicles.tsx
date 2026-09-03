@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -263,6 +263,7 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [contact, setContact] = useState("");
+  const [planMonths, setPlanMonths] = useState<number>(1);
   const [images, setImages] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -329,7 +330,7 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
       description: description.trim() || null,
       contact_phone: contact.trim() || null,
       images: images.length > 0 ? images : null,
-      is_active: false, // Só fica visível no app após aprovação do admin!
+      is_active: false, // Só fica visível no app após aprovação e pagamento com admin!
     });
 
     setSaving(false);
@@ -343,22 +344,25 @@ function NewVehicleSheet({ onClose, onCreated }: { onClose: () => void; onCreate
     // Monta a mensagem para o WhatsApp da administração
     const valorFormatado = cleanPrice ? `R$ ${cleanPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "A combinar";
     const msg = 
-`Olá Administrador! Acabei de cadastrar meu anúncio de *Veículo* no app MT 24horas express e aguardo aprovação:
+`Olá Administrador! Acabei de cadastrar meu anúncio de *Veículo* no app MT 24horas express e quero combinar a mensalidade para ativá-lo:
 
 🚗 *Tipo:* ${TYPE_LABEL[vehicleType] ?? vehicleType}
 🏷️ *Veículo:* ${brand.trim() ? `${brand.trim()} ` : ""}${model.trim()}${year ? ` (${year})` : ""}
 🛣️ *Quilometragem:* ${km ? `${km} km` : "Não informado"}
-💰 *Preço:* ${valorFormatado}
+💰 *Preço Pedido:* ${valorFormatado}
+📅 *Período Desejado de Permanência:* ${planMonths} ${planMonths === 1 ? "mês" : "meses"}
+💳 *Objetivo:* Combinar o valor da mensalidade e pagar via Pix para liberar meu anúncio!
+
 📱 *Meu WhatsApp:* ${contact.trim()}
 📝 *Detalhes:* ${description.trim() || "Sem observações adicionais"}
 ${images.length > 0 ? `📸 *Fotos anexadas:* ${images.length} foto(s)` : ""}
 
-Solicito a aprovação e liberação do meu anúncio na Central de Negócios!`;
+Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pagamento e ativar meu anúncio!`;
 
     const adminWaUrl = `https://wa.me/556697196937?text=${encodeURIComponent(msg)}`;
     window.open(adminWaUrl, "_blank", "noopener,noreferrer");
 
-    toast.success("Anúncio enviado com sucesso! Aguarde a aprovação do administrador para aparecer no aplicativo.", {
+    toast.success("Anúncio enviado com sucesso! Combine a mensalidade no WhatsApp para ativação.", {
       duration: 6000,
     });
 
@@ -477,13 +481,50 @@ Solicito a aprovação e liberação do meu anúncio na Central de Negócios!`;
           )}
         </div>
 
+        {/* Escolha do Tempo de Permanência / Mensalidade */}
+        <div className="space-y-2 pt-2 border-t border-border/50">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <CalendarClock className="w-4 h-4 text-emerald-500" />
+              Tempo que deseja manter ativo:
+            </label>
+            <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+              {planMonths} {planMonths === 1 ? "Mês" : "Meses"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-5 gap-1.5">
+            {[1, 2, 3, 6, 12].map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setPlanMonths(m)}
+                className={`py-2 px-1 rounded-xl text-xs font-bold border transition-all text-center ${
+                  planMonths === m
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm scale-[1.02]"
+                    : "bg-background text-muted-foreground border-border/60 hover:border-border"
+                }`}
+              >
+                {m === 12 ? "1 Ano" : `${m} ${m === 1 ? "mês" : "meses"}`}
+              </button>
+            ))}
+          </div>
+
+          {/* Card explicativo sobre Mensalidade e Pagamento com Admin */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>Mensalidade & Ativação no Sistema</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Você falará diretamente com o Administrador no WhatsApp para combinar os <strong>{planMonths} {planMonths === 1 ? "mês" : "meses"}</strong> que seu anúncio ficará ativo e efetuar o <strong>pagamento da mensalidade via Pix</strong>. Após a confirmação, seu veículo será liberado imediatamente!
+            </p>
+          </div>
+        </div>
+
         {error && <p className="text-xs text-destructive font-medium">{error}</p>}
 
         <div className="pt-2">
-          <p className="text-[11px] text-muted-foreground text-center pb-2">
-            📲 Ao enviar, você será direcionado ao WhatsApp da Administração para validar seu anúncio.
-          </p>
-
           <button
             onClick={submit}
             disabled={saving || uploadingPhotos || !model.trim()}
@@ -495,7 +536,7 @@ Solicito a aprovação e liberação do meu anúncio na Central de Negócios!`;
               </>
             ) : (
               <>
-                <WhatsappIcon className="w-4 h-4" /> Enviar e Falar com Admin no WhatsApp
+                <WhatsappIcon className="w-4 h-4" /> Combinar Mensalidade ({planMonths} {planMonths === 1 ? "mês" : "meses"}) no WhatsApp
               </>
             )}
           </button>
