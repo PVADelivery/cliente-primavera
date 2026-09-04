@@ -214,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const defaultAuthValue: AuthContextType = {
+const defaultAuthValue: AuthContextValue = {
   user: null,
   session: null,
   loading: true,

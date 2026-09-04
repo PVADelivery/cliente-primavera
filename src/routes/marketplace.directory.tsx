@@ -22,6 +22,12 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { toast } from "sonner";
 import { AeroHero, AeroPlate, AeroSection, AeroButton, AeroEmptyState, AeroSkeletonList } from "@/components/aero";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
+import { ProviderCard } from "@/components/ppp/ProviderCard";
+import { ProviderDetailDialog } from "@/components/ppp/ProviderDetailDialog";
+import { ProviderMap } from "@/components/ppp/ProviderMap";
+import { QuotesSection } from "@/components/ppp/QuotesSection";
+import { ProviderRegisterDialog } from "@/components/ppp/ProviderRegisterDialog";
+import type { Business } from "@/lib/ppp";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
@@ -43,64 +49,19 @@ export const Route = createFileRoute("/marketplace/directory")({
   component: DirectoryPage,
 });
 
-type Business = {
-  id: string;
-  name: string;
-  category: string;
-  phone: string | null;
-  whatsapp: string | null;
-  address: string | null;
-  email?: string | null;
-  website: string | null;
-  hours: string | null;
-  rating: number | null;
-  featured?: boolean;
-  card_image_url?: string | null;
-  card_style?: string | null;
-};
-
-const onlyDigits = (v: string) => v.replace(/\D/g, "");
-const formatPhone = (v: string) => {
-  const d = onlyDigits(v);
-  if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-  if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-  return v;
-};
-
-const waLink = (v: string, name?: string) => {
-  const d = onlyDigits(v);
-  const clean = d.startsWith("55") ? d : `55${d}`;
-  const text = encodeURIComponent(`Olá${name ? ` *${name}*` : ""}! Encontrei seu contato no *PPP do app MT 24horas express* e gostaria de informações/orçamento.`);
-  return `https://wa.me/${clean}?text=${text}`;
-};
-
-const getMapsUrl = (addr: string) => {
-  const cleanAddr = addr.trim();
-  const full = cleanAddr.toLowerCase().includes("primavera")
-    ? cleanAddr
-    : `${cleanAddr}, Primavera do Leste - MT`;
-  return `https://maps.google.com/?q=${encodeURIComponent(full)}`;
-};
-
-const handleOpenMaps = (addr: string, e?: React.MouseEvent) => {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  const url = getMapsUrl(addr);
-  if (typeof window !== "undefined") {
-    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-      window.location.href = url;
-    }
-  }
-};
-
 export function DirectoryPage() {
   const [q, setQ] = useState("");
   const [selectedCat, setSelectedCat] = useState("Tudo");
   const [onlyWithWhatsapp, setOnlyWithWhatsapp] = useState(false);
   const [onlyFeatured, setOnlyFeatured] = useState(false);
+  const [selected, setSelected] = useState<Business | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+
+  const openDetail = (b: Business) => {
+    setSelected(b);
+    setDetailOpen(true);
+  };
 
   const { data: businesses = [], isLoading } = useQuery<Business[]>({
     queryKey: ["directory"],
@@ -193,6 +154,11 @@ export function DirectoryPage() {
     });
   }, [businesses, dynamicCategories]);
 
+  const categoryNames = useMemo(
+    () => categoriesWithCounts.map((c) => c.name).filter((n) => n.toLowerCase() !== "tudo"),
+    [categoriesWithCounts],
+  );
+
   const filtered = useMemo(() => {
     const cleanCat = (str: string) => 
       (str || "").replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*/u, "").trim().toLowerCase();
@@ -220,17 +186,6 @@ export function DirectoryPage() {
   }, [businesses, q, selectedCat, onlyWithWhatsapp, onlyFeatured]);
 
   const featuredList = useMemo(() => businesses.filter((b) => b.featured), [businesses]);
-
-  const handleShare = async (b: Business) => {
-    const text = `Confira *${b.name}* (${b.category}) no PPP — MT 24horas express!`;
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title: b.name, text, url }); } catch {}
-    } else {
-      navigator.clipboard?.writeText(`${text}\n${url}`);
-      toast.success("Link copiado!");
-    }
-  };
 
   const clearFilters = () => {
     setQ("");
@@ -319,6 +274,11 @@ export function DirectoryPage() {
         </div>
       </div>
 
+      {/* ─── MAPA DOS PRESTADORES ─── */}
+      <AeroSection title="Mapa dos Prestadores" tag="Localização" subtitle="Toque em um marcador para abrir o card completo.">
+        <ProviderMap businesses={filtered} onSelect={openDetail} />
+      </AeroSection>
+
       {/* ─── DESTAQUES VIP ─── */}
       {featuredList.length > 0 && selectedCat === "Tudo" && !q && !onlyWithWhatsapp && (
         <div className="rounded-3xl bg-primary/8 border border-primary/20 p-4 space-y-3">
@@ -333,7 +293,7 @@ export function DirectoryPage() {
           </div>
           <div className="space-y-2.5">
             {featuredList.map((b) => (
-              <BusinessCard key={`vip-${b.id}`} business={b} onShare={handleShare} isVip />
+              <ProviderCard key={`vip-${b.id}`} business={b} onOpen={openDetail} isVip />
             ))}
           </div>
         </div>
@@ -376,12 +336,15 @@ export function DirectoryPage() {
           <div className="space-y-2.5">
             <AnimatePresence mode="popLayout">
               {filtered.map((b) => (
-                <BusinessCard key={b.id} business={b} onShare={handleShare} />
+                <ProviderCard key={b.id} business={b} onOpen={openDetail} />
               ))}
             </AnimatePresence>
           </div>
         )}
       </AeroSection>
+
+      {/* ─── ORÇAMENTOS ─── */}
+      <QuotesSection categories={categoryNames} providers={businesses} />
 
       {/* ─── CTA ANUNCIAR ─── */}
       <div className="rounded-3xl bg-card border border-border p-5 space-y-2.5 shadow-sm">
@@ -405,216 +368,13 @@ export function DirectoryPage() {
             Quero Anunciar no PPP
           </AeroButton>
         </a>
+        <AeroButton onClick={() => setRegisterOpen(true)} className="mt-1">
+          Cadastrar meu perfil agora
+        </AeroButton>
       </div>
+
+      <ProviderDetailDialog business={selected} open={detailOpen} onOpenChange={setDetailOpen} />
+      <ProviderRegisterDialog open={registerOpen} onOpenChange={setRegisterOpen} categories={categoryNames} />
     </div>
-  );
-}
-
-// ─── CARD DE PRESTADOR ───
-function BusinessCard({
-  business: b,
-  onShare,
-  isVip = false,
-}: {
-  business: Business;
-  onShare: (b: Business) => void;
-  isVip?: boolean;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyPhone = (phone: string) => {
-    navigator.clipboard?.writeText(phone);
-    setCopied(true);
-    toast.success("Telefone copiado!");
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const initial = (b.name || "P").trim().charAt(0).toUpperCase();
-  const phoneDisplay = b.whatsapp || b.phone;
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.18 }}
-      className={`rounded-2xl border bg-card overflow-hidden transition-all ${
-        isVip
-          ? "border-primary/30 shadow-[var(--shadow-card)]"
-          : "border-border shadow-sm"
-      }`}
-    >
-      {/* Imagem personalizada */}
-      {b.card_image_url && (
-        <div className="w-full aspect-[3/1] bg-muted relative overflow-hidden">
-          <img src={b.card_image_url} alt={b.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between">
-            <div>
-              <h3 className="font-black text-sm text-white drop-shadow leading-tight">{b.name}</h3>
-              <span className="text-[10px] text-white/80">{b.category || "Serviços"}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              {b.featured && (
-                <span className="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase bg-primary text-black flex items-center gap-0.5">
-                  <Star className="w-2.5 h-2.5" /> VIP
-                </span>
-              )}
-              {b.rating != null && (
-                <span className="text-[10px] font-bold flex items-center gap-0.5 text-primary bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-md">
-                  <Star className="w-2.5 h-2.5" /> {b.rating.toFixed(1)}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="px-3 py-2.5 space-y-2">
-        {/* Cabeçalho */}
-        {!b.card_image_url && (
-          <div className="flex items-center gap-2.5">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 shadow-inner ${
-              isVip
-                ? "bg-primary/15 border border-primary/40 text-gold-ink"
-                : "bg-gradient-to-br from-muted to-muted/60 border border-border text-foreground/70"
-            }`}>
-              {initial}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="font-extrabold text-[13px] text-foreground truncate leading-tight">{b.name}</h3>
-                {b.featured && (
-                  <span className="inline-flex items-center gap-0.5 text-[9px] font-black text-black bg-primary px-1.5 py-px rounded-full shadow-sm">
-                    <Star className="w-2.5 h-2.5 fill-black" /> VIP
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/70 px-1.5 py-px rounded-md">
-                  {b.category || "Serviços"}
-                </span>
-                {b.rating != null && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-gold-ink">
-                    <Star className="w-3 h-3 text-primary fill-primary" /> {b.rating.toFixed(1)}
-                  </span>
-                )}
-                {b.hours && (
-                  <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 truncate">
-                    <Clock className="w-2.5 h-2.5" /> {b.hours}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Info */}
-        <div className="space-y-1 text-[11px]">
-          {b.address ? (
-            <a
-              href={getMapsUrl(b.address)}
-              onClick={(e) => handleOpenMaps(b.address, e)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
-              title="Abrir no Google Maps"
-            >
-              <MapPin className="w-3 h-3 text-primary shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="truncate underline-offset-2 group-hover:underline">{b.address}</span>
-            </a>
-          ) : (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
-              <MapPin className="w-3 h-3 shrink-0" />
-              <span>Atende Primavera do Leste e Região</span>
-            </div>
-          )}
-
-          {phoneDisplay && (
-            <div className="flex items-center gap-1.5 text-foreground">
-              {b.whatsapp ? (
-                <WhatsappIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-              ) : (
-                <Phone className="w-3 h-3 text-muted-foreground shrink-0" />
-              )}
-              <span className="font-mono font-semibold tracking-tight">{formatPhone(phoneDisplay)}</span>
-              <button
-                type="button"
-                onClick={() => handleCopyPhone(phoneDisplay)}
-                aria-label="Copiar telefone"
-                className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#25D366]" /> : <Copy className="w-3 h-3" />}
-              </button>
-            </div>
-          )}
-
-          {b.website && (
-            <a
-              href={b.website.startsWith("http") ? b.website : `https://${b.website}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:underline truncate"
-            >
-              <Globe className="w-3 h-3 shrink-0" />
-              <span className="truncate">{b.website.replace(/^https?:\/\//, "")}</span>
-            </a>
-          )}
-        </div>
-
-        {/* Ações */}
-        <div className="flex items-center gap-1.5 pt-0.5">
-          {b.whatsapp ? (
-            <a
-              href={waLink(b.whatsapp, b.name)}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl bg-[#25D366] hover:bg-[#1fb457] text-white font-bold text-[11px] active:scale-[0.97] transition-all shadow-[0_2px_10px_-2px_rgba(37,211,102,0.5)]"
-            >
-              <WhatsappIcon className="w-4 h-4" />
-              <span>Chamar no WhatsApp</span>
-            </a>
-          ) : b.phone ? (
-            <a
-              href={`tel:${onlyDigits(b.phone)}`}
-              className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-primary text-black font-bold text-[11px] active:scale-[0.97] transition-all shadow-sm"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              <span>Ligar Agora</span>
-            </a>
-          ) : (
-            <div className="flex-1 h-9 rounded-xl bg-muted/70 text-muted-foreground flex items-center justify-center gap-1.5 text-[10px] font-semibold">
-              <WhatsappIcon className="w-3.5 h-3.5 opacity-30 text-muted-foreground" />
-              <span>Sem WhatsApp cadastrado</span>
-            </div>
-          )}
-
-          {b.address && (
-            <a
-              href={getMapsUrl(b.address)}
-              onClick={(e) => handleOpenMaps(b.address, e)}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Abrir rota no Google Maps"
-              aria-label="Abrir rota no Google Maps"
-              className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0 cursor-pointer active:scale-95"
-            >
-              <Navigation className="w-3.5 h-3.5 text-primary" />
-            </a>
-          )}
-
-          <button
-            type="button"
-            onClick={() => onShare(b)}
-            title="Compartilhar"
-            aria-label="Compartilhar prestador"
-            className="h-9 w-9 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shrink-0"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    </motion.div>
   );
 }

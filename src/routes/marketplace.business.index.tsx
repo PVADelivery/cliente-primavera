@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, Sparkles, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check } from "lucide-react";
+import { AlertCircle, ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, Sparkles, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
