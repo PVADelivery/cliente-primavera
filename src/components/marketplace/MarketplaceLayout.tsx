@@ -96,34 +96,72 @@ export function MarketplaceLayout() {
         // 2. Corridas ativas (Suporta usuário logado e corridas salvas no localStorage)
         let savedIds: string[] = [];
         let localActiveCount = 0;
+        const now = Date.now();
         try {
           savedIds = JSON.parse(localStorage.getItem("pva_my_ride_ids") || "[]");
           const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
-          localActiveCount = localRides.filter((r: any) => ["pending", "accepted", "in_progress"].includes(r.status)).length;
+          // Considera ativo apenas corridas com menos de 12 horas para evitar fantasmas
+          const freshLocal = localRides.filter((r: any) => {
+            const isStatusActive = ["pending", "accepted", "in_progress"].includes(r.status);
+            const isRecent = !r.created_at || (now - new Date(r.created_at).getTime() < 12 * 3600 * 1000);
+            return isStatusActive && isRecent;
+          });
+          localActiveCount = freshLocal.length;
         } catch (e) {}
 
         let dbActiveCount = 0;
+        let queriedDb = false;
         if (savedIds.length > 0 || user?.id) {
           try {
             let query = supabase
               .from("ride_requests")
-              .select("id", { count: "exact", head: true })
+              .select("id, status, created_at")
               .in("status", ["pending", "accepted", "in_progress"]);
 
-            if (savedIds.length > 0) {
-              query = query.in("id", savedIds);
+            if (user?.id && savedIds.length > 0) {
+              query = query.or(`user_id.eq.${user.id},id.in.(${savedIds.join(",")})`);
             } else if (user?.id) {
               query = query.eq("user_id", user.id);
+            } else if (savedIds.length > 0) {
+              query = query.in("id", savedIds);
             }
 
-            const { count: c, error: ridesErr } = await query;
-            if (!ridesErr && typeof c === "number") {
-              dbActiveCount = c;
+            const { data: rows, error: ridesErr } = await query;
+            if (!ridesErr && Array.isArray(rows)) {
+              queriedDb = true;
+              // Apenas corridas das últimas 12 horas
+              const freshRows = rows.filter((r: any) => {
+                if (!r.created_at) return true;
+                return (now - new Date(r.created_at).getTime()) < 12 * 3600 * 1000;
+              });
+              dbActiveCount = freshRows.length;
+
+              // Se o banco confirmou 0 corridas ativas, limpa estados fantasmas do localStorage
+              if (dbActiveCount === 0) {
+                try {
+                  const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
+                  let hasChanges = false;
+                  const updatedLocal = localRides.map((lr: any) => {
+                    if (["pending", "accepted", "in_progress"].includes(lr.status)) {
+                      hasChanges = true;
+                      return { ...lr, status: "completed" };
+                    }
+                    return lr;
+                  });
+                  if (hasChanges) {
+                    localStorage.setItem("pva_local_rides", JSON.stringify(updatedLocal));
+                  }
+                  if (savedIds.length > 0) {
+                    localStorage.setItem("pva_my_ride_ids", "[]");
+                  }
+                  localActiveCount = 0;
+                } catch {}
+              }
             }
           } catch (e) {}
         }
 
-        const finalRidesCount = Math.max(dbActiveCount, localActiveCount);
+        const finalRidesCount = queriedDb ? dbActiveCount : localActiveCount;
         setActiveRidesCount(finalRidesCount);
       } catch (err) {
         console.error("Erro ao buscar contadores ativos:", err);

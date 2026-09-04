@@ -146,6 +146,25 @@ function RidesPage() {
         const active = formattedRides?.find((r: any) => r.status === "pending" || r.status === "accepted" || r.status === "in_progress");
         setActiveRide(active || null);
 
+        // Se não há corridas ativas reais no sistema, sincroniza e limpa pendências fantasmas no localStorage
+        if (!active && typeof window !== "undefined") {
+          try {
+            const localRides = JSON.parse(localStorage.getItem("pva_local_rides") || "[]");
+            let hasStale = false;
+            const updated = localRides.map((lr: any) => {
+              if (["pending", "accepted", "in_progress"].includes(lr.status)) {
+                hasStale = true;
+                return { ...lr, status: "completed" };
+              }
+              return lr;
+            });
+            if (hasStale) {
+              localStorage.setItem("pva_local_rides", JSON.stringify(updated));
+              localStorage.setItem("pva_my_ride_ids", "[]");
+              window.dispatchEvent(new Event("pva_ride_updated"));
+            }
+          } catch (e) {}
+        }
       } catch (err) {
         console.error("Erro ao buscar corridas:", err);
       } finally {
