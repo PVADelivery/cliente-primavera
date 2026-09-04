@@ -515,7 +515,7 @@ function BusinessCard({
           {b.address ? (
             <a
               href={getMapsUrl(b.address)}
-              onClick={(e) => handleOpenMaps(b.address, e)}
+              onClick={(e) => handleOpenMaps(b.address!, e)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
@@ -593,7 +593,7 @@ function BusinessCard({
           {b.address && (
             <a
               href={getMapsUrl(b.address)}
-              onClick={(e) => handleOpenMaps(b.address, e)}
+              onClick={(e) => handleOpenMaps(b.address!, e)}
               target="_blank"
               rel="noopener noreferrer"
               title="Abrir rota no Google Maps"
