@@ -27,7 +27,7 @@ import { ProviderDetailDialog } from "@/components/ppp/ProviderDetailDialog";
 import { ProviderMap } from "@/components/ppp/ProviderMap";
 import { QuotesSection } from "@/components/ppp/QuotesSection";
 import { ProviderRegisterDialog } from "@/components/ppp/ProviderRegisterDialog";
-import { cleanCategory, type Business } from "@/lib/ppp";
+import type { Business } from "@/lib/ppp";
 
 export const Route = createFileRoute("/marketplace/directory")({
   head: () => ({
