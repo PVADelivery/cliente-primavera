@@ -75,6 +75,7 @@ function SignupPage() {
             <label className="block text-xs font-medium text-muted-foreground mb-1 ml-1">Nome completo</label>
             <input
               required
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Seu nome completo"
@@ -88,6 +89,7 @@ function SignupPage() {
             <input
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
@@ -102,6 +104,7 @@ function SignupPage() {
               <input
                 type={showPw ? "text" : "password"}
                 required
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Crie uma senha forte"
@@ -133,6 +136,7 @@ function SignupPage() {
               <input
                 type={showConfirm ? "text" : "password"}
                 required
+                autoComplete="new-password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 placeholder="Repita a senha"
