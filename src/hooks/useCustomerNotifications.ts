@@ -11,68 +11,73 @@ export function useCustomerNotifications() {
   const { user } = useAuth();
   const channelsRef = useRef<any[]>([]);
 
+  // 1. Solicita permissões nativas imediatamente ao abrir o aplicativo (Android / iOS)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    if (Capacitor.isPluginAvailable("LocalNotifications")) {
+      LocalNotifications.requestPermissions().then((res) => {
+        if (res.display === "granted" && Capacitor.getPlatform() === "android") {
+          LocalNotifications.createChannel({
+            id: "customer-order-updates-v1",
+            name: "Atualizações de Pedidos",
+            description: "Notificações de status de pedidos no MT 24 Horas",
+            importance: 5,
+            visibility: 1,
+            vibration: true,
+          }).catch(() => {});
+        }
+      }).catch(() => {});
+    }
+
+    if (Capacitor.isPluginAvailable("PushNotifications")) {
+      PushNotifications.requestPermissions().then((res) => {
+        if (res.receive === "granted") {
+          PushNotifications.register().catch(() => {});
+        }
+      }).catch(() => {});
+    }
+  }, []);
+
   useEffect(() => {
     if (!user?.id) return;
 
-    // Configuração Nativa Capacitor (FCM)
-    if (Capacitor.isNativePlatform()) {
-      if (Capacitor.isPluginAvailable("LocalNotifications")) {
-        LocalNotifications.requestPermissions().then((res) => {
-          if (res.display === "granted" && Capacitor.getPlatform() === "android") {
-            LocalNotifications.createChannel({
-              id: "customer-order-updates-v1",
-              name: "Atualizações de Pedidos",
-              description: "Notificações de status de pedidos no MT 24 Horas",
-              importance: 4,
-              visibility: 1,
-              vibration: true,
-            }).catch(() => {});
-          }
-        }).catch(() => {});
-      }
-
-      if (Capacitor.isPluginAvailable("PushNotifications")) {
-        const syncFcmToken = async (tokenVal: string) => {
-          if (!tokenVal) return;
-          localStorage.setItem("customer_fcm_token", tokenVal);
-          try {
-            await supabase
-              .from("profiles")
-              .update({ fcm_token: tokenVal } as any)
-              .eq("id", user.id);
-          } catch (e) {
-            console.warn("[FCM] Perfil token update error:", e);
-          }
-        };
-
-        PushNotifications.addListener("registration", (token) => {
-          syncFcmToken(token.value);
-        }).catch(() => {});
-
-        const cachedToken = localStorage.getItem("customer_fcm_token");
-        if (cachedToken) {
-          syncFcmToken(cachedToken);
+    // Configuração de Token FCM e listeners vinculados ao usuário
+    if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable("PushNotifications")) {
+      const syncFcmToken = async (tokenVal: string) => {
+        if (!tokenVal) return;
+        localStorage.setItem("customer_fcm_token", tokenVal);
+        try {
+          await supabase
+            .from("profiles")
+            .update({ fcm_token: tokenVal } as any)
+            .eq("id", user.id);
+        } catch (e) {
+          console.warn("[FCM] Perfil token update error:", e);
         }
+      };
 
-        PushNotifications.requestPermissions().then((res) => {
-          if (res.receive === "granted") {
-            PushNotifications.register().catch(() => {});
-          }
-        }).catch(() => {});
+      PushNotifications.addListener("registration", (token) => {
+        syncFcmToken(token.value);
+      }).catch(() => {});
 
-        PushNotifications.addListener("pushNotificationReceived", (notification) => {
-          const title = notification.title || "Atualização do seu Pedido";
-          const body = notification.body || notification.data?.message || "Confira o status no app!";
-          toast.info(title, { description: body });
-        }).catch(() => {});
-
-        PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-          const orderId = action.notification?.data?.orderId || action.notification?.data?.order_id;
-          if (orderId && typeof window !== "undefined") {
-            window.location.href = `/orders/${orderId}`;
-          }
-        }).catch(() => {});
+      const cachedToken = localStorage.getItem("customer_fcm_token");
+      if (cachedToken) {
+        syncFcmToken(cachedToken);
       }
+
+      PushNotifications.addListener("pushNotificationReceived", (notification) => {
+        const title = notification.title || "Atualização do seu Pedido";
+        const body = notification.body || notification.data?.message || "Confira o status no app!";
+        toast.info(title, { description: body });
+      }).catch(() => {});
+
+      PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+        const orderId = action.notification?.data?.orderId || action.notification?.data?.order_id;
+        if (orderId && typeof window !== "undefined") {
+          window.location.href = `/orders/${orderId}`;
+        }
+      }).catch(() => {});
     }
 
     // Realtime Postgres Changes para Pedidos do Cliente
