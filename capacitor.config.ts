@@ -1,14 +1,25 @@
-﻿import type { CapacitorConfig } from "@capacitor/cli";
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.primavera.cliente",
-  appName: "MT 24horas express",
-  webDir: "dist",
+  appName: "MT 24 Horas Express - Marketplace",
+  webDir: "dist/client",
   server: {
-    // Em desenvolvimento, aponte para o preview Lovable, ex.:
-    // url: "https://id-preview--<UUID>.lovable.app",
-    // cleartext: true,
+    url: "https://mt24horasexpress.com",
+    errorPath: "error.html",
+    cleartext: false,
     androidScheme: "https",
+  },
+  android: {
+    allowMixedContent: false,
+  },
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"],
+    },
+    LocalNotifications: {
+      sound: "ring.wav",
+    },
   },
 };
 
