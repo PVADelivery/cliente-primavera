@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.primavera.cliente",
-  appName: "MT 24 Horas Express",
+  appId: "com.mt24horasexpress.cliente",
+  appName: "MT 24 Horas",
   webDir: "dist/client",
   server: {
     url: "https://www.mt24horasexpress.com",

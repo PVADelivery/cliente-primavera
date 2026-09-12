@@ -1,4 +1,4 @@
-package com.primavera.cliente;
+package com.mt24horasexpress.cliente;
 
 import com.getcapacitor.BridgeActivity;
 
