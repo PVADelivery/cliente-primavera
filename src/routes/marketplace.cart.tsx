@@ -75,7 +75,7 @@ function CartPage() {
         <div className="h-px w-full bg-border my-1" />
         <div className="flex items-center justify-between text-base font-bold">
           <span>Total estimado</span>
-          <span className="text-primary font-black">R$ {finalCartTotal.toFixed(2).replace(".", ",")}</span>
+          <span className="text-slate-900 dark:text-white font-black text-lg">R$ {finalCartTotal.toFixed(2).replace(".", ",")}</span>
         </div>
       </div>
       <Link to="/marketplace/checkout" className="block w-full text-center py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold" style={{ boxShadow: "var(--shadow-elegant)" }}>

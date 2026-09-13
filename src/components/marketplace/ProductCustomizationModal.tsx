@@ -200,7 +200,7 @@ export function ProductCustomizationModal({
               <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
             )}
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-base sm:text-lg font-black text-primary">
+              <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                 R$ {basePrice.toFixed(2).replace(".", ",")}
               </span>
               {(product as any).promo && (
