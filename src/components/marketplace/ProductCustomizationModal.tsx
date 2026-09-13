@@ -5,6 +5,7 @@ import { useCart, type CartOptionSelected } from "@/contexts/CartContext";
 import type { Product } from "@/types/database";
 import { toast } from "sonner";
 
+// v1.0.2 - Correcao de hooks React #310 e disparo imediato Telegram
 interface OptionGroup {
   id: string;
   name: string;
