@@ -89,6 +89,20 @@ export function ProductCustomizationModal({
     }
   };
 
+  // Validation (Hook deve sempre ser executado antes de qualquer return condicional)
+  const validationErrors = useMemo(() => {
+    const errors: string[] = [];
+    for (const grp of groups) {
+      const chosen = (selections[grp.id] || []).length;
+      if (grp.required && chosen < Math.max(1, grp.min_options)) {
+        errors.push(`Selecione ao menos ${Math.max(1, grp.min_options)} em "${grp.name}"`);
+      } else if (grp.min_options > 0 && chosen < grp.min_options) {
+        errors.push(`Escolha no mínimo ${grp.min_options} em "${grp.name}"`);
+      }
+    }
+    return errors;
+  }, [groups, selections]);
+
   if (!product) return null;
 
   // Toggle selection for a group
@@ -131,20 +145,6 @@ export function ProductCustomizationModal({
 
   const unitPrice = basePrice + extraPricePerUnit;
   const totalPrice = unitPrice * quantity;
-
-  // Validation
-  const validationErrors = useMemo(() => {
-    const errors: string[] = [];
-    for (const grp of groups) {
-      const chosen = (selections[grp.id] || []).length;
-      if (grp.required && chosen < Math.max(1, grp.min_options)) {
-        errors.push(`Selecione ao menos ${Math.max(1, grp.min_options)} em "${grp.name}"`);
-      } else if (grp.min_options > 0 && chosen < grp.min_options) {
-        errors.push(`Escolha no mínimo ${grp.min_options} em "${grp.name}"`);
-      }
-    }
-    return errors;
-  }, [groups, selections]);
 
   const handleAddToCart = () => {
     if (validationErrors.length > 0) {
