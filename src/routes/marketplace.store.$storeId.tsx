@@ -29,6 +29,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { ProductCustomizationModal } from "@/components/marketplace/ProductCustomizationModal";
 
 export const Route = createFileRoute("/marketplace/store/$storeId")({
   component: StoreDetail,
@@ -54,6 +55,7 @@ function StoreDetail() {
   const [cartOpen, setCartOpen] = useState(false);
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
+  const [customizingProduct, setCustomizingProduct] = useState<(Product & { promo?: number }) | null>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const coverImgRef = useRef<HTMLImageElement | null>(null);
 
@@ -410,8 +412,9 @@ function StoreDetail() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.4, delay: i * 0.05, ease: "easeOut" }}
-                    className="group relative flex flex-row items-stretch gap-3 p-3 sm:p-4 bg-card rounded-2xl border border-border/40 hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden"
+                    className="group relative flex flex-row items-stretch gap-3 p-3 sm:p-4 bg-card rounded-2xl border border-border/40 hover:border-primary/40 hover:shadow-lg transition-all overflow-hidden cursor-pointer"
                     style={{ boxShadow: "var(--shadow-elegant)" }}
+                    onClick={() => setCustomizingProduct(p)}
                   >
                     {/* Coluna de Texto */}
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
@@ -460,12 +463,13 @@ function StoreDetail() {
                       )}
 
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          add(storeId, name, { productId: p.id, name: p.name, price: finalPrice, quantity: 1, imageUrl: displayImage || undefined });
+                          setCustomizingProduct(p);
                         }}
                         className="absolute -bottom-2 -right-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground grid place-items-center hover:scale-105 active:scale-95 transition-transform shadow-md z-10"
-                        aria-label={`Adicionar ${p.name}`}
+                        aria-label={`Personalizar e adicionar ${p.name}`}
                       >
                         <Plus className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
                       </button>
@@ -585,6 +589,14 @@ function StoreDetail() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal de Personalização / Sabores / Tamanhos */}
+      <ProductCustomizationModal
+        product={customizingProduct}
+        storeId={storeId}
+        storeName={name}
+        onClose={() => setCustomizingProduct(null)}
+      />
     </div>
   );
 }

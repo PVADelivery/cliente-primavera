@@ -351,12 +351,23 @@ function Checkout() {
       );
 
       const requestBody = {
-        items: validItems.map((it) => ({
-          product_id: it.productId,
-          quantity: Number(it.quantity) || 1,
-          notes: it.notes || null,
-          options: [],
-        })),
+        items: validItems.map((it) => {
+          const optionsText = it.selectedOptions && it.selectedOptions.length > 0
+            ? it.selectedOptions.map(o => `${o.groupName}: ${o.optionName}${o.price > 0 ? ` (+R$ ${o.price.toFixed(2)})` : ''}`).join(' | ')
+            : '';
+          const combinedNotes = [it.notes, optionsText].filter(Boolean).join(' • ');
+
+          return {
+            product_id: it.productId,
+            quantity: Number(it.quantity) || 1,
+            notes: combinedNotes || null,
+            options: it.selectedOptions?.map(o => ({
+              group_name: o.groupName,
+              name: o.optionName,
+              price: o.price
+            })) || [],
+          };
+        }),
         company_id: companyId,
         store_id: companyId,
         customer_id: resolvedCustomerId || undefined,

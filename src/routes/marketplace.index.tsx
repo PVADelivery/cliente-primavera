@@ -35,6 +35,17 @@ const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Bebidas", icon: Wine },
 ];
 
+const CATEGORY_SYNONYMS: Record<string, string[]> = {
+  "restaurantes": ["restaurante", "lanche", "lanches", "hamburguer", "burger", "comida", "marmita", "refeição", "lanchonete", "pastel", "churrasco", "almoço", "jantar", "porções", "prato"],
+  "mercado": ["mercado", "supermercado", "mercearia", "conveniência", "conveniencia", "hortifruti", "empório", "emporio", "mercearia", "açougue", "acougue"],
+  "farmácia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "suplemento", "farmaceutica"],
+  "pizza": ["pizza", "pizzaria", "esfirra", "esfiha", "calzone", "massa", "fogazza"],
+  "doces": ["doce", "doces", "sorvete", "sorvetes", "acai", "açaí", "cremosinho", "sobremesa", "sobremesas", "bolo", "bolos", "torta", "chocolate", "confeitaria", "picolé", "geladinho"],
+  "cafés": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgados"],
+  "shopping": ["shopping", "calcado", "calçado", "calcados", "calçados", "sapato", "sapatos", "tenis", "tênis", "roupa", "roupas", "moda", "vestuario", "vestuário", "loja", "acessorio", "acessório", "chinelo", "sandalia", "sandália", "calça", "camisa"],
+  "bebidas": ["bebida", "bebidas", "distribuidora", "cerveja", "chopp", "adega", "refrigerante", "agua", "água", "gelo", "vinho", "whisky", "vodka", "destilados"],
+};
+
 // ─── Persistence ──────────────────────────────────────────────────────────────
 type SortKey = "relevance" | "rating" | "fee" | "open";
 const LS_FILTER = "pva_store_filters";
@@ -850,22 +861,30 @@ function MarketplaceHome() {
     const q = searchTerm.trim().toLowerCase();
 
     if (q) {
+      // Coleta sinônimos para a busca caso o termo corresponda a uma categoria
+      const queryTerms = [q];
+      const syns = CATEGORY_SYNONYMS[q] || Object.entries(CATEGORY_SYNONYMS).find(([k]) => k === q)?.[1];
+      if (syns) {
+        queryTerms.push(...syns);
+      }
+
+      const matchText = (txt?: string | null) => {
+        if (!txt) return false;
+        const lower = txt.toLowerCase();
+        return queryTerms.some(term => lower.includes(term));
+      };
+
       const matchingCompanyIds = new Set(
         allProducts
-          .filter(
-            (p) =>
-              p.name?.toLowerCase().includes(q) ||
-              p.description?.toLowerCase().includes(q) ||
-              p.category?.toLowerCase().includes(q)
-          )
+          .filter((p) => matchText(p.name) || matchText(p.description) || matchText(p.category))
           .map((p) => p.company_id)
       );
 
       list = list.filter((s) => {
-        const nameMatch = s.name?.toLowerCase().includes(q);
-        const catMatch = s.category?.toLowerCase().includes(q);
-        const descMatch = s.description?.toLowerCase().includes(q);
-        const addressMatch = s.address?.toLowerCase().includes(q);
+        const nameMatch = matchText(s.name);
+        const catMatch = matchText(s.category);
+        const descMatch = matchText(s.description);
+        const addressMatch = matchText(s.address);
         const productMatch = matchingCompanyIds.has(s.id);
         return nameMatch || catMatch || descMatch || addressMatch || productMatch;
       });
