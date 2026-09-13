@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { AeroPageHeader } from "@/components/aero";
 import { createPickupPinElement, createDropoffPinElement, createUserLocationElement } from "@/lib/map-markers";
+import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
+import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 
 export const Route = createFileRoute("/marketplace/errands")({
   head: () => ({ meta: [{ title: "Enviar Encomenda — MT 24horas express" }] }),
@@ -89,6 +91,7 @@ function ErrandsPage() {
   const [dropoffCoords, setDropoffCoords] = useState<[number, number] | null>(null);
   const [distance, setDistance] = useState<number>(0);
   const [price, setPrice] = useState<number>(15.0);
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
 
   // Endereços, Números e Autocomplete
   const [pickupText, setPickupText] = useState("");
@@ -419,7 +422,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         baseFee = 9.99;
         rate = 3.0;
       }
-      setPrice(Number((baseFee + distance * rate).toFixed(2)));
+      setPrice(Number((baseFee + distance * rate + SYSTEM_SERVICE_FEE).toFixed(2)));
     } else {
       setPrice(0);
     }
@@ -634,8 +637,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
     };
 
     const finalNotes = description.trim() 
-      ? `${description}\n\n[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}]`
-      : `[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}]`;
+      ? `${description}\n\n[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}] • [Taxa de serviço: R$ 0,99 • Total: R$ ${price.toFixed(2)}]`
+      : `[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}] • [Taxa de serviço: R$ 0,99 • Total: R$ ${price.toFixed(2)}]`;
 
     try {
       // Busca a primeira empresa disponível para usar como fallback
@@ -877,14 +880,41 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
 
         {/* Informações da Rota / Distância */}
         {pickupCoords && dropoffCoords && (
-          <div className="bg-muted/50 p-4 rounded-2xl space-y-2 mt-4">
+          <div className="bg-card border border-border p-4 rounded-2xl space-y-2.5 mt-4 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Resumo dos valores</h4>
+
             <div className="flex justify-between items-center text-xs">
               <span className="text-muted-foreground">Distância Estimada</span>
               <span className="font-bold text-foreground">{distance} km</span>
             </div>
-            <div className="flex justify-between items-center border-t border-border/50 pt-2">
-              <span className="text-sm font-semibold text-foreground">Preço da Entrega</span>
-              <span className="text-xl font-black text-slate-900 dark:text-white">
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground">Valor do Frete</span>
+              <span className="font-medium text-foreground">
+                R$ {(price - SYSTEM_SERVICE_FEE > 0 ? price - SYSTEM_SERVICE_FEE : 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground flex items-center gap-1.5">
+                Taxa de serviço
+                <button
+                  type="button"
+                  onClick={() => setShowServiceFeeModal(true)}
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+                  title="Entenda a taxa de serviço"
+                >
+                  ?
+                </button>
+              </span>
+              <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}</span>
+            </div>
+
+            <div className="h-px w-full bg-border/60 my-1" />
+
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-sm font-bold text-foreground">Total da Entrega</span>
+              <span className="text-xl font-display font-black text-slate-900 dark:text-white">
                 R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -1081,6 +1111,10 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         </div>,
         document.body
       )}
+      <ServiceFeeInfoModal
+        isOpen={showServiceFeeModal}
+        onClose={() => setShowServiceFeeModal(false)}
+      />
     </div>
   );
 }

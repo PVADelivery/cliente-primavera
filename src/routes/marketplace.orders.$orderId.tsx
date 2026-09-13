@@ -219,11 +219,17 @@ function OrderDetailPage() {
           </div>
         )}
 
-        <div className="border-t border-border/60 pt-3 flex items-center justify-between">
-          <span className="font-bold text-foreground text-base">Total Pago</span>
-          <span className="font-black text-xl text-slate-900 dark:text-white">
-            R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}
-          </span>
+        <div className="border-t border-border/60 pt-3 space-y-1.5">
+          <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <span>Taxa de serviço do sistema</span>
+            <span className="font-medium text-foreground">R$ 0,99</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-foreground text-base">Total Pago</span>
+            <span className="font-black text-xl text-slate-900 dark:text-white">
+              R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}
+            </span>
+          </div>
         </div>
       </div>
     </div>

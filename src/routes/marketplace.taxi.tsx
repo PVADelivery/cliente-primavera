@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { AeroPageHeader } from "@/components/aero";
 import { createPickupPinElement, createDropoffPinElement, createUserLocationElement, registerMapEmojis } from "@/lib/map-markers";
+import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
+import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
@@ -106,6 +108,7 @@ function TaxiPage() {
   const [distance, setDistance] = useState<number>(0);
   const [price, setPrice] = useState<number>(15.0);
   const [rates, setRates] = useState({ taxi: 3.0, mototaxi: 2.0 });
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
 
   // Endereços, Números e Autocomplete
   const [pickupText, setPickupText] = useState("");
@@ -367,7 +370,7 @@ function TaxiPage() {
             baseFee = 9.99;
             rate = 3.0;
           }
-          setPrice(baseFee + routeData.distanceKm * rate);
+          setPrice(Number((baseFee + routeData.distanceKm * rate + SYSTEM_SERVICE_FEE).toFixed(2)));
         } else {
           // Fallback para linha reta se a API do OSRM falhar
           const dist = calculateDistance(
@@ -384,7 +387,7 @@ function TaxiPage() {
             baseFee = 9.99;
             rate = 3.0;
           }
-          setPrice(baseFee + dist * rate);
+          setPrice(Number((baseFee + dist * rate + SYSTEM_SERVICE_FEE).toFixed(2)));
         }
       });
     }
@@ -636,8 +639,8 @@ function TaxiPage() {
 
       let baseFee = vehicleType === "taxi" ? 9.99 : 6.99;
       let kmRate = vehicleType === "taxi" ? (rates.taxi || 3.0) : (rates.mototaxi || 2.0);
-      let calculatedPrice = price > 0 ? price : Number((baseFee + (finalDist * kmRate)).toFixed(2));
-      if (calculatedPrice < baseFee) calculatedPrice = baseFee;
+      let calculatedPrice = price > 0 ? price : Number((baseFee + (finalDist * kmRate) + SYSTEM_SERVICE_FEE).toFixed(2));
+      if (calculatedPrice < (baseFee + SYSTEM_SERVICE_FEE)) calculatedPrice = baseFee + SYSTEM_SERVICE_FEE;
 
       const newRidePayload = {
         id: rideId,
@@ -894,14 +897,43 @@ function TaxiPage() {
         </div>
 
         {pickupCoords && dropoffCoords && (
-          <div className="bg-secondary/40 p-4 rounded-2xl flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground font-semibold">Distância Estimada</p>
-              <p className="text-sm font-bold text-foreground mt-0.5">{distance.toFixed(2)} km</p>
+          <div className="bg-card border border-border p-4 rounded-2xl space-y-2.5 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Resumo da corrida</h4>
+            
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground">Distância Estimada</span>
+              <span className="font-bold text-foreground">{distance.toFixed(2)} km</span>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground font-semibold">Preço da Corrida</p>
-              <p className="text-xl font-display font-black text-slate-900 dark:text-white">R$ {price.toFixed(2).replace(".", ",")}</p>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground">Valor do Trajeto</span>
+              <span className="font-medium text-foreground">
+                R$ {(price - SYSTEM_SERVICE_FEE > 0 ? price - SYSTEM_SERVICE_FEE : 0).toFixed(2).replace(".", ",")}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground flex items-center gap-1.5">
+                Taxa de serviço
+                <button
+                  type="button"
+                  onClick={() => setShowServiceFeeModal(true)}
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+                  title="Entenda a taxa de serviço"
+                >
+                  ?
+                </button>
+              </span>
+              <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}</span>
+            </div>
+
+            <div className="h-px w-full bg-border/60 my-1" />
+
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-bold text-foreground">Total da Corrida</span>
+              <span className="text-xl font-display font-black text-slate-900 dark:text-white">
+                R$ {price.toFixed(2).replace(".", ",")}
+              </span>
             </div>
           </div>
         )}
@@ -1097,6 +1129,10 @@ function TaxiPage() {
         </div>,
         document.body
       )}
+      <ServiceFeeInfoModal
+        isOpen={showServiceFeeModal}
+        onClose={() => setShowServiceFeeModal(false)}
+      />
     </div>
   );
 }

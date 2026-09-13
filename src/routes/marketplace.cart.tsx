@@ -1,6 +1,9 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Minus, Plus, Trash2, HelpCircle } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
+import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 
 export const Route = createFileRoute("/marketplace/cart")({
   head: () => ({ meta: [{ title: "Carrinho — MT 24horas express" }] }),
@@ -9,6 +12,7 @@ export const Route = createFileRoute("/marketplace/cart")({
 
 function CartPage() {
   const { items, companyName, total, setQty, remove } = useCart();
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -21,6 +25,8 @@ function CartPage() {
       </div>
     );
   }
+
+  const finalCartTotal = total + SYSTEM_SERVICE_FEE;
 
   return (
     <div className="space-y-4">
@@ -47,13 +53,39 @@ function CartPage() {
           </li>
         ))}
       </ul>
-      <div className="bg-card rounded-2xl border border-border p-4 space-y-2">
-        <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>R$ {total.toFixed(2).replace(".", ",")}</span></div>
-        <div className="flex items-center justify-between text-base font-bold"><span>Total</span><span>R$ {total.toFixed(2).replace(".", ",")}</span></div>
+      <div className="bg-card rounded-2xl border border-border p-4 space-y-2.5 shadow-sm">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal dos itens</span>
+          <span>R$ {total.toFixed(2).replace(".", ",")}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground flex items-center gap-1.5">
+            Taxa de serviço
+            <button
+              type="button"
+              onClick={() => setShowServiceFeeModal(true)}
+              className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+              title="Entenda a taxa de serviço"
+            >
+              ?
+            </button>
+          </span>
+          <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}</span>
+        </div>
+        <div className="h-px w-full bg-border my-1" />
+        <div className="flex items-center justify-between text-base font-bold">
+          <span>Total estimado</span>
+          <span className="text-primary font-black">R$ {finalCartTotal.toFixed(2).replace(".", ",")}</span>
+        </div>
       </div>
       <Link to="/marketplace/checkout" className="block w-full text-center py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold" style={{ boxShadow: "var(--shadow-elegant)" }}>
         Ir para o checkout
       </Link>
+
+      <ServiceFeeInfoModal
+        isOpen={showServiceFeeModal}
+        onClose={() => setShowServiceFeeModal(false)}
+      />
     </div>
   );
 }

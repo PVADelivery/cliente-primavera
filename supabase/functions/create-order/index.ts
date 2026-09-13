@@ -375,7 +375,8 @@ Deno.serve(async (req) => {
     return fail(400, 'create_order.out_of_region', 'Delivery unavailable for this address (out of region).', { field: 'address' });
   }
 
-  const total = Math.max(0, subtotal - discount) + deliveryFee;
+  const SYSTEM_SERVICE_FEE = 0.99;
+  const total = Number((Math.max(0, subtotal - discount) + deliveryFee + SYSTEM_SERVICE_FEE).toFixed(2));
 
   // 7) Idempotência
   const { data: existing } = await adminClient
@@ -388,12 +389,14 @@ Deno.serve(async (req) => {
     return json({ order_id: existing.id, idempotent: true });
   }
 
-  // 8) Notas (inclui troco)
+  // 8) Notas (inclui troco e taxa de serviço do sistema)
   let finalNotes = body.notes?.trim() || null;
   if (body.payment_method === 'money' && body.needs_change && body.change_for) {
     const note = `Troco para R$ ${Number(body.change_for).toFixed(2)}`;
     finalNotes = finalNotes ? `${finalNotes} • ${note}` : note;
   }
+  const feeTag = `Taxa de serviço: R$ 0,99`;
+  finalNotes = finalNotes ? `${finalNotes} • ${feeTag}` : feeTag;
 
   const customerFullName = (user.user_metadata as any)?.full_name || user.email?.split('@')[0] || 'Cliente';
 

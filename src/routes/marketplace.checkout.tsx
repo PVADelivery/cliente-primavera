@@ -22,6 +22,8 @@ import { isStoreOpenNow } from '@/lib/storeHours';
 import { useRequirePhone } from '@/hooks/useRequirePhone';
 import { RequirePhoneModal } from '@/components/marketplace/RequirePhoneModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SYSTEM_SERVICE_FEE } from '@/lib/constants';
+import { ServiceFeeInfoModal } from '@/components/marketplace/ServiceFeeInfoModal';
 
 export const Route = createFileRoute('/marketplace/checkout')({
   component: Checkout,
@@ -57,6 +59,7 @@ function Checkout() {
   const [fulfillmentMode, setFulfillmentMode] = useState<'delivery' | 'pickup'>('delivery');
   
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
 
   // Créditos do Cliente
   const { data: customerCredits, refetch: refetchCredits } = useCustomerCredits(user?.id);
@@ -218,7 +221,7 @@ function Checkout() {
     checkRegion();
   }, [selectedAddress, addresses, companyId, fulfillmentMode]);
 
-  const finalTotal = Math.max(0, subtotal) + (fulfillmentMode === 'pickup' ? 0 : (deliveryFee || 0));
+  const finalTotal = Math.max(0, subtotal) + (fulfillmentMode === 'pickup' ? 0 : (deliveryFee || 0)) + SYSTEM_SERVICE_FEE;
 
   const handleSubmit = async () => {
     // 1. Validação de Endereço de Entrega
@@ -379,6 +382,7 @@ function Checkout() {
         change_for: changeFor ? Number(changeFor) : null,
         idempotency_key: ik,
         fulfillment_mode: fulfillmentMode,
+        service_fee: SYSTEM_SERVICE_FEE,
       };
 
       const { data, error: functionError } = await supabase.functions.invoke('create-order', { body: requestBody });
@@ -842,25 +846,55 @@ function Checkout() {
               </div>
             )}
             
-            <div className="relative z-10 space-y-3 mb-4">
+            <div className="relative z-10 space-y-2.5 mb-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Resumo de valores</h3>
+              
               <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">Subtotal ({count} {count === 1 ? 'item' : 'itens'})</span>
+                <span className="text-muted-foreground">Total dos itens ({count} {count === 1 ? 'item' : 'itens'})</span>
                 <span className="font-medium">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
               </div>
               
-              {fulfillmentMode === 'delivery' && (
+              {fulfillmentMode === 'delivery' ? (
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Taxa de entrega</span>
+                  <span className="text-muted-foreground">Entrega</span>
                   <span className="font-medium">
-                    {loadingFee ? <Loader2 className="w-4 h-4 animate-spin inline" /> : (deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace('.', ',')}` : (!selectedAddress ? 'Endereço pendente' : 'A calcular'))}
+                    {loadingFee ? (
+                      <Loader2 className="w-4 h-4 animate-spin inline" />
+                    ) : deliveryFee && deliveryFee > 0 ? (
+                      `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`
+                    ) : !selectedAddress ? (
+                      'Endereço pendente'
+                    ) : (
+                      <span className="text-emerald-500 font-bold">Grátis</span>
+                    )}
                   </span>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Retirada no local</span>
+                  <span className="text-emerald-500 font-bold">Grátis</span>
                 </div>
               )}
               
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  Taxa de serviço
+                  <button 
+                    type="button" 
+                    onClick={() => setShowServiceFeeModal(true)} 
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+                    title="Entenda a taxa de serviço"
+                  >
+                    ?
+                  </button>
+                </span>
+                <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace('.', ',')}</span>
+              </div>
+
               <div className="h-px w-full bg-border my-2" />
               
               <div className="flex justify-between items-end">
-                <span className="text-base font-medium">Total</span>
+                <span className="text-base font-bold">Total</span>
                 <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
@@ -928,6 +962,11 @@ function Checkout() {
         setPhoneInput={setPhoneInput}
         onSubmit={handlePhoneSubmit}
         isSubmitting={isSubmittingPhone}
+      />
+
+      <ServiceFeeInfoModal
+        isOpen={showServiceFeeModal}
+        onClose={() => setShowServiceFeeModal(false)}
       />
     </div>
   );

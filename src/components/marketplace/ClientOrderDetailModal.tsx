@@ -250,6 +250,10 @@ export function ClientOrderDetailModal({ orderId, isOpen, onClose }: ClientOrder
                       <span className="font-bold">R$ {deliveryFeeNum.toFixed(2).replace(".", ",")}</span>
                     </div>
                   )}
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Taxa de serviço do sistema</span>
+                    <span className="font-bold">R$ 0,99</span>
+                  </div>
                   <div className="border-t border-border/60 pt-3 flex justify-between items-center">
                     <span className="font-black text-sm text-foreground uppercase tracking-wider">Total</span>
                     <span className="font-black text-xl text-slate-900 dark:text-white">

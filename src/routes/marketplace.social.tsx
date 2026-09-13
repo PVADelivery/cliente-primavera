@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { SocialCategory, SocialPost } from "@/types/database";
 import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
+import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
+import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 
 export const Route = createFileRoute("/marketplace/social")({
   head: () => ({
@@ -161,6 +163,7 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
   const [contact, setContact] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
 
   const handleContactChange = (val: string) => {
     const digits = val.replace(/\D/g, "").slice(0, 11);
@@ -276,6 +279,36 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
               {error}
             </div>
           )}
+
+          {/* Resumo de valores estilo iFood / Print */}
+          <div className="bg-muted/40 rounded-2xl border border-border/70 p-3.5 space-y-2">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Resumo de valores</h4>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground">Publicação Comunitária</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Grátis</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-muted-foreground flex items-center gap-1.5">
+                Taxa de serviço
+                <button
+                  type="button"
+                  onClick={() => setShowServiceFeeModal(true)}
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+                  title="Entenda a taxa de serviço"
+                >
+                  ?
+                </button>
+              </span>
+              <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}</span>
+            </div>
+            <div className="h-px w-full bg-border/60 my-1" />
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-bold text-foreground">Total</span>
+              <span className="font-black text-sm text-slate-900 dark:text-white">
+                R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Footer Fixo com Botão Sempre Visível */}
@@ -291,10 +324,15 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
                 <span>Publicando classificado...</span>
               </>
             ) : (
-              <span>Publicar Classificado</span>
+              <span>Publicar Classificado (R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")})</span>
             )}
           </button>
         </div>
+
+        <ServiceFeeInfoModal
+          isOpen={showServiceFeeModal}
+          onClose={() => setShowServiceFeeModal(false)}
+        />
 
       </div>
     </div>
