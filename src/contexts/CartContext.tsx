@@ -1,5 +1,30 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+export function cleanProductImageUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (trimmed.startsWith("[") || trimmed.startsWith("{") || trimmed.startsWith('"')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const first = parsed[0];
+          if (typeof first === "string") return cleanProductImageUrl(first);
+        }
+        if (typeof parsed === "string") return cleanProductImageUrl(parsed);
+      } catch {
+        // fallback
+      }
+    }
+    let cleaned = trimmed.replace(/^[\s\["'`]+|[\s\]"'`]+$/g, "");
+    cleaned = cleaned.replace(/^(https?):\/([^\/])/, "$1://$2");
+    if (cleaned.startsWith("http://") || cleaned.startsWith("https://") || cleaned.startsWith("/")) {
+      return cleaned;
+    }
+  }
+  return null;
+}
+
 export interface CartOptionSelected {
   groupName: string;
   optionName: string;
@@ -49,7 +74,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCart(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.items)) {
+          parsed.items = parsed.items.map((it: CartItem) => ({
+            ...it,
+            imageUrl: cleanProductImageUrl(it.imageUrl),
+          }));
+        }
+        setCart(parsed);
+      }
     } catch { /* ignore */ }
   }, []);
 
@@ -58,19 +92,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart]);
 
   const add: CartContextValue["add"] = (companyId, companyName, item) => {
+    const sanitizedItem: CartItem = {
+      ...item,
+      imageUrl: cleanProductImageUrl(item.imageUrl),
+    };
     if (cart.companyId && cart.companyId !== companyId) {
       const ok = confirm("Você já tem itens de outra loja no carrinho. Deseja limpar e começar um novo pedido?");
       if (!ok) return false;
-      const key = getItemKey(item);
-      setCart({ companyId, companyName, items: [{ ...item, id: key }] });
+      const key = getItemKey(sanitizedItem);
+      setCart({ companyId, companyName, items: [{ ...sanitizedItem, id: key }] });
       return true;
     }
     setCart((c) => {
-      const targetKey = getItemKey(item);
-      const targetItem = { ...item, id: targetKey };
+      const targetKey = getItemKey(sanitizedItem);
+      const targetItem = { ...sanitizedItem, id: targetKey };
       const existing = c.items.find((i) => (i.id || getItemKey(i)) === targetKey);
       const items = existing
-        ? c.items.map((i) => ((i.id || getItemKey(i)) === targetKey ? { ...i, quantity: i.quantity + item.quantity } : i))
+        ? c.items.map((i) => ((i.id || getItemKey(i)) === targetKey ? { ...i, quantity: i.quantity + sanitizedItem.quantity } : i))
         : [...c.items, targetItem];
       return { companyId, companyName, items };
     });

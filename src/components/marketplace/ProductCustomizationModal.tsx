@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { X, Plus, Minus, Check, AlertCircle, ShoppingBag, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useCart, type CartOptionSelected } from "@/contexts/CartContext";
+import { useCart, cleanProductImageUrl, type CartOptionSelected } from "@/contexts/CartContext";
 import type { Product } from "@/types/database";
 import { toast } from "sonner";
 
@@ -177,7 +177,7 @@ export function ProductCustomizationModal({
       name: product.name,
       price: unitPrice,
       quantity,
-      imageUrl: product.image_url || undefined,
+      imageUrl: cleanProductImageUrl(product.image_url) || undefined,
       notes: combinedNotes || undefined,
       selectedOptions: selectedOptionsList,
     });

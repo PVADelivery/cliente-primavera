@@ -17,7 +17,9 @@ import {
   Minus,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { useCart } from "@/contexts/CartContext";
+import { useCart, cleanProductImageUrl } from "@/contexts/CartContext";
+import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
+import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 import type { Company, Product } from "@/types/database";
 import {
   Drawer,
@@ -35,15 +37,20 @@ export const Route = createFileRoute("/marketplace/store/$storeId")({
   component: StoreDetail,
 });
 
-function parseImages(imageUrl: string | null): string[] {
+function parseImages(imageUrl: string | null | undefined): string[] {
   if (!imageUrl) return [];
   try {
-    const parsed = JSON.parse(imageUrl);
-    if (Array.isArray(parsed)) return parsed.filter((u: any) => typeof u === "string" && u.startsWith("http"));
+    const parsed = typeof imageUrl === "string" ? JSON.parse(imageUrl) : imageUrl;
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((u: any) => (typeof u === "string" ? cleanProductImageUrl(u) : null))
+        .filter(Boolean) as string[];
+    }
   } catch {
-    if (imageUrl.startsWith("http") || imageUrl.startsWith("/")) return [imageUrl];
+    // fallback
   }
-  return [];
+  const single = cleanProductImageUrl(imageUrl);
+  return single ? [single] : [];
 }
 
 function StoreDetail() {
@@ -56,6 +63,7 @@ function StoreDetail() {
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFailed, setCoverFailed] = useState(false);
   const [customizingProduct, setCustomizingProduct] = useState<(Product & { promo?: number }) | null>(null);
+  const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const coverImgRef = useRef<HTMLImageElement | null>(null);
 
@@ -528,28 +536,38 @@ function StoreDetail() {
                         <p className="text-center text-muted-foreground py-10">Carrinho vazio.</p>
                       ) : (
                         <ul className="space-y-4">
-                          {items.map((it) => (
-                            <li key={it.productId} className="flex gap-3">
-                              <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-                                {it.imageUrl ? (
-                                  <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center"><UtensilsCrossed className="w-4 h-4 text-muted-foreground/40"/></div>
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm leading-tight truncate">{it.name}</p>
-                                <p className="text-slate-900 dark:text-white font-black text-sm mt-0.5">R$ {(it.price * it.quantity).toFixed(2).replace(".", ",")}</p>
-                                <div className="flex items-center gap-3 mt-2">
-                                  <div className="flex items-center border border-border rounded-lg bg-background overflow-hidden h-8">
-                                    <button onClick={() => { if (it.quantity > 1) setQty(it.productId, it.quantity - 1); else remove(it.productId); }} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-muted-foreground transition-colors"><Minus className="w-3 h-3" /></button>
-                                    <span className="w-8 text-center text-sm font-bold">{it.quantity}</span>
-                                    <button onClick={() => setQty(it.productId, it.quantity + 1)} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-foreground transition-colors"><Plus className="w-3 h-3" /></button>
+                          {items.map((it) => {
+                            const cleanImg = cleanProductImageUrl(it.imageUrl);
+                            return (
+                              <li key={it.productId} className="flex gap-3">
+                                <div className="w-16 h-16 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                                  {cleanImg ? (
+                                    <img
+                                      src={cleanImg}
+                                      alt={it.name}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = "none";
+                                      }}
+                                    />
+                                  ) : (
+                                    <UtensilsCrossed className="w-5 h-5 text-muted-foreground/40" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-sm leading-tight truncate">{it.name}</p>
+                                  <p className="text-slate-900 dark:text-white font-black text-sm mt-0.5">R$ {(it.price * it.quantity).toFixed(2).replace(".", ",")}</p>
+                                  <div className="flex items-center gap-3 mt-2">
+                                    <div className="flex items-center border border-border rounded-lg bg-background overflow-hidden h-8">
+                                      <button onClick={() => { if (it.quantity > 1) setQty(it.productId, it.quantity - 1); else remove(it.productId); }} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-muted-foreground transition-colors"><Minus className="w-3 h-3" /></button>
+                                      <span className="w-8 text-center text-sm font-bold">{it.quantity}</span>
+                                      <button onClick={() => setQty(it.productId, it.quantity + 1)} className="w-8 h-full flex items-center justify-center hover:bg-muted active:bg-muted/80 text-foreground transition-colors"><Plus className="w-3 h-3" /></button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </li>
-                          ))}
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
 
@@ -563,9 +581,23 @@ function StoreDetail() {
                             <span className="text-muted-foreground">Taxa de entrega</span>
                             <span className="font-semibold">{deliveryFee && deliveryFee > 0 ? `R$ ${deliveryFee.toFixed(2).replace(".", ",")}` : "A calcular"}</span>
                           </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              Taxa de serviço
+                              <button
+                                type="button"
+                                onClick={() => setShowServiceFeeModal(true)}
+                                className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted hover:bg-muted-foreground/20 text-[10px] font-bold text-muted-foreground transition-colors cursor-pointer"
+                                title="Entenda a taxa de serviço"
+                              >
+                                ?
+                              </button>
+                            </span>
+                            <span className="font-medium text-foreground">R$ {SYSTEM_SERVICE_FEE.toFixed(2).replace(".", ",")}</span>
+                          </div>
                           <div className="flex justify-between text-lg pt-2 font-black border-t border-border mt-2">
                             <span>Total</span>
-                            <span className="text-slate-900 dark:text-white">R$ {(total + deliveryFee).toFixed(2).replace(".", ",")}</span>
+                            <span className="text-slate-900 dark:text-white">R$ {(total + deliveryFee + SYSTEM_SERVICE_FEE).toFixed(2).replace(".", ",")}</span>
                           </div>
                         </div>
                       )}
@@ -596,6 +628,12 @@ function StoreDetail() {
         storeId={storeId}
         storeName={name}
         onClose={() => setCustomizingProduct(null)}
+      />
+
+      {/* Modal Explicativo da Taxa de Serviço */}
+      <ServiceFeeInfoModal
+        isOpen={showServiceFeeModal}
+        onClose={() => setShowServiceFeeModal(false)}
       />
     </div>
   );
