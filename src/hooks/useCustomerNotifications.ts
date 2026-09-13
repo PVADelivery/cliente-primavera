@@ -25,6 +25,7 @@ export function useCustomerNotifications() {
             importance: 5,
             visibility: 1,
             vibration: true,
+            sound: "notification_sound.mp3",
           }).catch(() => {});
         }
       }).catch(() => {});
@@ -55,6 +56,19 @@ export function useCustomerNotifications() {
         } catch (e) {
           console.warn("[FCM] Perfil token update error:", e);
         }
+
+        try {
+          await supabase
+            .from("device_tokens")
+            .upsert({
+              token: tokenVal,
+              user_id: user.id,
+              platform: Capacitor.getPlatform(),
+              updated_at: new Date().toISOString(),
+            } as any, { onConflict: "token" });
+        } catch (e) {
+          console.warn("[FCM] device_tokens update error:", e);
+        }
       };
 
       PushNotifications.addListener("registration", (token) => {
@@ -70,6 +84,21 @@ export function useCustomerNotifications() {
         const title = notification.title || "Atualização do seu Pedido";
         const body = notification.body || notification.data?.message || "Confira o status no app!";
         toast.info(title, { description: body });
+
+        if (Capacitor.isNativePlatform()) {
+          LocalNotifications.schedule({
+            notifications: [
+              {
+                title,
+                body,
+                id: Math.floor(Math.random() * 100000),
+                channelId: "customer-order-updates-v1",
+                sound: "notification_sound.mp3",
+                extra: notification.data || {},
+              },
+            ],
+          }).catch(() => {});
+        }
       }).catch(() => {});
 
       PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
@@ -113,6 +142,7 @@ export function useCustomerNotifications() {
                     body: statusText,
                     id: Math.floor(Math.random() * 100000),
                     channelId: "customer-order-updates-v1",
+                    sound: "notification_sound.mp3",
                     extra: { orderId: ord.id },
                   },
                 ],
