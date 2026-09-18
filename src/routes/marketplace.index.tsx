@@ -272,8 +272,12 @@ function SmartSearchBar({
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const recents = loadRecents();
+  const [recents, setRecents] = useState<string[]>([]);
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    setRecents(loadRecents());
+  }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -319,20 +323,29 @@ function SmartSearchBar({
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    if (term.trim()) pushRecent(term.trim());
+    if (term.trim()) {
+      pushRecent(term.trim());
+      setRecents(loadRecents());
+    }
     setFocused(false);
     inputRef.current?.blur();
   };
 
   const handleSelectFeature = (feat: AppFeature) => {
-    if (feat.title) pushRecent(feat.title);
+    if (feat.title) {
+      pushRecent(feat.title);
+      setRecents(loadRecents());
+    }
     setFocused(false);
     inputRef.current?.blur();
     navigate({ to: feat.to as any });
   };
 
   const handleSelectStore = (store: Company) => {
-    if (store.name) pushRecent(store.name);
+    if (store.name) {
+      pushRecent(store.name);
+      setRecents(loadRecents());
+    }
     setFocused(false);
     inputRef.current?.blur();
     navigate({ to: `/marketplace/store/${store.id}` as any });
@@ -700,6 +713,9 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 src={s.cover_url}
                 alt={s.name}
                 loading="lazy"
+                onError={(e) => {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }}
                 className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
               />
             ) : (
@@ -742,7 +758,16 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-16">
               <div className="flex items-end gap-3">
                 <div className="w-14 h-14 rounded-2xl bg-white shrink-0 grid place-items-center font-display font-black text-2xl text-slate-900 ring-2 ring-white/25 overflow-hidden shadow-2xl transition-transform duration-300 group-hover:scale-105">
-                  {s.logo_url ? <img src={s.logo_url} alt="" className="w-full h-full object-cover" /> : s.name.charAt(0)}
+                  {s.logo_url ? (
+                    <img 
+                      src={s.logo_url} 
+                      alt="" 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                      }}
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : s.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1 pb-0.5">
                   <h3 className="font-display font-black text-xl tracking-tight leading-tight text-white truncate" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.9)" }}>
@@ -814,6 +839,7 @@ function MarketplaceHome() {
   const { data: stores, isLoading } = useQuery<Company[]>({
     queryKey: ["companies"],
     placeholderData: [],
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       try {
         // Tenta primeiro via RPC pública (bypassa restrições RLS em tabelas para visitantes anon)
@@ -840,12 +866,14 @@ function MarketplaceHome() {
 
   const { data: allProducts = [] } = useQuery<any[]>({
     queryKey: ["all-products-search"],
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       try {
         const { data } = await supabase
           .from("products")
           .select("id, name, description, category, company_id")
-          .eq("is_active", true);
+          .eq("is_active", true)
+          .limit(250);
         return data || [];
       } catch {
         return [];
