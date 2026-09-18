@@ -346,31 +346,67 @@ export function DirectoryPage() {
       {/* ─── ORÇAMENTOS ─── */}
       <QuotesSection categories={categoryNames} providers={businesses} />
 
-      {/* ─── CTA ANUNCIAR ─── */}
-      <div className="rounded-3xl bg-card border border-border p-5 space-y-2.5 shadow-sm">
-        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-          <PlusCircle className="w-3.5 h-3.5" />
-          <span>Divulgue seus serviços</span>
+      {/* ─── CTA ANUNCIAR (ESTILO GETNINJA) ─── */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card/95 to-amber-500/5 border border-border p-5 sm:p-6 shadow-sm">
+        {/* Glows de acabamento */}
+        <div className="absolute -top-16 -right-16 w-36 h-36 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-3.5">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
+              <Briefcase className="w-3.5 h-3.5" />
+              Para Profissionais & Empresas
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-lg sm:text-xl font-black text-foreground tracking-tight leading-tight">
+              Você é prestador de serviços ou tem empresa em Primavera?
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Anuncie no <strong>PPP — MT 24horas express</strong> e receba novos orçamentos e clientes qualificados direto no seu WhatsApp todos os dias.
+            </p>
+          </div>
+
+          {/* Destaques de vantagens estilo GetNinja */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 pb-1">
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-card/80 border border-border/60 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <span className="text-foreground font-semibold text-[11px]">Clientes no WhatsApp</span>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-card/80 border border-border/60 text-xs">
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <span className="text-foreground font-semibold text-[11px]">Destaque no Mapa & Busca</span>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-card/80 border border-border/60 text-xs">
+              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+              <span className="text-foreground font-semibold text-[11px]">Perfil Profissional Oficial</span>
+            </div>
+          </div>
+
+          {/* Botões de Ação com hierarquia clara */}
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-1.5">
+            <button
+              type="button"
+              onClick={() => setRegisterOpen(true)}
+              className="w-full flex-1 tap-target inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-zinc-950 shadow-md shadow-amber-400/20 hover:brightness-105 active:scale-[0.98] transition-all border border-amber-300/50"
+            >
+              <PlusCircle className="w-4 h-4 text-zinc-950 stroke-[2.5]" />
+              <span>Cadastrar meu perfil agora</span>
+            </button>
+
+            <a
+              href="https://wa.me/556697196937?text=Ol%C3%A1%2C%20gostaria%20de%20anunciar%20meus%20servi%C3%A7os%20no%20PPP%20do%20MT%2024horas%20express!"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto tap-target inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-bold bg-[#25D366]/10 hover:bg-[#25D366]/15 text-[#128C7E] dark:text-[#25D366] border border-[#25D366]/30 active:scale-[0.98] transition-all"
+            >
+              <WhatsappIcon className="w-4 h-4 text-[#25D366]" />
+              <span>Falar no WhatsApp</span>
+            </a>
+          </div>
         </div>
-        <h3 className="text-base font-black text-foreground leading-tight">
-          Você é prestador de serviços ou tem empresa em Primavera?
-        </h3>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Receba orçamentos e clientes no seu WhatsApp anunciando no PPP do MT 24horas express!
-        </p>
-        <a
-          href="https://wa.me/556697196937?text=Ol%C3%A1%2C%20gostaria%20de%20anunciar%20meus%20servi%C3%A7os%20no%20PPP%20do%20MT%2024horas%20express!"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <AeroButton className="mt-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold border-0 shadow-md flex items-center justify-center gap-2">
-            <WhatsappIcon className="w-4 h-4" />
-            Quero Anunciar no PPP
-          </AeroButton>
-        </a>
-        <AeroButton onClick={() => setRegisterOpen(true)} className="mt-1">
-          Cadastrar meu perfil agora
-        </AeroButton>
       </div>
 
       <ProviderDetailDialog business={selected} open={detailOpen} onOpenChange={setDetailOpen} />

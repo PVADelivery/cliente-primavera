@@ -148,14 +148,15 @@ export function QuotesSection({
           className={aeroInput(false, "h-auto py-2.5 resize-none")}
         />
 
-        <AeroButton
+        <button
+          type="button"
           onClick={() => createQuote.mutate()}
           disabled={!canSubmit || createQuote.isPending}
-          className="flex items-center justify-center gap-2"
+          className="w-full tap-target inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-zinc-950 shadow-md shadow-amber-400/20 hover:brightness-105 active:scale-[0.98] transition-all border border-amber-300/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
         >
-          {createQuote.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          Enviar solicitação
-        </AeroButton>
+          {createQuote.isPending ? <Loader2 className="w-4 h-4 animate-spin text-zinc-950" /> : <Send className="w-4 h-4 text-zinc-950 stroke-[2.5]" />}
+          <span>Enviar solicitação de orçamento</span>
+        </button>
 
         {matching.length > 0 && (
           <div className="space-y-2 pt-1">
