@@ -10,6 +10,7 @@ import { AeroPageHeader } from "@/components/aero";
 import { createPickupPinElement, createDropoffPinElement, createUserLocationElement, registerMapEmojis } from "@/lib/map-markers";
 import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
 import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
+import { searchCityStreets } from "@/data/primaveraStreets";
 
 export const Route = createFileRoute("/marketplace/taxi")({
   head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
@@ -446,10 +447,18 @@ function TaxiPage() {
 
   // Helper para formatar sugestões com bairro correto
   const formatSuggestionLabel = (item: any) => {
+    // Se for do catálogo local de Primavera do Leste
+    if (item.name && item.bairro !== undefined) {
+      return {
+        main: item.bairro ? `${item.name}, ${item.bairro}` : item.name,
+        sub: `${item.city || "Primavera do Leste"} - ${item.state || "MT"}`
+      };
+    }
+
     const lon = parseFloat(item.lon);
     const lat = parseFloat(item.lat);
     const addr = item.address || {};
-    const street = addr.road || addr.street || item.display_name.split(",")[0] || "";
+    const street = addr.road || addr.street || item.display_name?.split(",")[0] || item.name || "";
     
     const bairro = getCorrectBairro(lon, lat, street, addr);
     const city = addr.city || addr.town || addr.municipality || "Primavera do Leste";
@@ -489,39 +498,78 @@ function TaxiPage() {
     }
   };
 
-  // Autocomplete
+  // Autocomplete Instantâneo de Ruas da Cidade (0ms) + Fallback
   const searchAddress = (query: string, type: "pickup" | "dropoff") => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (!query.trim()) {
-      if (type === "pickup") setPickupSuggestions([]);
-      else setDropoffSuggestions([]);
+      if (type === "pickup") {
+        setPickupSuggestions([]);
+        setSearchingPickup(false);
+      } else {
+        setDropoffSuggestions([]);
+        setSearchingDropoff(false);
+      }
       return;
     }
 
-    if (type === "pickup") setSearchingPickup(true);
-    else setSearchingDropoff(true);
+    // 1. Busca instantânea (0ms) no catálogo completo de ruas de Primavera do Leste
+    const localMatches = searchCityStreets(query, 12);
+    if (type === "pickup") {
+      setPickupSuggestions(localMatches);
+    } else {
+      setDropoffSuggestions(localMatches);
+    }
 
-    searchTimeout.current = setTimeout(async () => {
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
-          query
-        )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
-        const res = await fetch(url, { headers: { "User-Agent": "Primavera-Delivery/1.0" } });
-        const data = await res.json();
-        if (type === "pickup") setPickupSuggestions(data);
-        else setDropoffSuggestions(data);
-      } catch (err) {
-        console.error("Erro na busca de endereço:", err);
-      } finally {
-        setSearchingPickup(false);
-        setSearchingDropoff(false);
-      }
-    }, 400);
+    // 2. Se houver poucos resultados locais e a busca tiver 3+ caracteres, busca complementar online
+    if (localMatches.length < 4 && query.trim().length >= 3) {
+      if (type === "pickup") setSearchingPickup(true);
+      else setSearchingDropoff(true);
+
+      searchTimeout.current = setTimeout(async () => {
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
+            query
+          )}&viewbox=${PVA_BOUNDS}&bounded=1&limit=6`;
+          const res = await fetch(url, { headers: { "User-Agent": "Primavera-Delivery/1.0" } });
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const cleanKey = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            if (type === "pickup") {
+              setPickupSuggestions((prev) => {
+                const seen = new Set(prev.map((p) => cleanKey(p.name)));
+                const filtered = data.filter((d: any) => {
+                  const name = d.address?.road || d.display_name?.split(",")[0] || "";
+                  return name && !seen.has(cleanKey(name));
+                });
+                return [...prev, ...filtered].slice(0, 12);
+              });
+            } else {
+              setDropoffSuggestions((prev) => {
+                const seen = new Set(prev.map((p) => cleanKey(p.name)));
+                const filtered = data.filter((d: any) => {
+                  const name = d.address?.road || d.display_name?.split(",")[0] || "";
+                  return name && !seen.has(cleanKey(name));
+                });
+                return [...prev, ...filtered].slice(0, 12);
+              });
+            }
+          }
+        } catch (err) {
+          console.warn("Erro no fallback Nominatim:", err);
+        } finally {
+          setSearchingPickup(false);
+          setSearchingDropoff(false);
+        }
+      }, 400);
+    } else {
+      if (type === "pickup") setSearchingPickup(false);
+      else setSearchingDropoff(false);
+    }
   };
 
   const selectSuggestion = (item: any, type: "pickup" | "dropoff") => {
-    const lat = parseFloat(item.lat);
-    const lon = parseFloat(item.lon);
+    const lat = typeof item.lat === "number" ? item.lat : parseFloat(item.lat);
+    const lon = typeof item.lon === "number" ? item.lon : parseFloat(item.lon);
     
     const label = formatSuggestionLabel(item);
     const streetBairro = label.main;
@@ -536,6 +584,9 @@ function TaxiPage() {
       setDropoffSuggestions([]);
     }
 
+    if (mapSmall.current) {
+      mapSmall.current.flyTo({ center: [lon, lat], zoom: 15, duration: 800 });
+    }
     if (mapFull.current) {
       mapFull.current.flyTo({ center: [lon, lat], zoom: 16, duration: 1000 });
     }
