@@ -689,7 +689,7 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       const { data: companies } = await supabase.from('companies').select('id').limit(1);
       const fallbackCompanyId = companies && companies.length > 0 ? companies[0].id : null;
 
-      const { error } = await supabase.from("deliveries").insert({
+      const newDeliveryPayload = {
         company_id: fallbackCompanyId,
         customer_name: user?.user_metadata?.full_name || user?.email || "Cliente",
         pickup_address: finalPickup,
@@ -703,9 +703,30 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         pickup_longitude: pickupCoords[0],
         delivery_latitude: dropoffCoords[1],
         delivery_longitude: dropoffCoords[0],
-      } as any);
+      };
+
+      const { data: insertedData, error } = await supabase.from("deliveries").insert(newDeliveryPayload as any).select().maybeSingle();
 
       if (error) throw error;
+
+      // Dispara notificação push para entregadores habilitados
+      const payloadToSend = insertedData || newDeliveryPayload;
+      supabase.functions.invoke("send-push", {
+        body: {
+          record: payloadToSend,
+          type: "INSERT",
+          table: "deliveries",
+        },
+      }).catch((e) => console.warn("[Push] send-push invoke error:", e));
+
+      supabase.functions.invoke("notify-driver", {
+        body: {
+          record: payloadToSend,
+          type: "INSERT",
+          table: "deliveries",
+        },
+      }).catch((e) => console.warn("[Push] notify-driver invoke error:", e));
+
       setSuccess(true);
     } catch (err: any) {
       console.error(err);

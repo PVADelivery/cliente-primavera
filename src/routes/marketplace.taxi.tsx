@@ -726,6 +726,23 @@ function TaxiPage() {
 
       if (error) {
         console.error("Supabase insert error (saved in local storage):", error);
+      } else {
+        // Dispara push notifications instantaneamente para motoristas habilitados
+        supabase.functions.invoke("send-push", {
+          body: {
+            record: newRidePayload,
+            type: "INSERT",
+            table: "ride_requests",
+          },
+        }).catch((e) => console.warn("[Push] send-push invoke error:", e));
+
+        supabase.functions.invoke("notify-driver", {
+          body: {
+            record: newRidePayload,
+            type: "INSERT",
+            table: "ride_requests",
+          },
+        }).catch((e) => console.warn("[Push] notify-driver invoke error:", e));
       }
 
       if (typeof window !== "undefined") {
