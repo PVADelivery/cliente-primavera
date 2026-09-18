@@ -718,9 +718,19 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
                     const cleanPhone = String(rawPhone).replace(/\D/g, "");
                     const finalPhone = cleanPhone.length === 10 || cleanPhone.length === 11 ? `55${cleanPhone}` : cleanPhone;
                     if (!finalPhone) return null;
+
+                    const drvName = drv?.full_name ? `Olá ${drv.full_name}` : "Olá";
+                    const isTaxi = activeRide?.vehicle_type === "taxi" || activeRide?.vehicle_type === "carro";
+                    const vehLabel = isTaxi ? "Táxi (Carro)" : "Moto Táxi";
+                    const rideCode = activeRide?.id ? `#${String(activeRide.id).slice(0, 6).toUpperCase()}` : "";
+                    const pickupAddr = activeRide?.pickup_address || "endereço de embarque";
+
+                    const defaultText = `${drvName}! Sou o passageiro da sua corrida de ${vehLabel} (${rideCode}) pelo MT 24horas express.\nEstou te aguardando no ponto de embarque:\n📍 ${pickupAddr}`;
+                    const whatsappUrl = `https://wa.me/${finalPhone}?text=${encodeURIComponent(defaultText)}`;
+
                     return (
                       <a
-                        href={`https://wa.me/${finalPhone}`}
+                        href={whatsappUrl}
                         target="_blank"
                         rel="noreferrer"
                         title="Falar com o motorista no WhatsApp"
