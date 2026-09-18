@@ -636,6 +636,7 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
         localStorage.setItem("pva_my_ride_ids", JSON.stringify(filteredIds));
 
         window.dispatchEvent(new Event("pva_ride_updated"));
+        window.dispatchEvent(new Event("storage"));
       } catch (e) {}
     }
 
@@ -652,6 +653,18 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
           .update({ status: "cancelled" })
           .filter("id", "eq", rideId);
       }
+
+      // Notifica o motorista via Edge Function se houver driver_id
+      if (activeRide?.driver_id) {
+        supabase.functions.invoke("send-push", {
+          body: {
+            record: { id: rideId, driver_id: activeRide.driver_id, status: "cancelled" },
+            type: "UPDATE",
+            table: "ride_requests",
+          },
+        }).catch(() => {});
+      }
+
       toast.success("Corrida cancelada com sucesso.");
     } catch (err: any) {
       console.warn("Aviso ao cancelar no Supabase:", err);
@@ -774,16 +787,15 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
               </div>
 
               {/* Botão de Cancelar Corrida Ativa */}
-              {["pending", "accepted"].includes(activeRide.status) && (
-                <Button
-                  variant="outline"
+              {["pending", "accepted", "in_progress"].includes(activeRide.status) && (
+                <button
                   type="button"
                   onClick={() => handleCancelRide(activeRide.id)}
-                  className="w-full h-11 rounded-xl border-rose-500/30 text-rose-500 hover:bg-rose-500/10 font-bold transition-all mt-1"
+                  className="w-full h-12 rounded-2xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-xs cursor-pointer"
                 >
-                  <XCircle className="w-4 h-4 mr-2" />
-                  Cancelar Corrida
-                </Button>
+                  <XCircle className="w-5 h-5 text-rose-500" />
+                  <span>Cancelar Corrida</span>
+                </button>
               )}
             </div>
           </div>
@@ -882,17 +894,15 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
                         <span className="font-bold text-base text-foreground">R$ {itemPrice.toFixed(2).replace('.', ',')}</span>
                       </div>
 
-                      {["pending", "accepted"].includes(ride.status) && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
+                      {["pending", "accepted", "in_progress"].includes(ride.status) && (
+                        <button
                           type="button"
                           onClick={() => handleCancelRide(ride.id)}
-                          className="h-8 px-3 rounded-lg text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 font-bold text-xs"
+                          className="h-8 px-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 hover:text-rose-600 font-bold text-xs flex items-center gap-1 cursor-pointer transition-all active:scale-95"
                         >
-                          <XCircle className="w-3.5 h-3.5 mr-1" />
-                          Cancelar
-                        </Button>
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Cancelar</span>
+                        </button>
                       )}
                     </div>
                   </div>
