@@ -250,8 +250,8 @@ export function MarketplaceLayout() {
           <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
           <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-14">
             <Link to="/marketplace" className="flex min-w-0 items-center gap-2.5 aero-focus rounded-xl">
-              <span className="flex items-center justify-center w-8 h-8">
-                <img src={logoIcon} alt="Logo" className="w-full h-full object-contain" />
+              <span className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-black shrink-0 ring-1 ring-white/10">
+                <img src={logoIcon} alt="Logo" className="w-full h-full object-cover rounded-full" />
               </span>
               <span className="font-display font-black italic tracking-tight text-sm text-white truncate pr-2 inline-block">MT 24horas express</span>
             </Link>
