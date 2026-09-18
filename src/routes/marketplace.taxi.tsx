@@ -445,25 +445,21 @@ function TaxiPage() {
     return "";
   };
 
-  // Helper para formatar sugestões com bairro correto
+  // Helper para formatar sugestões apenas com o nome da rua (sem bairro)
   const formatSuggestionLabel = (item: any) => {
     // Se for do catálogo local de Primavera do Leste
-    if (item.name && item.bairro !== undefined) {
+    if (item.name) {
       return {
-        main: item.bairro ? `${item.name}, ${item.bairro}` : item.name,
+        main: item.name,
         sub: `${item.city || "Primavera do Leste"} - ${item.state || "MT"}`
       };
     }
 
-    const lon = parseFloat(item.lon);
-    const lat = parseFloat(item.lat);
     const addr = item.address || {};
     const street = addr.road || addr.street || item.display_name?.split(",")[0] || item.name || "";
-    
-    const bairro = getCorrectBairro(lon, lat, street, addr);
     const city = addr.city || addr.town || addr.municipality || "Primavera do Leste";
     return {
-      main: bairro ? `${street}, ${bairro}` : street,
+      main: street,
       sub: `${city} - MT`
     };
   };
@@ -480,15 +476,12 @@ function TaxiPage() {
         const addr = data.address;
         const street = addr.road || addr.street || data.display_name.split(",")[0] || "";
         
-        const bairro = getCorrectBairro(lng, lat, street, addr);
-        const addressShort = bairro ? `${street}, ${bairro}` : street;
-        
         if (type === "pickup") {
-          setPickupText(addressShort);
+          setPickupText(street);
           const houseNo = addr.house_number || "";
           if (houseNo) setPickupNumber(houseNo);
         } else {
-          setDropoffText(addressShort);
+          setDropoffText(street);
           const houseNo = addr.house_number || "";
           if (houseNo) setDropoffNumber(houseNo);
         }
