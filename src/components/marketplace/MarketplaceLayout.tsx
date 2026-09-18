@@ -277,7 +277,7 @@ export function MarketplaceLayout() {
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
         <nav aria-label="Navegação principal" className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
-        <ul className="mx-auto max-w-2xl grid grid-cols-6">
+        <ul className="mx-auto max-w-2xl grid grid-cols-6 px-1 py-1">
           {tabs.map((t, index) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);
             const Icon = t.icon;
@@ -287,10 +287,10 @@ export function MarketplaceLayout() {
                   <motion.span
                     aria-hidden
                     layoutId="tab-active-pill"
-                    transition={{ type: "spring", stiffness: 480, damping: 34, mass: 0.7 }}
-                    className="absolute inset-x-1.5 inset-y-1 rounded-2xl bg-primary/12 border border-primary/30 shadow-[0_0_18px_-6px_var(--primary)] overflow-hidden"
+                    transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.6 }}
+                    className="absolute inset-x-1 inset-y-1 rounded-2xl bg-gradient-to-b from-[#FFE033] via-[#FFCC00] to-[#E5A800] border border-yellow-300/70 shadow-[0_2px_12px_rgba(234,179,8,0.45)] overflow-hidden"
                   >
-                    <span aria-hidden className="absolute inset-0 nav-sweep" />
+                    <span aria-hidden className="absolute inset-0 bg-white/20 pointer-events-none" />
                   </motion.span>
                 )}
                 <Link
@@ -304,14 +304,14 @@ export function MarketplaceLayout() {
                   onClick={() => {
                     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(8);
                   }}
-                  className={`aero-focus relative z-10 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 py-2 text-[11px] transition-all duration-200 active:scale-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                    active ? "text-black dark:text-white font-black" : "text-zinc-700 dark:text-zinc-300 font-bold hover:text-black dark:hover:text-white"
+                  className={`aero-focus relative z-10 min-h-[52px] rounded-2xl flex flex-col items-center justify-center gap-1 py-1.5 text-[11px] transition-all duration-200 active:scale-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                    active ? "text-zinc-950 font-black tracking-tight" : "text-zinc-600 dark:text-zinc-400 font-semibold hover:text-zinc-900 dark:hover:text-zinc-100"
                   }`}
                 >
                   <span className="relative">
                     <Icon
                       className={`w-5 h-5 transition-transform duration-300 ${
-                        active ? "-translate-y-0.5 scale-110 text-black dark:text-white stroke-[2.4]" : "text-zinc-700 dark:text-zinc-300 stroke-[1.8]"
+                        active ? "-translate-y-0.5 scale-105 text-zinc-950 stroke-[2.5]" : "text-zinc-600 dark:text-zinc-400 stroke-[1.8]"
                       }`}
                     />
                     {t.to === "/marketplace/cart" && count > 0 && (
@@ -330,16 +330,8 @@ export function MarketplaceLayout() {
                       </span>
                     )}
                   </span>
-                  {t.label}
+                  <span className="truncate max-w-full px-0.5">{t.label}</span>
                 </Link>
-                {active && (
-                  <motion.div
-                    aria-hidden
-                    layoutId="tab-indicator"
-                    transition={{ type: "spring", stiffness: 480, damping: 34 }}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]"
-                  />
-                )}
               </li>
             );
           })}
