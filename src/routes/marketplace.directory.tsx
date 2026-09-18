@@ -66,17 +66,36 @@ export function DirectoryPage() {
   const { data: businesses = [], isLoading } = useQuery<Business[]>({
     queryKey: ["directory"],
     queryFn: async () => {
-      if (!isSupabaseConfigured) return [];
-      try {
-        const { data, error } = await (supabase as any)
-          .from("business_directory")
-          .select("*")
-          .order("name");
-        if (error || !data) return [];
-        return data as Business[];
-      } catch {
-        return [];
+      let remoteList: Business[] = [];
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await (supabase as any)
+            .from("business_directory")
+            .select("*")
+            .order("name");
+          if (!error && data) {
+            remoteList = data as Business[];
+          }
+        } catch {}
       }
+
+      let localList: Business[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          localList = JSON.parse(localStorage.getItem("pva_local_directory_providers") || "[]");
+        } catch {}
+      }
+
+      // Mescla priorizando os remotos e adicionando os locais novos
+      const map = new Map<string, Business>();
+      localList.forEach((b) => {
+        if (b.id) map.set(b.id, b);
+      });
+      remoteList.forEach((b) => {
+        if (b.id) map.set(b.id, b);
+      });
+
+      return Array.from(map.values()).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     },
     retry: 1,
   });
