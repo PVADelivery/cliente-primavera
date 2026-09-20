@@ -72,6 +72,7 @@ export function DirectoryPage() {
           const { data, error } = await (supabase as any)
             .from("business_directory")
             .select("*")
+            .eq("featured", true)
             .order("name");
           if (!error && data) {
             remoteList = data as Business[];
@@ -79,24 +80,15 @@ export function DirectoryPage() {
         } catch {}
       }
 
-      let localList: Business[] = [];
+      // Limpa cache local legado não aprovado
       if (typeof window !== "undefined") {
         try {
-          localList = JSON.parse(localStorage.getItem("pva_local_directory_providers") || "[]");
+          localStorage.removeItem("pva_local_directory_providers");
         } catch {}
       }
 
-      // Mescla priorizando os remotos e adicionando os locais novos
-      const map = new Map<string, Business>();
-      localList.forEach((b) => {
-        if (b.id) map.set(b.id, b);
-      });
-      remoteList.forEach((b) => {
-        if (b.id) map.set(b.id, b);
-      });
-
-      return Array.from(map.values())
-        .map((b, idx) => {
+      return remoteList
+        .map((b) => {
           let lat = Number(b.latitude);
           let lng = Number(b.longitude);
           if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0) {

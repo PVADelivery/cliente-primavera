@@ -201,7 +201,7 @@ export function ProviderRegisterDialog({
         hours: hours.trim() || "Seg a Sex 08:00 às 18:00",
         website: description.trim() || null,
         rating: 5.0,
-        featured: true,
+        featured: false, // Inicia como PENDENTE de aprovação do Admin
         card_image_url: cardImageUrl,
         card_style: "dark",
         latitude: finalLat,
@@ -225,7 +225,7 @@ export function ProviderRegisterDialog({
             latitude: businessData.latitude,
             longitude: businessData.longitude,
             owner_id: businessData.owner_id,
-            featured: false,
+            featured: false, // Aguardando aprovação
           });
 
         if (insertErr) {
@@ -238,24 +238,19 @@ export function ProviderRegisterDialog({
               whatsapp: businessData.whatsapp,
               phone: businessData.phone,
               address: businessData.address,
+              featured: false,
             });
         }
       } catch (e) {
         console.warn("[PPP] Offline fallback:", e);
       }
 
-      try {
-        const localList = JSON.parse(localStorage.getItem("pva_local_directory_providers") || "[]");
-        localList.unshift(businessData);
-        localStorage.setItem("pva_local_directory_providers", JSON.stringify(localList.slice(0, 50)));
-      } catch {}
-
       return businessData;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["directory"] });
       setStep("success");
-      toast.success("Cadastro realizado com sucesso!");
+      toast.success("Cadastro enviado para aprovação do Administrador!");
     },
     onError: (err: any) => {
       console.error("[PPP] Erro ao cadastrar:", err);
