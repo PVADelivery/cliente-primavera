@@ -692,6 +692,8 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       const newDeliveryPayload = {
         company_id: fallbackCompanyId,
         customer_name: user?.user_metadata?.full_name || user?.email || "Cliente",
+        customer_phone: user?.phone || user?.user_metadata?.phone || null,
+        customer_id: user?.id || null,
         pickup_address: finalPickup,
         address: finalDropoff,
         notes: finalNotes,
@@ -699,15 +701,43 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         status: "pending",
         vehicle_type: vehicleType,
         distance_km: distance,
+        value: price,
         pickup_latitude: pickupCoords[1],
         pickup_longitude: pickupCoords[0],
         delivery_latitude: dropoffCoords[1],
         delivery_longitude: dropoffCoords[0],
       };
 
-      const { data: insertedData, error } = await supabase.from("deliveries").insert(newDeliveryPayload as any).select().maybeSingle();
+      let insertedData: any = null;
 
-      if (error) throw error;
+      // 1. Tenta via RPC com SECURITY DEFINER (imune a bloqueios de RLS)
+      const { data: rpcData, error: rpcError } = await supabase.rpc("create_customer_errand", {
+        p_delivery: newDeliveryPayload,
+      });
+
+      if (!rpcError && rpcData) {
+        insertedData = rpcData;
+      } else {
+        // 2. Fallback direto se a RPC ainda não tiver sido criada
+        const { data: directData, error: directError } = await supabase
+          .from("deliveries")
+          .insert(newDeliveryPayload as any)
+          .select()
+          .maybeSingle();
+
+        if (directError) {
+          // Se falhou por select no RLS mas o insert foi aceito, tenta insert sem select
+          const { error: insertOnlyError } = await supabase
+            .from("deliveries")
+            .insert(newDeliveryPayload as any);
+
+          if (insertOnlyError) {
+            throw directError || insertOnlyError;
+          }
+        } else {
+          insertedData = directData;
+        }
+      }
 
       // Dispara notificação push para entregadores habilitados
       const payloadToSend = insertedData || newDeliveryPayload;
