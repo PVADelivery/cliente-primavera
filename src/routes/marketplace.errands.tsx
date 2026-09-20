@@ -757,6 +757,16 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
         },
       }).catch((e) => console.warn("[Push] notify-driver invoke error:", e));
 
+      // Salva o ID da entrega no localStorage para persistência e acompanhamento
+      if (insertedData?.id && typeof window !== "undefined") {
+        try {
+          const existing = JSON.parse(localStorage.getItem("pva_my_errand_ids") || "[]");
+          if (!existing.includes(insertedData.id)) {
+            localStorage.setItem("pva_my_errand_ids", JSON.stringify([insertedData.id, ...existing].slice(0, 50)));
+          }
+        } catch (e) {}
+      }
+
       setSuccess(true);
     } catch (err: any) {
       console.error(err);
@@ -771,12 +781,17 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       <div className="flex flex-col items-center justify-center text-center py-20 px-4">
         <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4" />
         <h2 className="text-2xl font-display font-bold mb-2">Solicitação enviada!</h2>
-        <p className="text-muted-foreground mb-8">
-          Um entregador já foi notificado e está a caminho do local de coleta.
+        <p className="text-muted-foreground mb-8 max-w-xs">
+          Um entregador já foi notificado e está a caminho do local de coleta. Você pode acompanhar o trajeto em tempo real na aba Pedidos.
         </p>
-        <Button onClick={() => navigate({ to: "/marketplace" })} className="w-full max-w-xs h-12 rounded-xl">
-          Voltar ao Início
-        </Button>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <Button onClick={() => navigate({ to: "/marketplace/orders" })} className="w-full h-12 rounded-2xl font-bold shadow-md">
+            Acompanhar em Meus Pedidos
+          </Button>
+          <Button variant="outline" onClick={() => navigate({ to: "/marketplace" })} className="w-full h-12 rounded-2xl">
+            Voltar ao Início
+          </Button>
+        </div>
       </div>
     );
   }
