@@ -25,7 +25,6 @@ import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { ProviderCard } from "@/components/ppp/ProviderCard";
 import { ProviderDetailDialog } from "@/components/ppp/ProviderDetailDialog";
 import { ProviderMap } from "@/components/ppp/ProviderMap";
-import { QuotesSection } from "@/components/ppp/QuotesSection";
 import { ProviderRegisterDialog } from "@/components/ppp/ProviderRegisterDialog";
 import type { Business } from "@/lib/ppp";
 
@@ -361,9 +360,6 @@ export function DirectoryPage() {
           </div>
         )}
       </AeroSection>
-
-      {/* ─── ORÇAMENTOS ─── */}
-      <QuotesSection categories={categoryNames} providers={businesses} />
 
       {/* ─── CTA ANUNCIAR (ESTILO GETNINJA) ─── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card/95 to-amber-500/5 border border-border p-5 sm:p-6 shadow-sm">
