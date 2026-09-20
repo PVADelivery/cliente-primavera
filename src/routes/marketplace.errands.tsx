@@ -685,11 +685,41 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
       : `[Veículo Solicitado: ${vehicleLabelMap[vehicleType] || vehicleType}] • [Taxa de serviço: R$ 0,99 • Total: R$ ${price.toFixed(2)}]`;
 
     try {
+      let resolvedCustomerId: string | null = null;
+      if (user?.id) {
+        try {
+          const { data: cust } = await supabase
+            .from("customers")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (cust?.id) {
+            resolvedCustomerId = cust.id;
+          } else {
+            const { data: newCust } = await supabase
+              .from("customers")
+              .insert({
+                user_id: user.id,
+                full_name: user.user_metadata?.full_name || user.email || "Cliente",
+                phone: user.phone || user.user_metadata?.phone || null,
+                email: user.email || null,
+              } as any)
+              .select("id")
+              .maybeSingle();
+
+            resolvedCustomerId = newCust?.id || null;
+          }
+        } catch (custErr) {
+          console.warn("[Errands] Could not resolve customer_id:", custErr);
+        }
+      }
+
       const newDeliveryPayload = {
         company_id: null,
         customer_name: user?.user_metadata?.full_name || user?.email || "Cliente",
         customer_phone: user?.phone || user?.user_metadata?.phone || null,
-        customer_id: user?.id || null,
+        customer_id: resolvedCustomerId,
         pickup_address: finalPickup,
         address: finalDropoff,
         notes: finalNotes,
