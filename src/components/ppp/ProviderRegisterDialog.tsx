@@ -141,7 +141,7 @@ export function ProviderRegisterDialog({
   };
 
   const buildWhatsAppMessage = () => {
-    return `Olá, Administrador do MT 24horas express! 👋\n\nAcabei de cadastrar meu perfil no *PPP (Painel Profissional Prestador)*:\n\n👤 *Nome/Empresa:* ${name.trim()}\n📂 *Categoria:* ${category}\n📱 *WhatsApp:* ${whatsapp}\n📍 *Endereço:* ${address.trim() || "Primavera do Leste - MT"}\n🕒 *Horário:* ${hours.trim() || "Comercial"}\n${description.trim() ? `💼 *Serviços:* ${description.trim()}\n` : ""}\nGostaria de fazer o *pagamento da mensalidade* para ativar meu perfil com destaque VIP no app e receber novos clientes! Por favor, me envie a chave Pix. 🚀`;
+    return `Ola, Administrador do MT 24horas express!\n\nAcabei de cadastrar meu perfil no *PPP (Painel Profissional Prestador)*:\n\n*Nome/Empresa:* ${name.trim()}\n*Categoria:* ${category}\n*WhatsApp:* ${whatsapp}\n*Endereco:* ${address.trim() || "Primavera do Leste - MT"}\n*Horario:* ${hours.trim() || "Comercial"}\n${description.trim() ? `*Servicos:* ${description.trim()}\n` : ""}\nGostaria de fazer o *pagamento da mensalidade* para ativar meu perfil com destaque VIP no app e receber novos clientes! Por favor, me envie a chave Pix.`;
   };
 
   const openAdminWhatsApp = () => {
