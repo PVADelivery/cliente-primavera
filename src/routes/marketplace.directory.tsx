@@ -26,6 +26,7 @@ import { ProviderCard } from "@/components/ppp/ProviderCard";
 import { ProviderDetailDialog } from "@/components/ppp/ProviderDetailDialog";
 import { ProviderMap } from "@/components/ppp/ProviderMap";
 import { ProviderRegisterDialog } from "@/components/ppp/ProviderRegisterDialog";
+import { searchCityStreets } from "@/data/primaveraStreets";
 import type { Business } from "@/lib/ppp";
 
 export const Route = createFileRoute("/marketplace/directory")({
@@ -94,7 +95,26 @@ export function DirectoryPage() {
         if (b.id) map.set(b.id, b);
       });
 
-      return Array.from(map.values()).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      return Array.from(map.values())
+        .map((b, idx) => {
+          let lat = Number(b.latitude);
+          let lng = Number(b.longitude);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0) {
+            if (b.address) {
+              const matched = searchCityStreets(b.address, 1);
+              if (matched.length > 0) {
+                lat = matched[0].lat;
+                lng = matched[0].lon;
+              }
+            }
+          }
+          return {
+            ...b,
+            latitude: Number.isFinite(lat) && lat !== 0 ? lat : undefined,
+            longitude: Number.isFinite(lng) && lng !== 0 ? lng : undefined,
+          };
+        })
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
     },
     retry: 1,
   });
