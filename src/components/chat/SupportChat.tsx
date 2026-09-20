@@ -30,9 +30,9 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const QUICK_MESSAGES = [
-    { label: "Quero será entregador 🏍️", text: "Olá! Gostaria de saber como faço para me cadastrar como entregador na plataforma." },
-    { label: "Problema não pedido 🍔", text: "Olá! Tive um problema com meu pedido recente e gostaria de suporte." },
-    { label: "Falar com suporte 👤", text: "Olá! Gostaria de falar com um atendente humanão sobre uma dúvida geral." }
+    { label: "Quero ser entregador 🏍️", text: "Olá! Gostaria de saber como faço para me cadastrar como entregador na plataforma." },
+    { label: "Problema no pedido 🍔", text: "Olá! Tive um problema com meu pedido recente e gostaria de suporte." },
+    { label: "Falar com suporte 👤", text: "Olá! Gostaria de falar com um atendente humano sobre uma dúvida geral." }
   ];
 
   useEffect(() => {
@@ -59,12 +59,21 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
           }
         }
 
-        // Se não encontrou, cria um nãovo chat limpo para esse tópico!
+        // Se não encontrou, cria um novo chat limpo para esse tópico!
         if (!conversation) {
+          // Busca IDs de administradores para já incluí-los como participantes
+          const { data: adminProfiles } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .in('role', ['admin', 'master']);
+
+          const adminIds = (adminProfiles || []).map((p: any) => p.user_id).filter(Boolean);
+          const participants = Array.from(new Set([user.id, ...adminIds]));
+
           const { data: newConv, error: createError } = await supabase
             .from('conversations' as any)
             .insert({ 
-              participants: [user.id]
+              participants
             } as any)
             .select();
           
@@ -93,7 +102,7 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
 
           if (history) setMessages(history);
 
-          // Subscription Realtime com nãome único para evitar conflitos de React StrictMode
+          // Subscription Realtime com nome único para evitar conflitos de React StrictMode
           const channelName = `conversation_${conversation.id}_${Math.random().toString(36).substring(7)}`;
           const channel = supabase.channel(channelName)
             .on('postgres_changes', { 
@@ -162,7 +171,7 @@ export function SupportChat({ topic, title, companyId = null, onClose }: Support
 
   const handleEndChat = () => {
     if (!user) return;
-    if (window.confirm("Deseja encerrar este chat e começar um nãovo?")) {
+    if (window.confirm("Deseja encerrar este chat e começar um novo?")) {
       const storageKey = `epraja_chat_${topic}_${user.id}_v2`;
       localStorage.removeItem(storageKey);
       setMessages([]);
