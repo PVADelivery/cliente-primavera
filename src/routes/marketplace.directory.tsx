@@ -84,10 +84,20 @@ export function DirectoryPage() {
       if (typeof window !== "undefined") {
         try {
           localStorage.removeItem("pva_local_directory_providers");
+          sessionStorage.removeItem("pva_local_directory_providers");
         } catch {}
       }
 
-      return remoteList
+      // Deduplicação estrita por ID e Nome+WhatsApp
+      const uniqueMap = new Map<string, Business>();
+      remoteList.forEach((b) => {
+        const key = b.id || `${(b.name || "").toLowerCase().trim()}_${b.whatsapp || b.phone || ""}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, b);
+        }
+      });
+
+      return Array.from(uniqueMap.values())
         .map((b) => {
           let lat = Number(b.latitude);
           let lng = Number(b.longitude);
@@ -106,7 +116,12 @@ export function DirectoryPage() {
             longitude: Number.isFinite(lng) && lng !== 0 ? lng : undefined,
           };
         })
-        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+        .sort((a, b) => {
+          // VIPs primeiro, depois por ordem alfabética
+          if (Boolean(a.featured) && !b.featured) return -1;
+          if (!a.featured && Boolean(b.featured)) return 1;
+          return (a.name || "").localeCompare(b.name || "");
+        });
     },
     retry: 1,
   });
@@ -308,26 +323,6 @@ export function DirectoryPage() {
       <AeroSection title="Mapa dos Prestadores" tag="Localização" subtitle="Toque em um marcador para abrir o card completo.">
         <ProviderMap businesses={filtered} onSelect={openDetail} />
       </AeroSection>
-
-      {/* ─── DESTAQUES VIP ─── */}
-      {featuredList.length > 0 && selectedCat === "Tudo" && !q && !onlyWithWhatsapp && (
-        <div className="rounded-3xl bg-primary/8 border border-primary/20 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-gold-ink font-black text-xs tracking-wide uppercase">
-              <Star className="w-3.5 h-3.5 text-primary" />
-              <span>Destaques VIP</span>
-            </div>
-            <span className="text-[9px] font-bold bg-primary/15 text-gold-ink px-2 py-0.5 rounded-full border border-primary/25">
-              VIP
-            </span>
-          </div>
-          <div className="space-y-2.5">
-            {featuredList.map((b) => (
-              <ProviderCard key={`vip-${b.id}`} business={b} onOpen={openDetail} isVip />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ─── LISTA PRINCIPAL ─── */}
       <AeroSection
