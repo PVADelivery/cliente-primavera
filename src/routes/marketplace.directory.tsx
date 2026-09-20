@@ -7,7 +7,6 @@ import {
   MapPin,
   Search,
   Globe,
-  Star,
   Clock,
   Navigation,
   Copy,
@@ -52,7 +51,6 @@ export function DirectoryPage() {
   const [q, setQ] = useState("");
   const [selectedCat, setSelectedCat] = useState("Tudo");
   const [onlyWithWhatsapp, setOnlyWithWhatsapp] = useState(false);
-  const [onlyFeatured, setOnlyFeatured] = useState(false);
   const [selected, setSelected] = useState<Business | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
@@ -224,18 +222,14 @@ export function DirectoryPage() {
         (b.whatsapp || "").includes(term) ||
         (b.phone || "").includes(term);
       const matchWa = !onlyWithWhatsapp || Boolean(b.whatsapp);
-      const matchFeat = !onlyFeatured || Boolean(b.featured);
-      return matchCat && matchQ && matchWa && matchFeat;
+      return matchCat && matchQ && matchWa;
     });
-  }, [businesses, q, selectedCat, onlyWithWhatsapp, onlyFeatured]);
-
-  const featuredList = useMemo(() => businesses.filter((b) => b.featured), [businesses]);
+  }, [businesses, q, selectedCat, onlyWithWhatsapp]);
 
   const clearFilters = () => {
     setQ("");
     setSelectedCat("Tudo");
     setOnlyWithWhatsapp(false);
-    setOnlyFeatured(false);
   };
 
   return (
@@ -280,19 +274,6 @@ export function DirectoryPage() {
           >
             <WhatsappIcon className={`w-3.5 h-3.5 ${onlyWithWhatsapp ? "text-white" : "text-[#25D366]"}`} />
             <span>Com WhatsApp</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setOnlyFeatured(!onlyFeatured)}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all border ${
-              onlyFeatured
-                ? "bg-primary text-black border-primary"
-                : "bg-white/10 border-white/15 text-white/70 hover:text-white"
-            }`}
-          >
-            <Star className="w-3 h-3" />
-            <span>Destaques VIP</span>
           </button>
         </div>
       </AeroHero>

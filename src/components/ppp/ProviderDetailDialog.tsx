@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
-import { Phone, MapPin, Globe, Clock, Star, Navigation, Copy, Share2, Mail } from "lucide-react";
+import { Phone, MapPin, Globe, Clock, Navigation, Copy, Share2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { formatPhone, getMapsUrl, onlyDigits, openMaps, waLink, type Business } from "@/lib/ppp";
 
@@ -44,14 +44,6 @@ export function ProviderDetailDialog({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                 {b.category || "Serviços"}
-              </span>
-              {b.featured && (
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-primary text-black flex items-center gap-1">
-                  <Star className="w-2.5 h-2.5" /> VIP
-                </span>
-              )}
-              <span className="text-[11px] font-bold text-primary flex items-center gap-1">
-                <Star className="w-3 h-3 fill-current" /> {(b.rating ?? 5).toFixed(1)}
               </span>
             </div>
           </DialogHeader>

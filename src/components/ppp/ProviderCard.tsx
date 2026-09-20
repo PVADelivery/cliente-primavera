@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, Star, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { waLink, type Business } from "@/lib/ppp";
 
@@ -11,11 +11,9 @@ import { waLink, type Business } from "@/lib/ppp";
 export function ProviderCard({
   business: b,
   onOpen,
-  isVip = false,
 }: {
   business: Business;
   onOpen: (b: Business) => void;
-  isVip?: boolean;
 }) {
   const initial = (b.name || "P").trim().charAt(0).toUpperCase();
 
@@ -26,9 +24,7 @@ export function ProviderCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.18 }}
-      className={`rounded-2xl border bg-card overflow-hidden ${
-        isVip ? "border-primary/30 shadow-[var(--shadow-card)]" : "border-border shadow-sm"
-      }`}
+      className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
     >
       <button
         type="button"
@@ -55,15 +51,6 @@ export function ProviderCard({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {b.category || "Serviços"}
-              </span>
-              {b.featured && (
-                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-primary text-black">
-                  VIP
-                </span>
-              )}
-              <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
-                <Star className="w-2.5 h-2.5 fill-current" />
-                {(b.rating ?? 5).toFixed(1)}
               </span>
             </div>
             {b.address && (
