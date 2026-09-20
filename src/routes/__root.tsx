@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { Toaster } from "@/components/ui/sonner";
 
 import { initializeGlobalErrorHandlers, reportErrorToTelegram } from "@/services/logger";
 import { useEffect, Suspense } from "react";
@@ -157,6 +158,7 @@ function RootComponent() {
           <Suspense fallback={null}>
             <Outlet />
           </Suspense>
+          <Toaster position="top-center" richColors />
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>

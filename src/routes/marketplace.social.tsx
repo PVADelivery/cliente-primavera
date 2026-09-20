@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Loader2, Phone, X } from "lucide-react";
+import { ArrowLeft, Plus, Loader2, Phone, X, LogIn, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { SocialCategory, SocialPost } from "@/types/database";
 import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
 import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/social")({
   head: () => ({
@@ -63,7 +64,6 @@ function SocialPage() {
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) {
-        // Tabela ainda não criada no Supabase → lista vazia, sem quebrar a tela
         console.info("[social_posts]", error.code, error.message);
         return [];
       }
@@ -72,6 +72,15 @@ function SocialPage() {
   });
 
   const list = tab === "all" ? posts : posts.filter((p) => p.category === tab);
+
+  const handleOpenForm = () => {
+    if (!user) {
+      toast.error("Você precisa entrar na sua conta para publicar um classificado.");
+      navigate({ to: "/login" });
+      return;
+    }
+    setShowForm(true);
+  };
 
   return (
     <div className="space-y-5 pb-6">
@@ -86,7 +95,7 @@ function SocialPage() {
           <button
             key={c.key}
             onClick={() => setTab(c.key)}
-            className={`tap-target aero-focus shrink-0 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors ${
+            className={`tap-target aero-focus shrink-0 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors cursor-pointer ${
               tab === c.key
                 ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
                 : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
@@ -98,46 +107,60 @@ function SocialPage() {
       </div>
 
       {isLoading ? (
-        <AeroSkeletonList count={3} lines={3} label="Carregando classificados" />
+        <AeroSkeletonList count={3} />
       ) : list.length === 0 ? (
         <AeroEmptyState
           title="Nenhum classificado por aqui"
           description="Seja o primeiro a publicar nesta categoria."
+          actionLabel="Publicar"
+          onAction={handleOpenForm}
         />
       ) : (
-        <ul className="space-y-3">
-          {list.map((p) => (
-            <li
-              key={p.id}
-              className="rounded-3xl border border-border/50 bg-card p-5"
-              style={{ boxShadow: "var(--shadow-card)" }}
+        <div className="space-y-3">
+          {list.map((post) => (
+            <div
+              key={post.id}
+              className="p-4 rounded-2xl bg-card border border-border/80 shadow-xs space-y-2 hover:border-border transition-colors"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
-                  {CATEGORY_LABEL[p.category]}
+                <span className="text-[11px] uppercase tracking-wider font-extrabold text-btn-surface-hover">
+                  {CATEGORY_LABEL[post.category]}
                 </span>
-                <span className="text-[11px] text-muted-foreground">{formatDate(p.created_at)}</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {formatDate(post.created_at)}
+                </span>
               </div>
-              <h2 className="font-display font-bold text-base mt-3 leading-tight">{p.title}</h2>
-              {p.body && <p className="text-sm text-muted-foreground mt-1.5 whitespace-pre-line">{p.body}</p>}
-              {p.contact && (
-                <a
-                  href={`https://wa.me/55${p.contact.replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-primary"
-                >
-                  <Phone className="w-3.5 h-3.5" /> {p.contact}
-                </a>
+              <h3 className="font-display font-bold text-base text-foreground leading-snug">
+                {post.title}
+              </h3>
+              {post.body && (
+                <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                  {post.body}
+                </p>
               )}
-            </li>
+              {post.contact && (
+                <div className="pt-2 flex items-center gap-2">
+                  <a
+                    href={`https://wa.me/55${post.contact.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>WhatsApp: {post.contact}</span>
+                  </a>
+                </div>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
+      {/* Botão flutuante "Publicar" */}
       <button
-        onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
-        className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-btn-surface text-btn-ink border border-btn-line hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink font-bold text-sm flex items-center gap-2 shadow-lg aero-focus"
+        type="button"
+        onClick={handleOpenForm}
+        className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-btn-surface text-btn-ink border border-btn-line hover:bg-btn-surface-hover active:bg-btn-active active:text-btn-active-ink font-bold text-sm flex items-center gap-2 shadow-lg aero-focus cursor-pointer"
       >
         <Plus className="w-4 h-4" /> Publicar
       </button>
@@ -157,6 +180,7 @@ function SocialPage() {
 
 function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [category, setCategory] = useState<SocialCategory>("vagas");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -179,27 +203,52 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
   };
 
   const submit = async () => {
-    if (!title.trim() || !user) return;
-    setSaving(true);
-    setError(null);
-    const { error: err } = await supabase.from("social_posts").insert({
-      user_id: user.id,
-      category,
-      title: title.trim(),
-      body: body.trim() || null,
-      contact: contact.trim() || null,
-    });
-    setSaving(false);
-    if (err) {
-      setError("Não foi possível publicar agora. Tente novamente.");
-      console.info("[social_posts insert]", err.code, err.message);
+    if (!title.trim()) {
+      setError("Por favor, preencha o título do classificado.");
+      toast.error("Informe um título para o classificado.");
       return;
     }
-    onCreated();
+
+    if (!user) {
+      setError("Você precisa estar logado para publicar.");
+      toast.error("Faça login para publicar.");
+      navigate({ to: "/login" });
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const { error: err } = await supabase.from("social_posts").insert({
+        user_id: user.id,
+        category,
+        title: title.trim(),
+        body: body.trim() || null,
+        contact: contact.trim() || null,
+      });
+
+      if (err) {
+        console.error("[social_posts insert]", err);
+        setError("Não foi possível publicar agora: " + (err.message || "Erro de permissão"));
+        toast.error("Erro ao publicar classificado.");
+        setSaving(false);
+        return;
+      }
+
+      toast.success("Classificado publicado com sucesso!");
+      onCreated();
+    } catch (e: any) {
+      console.error("[social_posts exception]", e);
+      setError(e?.message || "Erro inesperado ao salvar.");
+      toast.error("Erro ao publicar.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="w-full sm:max-w-md bg-card border border-border/80 rounded-t-[32px] sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] sm:max-h-[85vh] flex flex-col">
         
         {/* Header Fixo */}
@@ -211,6 +260,7 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
             <h2 className="font-display font-black text-lg sm:text-xl text-foreground mt-0.5">Novo Classificado</h2>
           </div>
           <button 
+            type="button"
             onClick={onClose} 
             aria-label="Fechar" 
             className="h-9 w-9 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
@@ -221,6 +271,22 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
 
         {/* Corpo com Rolagem Livre */}
         <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+          {!user && (
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>Faça login para poder publicar seu anúncio.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/login" })}
+                className="px-3 py-1.5 rounded-xl bg-amber-500 text-black font-bold text-xs shrink-0 flex items-center gap-1 cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" /> Entrar
+              </button>
+            </div>
+          )}
+
           <div>
             <span className="text-xs font-bold text-foreground block mb-2">Categoria</span>
             <div className="flex flex-wrap gap-2">
@@ -314,8 +380,9 @@ function NewPostSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
         {/* Footer Fixo com Botão Sempre Visível */}
         <div className="p-4 sm:p-5 border-t border-border/60 bg-card shrink-0 space-y-2 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
           <button
+            type="button"
             onClick={submit}
-            disabled={saving || !title.trim()}
+            disabled={saving || !title.trim() || !user}
             className="w-full h-13 rounded-2xl bg-primary hover:bg-primary/90 text-black font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
           >
             {saving ? (
