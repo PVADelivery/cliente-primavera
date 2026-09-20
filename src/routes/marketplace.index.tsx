@@ -35,16 +35,92 @@ const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Bebidas", icon: Wine },
 ];
 
-const CATEGORY_SYNONYMS: Record<string, string[]> = {
-  "restaurantes": ["restaurante", "lanche", "lanches", "hamburguer", "burger", "comida", "marmita", "refeição", "lanchonete", "pastel", "churrasco", "almoço", "jantar", "porções", "prato"],
-  "mercado": ["mercado", "supermercado", "mercearia", "conveniência", "conveniencia", "hortifruti", "empório", "emporio", "mercearia", "açougue", "acougue"],
-  "farmácia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "suplemento", "farmaceutica"],
-  "pizza": ["pizza", "pizzaria", "esfirra", "esfiha", "calzone", "massa", "fogazza"],
-  "doces": ["doce", "doces", "sorvete", "sorvetes", "acai", "açaí", "cremosinho", "sobremesa", "sobremesas", "bolo", "bolos", "torta", "chocolate", "confeitaria", "picolé", "geladinho"],
-  "cafés": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgados"],
+export function normalizeSearchText(str?: string | null): string {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[-_.,/\\#+]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function parseProductImage(rawUrl?: string | null): string {
+  if (!rawUrl) return "";
+  if (rawUrl.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(rawUrl);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
+    } catch {}
+  }
+  return rawUrl;
+}
+
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  "lanche": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao", "sanduiche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente"],
+  "lanches": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao", "sanduiche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente"],
+  "hamburguer": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "artesanal", "smash"],
+  "burger": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "artesanal", "smash"],
+  "x tudo": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao"],
+  "xtudo": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao"],
+  "x-tudo": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao"],
+  "x salada": ["x salada", "x-salada", "x tudo", "hamburguer", "burger", "lanche"],
+  "x bacon": ["x bacon", "x-bacon", "x tudo", "hamburguer", "burger", "lanche"],
+  "pizza": ["pizza", "pizzas", "pizzaria", "calzone", "esfirra", "esfiha", "massa", "fogazza"],
+  "pizzas": ["pizza", "pizzas", "pizzaria", "calzone", "esfirra", "esfiha", "massa", "fogazza"],
+  "acai": ["acai", "açaí", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
+  "açaí": ["acai", "açaí", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
+  "cremosinho": ["cremosinho", "acai", "açaí", "sorvete", "geladinho", "sobremesa", "doce"],
+  "doce": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria"],
+  "doces": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria"],
+  "farmacia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
+  "farmácia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
+  "remedio": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
+  "bebida": ["bebida", "bebidas", "cerveja", "chopp", "refrigerante", "agua", "gelo", "adega", "distribuidora", "vinho", "whisky", "vodka", "energetico"],
+  "bebidas": ["bebida", "bebidas", "cerveja", "chopp", "refrigerante", "agua", "gelo", "adega", "distribuidora", "vinho", "whisky", "vodka", "energetico"],
+  "mercado": ["mercado", "supermercado", "mercearia", "arroz", "feijao", "leite", "carne", "acougue", "hortifruti", "fruta", "verdura"],
+  "cafe": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "café": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "cafes": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "cafés": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
   "shopping": ["shopping", "calcado", "calçado", "calcados", "calçados", "sapato", "sapatos", "tenis", "tênis", "roupa", "roupas", "moda", "vestuario", "vestuário", "loja", "acessorio", "acessório", "chinelo", "sandalia", "sandália", "calça", "camisa"],
-  "bebidas": ["bebida", "bebidas", "distribuidora", "cerveja", "chopp", "adega", "refrigerante", "agua", "água", "gelo", "vinho", "whisky", "vodka", "destilados"],
 };
+
+export function checkSearchMatch(targetText?: string | null, query?: string): boolean {
+  if (!targetText || !query) return false;
+  const targetNorm = normalizeSearchText(targetText);
+  const queryNorm = normalizeSearchText(query);
+  if (!targetNorm || !queryNorm) return false;
+
+  // 1. Inclusão direta
+  if (targetNorm.includes(queryNorm)) return true;
+
+  // 2. Sem espaços
+  const targetNoSpace = targetNorm.replace(/\s+/g, "");
+  const queryNoSpace = queryNorm.replace(/\s+/g, "");
+  if (targetNoSpace.includes(queryNoSpace) || queryNoSpace.includes(targetNoSpace)) return true;
+
+  // 3. Todas as palavras da busca presentes no texto
+  const queryWords = queryNorm.split(" ").filter(w => w.length > 1);
+  if (queryWords.length > 1 && queryWords.every(w => targetNorm.includes(w))) return true;
+
+  // 4. Prefix match (ex: "x tud" -> "x tudo")
+  if (queryWords.length === 1 && queryWords[0].length >= 2) {
+    const targetWords = targetNorm.split(" ");
+    if (targetWords.some(w => w.startsWith(queryWords[0]))) return true;
+  }
+
+  // 5. Sinônimos bidirecionais
+  for (const [key, synList] of Object.entries(SEARCH_SYNONYMS)) {
+    const normKey = normalizeSearchText(key);
+    if (queryNorm.includes(normKey) || normKey.includes(queryNorm) || queryNoSpace.includes(normKey.replace(/\s+/g, ""))) {
+      if (synList.some(syn => targetNorm.includes(normalizeSearchText(syn)))) return true;
+    }
+  }
+
+  return false;
+}
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
 type SortKey = "relevance" | "rating" | "fee" | "open";
@@ -264,10 +340,12 @@ function SmartSearchBar({
   searchTerm,
   setSearchTerm,
   stores = [],
+  products = [],
 }: {
   searchTerm: string;
   setSearchTerm: (v: string) => void;
   stores?: Company[];
+  products?: any[];
 }) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -289,36 +367,45 @@ function SmartSearchBar({
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const q = searchTerm.trim().toLowerCase();
+  const q = searchTerm.trim();
 
   // 1. Filtragem das Funções do App
   const matchingFeatures = useMemo(() => {
     if (!q) return [];
     return APP_FEATURES.filter(
       (f) =>
-        f.title.toLowerCase().includes(q) ||
-        f.subtitle.toLowerCase().includes(q) ||
-        f.keywords.some((k) => k.includes(q))
+        checkSearchMatch(f.title, q) ||
+        checkSearchMatch(f.subtitle, q) ||
+        f.keywords.some((k) => checkSearchMatch(k, q))
     );
   }, [q]);
 
-  // 2. Filtragem de Lojas Cadastradas
+  // 2. Filtragem de Pratos e Produtos
+  const matchingProducts = useMemo(() => {
+    if (!q) return [];
+    return products
+      .filter((p) => checkSearchMatch(p.name, q) || checkSearchMatch(p.description, q) || checkSearchMatch(p.category, q))
+      .slice(0, 5);
+  }, [q, products]);
+
+  // 3. Filtragem de Lojas Cadastradas
   const matchingStores = useMemo(() => {
     if (!q) return [];
     return stores
       .filter(
         (s) =>
-          s.name?.toLowerCase().includes(q) ||
-          s.category?.toLowerCase().includes(q) ||
-          s.description?.toLowerCase().includes(q)
+          checkSearchMatch(s.name, q) ||
+          checkSearchMatch(s.category, q) ||
+          checkSearchMatch(s.description, q) ||
+          checkSearchMatch(s.address, q)
       )
       .slice(0, 4);
   }, [q, stores]);
 
-  // 3. Filtragem de Categorias
+  // 4. Filtragem de Categorias
   const matchingCategories = useMemo(() => {
     if (!q) return [];
-    return CATEGORIES.filter((c) => c.label.toLowerCase().includes(q));
+    return CATEGORIES.filter((c) => checkSearchMatch(c.label, q));
   }, [q]);
 
   const handleSearch = (term: string) => {
@@ -351,6 +438,16 @@ function SmartSearchBar({
     navigate({ to: `/marketplace/store/${store.id}` as any });
   };
 
+  const handleSelectProduct = (p: any) => {
+    if (p.name) {
+      pushRecent(p.name);
+      setRecents(loadRecents());
+    }
+    setFocused(false);
+    inputRef.current?.blur();
+    navigate({ to: `/marketplace/store/${p.company_id}` as any });
+  };
+
   const handleEnterKey = () => {
     if (!q) return;
 
@@ -361,7 +458,7 @@ function SmartSearchBar({
     }
 
     // Se bater diretamente com uma loja exclusiva, vai para ela
-    if (matchingStores.length === 1 && matchingStores[0].name?.toLowerCase() === q) {
+    if (matchingStores.length === 1 && normalizeSearchText(matchingStores[0].name) === normalizeSearchText(q)) {
       handleSelectStore(matchingStores[0]);
       return;
     }
@@ -506,6 +603,56 @@ function SmartSearchBar({
                         </span>
                       </motion.button>
                     ))}
+                  </div>
+                  <div className="h-px bg-white/10 mx-4 my-1" />
+                </div>
+              )}
+
+              {/* ── SEÇÃO 3: PRATOS & PRODUTOS ENCONTRADOS ── */}
+              {matchingProducts.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 px-4 pt-2.5 pb-1.5">
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Pratos & Produtos</span>
+                  </div>
+                  <div className="p-1 space-y-0.5">
+                    {matchingProducts.map((p) => {
+                      const img = parseProductImage(p.image_url);
+                      return (
+                        <motion.button
+                          key={p.id}
+                          type="button"
+                          className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl hover:bg-card/90 transition-all text-left group"
+                          onClick={() => handleSelectProduct(p)}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-xl bg-black/60 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                              {img ? (
+                                <img src={img} alt={p.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <UtensilsCrossed className="w-4 h-4 text-white/40" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                                {p.name}
+                              </p>
+                              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                {p.category && <span>{p.category}</span>}
+                                {p.price && (
+                                  <span className="text-emerald-400 font-bold">
+                                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.price)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-[11px] text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                            Pedir →
+                          </span>
+                        </motion.button>
+                      );
+                    })}
                   </div>
                   <div className="h-px bg-white/10 mx-4 my-1" />
                 </div>
@@ -871,9 +1018,9 @@ function MarketplaceHome() {
       try {
         const { data } = await supabase
           .from("products")
-          .select("id, name, description, category, company_id")
+          .select("id, name, description, price, image_url, category, company_id")
           .eq("is_active", true)
-          .limit(250);
+          .limit(2000);
         return data || [];
       } catch {
         return [];
@@ -883,36 +1030,31 @@ function MarketplaceHome() {
 
   const allStores = stores ?? [];
   const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 8), [allStores]);
+  const storesMap = useMemo(() => new Map(allStores.map(s => [s.id, s])), [allStores]);
+
+  const matchedProducts = useMemo(() => {
+    const q = searchTerm.trim();
+    if (!q) return [];
+    return allProducts.filter(
+      (p) =>
+        checkSearchMatch(p.name, q) ||
+        checkSearchMatch(p.description, q) ||
+        checkSearchMatch(p.category, q)
+    );
+  }, [allProducts, searchTerm]);
 
   const filtered = useMemo(() => {
     let list = [...allStores];
-    const q = searchTerm.trim().toLowerCase();
+    const q = searchTerm.trim();
 
     if (q) {
-      // Coleta sinônimos para a busca caso o termo corresponda a uma categoria
-      const queryTerms = [q];
-      const syns = CATEGORY_SYNONYMS[q] || Object.entries(CATEGORY_SYNONYMS).find(([k]) => k === q)?.[1];
-      if (syns) {
-        queryTerms.push(...syns);
-      }
-
-      const matchText = (txt?: string | null) => {
-        if (!txt) return false;
-        const lower = txt.toLowerCase();
-        return queryTerms.some(term => lower.includes(term));
-      };
-
-      const matchingCompanyIds = new Set(
-        allProducts
-          .filter((p) => matchText(p.name) || matchText(p.description) || matchText(p.category))
-          .map((p) => p.company_id)
-      );
+      const matchingCompanyIds = new Set(matchedProducts.map((p) => p.company_id));
 
       list = list.filter((s) => {
-        const nameMatch = matchText(s.name);
-        const catMatch = matchText(s.category);
-        const descMatch = matchText(s.description);
-        const addressMatch = matchText(s.address);
+        const nameMatch = checkSearchMatch(s.name, q);
+        const catMatch = checkSearchMatch(s.category, q);
+        const descMatch = checkSearchMatch(s.description, q);
+        const addressMatch = checkSearchMatch(s.address, q);
         const productMatch = matchingCompanyIds.has(s.id);
         return nameMatch || catMatch || descMatch || addressMatch || productMatch;
       });
@@ -928,7 +1070,7 @@ function MarketplaceHome() {
       list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
     return list;
-  }, [allStores, allProducts, searchTerm, sort, openOnly]);
+  }, [allStores, matchedProducts, searchTerm, sort, openOnly]);
 
   const visibleStores = filtered;
 
@@ -1008,7 +1150,7 @@ function MarketplaceHome() {
             O que você quer pedir hoje na sua cidade?
           </p>
 
-          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} stores={allStores} />
+          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} stores={allStores} products={allProducts} />
         </motion.div>
       </section>
 
@@ -1175,16 +1317,72 @@ function MarketplaceHome() {
         <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
 
         {searchTerm && (
-          <div className="mt-3 flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-2.5 rounded-2xl">
-            <p className="text-xs font-bold text-foreground">
-              Exibindo resultados para "<span className="text-primary">{searchTerm}</span>" ({filtered.length} {filtered.length === 1 ? "loja" : "lojas"})
-            </p>
-            <button
-              onClick={() => setSearchTerm("")}
-              className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <X className="w-3.5 h-3.5" /> Limpar
-            </button>
+          <div className="space-y-4 my-3">
+            <div className="flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-2.5 rounded-2xl">
+              <p className="text-xs font-bold text-foreground">
+                Exibindo resultados para "<span className="text-primary">{searchTerm}</span>"
+                {matchedProducts.length > 0 ? ` (${matchedProducts.length} ${matchedProducts.length === 1 ? "prato/item" : "pratos/itens"}, ` : " ("}
+                {filtered.length} {filtered.length === 1 ? "loja" : "lojas"})
+              </p>
+              <button
+                onClick={() => setSearchTerm("")}
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" /> Limpar
+              </button>
+            </div>
+
+            {/* Pratos e Produtos Encontrados na Busca */}
+            {matchedProducts.length > 0 && (
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                    <UtensilsCrossed className="w-3.5 h-3.5" /> Pratos &amp; Produtos Encontrados ({matchedProducts.length})
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {matchedProducts.map((p) => {
+                    const store = storesMap.get(p.company_id);
+                    const img = parseProductImage(p.image_url);
+                    return (
+                      <Link
+                        key={p.id}
+                        to="/marketplace/store/$storeId"
+                        params={{ storeId: p.company_id }}
+                        className="p-3 rounded-2xl bg-card border border-border/80 hover:border-primary/50 transition-all flex items-center gap-3 group active:scale-[0.98] shadow-xs"
+                      >
+                        <div className="w-16 h-16 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border/40 flex items-center justify-center">
+                          {img ? (
+                            <img src={img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          ) : (
+                            <UtensilsCrossed className="w-6 h-6 text-muted-foreground/40" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                            {p.name}
+                          </p>
+                          {store && (
+                            <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                              <Store className="w-3 h-3 text-amber-400 shrink-0" />
+                              <span className="truncate">{store.name}</span>
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between mt-1 pt-0.5">
+                            <span className="text-xs font-black text-emerald-500">
+                              {p.price ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.price) : "Sob consulta"}
+                            </span>
+                            <span className="text-[11px] font-bold text-primary flex items-center gap-0.5 opacity-90 group-hover:opacity-100">
+                              Pedir <ChevronRight className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
