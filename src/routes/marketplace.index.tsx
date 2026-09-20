@@ -1154,269 +1154,314 @@ function MarketplaceHome() {
         </motion.div>
       </section>
 
-      {/* ── Categories ── */}
-      <AeroSection title="Categorias" subtitle="Escolha por onde começar">
-        <div className="flex gap-3 overflow-x-auto scrollbar-none px-1 pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:px-0">
-          {CATEGORIES.map((c, i) => {
-            const Icon = c.icon;
-            const isActive = searchTerm.toLowerCase() === c.label.toLowerCase();
-            return (
-              <motion.button
-                key={c.label}
-                type="button"
-                aria-label={c.label}
-                onClick={() => {
-                  if (isActive) {
-                    setSearchTerm("");
-                  } else {
-                    setSearchTerm(c.label);
-                  }
-                }}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                whileTap={{ scale: 0.94 }}
-                whileHover={{ y: -3 }}
-                className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[76px] sm:w-auto cursor-pointer"
-              >
-                <div
-                  className={`aero-plate w-[68px] sm:w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-btn-surface border-btn-line group-hover:border-primary/45 group-active:bg-btn-active group-active:border-btn-active"}`}
-                  style={{
-                    boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
-                  }}
-                >
-                  {/* Halo amarelo difuso atrás da placa */}
-                  <span aria-hidden className="absolute -inset-3 rounded-full bg-primary-glow/40 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
-                  <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
-                  <span
-                    aria-hidden
-                    className={`checker-flag absolute inset-x-0 bottom-0 h-[6px] pointer-events-none transition-colors ${isActive ? "text-btn-active-ink/70" : "text-black/30"}`}
-                    style={{ backgroundSize: "6px 6px" }}
-                  />
-
-                  <span aria-hidden className="spec-sheen" />
-                  <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
-                </div>
-                <span className={`text-[12px] font-bold text-center leading-tight whitespace-nowrap transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
-
-              </motion.button>
-            );
-          })}
-        </div>
-      </AeroSection>
-
-      {/* ── Quick banners ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroPanel to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
-        <AeroPanel to="/marketplace/directory" icon={Tag} title="PPP" subtitle="Prestadores" />
-      </section>
-
-      {/* ── Taxi ── */}
-      <section>
-        <Link
-          to="/marketplace/taxi"
-          className="block p-6 rounded-3xl relative overflow-hidden group clearcoat aero-focus border border-btn-line hover:border-primary/45 active:border-btn-active transition-colors bg-btn-surface hover:bg-btn-surface-hover active:bg-btn-active active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
-          style={{
-            boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
-          }}
-        >
-          {/* Nuvem dourada difusa atrás do botão */}
-          <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
-          <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl" />
-          <span aria-hidden className="spec-sheen" />
-          
-          {/* Faixa de bandeira quadriculada correndo no topo e na base */}
-          <span aria-hidden className="checker-run checker-fade-r absolute top-0 left-0 right-0 h-[10px] text-black/30 group-active:text-btn-active-ink/60 pointer-events-none" />
-          <span aria-hidden className="checker-run checker-fade-l absolute bottom-0 left-0 right-0 h-[10px] text-black/25 group-active:text-btn-active-ink/50 pointer-events-none" />
-
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
-                <Car className="w-5 h-5 text-btn-ink group-active:text-btn-active-ink transition-colors" />
-              </div>
-              <h2 className="font-display font-bold italic text-2xl leading-tight text-btn-ink group-active:text-btn-active-ink transition-colors">Táxi &amp; Moto Táxi</h2>
-            </div>
-            <p className="text-sm text-btn-ink-soft max-w-[70%] font-medium mt-2 group-active:text-btn-active-ink/80 transition-colors">Corridas rápidas e seguras na sua porta agora.</p>
-
-          </div>
-        </Link>
-      </section>
-
-      {/* ── Espaço Social & Central de Negócios (Imóveis, Carros e Motos) ── */}
-      <section className="grid grid-cols-2 gap-3">
-        <AeroPanel to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
-        <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis, Carros e Motos" />
-      </section>
-
-      {/* ── Destaque carousel (Mais bem avaliados) ── */}
-      <AeroSection
-        title="Em destaque"
-       
-        subtitle="Os mais bem avaliados agora"
-        action={
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
-            <Star className="w-3.5 h-3.5 fill-primary" /> Top {top.length}
-          </span>
-        }
-      >
-        <div className="flex gap-4 overflow-x-auto -mx-4 px-4 py-2 scrollbar-none snap-x snap-mandatory">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="shrink-0 snap-start w-48">
-                  <SkeletonCarouselItem />
-                </div>
-              ))
-            : top.map((s, i) => {
-                const freeShip = s.delivery_fee === 0;
-                return (
-                  <motion.div
-                    key={s.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07, duration: 0.35 }}
-                    className="shrink-0 snap-start w-48"
-                  >
-                    <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="block group">
-                      <motion.div
-                        whileHover={{ y: -4 }}
-                        whileTap={{ scale: 0.96 }}
-                        className="aspect-[4/3] rounded-2xl bg-secondary relative overflow-hidden border border-border/40 group-hover:border-primary/40 transition-colors duration-300"
-                        style={{ boxShadow: "var(--shadow-card)" }}
-                      >
-                        {s.cover_url
-                          ? <img src={s.cover_url} alt={s.name} loading="lazy" className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`} />
-                          : <div className={`w-full h-full ${!s.is_open ? "grayscale" : ""}`} style={{ background: "var(--gradient-primary)" }} />
-                        }
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-                        {/* Rating badge */}
-                        <span className="absolute top-2 left-2 text-[10px] font-bold bg-black/70 text-white px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur">
-                          <Star className="w-3 h-3 fill-primary text-primary" /> {(s.rating ?? 5).toFixed(1)}
-                        </span>
-
-                        {/* Store name inside */}
-                        <div className="absolute bottom-2 left-3 right-3">
-                          <p className="font-display font-black text-sm text-white leading-tight truncate drop-shadow-lg">{s.name}</p>
-                        </div>
-                      </motion.div>
-                      <p className="mt-2 text-xs text-muted-foreground truncate">{s.category}</p>
-                    </Link>
-                  </motion.div>
-                );
-              })
-          }
-        </div>
-      </AeroSection>
-
-      {/* ── Lojas próximas com filtros ── */}
-      <AeroSection
-        title="Lojas próximas"
-        subtitle="Selecionadas para você"
-      >
-        <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
-
-        {searchTerm && (
-          <div className="space-y-4 my-3">
-            <div className="flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-2.5 rounded-2xl">
-              <p className="text-xs font-bold text-foreground">
-                Exibindo resultados para "<span className="text-primary">{searchTerm}</span>"
-                {matchedProducts.length > 0 ? ` (${matchedProducts.length} ${matchedProducts.length === 1 ? "prato/item" : "pratos/itens"}, ` : " ("}
-                {filtered.length} {filtered.length === 1 ? "loja" : "lojas"})
+      {/* ── SEÇÃO DE BUSCA ATIVA (Quando o usuário digita algo na busca) ── */}
+      {searchTerm.trim() ? (
+        <section className="space-y-6 animate-in fade-in duration-200">
+          {/* Header dos Resultados */}
+          <div className="flex items-center justify-between bg-primary/10 border border-primary/30 px-4 py-3 rounded-2xl">
+            <div className="flex items-center gap-2.5">
+              <Search className="w-4 h-4 text-primary shrink-0" />
+              <p className="text-sm font-bold text-foreground">
+                Resultados para "<span className="text-primary">{searchTerm}</span>"
+                <span className="text-xs font-medium text-muted-foreground ml-2">
+                  ({matchedProducts.length} {matchedProducts.length === 1 ? "item" : "itens"}, {filtered.length} {filtered.length === 1 ? "loja" : "lojas"})
+                </span>
               </p>
-              <button
-                onClick={() => setSearchTerm("")}
-                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" /> Limpar
-              </button>
             </div>
-
-            {/* Pratos e Produtos Encontrados na Busca */}
-            {matchedProducts.length > 0 && (
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
-                    <UtensilsCrossed className="w-3.5 h-3.5" /> Pratos &amp; Produtos Encontrados ({matchedProducts.length})
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {matchedProducts.map((p) => {
-                    const store = storesMap.get(p.company_id);
-                    const img = parseProductImage(p.image_url);
-                    return (
-                      <Link
-                        key={p.id}
-                        to="/marketplace/store/$storeId"
-                        params={{ storeId: p.company_id }}
-                        className="p-3 rounded-2xl bg-card border border-border/80 hover:border-primary/50 transition-all flex items-center gap-3 group active:scale-[0.98] shadow-xs"
-                      >
-                        <div className="w-16 h-16 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border/40 flex items-center justify-center">
-                          {img ? (
-                            <img src={img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                          ) : (
-                            <UtensilsCrossed className="w-6 h-6 text-muted-foreground/40" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
-                            {p.name}
-                          </p>
-                          {store && (
-                            <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                              <Store className="w-3 h-3 text-amber-400 shrink-0" />
-                              <span className="truncate">{store.name}</span>
-                            </p>
-                          )}
-                          <div className="flex items-center justify-between mt-1 pt-0.5">
-                            <span className="text-xs font-black text-emerald-500">
-                              {p.price ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.price) : "Sob consulta"}
-                            </span>
-                            <span className="text-[11px] font-bold text-primary flex items-center gap-0.5 opacity-90 group-hover:opacity-100">
-                              Pedir <ChevronRight className="w-3.5 h-3.5" />
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <button
+              onClick={() => setSearchTerm("")}
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" /> Limpar busca
+            </button>
           </div>
-        )}
 
-        <div className="mt-4">
-          {isLoading ? (
-            <div className="space-y-5">
-              {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+          {/* Filtros de Ordenação */}
+          <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
+
+          {/* 1. Pratos & Produtos Encontrados */}
+          {matchedProducts.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <UtensilsCrossed className="w-4 h-4 text-primary" />
+                <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                  Pratos &amp; Produtos Encontrados ({matchedProducts.length})
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {matchedProducts.map((p) => {
+                  const store = storesMap.get(p.company_id);
+                  const img = parseProductImage(p.image_url);
+                  return (
+                    <Link
+                      key={p.id}
+                      to="/marketplace/store/$storeId"
+                      params={{ storeId: p.company_id }}
+                      className="p-3.5 rounded-2xl bg-card border border-border/80 hover:border-primary/60 transition-all flex items-center gap-3.5 group active:scale-[0.98] shadow-sm hover:shadow-md"
+                    >
+                      <div className="w-18 h-18 rounded-xl bg-secondary overflow-hidden shrink-0 border border-border/40 flex items-center justify-center">
+                        {img ? (
+                          <img src={img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <UtensilsCrossed className="w-7 h-7 text-muted-foreground/40" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                          {p.name}
+                        </p>
+                        {p.description && (
+                          <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                            {p.description}
+                          </p>
+                        )}
+                        {store && (
+                          <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-1">
+                            <Store className="w-3 h-3 text-amber-400 shrink-0" />
+                            <span className="truncate font-medium">{store.name}</span>
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-border/30">
+                          <span className="text-xs font-black text-emerald-500">
+                            {p.price ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.price) : "Sob consulta"}
+                          </span>
+                          <span className="text-[11px] font-bold text-primary flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                            Pedir <ChevronRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            <>
+          )}
+
+          {/* 2. Lojas Encontradas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Store className="w-4 h-4 text-amber-400" />
+              <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                Lojas Correspondentes ({filtered.length})
+              </h2>
+            </div>
+
+            {isLoading ? (
+              <div className="space-y-5">
+                {Array.from({ length: 2 }).map((_, i) => <SkeletonCard key={i} />)}
+              </div>
+            ) : filtered.length > 0 ? (
               <AnimatePresence mode="popLayout">
                 <ul className="space-y-5">
                   {visibleStores.map((s, i) => <StoreCard key={s.id} s={s} i={i} />)}
                 </ul>
               </AnimatePresence>
-
-              {filtered.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-16 text-center">
-                  <p className="text-5xl mb-3">😴</p>
-                  <p className="font-display font-bold text-foreground">Nenhuma loja encontrada</p>
-                  <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros ou veja todas as lojas.</p>
-                  <AeroButton
-                    onClick={() => { setOpenOnly(false); setSort("relevance"); saveFilters({}); }}
-                    className="mt-4"
+            ) : matchedProducts.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-12 text-center bg-card/50 rounded-3xl border border-border/40 p-6">
+                <p className="text-4xl mb-2">🔍</p>
+                <p className="font-display font-bold text-base text-foreground">Nenhum resultado para "{searchTerm}"</p>
+                <p className="text-xs text-muted-foreground mt-1">Tente pesquisar por outro prato, categoria ou nome de loja.</p>
+                <AeroButton
+                  onClick={() => setSearchTerm("")}
+                  className="mt-4 text-xs"
+                >
+                  Ver todas as lojas e categorias
+                </AeroButton>
+              </motion.div>
+            ) : null}
+          </div>
+        </section>
+      ) : (
+        /* ── MODO HOME PADRÃO (Sem busca ativa) ── */
+        <>
+          {/* ── Categories ── */}
+          <AeroSection title="Categorias" subtitle="Escolha por onde começar">
+            <div className="flex gap-3 overflow-x-auto scrollbar-none px-1 pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:px-0">
+              {CATEGORIES.map((c, i) => {
+                const Icon = c.icon;
+                const isActive = searchTerm.toLowerCase() === c.label.toLowerCase();
+                return (
+                  <motion.button
+                    key={c.label}
+                    type="button"
+                    aria-label={c.label}
+                    onClick={() => {
+                      if (isActive) {
+                        setSearchTerm("");
+                      } else {
+                        setSearchTerm(c.label);
+                      }
+                    }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    whileTap={{ scale: 0.94 }}
+                    whileHover={{ y: -3 }}
+                    className="flex flex-col items-center gap-2 group aero-focus rounded-2xl shrink-0 snap-start w-[76px] sm:w-auto cursor-pointer"
                   >
-                    Ver todas as lojas
-                  </AeroButton>
-                </motion.div>
-              )}
+                    <div
+                      className={`aero-plate w-[68px] sm:w-full aspect-square max-w-[72px] min-h-[56px] grid place-items-center relative overflow-hidden -skew-x-[6deg] transition-all duration-300 group-hover:-skew-x-[3deg] border ${isActive ? "bg-btn-active border-btn-active shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]" : "bg-btn-surface border-btn-line group-hover:border-primary/45 group-active:bg-btn-active group-active:border-btn-active"}`}
+                      style={{
+                        boxShadow: "0 14px 26px -14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
+                      }}
+                    >
+                      {/* Halo amarelo difuso atrás da placa */}
+                      <span aria-hidden className="absolute -inset-3 rounded-full bg-primary-glow/40 blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+                      <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-2xl" />
+                      <div aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-2xl" />
+                      <span
+                        aria-hidden
+                        className={`checker-flag absolute inset-x-0 bottom-0 h-[6px] pointer-events-none transition-colors ${isActive ? "text-btn-active-ink/70" : "text-black/30"}`}
+                        style={{ backgroundSize: "6px 6px" }}
+                      />
 
-            </>
-          )}
-        </div>
-      </AeroSection>
+                      <span aria-hidden className="spec-sheen" />
+                      <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
+                    </div>
+                    <span className={`text-[12px] font-bold text-center leading-tight whitespace-nowrap transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </AeroSection>
+
+          {/* ── Quick banners ── */}
+          <section className="grid grid-cols-2 gap-3">
+            <AeroPanel to="/marketplace/errands" icon={Zap} title={<>Solicitar<br/>Entrega</>} subtitle="Motoboy rápido" />
+            <AeroPanel to="/marketplace/directory" icon={Tag} title="PPP" subtitle="Prestadores" />
+          </section>
+
+          {/* ── Taxi ── */}
+          <section>
+            <Link
+              to="/marketplace/taxi"
+              className="block p-6 rounded-3xl relative overflow-hidden group clearcoat aero-focus border border-btn-line hover:border-primary/45 active:border-btn-active transition-colors bg-btn-surface hover:bg-btn-surface-hover active:bg-btn-active active:shadow-[0_10px_28px_-12px_rgba(255,222,33,0.8)]"
+              style={{
+                boxShadow: "0 24px 40px -24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.45)",
+              }}
+            >
+              {/* Nuvem dourada difusa atrás do botão */}
+              <span aria-hidden className="absolute -inset-3 rounded-[2rem] bg-primary-glow/40 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none -z-10" />
+              <div aria-hidden className="absolute inset-0 carbon-weave opacity-[0.06] rounded-3xl" />
+              <span aria-hidden className="spec-sheen" />
+              
+              {/* Faixa de bandeira quadriculada correndo no topo e na base */}
+              <span aria-hidden className="checker-run checker-fade-r absolute top-0 left-0 right-0 h-[10px] text-black/30 group-active:text-btn-active-ink/60 pointer-events-none" />
+              <span aria-hidden className="checker-run checker-fade-l absolute bottom-0 left-0 right-0 h-[10px] text-black/25 group-active:text-btn-active-ink/50 pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-black/[0.04] ring-1 ring-black/10 shadow-sm grid place-items-center group-active:bg-black/15 group-active:ring-black/25 transition-colors">
+                    <Car className="w-5 h-5 text-btn-ink group-active:text-btn-active-ink transition-colors" />
+                  </div>
+                  <h2 className="font-display font-bold italic text-2xl leading-tight text-btn-ink group-active:text-btn-active-ink transition-colors">Táxi &amp; Moto Táxi</h2>
+                </div>
+                <p className="text-sm text-btn-ink-soft max-w-[70%] font-medium mt-2 group-active:text-btn-active-ink/80 transition-colors">Corridas rápidas e seguras na sua porta agora.</p>
+              </div>
+            </Link>
+          </section>
+
+          {/* ── Espaço Social & Central de Negócios ── */}
+          <section className="grid grid-cols-2 gap-3">
+            <AeroPanel to="/marketplace/social" icon={Users} title={<>Espaço<br/>Social</>} subtitle="Classificados da cidade" />
+            <AeroPanel to="/marketplace/business" icon={Building2} title={<>Central de<br/>Negócios</>} subtitle="Imóveis, Carros e Motos" />
+          </section>
+
+          {/* ── Destaque carousel (Mais bem avaliados) ── */}
+          <AeroSection
+            title="Em destaque"
+            subtitle="Os mais bem avaliados agora"
+            action={
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+                <Star className="w-3.5 h-3.5 fill-primary" /> Top {top.length}
+              </span>
+            }
+          >
+            <div className="flex gap-4 overflow-x-auto -mx-4 px-4 py-2 scrollbar-none snap-x snap-mandatory">
+              {isLoading
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="shrink-0 snap-start w-48">
+                      <SkeletonCarouselItem />
+                    </div>
+                  ))
+                : top.map((s, i) => (
+                    <motion.div
+                      key={s.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.07, duration: 0.35 }}
+                      className="shrink-0 snap-start w-48"
+                    >
+                      <Link to="/marketplace/store/$storeId" params={{ storeId: s.id }} className="block group">
+                        <motion.div
+                          whileHover={{ y: -4 }}
+                          whileTap={{ scale: 0.96 }}
+                          className="aspect-[4/3] rounded-2xl bg-secondary relative overflow-hidden border border-border/40 group-hover:border-primary/40 transition-colors duration-300"
+                          style={{ boxShadow: "var(--shadow-card)" }}
+                        >
+                          {s.cover_url
+                            ? <img src={s.cover_url} alt={s.name} loading="lazy" className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`} />
+                            : <div className={`w-full h-full ${!s.is_open ? "grayscale" : ""}`} style={{ background: "var(--gradient-primary)" }} />
+                          }
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                          {/* Rating badge */}
+                          <span className="absolute top-2 left-2 text-[10px] font-bold bg-black/70 text-white px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur">
+                            <Star className="w-3 h-3 fill-primary text-primary" /> {(s.rating ?? 5).toFixed(1)}
+                          </span>
+
+                          {/* Store name inside */}
+                          <div className="absolute bottom-2 left-3 right-3">
+                            <p className="font-display font-black text-sm text-white leading-tight truncate drop-shadow-lg">{s.name}</p>
+                          </div>
+                        </motion.div>
+                        <p className="mt-2 text-xs text-muted-foreground truncate">{s.category}</p>
+                      </Link>
+                    </motion.div>
+                  ))
+              }
+            </div>
+          </AeroSection>
+
+          {/* ── Lojas próximas com filtros ── */}
+          <AeroSection
+            title="Lojas próximas"
+            subtitle="Selecionadas para você"
+          >
+            <FilterBar sort={sort} setSort={handleSetSort} openOnly={openOnly} setOpenOnly={handleSetOpen} />
+
+            <div className="mt-4">
+              {isLoading ? (
+                <div className="space-y-5">
+                  {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+                </div>
+              ) : (
+                <>
+                  <AnimatePresence mode="popLayout">
+                    <ul className="space-y-5">
+                      {visibleStores.map((s, i) => <StoreCard key={s.id} s={s} i={i} />)}
+                    </ul>
+                  </AnimatePresence>
+
+                  {filtered.length === 0 && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-16 text-center">
+                      <p className="text-5xl mb-3">😴</p>
+                      <p className="font-display font-bold text-foreground">Nenhuma loja encontrada</p>
+                      <p className="text-sm text-muted-foreground mt-1">Tente remover os filtros ou veja todas as lojas.</p>
+                      <AeroButton
+                        onClick={() => { setOpenOnly(false); setSort("relevance"); saveFilters({}); }}
+                        className="mt-4"
+                      >
+                        Ver todas as lojas
+                      </AeroButton>
+                    </motion.div>
+                  )}
+                </>
+              )}
+            </div>
+          </AeroSection>
+        </>
+      )}
 
       {/* ── BONASOFT Watermark ── */}
       <div className="pt-8 pb-4 flex justify-center opacity-40 select-none pointer-events-none">
