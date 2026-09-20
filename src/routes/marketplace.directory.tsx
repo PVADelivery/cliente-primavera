@@ -24,7 +24,6 @@ import { AeroHero, AeroPlate, AeroSection, AeroButton, AeroEmptyState, AeroSkele
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { ProviderCard } from "@/components/ppp/ProviderCard";
 import { ProviderDetailDialog } from "@/components/ppp/ProviderDetailDialog";
-import { ProviderMap } from "@/components/ppp/ProviderMap";
 import { ProviderRegisterDialog } from "@/components/ppp/ProviderRegisterDialog";
 import { searchCityStreets } from "@/data/primaveraStreets";
 import type { Business } from "@/lib/ppp";
@@ -319,11 +318,6 @@ export function DirectoryPage() {
         </div>
       </div>
 
-      {/* ─── MAPA DOS PRESTADORES ─── */}
-      <AeroSection title="Mapa dos Prestadores" tag="Localização" subtitle="Toque em um marcador para abrir o card completo.">
-        <ProviderMap businesses={filtered} onSelect={openDetail} />
-      </AeroSection>
-
       {/* ─── LISTA PRINCIPAL ─── */}
       <AeroSection
         title={selectedCat === "Tudo" ? "Todos os Prestadores" : selectedCat}
@@ -399,7 +393,7 @@ export function DirectoryPage() {
             </div>
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-card/80 border border-border/60 text-xs">
               <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-              <span className="text-foreground font-semibold text-[11px]">Destaque no Mapa & Busca</span>
+              <span className="text-foreground font-semibold text-[11px]">Destaque & Busca Rápida</span>
             </div>
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-card/80 border border-border/60 text-xs">
               <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
