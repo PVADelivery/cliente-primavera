@@ -55,6 +55,7 @@ function Profile() {
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || user?.user_metadata?.avatar_url || null);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -78,6 +79,9 @@ function Profile() {
   useEffect(() => {
     setFullName(profile?.full_name || '');
     setPhone(profile?.phone || '');
+    if (profile?.avatar_url) {
+      setAvatarUrl(profile.avatar_url);
+    }
   }, [profile]);
 
   const loadProfileData = async () => {
@@ -184,25 +188,62 @@ function Profile() {
     if (!file || !user) return;
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { upserát: true });
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
       if (uploadError) throw uploadError;
+
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+      const urlWithCacheBuster = `${publicUrl}?t=${Date.now()}`;
+      
+      // 1. Atualiza visualmente de imediato
+      setAvatarUrl(urlWithCacheBuster);
+
+      // 2. Atualiza no banco de dados na tabela profiles (user_id e id)
+      const { error: profErr } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .or(`user_id.eq.${user.id},id.eq.${user.id}`);
+
+      if (profErr) {
+        await supabase
+          .from('profiles')
+          .upsert({ user_id: user.id, avatar_url: publicUrl }, { onConflict: 'user_id' });
+      }
+
+      // 3. Atualiza na tabela customers se existir
+      try {
+        await supabase
+          .from('customers')
+          .update({ avatar_url: publicUrl } as any)
+          .eq('user_id', user.id);
+      } catch {}
+
+      // 4. Atualiza metadata do Auth
+      try {
+        await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
+      } catch {}
+
+      // 5. Atualiza AuthContext
       await refreshProfile();
-      toast.success('Foto atualizada!');
+      toast.success('Foto de perfil atualizada com sucesso!');
     } catch (err: any) { 
-      toast.error('Falha ao atualizar foto'); 
+      console.error('Erro ao atualizar foto:', err);
+      toast.error('Falha ao atualizar foto: ' + (err?.message || 'Tente novamente')); 
     }
-    finally { setUploading(false); }
+    finally { 
+      setUploading(false);
+      if (e.target) e.target.value = '';
+    }
   };
 
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
     try {
-      await supabase.from('profiles').update({ full_name: fullName, phone }).eq('id', user.id);
+      await supabase.from('profiles').update({ full_name: fullName, phone }).or(`user_id.eq.${user.id},id.eq.${user.id}`);
       await new Promise(resolve => setTimeout(resolve, 500));
       await refreshProfile();
       toast.success('Perfil atualizado!');
@@ -223,6 +264,7 @@ function Profile() {
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || 'Usuário';
   const initial = displayName.charAt(0).toUpperCase();
+  const currentAvatar = avatarUrl || profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   const ordersCount = orders.length;
   const tier = ordersCount >= 15
@@ -243,10 +285,11 @@ function Profile() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="group relative h-24 w-24 rounded-[2rem] overflow-hidden border-4 border-white dark:border-zinc-800 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 bg-gradient-to-br from-primary/20 to-primary/5"
+            className="group relative h-24 w-24 rounded-[2rem] overflow-hidden border-4 border-white dark:border-zinc-800 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 bg-gradient-to-br from-primary/20 to-primary/5 cursor-pointer"
+            title="Alterar foto de perfil"
           >
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} className="w-full h-full object-cover" alt="" />
+            {currentAvatar ? (
+              <img src={currentAvatar} key={currentAvatar} className="w-full h-full object-cover" alt="Foto de perfil" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-primary text-4xl font-black">
                 {initial}
