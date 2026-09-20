@@ -304,7 +304,7 @@ export function DirectoryPage() {
         title={selectedCat === "Tudo" ? "Todos os Prestadores" : selectedCat}
         tag={`${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"}`}
         action={
-          (q || selectedCat !== "Tudo" || onlyWithWhatsapp || onlyFeatured) ? (
+          (q || selectedCat !== "Tudo" || onlyWithWhatsapp) ? (
             <button
               type="button"
               onClick={clearFilters}
