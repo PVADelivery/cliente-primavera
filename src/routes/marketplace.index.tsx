@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
-  UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee,
+  UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee, Sandwich,
   SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car,
   Users, Building2, BookUser, ClipboardList, User, Store, ArrowRight, Sparkles, Bike
 } from "lucide-react";
@@ -26,13 +26,13 @@ export const Route = createFileRoute("/marketplace/")({
 
 const CATEGORIES: Array<{ label: string; icon: typeof UtensilsCrossed }> = [
   { label: "Restaurantes", icon: UtensilsCrossed },
-  { label: "Mercado", icon: ShoppingBasket },
-  { label: "Farmácia", icon: Pill },
+  { label: "Lanches", icon: Sandwich },
   { label: "Pizza", icon: Pizza },
-  { label: "Doces", icon: IceCream },
-  { label: "Cafés", icon: Coffee },
-  { label: "Shopping", icon: ShoppingBag },
+  { label: "Sorveteria- açaí", icon: IceCream },
+  { label: "Padaria- cafés", icon: Coffee },
+  { label: "Farmácia", icon: Pill },
   { label: "Bebidas", icon: Wine },
+  { label: "Shopping", icon: ShoppingBag },
 ];
 
 export function normalizeSearchText(str?: string | null): string {
@@ -58,8 +58,8 @@ export function parseProductImage(rawUrl?: string | null): string {
 }
 
 const SEARCH_SYNONYMS: Record<string, string[]> = {
-  "lanche": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao", "sanduiche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente"],
-  "lanches": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao", "sanduiche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente"],
+  "lanche": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "hambúrguer", "burger", "burguer", "lanche", "lanches", "podrao", "sanduiche", "sanduíche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente", "salgado", "salgados", "pastel", "pasteis"],
+  "lanches": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "hambúrguer", "burger", "burguer", "lanche", "lanches", "podrao", "sanduiche", "sanduíche", "artesanal", "fast food", "batata", "batata frita", "hot dog", "cachorro quente", "salgado", "salgados", "pastel", "pasteis"],
   "hamburguer": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "artesanal", "smash"],
   "burger": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "artesanal", "smash"],
   "x tudo": ["x tudo", "xtudo", "x-tudo", "x salada", "x bacon", "x egg", "x frango", "hamburguer", "burger", "lanche", "lanches", "podrao"],
@@ -69,21 +69,28 @@ const SEARCH_SYNONYMS: Record<string, string[]> = {
   "x bacon": ["x bacon", "x-bacon", "x tudo", "hamburguer", "burger", "lanche"],
   "pizza": ["pizza", "pizzas", "pizzaria", "calzone", "esfirra", "esfiha", "massa", "fogazza"],
   "pizzas": ["pizza", "pizzas", "pizzaria", "calzone", "esfirra", "esfiha", "massa", "fogazza"],
-  "acai": ["acai", "açaí", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
-  "açaí": ["acai", "açaí", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
-  "cremosinho": ["cremosinho", "acai", "açaí", "sorvete", "geladinho", "sobremesa", "doce"],
-  "doce": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria"],
-  "doces": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria"],
+  "sorveteria- acai": ["sorveteria", "acai", "açaí", "sorvete", "sorvetes", "gelato", "picole", "picolé", "cremosinho", "casquinha", "sundae", "milk shake", "milkshake", "paleta", "acaiteria", "açaíteria", "sobremesa", "doce"],
+  "sorveteria - acai": ["sorveteria", "acai", "açaí", "sorvete", "sorvetes", "gelato", "picole", "picolé", "cremosinho", "casquinha", "sundae", "milk shake", "milkshake", "paleta", "acaiteria", "açaíteria", "sobremesa", "doce"],
+  "sorveteria": ["sorveteria", "acai", "açaí", "sorvete", "sorvetes", "gelato", "picole", "picolé", "cremosinho", "casquinha", "sundae", "milk shake", "milkshake", "sobremesa"],
+  "sorvete": ["sorveteria", "acai", "açaí", "sorvete", "sorvetes", "gelato", "picole", "picolé", "cremosinho", "casquinha", "sundae", "milk shake", "milkshake"],
+  "sorvetes": ["sorveteria", "acai", "açaí", "sorvete", "sorvetes", "gelato", "picole", "picolé", "cremosinho", "casquinha", "sundae", "milk shake", "milkshake"],
+  "acai": ["acai", "açaí", "sorveteria", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
+  "açaí": ["acai", "açaí", "sorveteria", "cremosinho", "sorvete", "sorvetes", "gelato", "picole", "ninho", "nutella", "sobremesa", "doce"],
+  "cremosinho": ["cremosinho", "acai", "açaí", "sorvete", "sorveteria", "geladinho", "sobremesa", "doce"],
+  "doce": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria", "padaria", "sorveteria"],
+  "doces": ["doce", "doces", "sobremesa", "bolo", "bolos", "torta", "chocolate", "brigadeiro", "churros", "confeitaria", "padaria", "sorveteria"],
+  "padaria- cafes": ["padaria", "padarias", "cafe", "café", "cafes", "cafés", "cafeteria", "pao", "pão", "paes", "pães", "confeitaria", "salgado", "salgados", "croissant", "torta", "tortas", "bolo", "bolos", "cappuccino", "cafezinho"],
+  "padaria - cafes": ["padaria", "padarias", "cafe", "café", "cafes", "cafés", "cafeteria", "pao", "pão", "paes", "pães", "confeitaria", "salgado", "salgados", "croissant", "torta", "tortas", "bolo", "bolos", "cappuccino", "cafezinho"],
+  "padaria": ["padaria", "padarias", "cafe", "café", "cafes", "cafés", "cafeteria", "pao", "pão", "paes", "pães", "confeitaria", "salgado", "salgados", "croissant", "torta", "tortas", "bolo", "bolos", "cappuccino", "cafezinho"],
+  "cafe": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "café": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "cafes": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
+  "cafés": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
   "farmacia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
   "farmácia": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
   "remedio": ["farmacia", "farmácia", "drogaria", "remedio", "medicamento", "saude", "curativo", "fralda", "vitamina", "suplemento"],
   "bebida": ["bebida", "bebidas", "cerveja", "chopp", "refrigerante", "agua", "gelo", "adega", "distribuidora", "vinho", "whisky", "vodka", "energetico"],
   "bebidas": ["bebida", "bebidas", "cerveja", "chopp", "refrigerante", "agua", "gelo", "adega", "distribuidora", "vinho", "whisky", "vodka", "energetico"],
-  "mercado": ["mercado", "supermercado", "mercearia", "arroz", "feijao", "leite", "carne", "acougue", "hortifruti", "fruta", "verdura"],
-  "cafe": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
-  "café": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
-  "cafes": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
-  "cafés": ["cafe", "café", "cafeteria", "padaria", "pao", "pão", "confeitaria", "salgado", "salgados"],
   "shopping": ["shopping", "calcado", "calçado", "calcados", "calçados", "sapato", "sapatos", "tenis", "tênis", "roupa", "roupas", "moda", "vestuario", "vestuário", "loja", "acessorio", "acessório", "chinelo", "sandalia", "sandália", "calça", "camisa"],
 };
 
@@ -747,7 +754,7 @@ function SmartSearchBar({
                   {q ? "Buscar por Prato / Categoria" : "Pratos Populares"}
                 </span>
               </div>
-              {(q ? matchingCategories.map((c) => c.label) : ["X tudo", "Pizza", "Hambúrguer", "Açaí", "Lanches", "Mercado", "Farmácia", "Bebidas"]).map((s, i) => (
+              {(q ? matchingCategories.map((c) => c.label) : ["X tudo", "Pizza", "Hambúrguer", "Açaí", "Lanches", "Sorveteria- açaí", "Padaria- cafés", "Farmácia", "Bebidas"]).map((s, i) => (
                 <motion.button
                   key={s}
                   type="button"
@@ -1318,7 +1325,7 @@ function MarketplaceHome() {
                       <span aria-hidden className="spec-sheen" />
                       <Icon className={`w-6 h-6 skew-x-[6deg] relative z-10 transition-colors ${isActive ? "text-btn-active-ink" : "text-btn-ink group-active:text-btn-active-ink"}`} strokeWidth={1.75} />
                     </div>
-                    <span className={`text-[12px] font-bold text-center leading-tight whitespace-nowrap transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
+                    <span className={`text-[11px] sm:text-[12px] font-bold text-center leading-tight line-clamp-2 max-w-[76px] sm:max-w-none transition-colors ${isActive ? "text-primary" : "text-foreground/90 group-hover:text-primary"}`}>{c.label}</span>
                   </motion.button>
                 );
               })}
