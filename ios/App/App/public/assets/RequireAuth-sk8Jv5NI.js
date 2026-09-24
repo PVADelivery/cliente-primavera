@@ -1,0 +1,1 @@
+import{u as n,a as u,r as o,j as r}from"./index-CcOPGzBr.js";function c({children:a}){const{user:e,loading:t}=n(),s=u();return o.useEffect(()=>{!t&&!e&&s({to:"/login"})},[e,t,s]),t?r.jsx("div",{className:"p-8 text-center text-muted-foreground",children:"Carregando…"}):e?r.jsx(r.Fragment,{children:a}):null}export{c as R};
