@@ -17,6 +17,7 @@
     "@capacitor/app": "^8.1.1",
     "@capacitor/cli": "8.5.0",
     "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
     "@capacitor/local-notifications": "^8.3.0",
     "@capacitor/push-notifications": "^8.1.2",
     "@cloudflare/vite-plugin": "^1.43.0",
