@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import logoIcon from "@/assets/logo-icon-v3.png";
 import { useState, useEffect, useRef } from "react";
 import { Car } from "lucide-react";
+import { applyStatusBarTheme } from "@/utils/statusBar";
 
 const tabs: Array<{ to: string; label: string; icon: typeof Home; exact?: boolean }> = [
   { to: "/marketplace", label: "Início", icon: Home, exact: true },
@@ -55,14 +56,15 @@ export function MarketplaceLayout() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    // PADRÃO É SEMPRE TEMA CLARO
-    if (savedTheme === "dark") {
+    const isDark = savedTheme === "dark";
+    if (isDark) {
       document.documentElement.classList.add("dark");
       setTheme("dark");
     } else {
       document.documentElement.classList.remove("dark");
       setTheme("light");
     }
+    applyStatusBarTheme(isDark);
   }, []);
 
   useEffect(() => {
@@ -201,10 +203,12 @@ export function MarketplaceLayout() {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
       setTheme("dark");
+      applyStatusBarTheme(true);
     } else {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
       setTheme("light");
+      applyStatusBarTheme(false);
     }
   };
 
@@ -246,7 +250,12 @@ export function MarketplaceLayout() {
         }}
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <header className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07] relative overflow-hidden">
+        <header 
+          className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07] relative overflow-hidden transition-all shadow-md"
+          style={{
+            paddingTop: "max(env(safe-area-inset-top, 0px), 0px)",
+          }}
+        >
           <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
           <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-14">
             <Link to="/marketplace" className="flex min-w-0 items-center gap-2.5 aero-focus rounded-xl">
@@ -264,19 +273,31 @@ export function MarketplaceLayout() {
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               {!user ? (
-                <Link to="/login" className="tap-target aero-focus inline-flex items-center px-4 rounded-full bg-primary text-black text-sm font-black shadow-sm">Entrar</Link>
+                <Link to="/login" className="tap-target aero-focus inline-flex items-center px-4 h-9 rounded-full bg-primary text-black text-sm font-black shadow-sm">Entrar</Link>
               ) : null}
             </div>
           </div>
         </header>
       )}
 
-      <main className={`relative flex-1 mx-auto w-full max-w-2xl px-4 ${['/marketplace/checkout', '/marketplace/addresses'].includes(path) ? '' : 'pb-24 pt-4'}`}>
+      <main 
+        className={`relative flex-1 mx-auto w-full max-w-2xl px-4 ${['/marketplace/checkout', '/marketplace/addresses'].includes(path) ? '' : 'pt-4'}`}
+        style={{
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8.5rem)",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
         <Outlet />
       </main>
 
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
-        <nav aria-label="Navegação principal" className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+        <nav 
+          aria-label="Navegação principal" 
+          className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur"
+          style={{
+            paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0.5rem)",
+          }}
+        >
         <ul className="mx-auto max-w-2xl grid grid-cols-6 px-1 py-1">
           {tabs.map((t, index) => {
             const active = t.exact ? path === t.to : path.startsWith(t.to);

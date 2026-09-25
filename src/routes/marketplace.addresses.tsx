@@ -246,7 +246,10 @@ function Addresses() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-24">
       {/* ── HEADER GLASSMORPHISM ── */}
-      <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl border-b border-white/5">
+      <header 
+        className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl border-b border-white/5 transition-all"
+        style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 0px)" }}
+      >
         <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
           <button 
             onClick={() => showForm ? setShowForm(false) : router.history.back()} 

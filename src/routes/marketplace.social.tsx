@@ -19,7 +19,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { SocialCategory, SocialPost } from "@/types/database";
-import { AeroPageHeader, AeroSkeletonList, AeroEmptyState } from "@/components/aero";
+import { AeroPageHeader, AeroSkeletonList, AeroEmptyState, AeroButton } from "@/components/aero";
 import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
 import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
 import { toast } from "sonner";
@@ -215,8 +215,11 @@ function SocialPage() {
         <AeroEmptyState
           title="Nenhum classificado por aqui"
           description="Seja o primeiro a publicar nesta categoria."
-          actionLabel="Publicar"
-          onAction={handleOpenForm}
+          action={
+            <AeroButton variant="primary" onClick={handleOpenForm}>
+              Publicar
+            </AeroButton>
+          }
         />
       ) : (
         <div className="space-y-3">
