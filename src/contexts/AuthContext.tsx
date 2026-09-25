@@ -195,13 +195,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+
+      if (typeof window !== "undefined") {
+        try {
+          Object.keys(localStorage).forEach((k) => {
+            if (k.includes("supabase") || k.includes("sb-") || k.includes("auth")) {
+              localStorage.removeItem(k);
+            }
+          });
+          sessionStorage.clear();
+        } catch {}
+      }
+
+      await Promise.race([
+        supabase.auth.signOut({ scope: "local" }),
+        new Promise((resolve) => setTimeout(resolve, 800)),
+      ]);
     } catch (error) {
-      console.error("Erro no signOut:", error);
+      console.warn("Aviso no signOut:", error);
     } finally {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "/login";
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/login";
+      }
     }
   };
 
