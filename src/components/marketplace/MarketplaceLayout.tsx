@@ -251,23 +251,39 @@ export function MarketplaceLayout() {
       />
       {!['/marketplace/checkout', '/marketplace/addresses'].includes(path) && (
         <header 
-          className="sticky top-0 z-40 bg-[oklch(0.12_0.005_250)] border-b border-white/[0.07] relative overflow-hidden transition-all shadow-md"
+          className={`sticky top-0 z-40 border-b relative overflow-hidden transition-colors shadow-md ${
+            theme === 'dark' 
+              ? 'bg-black text-white border-white/10' 
+              : 'bg-white text-neutral-900 border-neutral-200'
+          }`}
           style={{
-            paddingTop: "max(env(safe-area-inset-top, 0px), 0px)",
+            paddingTop: "max(env(safe-area-inset-top, 0px), 56px)",
           }}
         >
-          <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
-          <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-14">
+          {theme === 'dark' && (
+            <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
+          )}
+          <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-16">
             <Link to="/marketplace" className="flex min-w-0 items-center gap-2.5 aero-focus rounded-xl">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden bg-black shrink-0 ring-1 ring-white/10">
+              <span className={`flex items-center justify-center w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 ${
+                theme === 'dark' ? 'bg-black ring-white/10' : 'bg-white ring-neutral-200 shadow-sm'
+              }`}>
                 <img src={logoIcon} alt="Logo" className="w-full h-full object-cover rounded-full" />
               </span>
-              <span className="font-display font-black italic tracking-tight text-sm text-white truncate pr-2 inline-block">MT 24horas express</span>
+              <span className={`font-display font-black italic tracking-tight text-sm truncate pr-2 inline-block ${
+                theme === 'dark' ? 'text-white' : 'text-neutral-900'
+              }`}>
+                MT 24horas express
+              </span>
             </Link>
             <div className="flex shrink-0 items-center gap-3">
               <button
                 onClick={toggleTheme}
-                className="tap-target aero-focus grid place-items-center w-10 h-10 rounded-full bg-card/70 border border-border text-white/85 hover:text-white hover:border-primary/50 transition-colors"
+                className={`tap-target aero-focus grid place-items-center w-10 h-10 rounded-full border transition-colors ${
+                  theme === 'dark'
+                    ? 'bg-neutral-900/80 border-white/10 text-white hover:border-primary/50'
+                    : 'bg-neutral-100 border-neutral-200 text-neutral-800 hover:border-primary/50 shadow-sm'
+                }`}
                 aria-label="Alternar tema"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
