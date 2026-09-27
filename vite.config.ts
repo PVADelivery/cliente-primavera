@@ -1,4 +1,9 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   nitro: {
@@ -7,4 +12,21 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    resolve: {
+      alias: {
+        "@capacitor/push-notifications": path.resolve(__dirname, "./src/lib/pushNotifications.ts"),
+      },
+    },
+    ssr: {
+      external: [
+        "@capacitor/core",
+        "@capacitor/app",
+        "@capacitor/status-bar",
+        "@capacitor/push-notifications",
+        "@capacitor/local-notifications",
+      ],
+    },
+  },
 });
+

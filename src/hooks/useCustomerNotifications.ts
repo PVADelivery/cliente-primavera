@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Capacitor } from "@capacitor/core";
-import { PushNotifications } from "@capacitor/push-notifications";
+import { PushNotifications } from "@/lib/pushNotifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { toast } from "sonner";
 
