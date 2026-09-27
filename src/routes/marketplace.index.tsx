@@ -990,27 +990,43 @@ function MarketplaceHome() {
     saveFilters({ sort, openOnly: v });
   }, [sort]);
 
+  const isSearching = searchTerm.trim().length >= 2;
+
   const { data: stores, isLoading } = useQuery<Company[]>({
     queryKey: ["companies"],
-    placeholderData: [],
+    initialData: () => {
+      if (typeof window !== "undefined") {
+        try {
+          const cached = sessionStorage.getItem("pva_cached_companies");
+          if (cached) return JSON.parse(cached);
+        } catch {}
+      }
+      return undefined;
+    },
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       try {
         // Tenta primeiro via RPC pública (bypassa restrições RLS em tabelas para visitantes anon)
         const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_companies");
         if (!rpcErr && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
+          if (typeof window !== "undefined") {
+            try { sessionStorage.setItem("pva_cached_companies", JSON.stringify(rpcData)); } catch {}
+          }
           return rpcData as Company[];
         }
 
         const { data, error } = await supabase
           .from("companies")
-          .select("*")
+          .select("id, name, phone, address, logo_url, rating, delivery_fee, prep_time_min, prep_time_max, is_open, category, description, banner_url, cover_url")
           .order("name", { ascending: true });
         if (error) {
           console.error("Error fetching companies:", error);
           return (rpcData as Company[]) || [];
         }
-        return data || [];
+        if (data && typeof window !== "undefined") {
+          try { sessionStorage.setItem("pva_cached_companies", JSON.stringify(data)); } catch {}
+        }
+        return (data as Company[]) || [];
       } catch (err) {
         console.error("Exception fetching companies:", err);
         return [];
@@ -1019,15 +1035,18 @@ function MarketplaceHome() {
   });
 
   const { data: allProducts = [] } = useQuery<any[]>({
-    queryKey: ["all-products-search"],
+    queryKey: ["all-products-search", searchTerm.trim().toLowerCase()],
+    enabled: isSearching,
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       try {
+        const cleanTerm = searchTerm.trim().replace(/[%_]/g, "");
         const { data } = await supabase
           .from("products")
           .select("id, name, description, price, image_url, category, company_id")
           .eq("is_active", true)
-          .limit(2000);
+          .ilike("name", `%${cleanTerm}%`)
+          .limit(100);
         return data || [];
       } catch {
         return [];

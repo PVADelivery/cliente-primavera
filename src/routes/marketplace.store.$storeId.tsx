@@ -85,19 +85,28 @@ function StoreDetail() {
   const { data: store } = useQuery<Company | null>({
     queryKey: ["company", storeId],
     placeholderData: null,
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      if (!isSupabaseConfigured) return null;
+      if (!isSupabaseConfigured || !storeId) return null;
       try {
+        // 1. Tenta consulta direta indexada por ID (ultra-rápida)
+        const { data: directData, error: directErr } = await supabase
+          .from("companies")
+          .select("*")
+          .eq("id", storeId)
+          .maybeSingle();
+
+        if (!directErr && directData) {
+          return directData as Company;
+        }
+
+        // 2. Fallback caso haja restrições RLS em visitantes anônimos
         const { data: rpcData } = await supabase.rpc("get_public_companies");
         if (rpcData && Array.isArray(rpcData)) {
           const found = rpcData.find((s: any) => s.id === storeId);
           if (found) return found as Company;
         }
-        const result = await Promise.race([
-          supabase.from("companies").select("*").eq("id", storeId).maybeSingle(),
-          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
-        ]);
-        return ((result as { data: Company | null }).data) ?? null;
+        return null;
       } catch {
         return null;
       }
@@ -108,14 +117,14 @@ function StoreDetail() {
   const { data: reviewStats = { avg: 5, count: 0 } } = useQuery<{ avg: number; count: number }>({
     queryKey: ["review-stats", storeId],
     placeholderData: { avg: 5, count: 0 },
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      if (!isSupabaseConfigured) return { avg: 5, count: 0 };
+      if (!isSupabaseConfigured || !storeId) return { avg: 5, count: 0 };
       try {
-        const result = await Promise.race([
-          supabase.from("reviews").select("rating").eq("company_id", storeId),
-          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
-        ]);
-        const rows = (result as { data: { rating: number }[] | null }).data;
+        const { data: rows } = await supabase
+          .from("reviews")
+          .select("rating")
+          .eq("company_id", storeId);
         if (!rows || rows.length === 0) return { avg: 5, count: 0 };
         const sum = rows.reduce((acc, r) => acc + Math.max(1, Math.min(5, Number(r.rating) || 5)), 0);
         return { avg: sum / rows.length, count: rows.length };
@@ -128,15 +137,17 @@ function StoreDetail() {
   const { data: products = [] } = useQuery<(Product & { promo?: number })[]>({
     queryKey: ["products", storeId],
     placeholderData: [],
+    staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      if (!isSupabaseConfigured) return [];
+      if (!isSupabaseConfigured || !storeId) return [];
       try {
-        const result = await Promise.race([
-          supabase.from("products").select("*").eq("company_id", storeId).eq("is_active", true),
-          new Promise<{ data: null }>((resolve) => setTimeout(() => resolve({ data: null }), 4000)),
-        ]);
-        const data = (result as { data: Product[] | null }).data;
-        if (!data || data.length === 0) return [];
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("company_id", storeId)
+          .eq("is_active", true)
+          .order("name", { ascending: true });
+        if (error || !data) return [];
         return data as (Product & { promo?: number })[];
       } catch {
         return [];
