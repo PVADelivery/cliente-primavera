@@ -257,13 +257,13 @@ export function MarketplaceLayout() {
               : 'bg-white text-neutral-900 border-neutral-200'
           }`}
           style={{
-            paddingTop: "max(env(safe-area-inset-top, 0px), 56px)",
+            paddingTop: "env(safe-area-inset-top, 0px)",
           }}
         >
           {theme === 'dark' && (
             <span aria-hidden className="absolute inset-0 carbon-weave opacity-40 pointer-events-none" />
           )}
-          <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-16">
+          <div className="relative mx-auto max-w-2xl grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 h-14">
             <Link to="/marketplace" className="flex min-w-0 items-center gap-2.5 aero-focus rounded-xl">
               <span className={`flex items-center justify-center w-8 h-8 rounded-full overflow-hidden shrink-0 ring-1 ${
                 theme === 'dark' ? 'bg-black ring-white/10' : 'bg-white ring-neutral-200 shadow-sm'

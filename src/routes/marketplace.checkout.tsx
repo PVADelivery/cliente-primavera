@@ -458,9 +458,9 @@ function Checkout() {
       {/* ── HEADER GLASSMORPHISM ── */}
       <header 
         className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 56px)" }}
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between px-4 h-14 max-w-2xl mx-auto">
           <button 
             onClick={() => router.history.back()} 
             className="w-10 h-10 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors border border-border"
