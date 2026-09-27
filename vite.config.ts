@@ -16,6 +16,7 @@ export default defineConfig({
     resolve: {
       alias: {
         "@capacitor/push-notifications": path.resolve(__dirname, "./src/lib/pushNotifications.ts"),
+        "@capacitor/local-notifications": path.resolve(__dirname, "./src/lib/localNotifications.ts"),
       },
     },
     ssr: {
