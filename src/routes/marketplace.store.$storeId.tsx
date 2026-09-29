@@ -15,6 +15,7 @@ import {
   UtensilsCrossed,
   BadgePercent,
   Minus,
+  Store,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useCart, cleanProductImageUrl } from "@/contexts/CartContext";
@@ -83,10 +84,10 @@ function StoreDetail() {
     return () => clearTimeout(t);
   }, []);
 
-  const { data: store } = useQuery<Company | null>({
+  const { data: store, isLoading: isStoreLoading } = useQuery<Company | null>({
     queryKey: ["company", storeId],
     placeholderData: null,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30,
     queryFn: async () => {
       if (!isSupabaseConfigured || !storeId) return null;
       try {
@@ -98,13 +99,16 @@ function StoreDetail() {
           .maybeSingle();
 
         if (!directErr && directData) {
+          if (directData.is_active === false) {
+            return null; // Loja inativa não deve ser exibida
+          }
           return directData as Company;
         }
 
         // 2. Fallback caso haja restrições RLS em visitantes anônimos
         const { data: rpcData } = await supabase.rpc("get_public_companies");
         if (rpcData && Array.isArray(rpcData)) {
-          const found = rpcData.find((s: any) => s.id === storeId);
+          const found = rpcData.find((s: any) => s.id === storeId && s.is_active !== false);
           if (found) return found as Company;
         }
         return null;
@@ -215,6 +219,26 @@ function StoreDetail() {
   const rating = reviewStats.avg.toFixed(1);
   const reviewCount = reviewStats.count;
   const deliveryFee = store?.delivery_fee ?? 4.99;
+
+  if (!isStoreLoading && !store) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 space-y-4" suppressHydrationWarning>
+        <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center">
+          <Store className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-foreground">Loja Indisponível</h2>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Esta loja está temporariamente desativada ou não está disponível no marketplace no momento.
+        </p>
+        <Link
+          to="/marketplace"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow hover:bg-primary/90 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar para as Lojas
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="-mt-4 -mx-4 pb-32 bg-muted/20 min-h-screen" suppressHydrationWarning>

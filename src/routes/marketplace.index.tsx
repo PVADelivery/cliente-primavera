@@ -998,36 +998,47 @@ function MarketplaceHome() {
     initialData: () => {
       if (typeof window !== "undefined") {
         try {
-          const cached = sessionStorage.getItem("pva_cached_companies");
-          if (cached) return JSON.parse(cached);
+          // Remove cache legado que continha empresas inativas
+          sessionStorage.removeItem("pva_cached_companies");
+          const cached = sessionStorage.getItem("pva_cached_companies_v2");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+              return parsed.filter((c: any) => c.is_active !== false);
+            }
+          }
         } catch {}
       }
       return undefined;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30s para atualizar com rapidez quando o admin ativa/desativa lojas
     queryFn: async () => {
       try {
         // Tenta primeiro via RPC pública (bypassa restrições RLS em tabelas para visitantes anon)
         const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_companies");
         if (!rpcErr && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
+          const activeOnly = rpcData.filter((c: any) => c.is_active !== false);
           if (typeof window !== "undefined") {
-            try { sessionStorage.setItem("pva_cached_companies", JSON.stringify(rpcData)); } catch {}
+            try { sessionStorage.setItem("pva_cached_companies_v2", JSON.stringify(activeOnly)); } catch {}
           }
-          return rpcData as Company[];
+          return activeOnly as Company[];
         }
 
         const { data, error } = await supabase
           .from("companies")
-          .select("id, name, phone, address, logo_url, rating, delivery_fee, prep_time_min, prep_time_max, is_open, category, description, banner_url, cover_url")
+          .select("id, name, phone, address, logo_url, rating, delivery_fee, prep_time_min, prep_time_max, is_open, category, description, banner_url, cover_url, is_active")
+          .eq("is_active", true)
           .order("name", { ascending: true });
         if (error) {
           console.error("Error fetching companies:", error);
-          return (rpcData as Company[]) || [];
+          const fallbackActive = ((rpcData as Company[]) || []).filter((c: any) => c.is_active !== false);
+          return fallbackActive;
         }
-        if (data && typeof window !== "undefined") {
-          try { sessionStorage.setItem("pva_cached_companies", JSON.stringify(data)); } catch {}
+        const activeData = (data as Company[] || []).filter((c) => c.is_active !== false);
+        if (typeof window !== "undefined") {
+          try { sessionStorage.setItem("pva_cached_companies_v2", JSON.stringify(activeData)); } catch {}
         }
-        return (data as Company[]) || [];
+        return activeData;
       } catch (err) {
         console.error("Exception fetching companies:", err);
         return [];
@@ -1056,7 +1067,7 @@ function MarketplaceHome() {
   });
 
   const allStores = useMemo(() => {
-    const raw = stores ?? [];
+    const raw = (stores ?? []).filter((s) => s.is_active !== false);
     return [...raw].sort((a, b) => {
       // Prioritize Açaí Primavera Gourmet (active registered menu) and open stores
       if (a.id === "55b3a1f7-36b8-49c5-b66b-40b16bed7737") return -1;
