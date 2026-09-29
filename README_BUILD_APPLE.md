@@ -23,8 +23,10 @@ if [ ! -d "cliente-primavera" ]; then
   git clone https://github.com/PVADelivery/cliente-primavera.git
 fi
 cd cliente-primavera
+git reset --hard HEAD
 git pull origin main
 npm install --legacy-peer-deps
+sed -i '' 's|\\|/|g' ios/App/CapApp-SPM/Package.swift 2>/dev/null || true
 
 mkdir -p build
 cat << 'EOF' > build/ExportOptions.plist
