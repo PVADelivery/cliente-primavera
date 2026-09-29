@@ -430,6 +430,17 @@ function Checkout() {
 
       clear();
       resetIdempotencyKey();
+
+      if (typeof window !== "undefined") {
+        try {
+          const saved = JSON.parse(localStorage.getItem("pva_my_order_ids") || "[]");
+          if (!saved.includes(orderId)) {
+            saved.unshift(orderId);
+            localStorage.setItem("pva_my_order_ids", JSON.stringify(saved.slice(0, 30)));
+          }
+        } catch {}
+      }
+
       toast.success('Pedido realizado com sucesso!');
       navigate({ to: `/marketplace/orders/${orderId}` });
     } catch (err: any) {

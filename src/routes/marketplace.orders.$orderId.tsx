@@ -6,12 +6,16 @@ import { RequireAuth } from "@/components/marketplace/RequireAuth";
 
 export const Route = createFileRoute("/marketplace/orders/$orderId")({
   head: () => ({ meta: [{ title: "Detalhes do Pedido — MT 24horas express" }] }),
-  component: () => (
+  component: OrderDetailRouteComponent,
+});
+
+function OrderDetailRouteComponent() {
+  return (
     <RequireAuth>
       <OrderDetailPage />
     </RequireAuth>
-  ),
-});
+  );
+}
 
 const TIMELINE = ["pending", "preparing", "ready", "in_route", "delivered"] as const;
 const LABEL: Record<string, string> = {

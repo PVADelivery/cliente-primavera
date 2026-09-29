@@ -126,16 +126,54 @@ function Profile() {
         .select('id')
         .eq('user_id', user.id);
 
-      const cIds = (custs || []).map((c) => c.id).filter(Boolean);
-      if (cIds.length === 0) cIds.push(user.id);
+      const cIds = Array.from(new Set([
+        user.id,
+        ...((custs || []).map((c) => c.id).filter(Boolean)),
+      ]));
 
-      const { data, error } = await supabase
-        .from('orders')
-        .select('id, status, total, created_at, company_id, companies(name, logo_url)')
-        .in('customer_id', cIds)
-        .order('created_at', { ascending: false });
+      let savedOrderIds: string[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          savedOrderIds = JSON.parse(localStorage.getItem("pva_my_order_ids") || "[]");
+        } catch {}
+      }
 
-      if (error) {
+      const queries = [
+        supabase
+          .from('orders')
+          .select('id, status, total, created_at, company_id, companies(name, logo_url)')
+          .in('customer_id', cIds)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('orders')
+          .select('id, status, total, created_at, company_id, companies(name, logo_url)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+      ];
+
+      if (savedOrderIds.length > 0) {
+        queries.push(
+          supabase
+            .from('orders')
+            .select('id, status, total, created_at, company_id, companies(name, logo_url)')
+            .in('id', savedOrderIds.slice(0, 30))
+            .order('created_at', { ascending: false })
+        );
+      }
+
+      const results = await Promise.all(queries);
+      const ordersMap = new Map<string, any>();
+
+      results.forEach((res) => {
+        if (res.data) {
+          res.data.forEach((o: any) => {
+            if (o && o.id) ordersMap.set(o.id, o);
+          });
+        }
+      });
+
+      const mergedOrders = Array.from(ordersMap.values());
+      if (mergedOrders.length === 0) {
         const { data: fallbackData } = await supabase
           .from('orders')
           .select('id, status, total, created_at, company_id')

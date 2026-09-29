@@ -18,12 +18,16 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/orders/")({
   head: () => ({ meta: [{ title: "Meus pedidos — MT 24horas express" }] }),
-  component: () => (
+  component: OrdersRouteComponent,
+});
+
+function OrdersRouteComponent() {
+  return (
     <RequireAuth>
       <OrdersList />
     </RequireAuth>
-  ),
-});
+  );
+}
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
   pending: "Aguardando",
@@ -74,46 +78,107 @@ function OrdersList() {
           .select("id")
           .eq("user_id", user.id);
 
-        const customerIds = (customers || []).map((c) => c.id).filter(Boolean);
-        if (customerIds.length === 0) {
-          customerIds.push(user.id);
+        const customerIds = Array.from(new Set([
+          user.id,
+          ...((customers || []).map((c) => c.id).filter(Boolean)),
+        ]));
+
+        let savedOrderIds: string[] = [];
+        if (typeof window !== "undefined") {
+          try {
+            savedOrderIds = JSON.parse(localStorage.getItem("pva_my_order_ids") || "[]");
+          } catch (e) {}
         }
 
-        const { data, error } = await supabase
-          .from("orders")
-          .select(`
-            id, status, total, created_at, company_id,
-            companies(name, logo_url)
-          `)
-          .in("customer_id", customerIds)
-          .order("created_at", { ascending: false })
-          .limit(50);
-
-        if (error) {
-          const { data: fallbackData } = await supabase
+        // Executa queries combinadas para garantir que nenhum pedido fique para trás
+        const queries = [
+          supabase
             .from("orders")
-            .select("id, status, total, created_at, company_id")
+            .select(`
+              id, status, total, created_at, company_id, user_id, customer_id,
+              companies(name, logo_url)
+            `)
+            .in("customer_id", customerIds)
+            .order("created_at", { ascending: false })
+            .limit(50),
+          supabase
+            .from("orders")
+            .select(`
+              id, status, total, created_at, company_id, user_id, customer_id,
+              companies(name, logo_url)
+            `)
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(50),
+        ];
+
+        if (savedOrderIds.length > 0) {
+          queries.push(
+            supabase
+              .from("orders")
+              .select(`
+                id, status, total, created_at, company_id, user_id, customer_id,
+                companies(name, logo_url)
+              `)
+              .in("id", savedOrderIds.slice(0, 30))
+              .order("created_at", { ascending: false })
+          );
+        }
+
+        const results = await Promise.all(queries);
+        const ordersMap = new Map<string, any>();
+
+        results.forEach((res) => {
+          if (res.data) {
+            res.data.forEach((o: any) => {
+              if (o && o.id) ordersMap.set(o.id, o);
+            });
+          }
+        });
+
+        // Caso a query com join tenha retornado erro para algum, fazemos fallback
+        const mergedOrders = Array.from(ordersMap.values());
+        
+        // Se as queries principais falharem, busca direto sem o join
+        if (mergedOrders.length === 0) {
+          const { data: rawOrders } = await supabase
+            .from("orders")
+            .select("id, status, total, created_at, company_id, user_id, customer_id")
             .in("customer_id", customerIds)
             .order("created_at", { ascending: false })
             .limit(50);
 
-          if (fallbackData && fallbackData.length > 0) {
-            const compIds = Array.from(new Set(fallbackData.map((o) => o.company_id).filter(Boolean)));
+          if (rawOrders && rawOrders.length > 0) {
+            rawOrders.forEach((o: any) => ordersMap.set(o.id, o));
+          }
+        }
+
+        const finalOrders = Array.from(ordersMap.values());
+        const missingCompanies = finalOrders.filter(
+          (o) => !o.companies || (Array.isArray(o.companies) && o.companies.length === 0)
+        );
+
+        if (missingCompanies.length > 0) {
+          const compIds = Array.from(new Set(missingCompanies.map((o) => o.company_id).filter(Boolean)));
+          if (compIds.length > 0) {
             const { data: compList } = await supabase
               .from("companies")
               .select("id, name, logo_url")
               .in("id", compIds);
 
-            const compMap = new Map((compList || []).map((c) => [c.id, c]));
-            return fallbackData.map((o) => ({
-              ...o,
-              companies: compMap.get(o.company_id) || { name: "Restaurante", logo_url: null },
-            }));
+            if (compList) {
+              const compMap = new Map(compList.map((c) => [c.id, c]));
+              missingCompanies.forEach((o) => {
+                if (compMap.has(o.company_id)) {
+                  o.companies = compMap.get(o.company_id);
+                }
+              });
+            }
           }
-          return [];
         }
 
-        return data ?? [];
+        finalOrders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        return finalOrders;
       } catch (err) {
         console.error("Error fetching client orders:", err);
         return [];

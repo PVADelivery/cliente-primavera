@@ -79,8 +79,10 @@ export function MarketplaceLayout() {
             .select("id")
             .eq("user_id", user.id);
 
-          const cIds = (custs || []).map((c) => c.id).filter(Boolean);
-          if (cIds.length === 0) cIds.push(user.id);
+          const cIds = Array.from(new Set([
+            user.id,
+            ...((custs || []).map((c) => c.id).filter(Boolean)),
+          ]));
 
           const { count: ordersCount, error: ordersErr } = await supabase
             .from("orders")
