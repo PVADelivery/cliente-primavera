@@ -12,6 +12,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Company } from "@/types/database";
 import { useAuth } from "@/contexts/AuthContext";
 import { AeroTile, AeroPlate, AeroSection, AeroButton } from "@/components/aero";
+import { getFallbackProductsForCompany } from "@/lib/fallbackCatalog";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -1054,20 +1055,48 @@ function MarketplaceHome() {
     },
   });
 
-  const allStores = stores ?? [];
-  const top = useMemo(() => [...allStores].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0)).slice(0, 8), [allStores]);
+  const allStores = useMemo(() => {
+    const raw = stores ?? [];
+    return [...raw].sort((a, b) => {
+      // Prioritize Açaí Primavera Gourmet (active registered menu) and open stores
+      if (a.id === "55b3a1f7-36b8-49c5-b66b-40b16bed7737") return -1;
+      if (b.id === "55b3a1f7-36b8-49c5-b66b-40b16bed7737") return 1;
+      if (a.is_open && !b.is_open) return -1;
+      if (!a.is_open && b.is_open) return 1;
+      return (b.rating ?? 0) - (a.rating ?? 0);
+    });
+  }, [stores]);
+
+  const top = useMemo(() => [...allStores].slice(0, 8), [allStores]);
   const storesMap = useMemo(() => new Map(allStores.map(s => [s.id, s])), [allStores]);
 
   const matchedProducts = useMemo(() => {
     const q = searchTerm.trim();
     if (!q) return [];
-    return allProducts.filter(
+    const directMatches = allProducts.filter(
       (p) =>
         checkSearchMatch(p.name, q) ||
         checkSearchMatch(p.description, q) ||
         checkSearchMatch(p.category, q)
     );
-  }, [allProducts, searchTerm]);
+    if (directMatches.length > 0) return directMatches;
+
+    // Se a busca no banco for vazia, busca nos catálogos das lojas próximas
+    const fallbackMatches: any[] = [];
+    allStores.slice(0, 10).forEach((s) => {
+      const fbList = getFallbackProductsForCompany(s.id, s.category, s.name);
+      fbList.forEach((p) => {
+        if (
+          checkSearchMatch(p.name, q) ||
+          checkSearchMatch(p.description, q) ||
+          checkSearchMatch(p.category, q)
+        ) {
+          fallbackMatches.push(p);
+        }
+      });
+    });
+    return fallbackMatches;
+  }, [allProducts, allStores, searchTerm]);
 
   const filtered = useMemo(() => {
     let list = [...allStores];
@@ -1176,7 +1205,7 @@ function MarketplaceHome() {
             O que você quer pedir hoje na sua cidade?
           </p>
 
-          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} stores={allStores} products={allProducts} />
+          <SmartSearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} stores={allStores} products={matchedProducts} />
         </motion.div>
       </section>
 

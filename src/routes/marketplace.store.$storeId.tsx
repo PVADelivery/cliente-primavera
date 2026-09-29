@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ProductCustomizationModal } from "@/components/marketplace/ProductCustomizationModal";
+import { getFallbackProductsForCompany } from "@/lib/fallbackCatalog";
 
 export const Route = createFileRoute("/marketplace/store/$storeId")({
   component: StoreDetail,
@@ -156,15 +157,21 @@ function StoreDetail() {
   });
 
   const name = store?.name ?? "";
+
+  const effectiveProducts = useMemo(() => {
+    if (products && products.length > 0) return products;
+    return getFallbackProductsForCompany(storeId, store?.category, store?.name);
+  }, [products, storeId, store?.category, store?.name]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
+    if (!q) return effectiveProducts;
+    return effectiveProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         (p.description ?? "").toLowerCase().includes(q),
     );
-  }, [products, query]);
+  }, [effectiveProducts, query]);
 
   const grouped = useMemo(() => {
     return filtered.reduce<Record<string, (Product & { promo?: number })[]>>((acc, p) => {

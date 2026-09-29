@@ -55,6 +55,14 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>O MT 24 Horas precisa de acesso à câmera para você tirar fotos do seu perfil ou anexar fotos em pedidos e comprovantes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>O MT 24 Horas precisa de acesso à sua biblioteca de fotos para você escolher sua foto de perfil ou anexar comprovantes.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>O MT 24 Horas precisa de permissão para salvar comprovantes de pedidos na sua galeria de fotos.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>O MT 24 Horas utiliza sua localização para exibir estabelecimentos, restaurantes e entregas próximas do seu endereço.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>O MT 24 Horas necessita de notificações ativas para informar em tempo real o status dos seus pedidos e entregas.</string>
 	<key>UIApplicationSceneManifest</key>
