@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, Sparkles, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check } from "lucide-react";
+import { AlertCircle, ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, Sparkles, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, Compass, SlidersHorizontal } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/marketplace/business/")({
   head: () => ({
     meta: [
-      { title: "Central de Negócios — Imóveis, Carros, Motos e Caminhões" },
+      { title: "Central de Negócios — Imóveis de Alto Padrão e Locação" },
       { name: "description", content: "Casas, apartamentos, salas comerciais para locação e venda, carros, motos, caminhões e utilitários em Primavera do Leste, MT." },
       { property: "og:title", content: "Central de Negócios — Imóveis, Carros e Motos" },
       { property: "og:description", content: "Casas, apartamentos, kitnets, salas, terrenos, carros, motos e caminhões na sua cidade." },
@@ -39,6 +39,15 @@ const TYPES: Array<{ key: PropertyType | "all"; label: string }> = [
   { key: "kitnet", label: "Kitnet" },
   { key: "terreno", label: "Terreno" },
 ];
+
+const TYPE_ICONS: Record<PropertyType | "all", any> = {
+  all: Layers,
+  casa: Home,
+  apartamento: Building2,
+  sala: Building2,
+  kitnet: Sparkles,
+  terreno: Compass,
+};
 
 const TYPE_LABEL: Record<PropertyType, string> = {
   casa: "Casa",
@@ -178,105 +187,193 @@ function BusinessPage() {
   }, [city, neighborhoods, neighborhood]);
 
   return (
-    <div className="space-y-5 pb-6">
-      <AeroPageHeader
-        title="Central de Negócios"
-        subtitle="Imóveis, Carros, Motos e Caminhões"
-        onBack={() => navigate({ to: "/marketplace" })}
-      />
+    <div className="space-y-6 pb-12">
+      {/* ── LUXURY HERO BANNER ── */}
+      <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-950 via-zinc-900 to-black p-5 sm:p-7 text-white shadow-2xl border border-white/10">
+        {/* Glow ambient effects */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="grid grid-cols-2 gap-2">
-        <span className="min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-black bg-primary text-black border border-primary/40 shadow-sm flex items-center justify-center gap-2 px-2.5 text-center">
-          <Building2 className="w-4 h-4 shrink-0 text-black" />
-          <span>Imóveis & Locação</span>
-        </span>
-        <Link
-          to="/marketplace/business/vehicles"
-          className="aero-focus min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-bold bg-card border border-border text-foreground hover:bg-muted active:scale-[0.98] transition-all flex items-center justify-center gap-2 px-2.5 text-center"
-        >
-          <Car className="w-4 h-4 shrink-0 text-foreground" />
-          <span>Carros, Motos & Caminhões</span>
-        </Link>
+        <div className="relative z-10 space-y-4">
+          {/* Top navigation row */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate({ to: "/marketplace" })}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/90 text-xs font-semibold backdrop-blur-md transition-all active:scale-95"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Voltar</span>
+            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold tracking-wide">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              {properties.length} Anúncios Ativos
+            </span>
+          </div>
+
+          {/* Title & subtitle */}
+          <div>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-md bg-amber-500 text-slate-950 shadow-sm">
+                CENTRAL DE NEGÓCIOS
+              </span>
+              <span className="text-xs text-amber-300 font-bold flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Imóveis & Oportunidades
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white font-display">
+              Imóveis em Primavera do Leste
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-300 mt-1 max-w-xl font-medium leading-relaxed">
+              Casas, apartamentos, salas comerciais e kitnets para locação e venda com negociação direta no WhatsApp.
+            </p>
+          </div>
+
+          {/* Luxury Switcher Tab: Imóveis vs Veículos */}
+          <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+            <div className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all">
+              <Building2 className="w-4 h-4 text-slate-950" />
+              <span>Imóveis & Locação</span>
+            </div>
+            <Link
+              to="/marketplace/business/vehicles"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 font-bold text-xs sm:text-sm transition-all active:scale-98"
+            >
+              <Car className="w-4 h-4 text-zinc-400" />
+              <span>Carros, Motos & Cargas</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
-      <div className="relative">
-        <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      {/* ── SEARCH BAR ── */}
+      <div className="relative group">
+        <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-amber-500 transition-colors pointer-events-none" />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por bairro ou descrição"
-          className="w-full h-12 pl-11 pr-4 rounded-2xl bg-card border border-border/60 text-sm outline-none focus:border-primary"
+          placeholder="Buscar por bairro, condomínio ou palavra-chave..."
+          className="w-full h-12 pl-11 pr-10 rounded-2xl bg-card border border-border/80 text-sm font-medium outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 shadow-sm transition-all"
         />
+        {q && (
+          <button
+            onClick={() => setQ("")}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
-        {DEALS.map((d) => (
-          <button
-            key={d.key}
-            onClick={() => setDeal(d.key)}
-            className={`tap-target aero-focus shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${deal === d.key
-                ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
-                : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
+      {/* ── MODALIDADE (DEAL) PILLS ── */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 py-0.5">
+        {DEALS.map((d) => {
+          const isSelected = deal === d.key;
+          return (
+            <button
+              key={d.key}
+              onClick={() => setDeal(d.key)}
+              className={`shrink-0 px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 border shadow-sm ${
+                isSelected
+                  ? d.key === "venda"
+                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 border-amber-500 shadow-amber-500/25 scale-[1.02]"
+                    : d.key === "locacao"
+                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-500 shadow-emerald-500/25 scale-[1.02]"
+                    : "bg-primary text-slate-950 border-primary shadow-primary/25 scale-[1.02]"
+                  : "bg-card text-muted-foreground border-border/70 hover:bg-muted/80 hover:text-foreground hover:border-border"
               }`}
-          >
-            {d.label}
-          </button>
-        ))}
+            >
+              {d.key === "locacao" && <span className="w-2 h-2 rounded-full bg-emerald-400" />}
+              {d.key === "venda" && <span className="w-2 h-2 rounded-full bg-amber-400" />}
+              <span>{d.label}</span>
+            </button>
+          );
+        })}
+
         <button
           onClick={() => setOnlyFavorites((v) => !v)}
-          aria-pressed={onlyFavorites}
-          className={`tap-target aero-focus shrink-0 inline-flex items-center gap-1.5 px-4 min-h-11 rounded-full text-xs font-semibold border transition-colors ${onlyFavorites
-              ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
-              : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
-            }`}
+          className={`shrink-0 px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1.5 border shadow-sm ${
+            onlyFavorites
+              ? "bg-rose-500 text-white border-rose-500 shadow-rose-500/25 scale-[1.02]"
+              : "bg-card text-muted-foreground border-border/70 hover:bg-muted/80 hover:text-foreground"
+          }`}
         >
-          <Heart className={`w-3.5 h-3.5 ${onlyFavorites ? "fill-current" : ""}`} />
-          Favoritos{hydrated && favorites.length > 0 ? ` (${favorites.length})` : ""}
+          <Heart className={`w-3.5 h-3.5 ${onlyFavorites ? "fill-white text-white" : "text-rose-500"}`} />
+          <span>Favoritos</span>
+          {hydrated && favorites.length > 0 && (
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${onlyFavorites ? "bg-white text-rose-600" : "bg-rose-500/15 text-rose-500 font-black"}`}>
+              {favorites.length}
+            </span>
+          )}
         </button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
-        {TYPES.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setType(t.key)}
-            className={`shrink-0 px-3.5 min-h-11 inline-flex items-center rounded-full text-xs font-semibold border transition-colors ${type === t.key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border/60"
+      {/* ── PROPERTY TYPES WITH RICH ICONS ── */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 py-0.5">
+        {TYPES.map((t) => {
+          const isSelected = type === t.key;
+          const Icon = TYPE_ICONS[t.key] || Building2;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setType(t.key)}
+              className={`shrink-0 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                isSelected
+                  ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-md scale-[1.02]"
+                  : "bg-card text-muted-foreground border-border/70 hover:bg-muted/80 hover:text-foreground"
               }`}
-          >
-            {t.label}
-          </button>
-        ))}
+            >
+              <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-amber-400 dark:text-amber-600" : "text-muted-foreground"}`} />
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <select
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          aria-label="Filtrar por cidade"
-          className="h-11 px-3 rounded-2xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
-        >
-          <option value="all">Todas as cidades</option>
-          {cities.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          value={neighborhood}
-          onChange={(e) => setNeighborhood(e.target.value)}
-          aria-label="Filtrar por bairro"
-          className="h-11 px-3 rounded-2xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
-        >
-          <option value="all">Todos os bairros</option>
-          {neighborhoods.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+      {/* ── CITY, NEIGHBORHOOD & SORT FILTERS (SLEEK CARDS) ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="relative">
+          <MapPin className="w-3.5 h-3.5 text-amber-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <select
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="w-full h-11 pl-9 pr-6 rounded-2xl bg-card border border-border/70 text-xs font-bold text-foreground outline-none focus:border-amber-500 appearance-none shadow-sm cursor-pointer"
+          >
+            <option value="all">Todas as Cidades</option>
+            {cities.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground rotate-90 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+
+        <div className="relative">
+          <Building2 className="w-3.5 h-3.5 text-emerald-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <select
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
+            className="w-full h-11 pl-9 pr-6 rounded-2xl bg-card border border-border/70 text-xs font-bold text-foreground outline-none focus:border-emerald-500 appearance-none shadow-sm cursor-pointer"
+          >
+            <option value="all">Todos os Bairros</option>
+            {neighborhoods.map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground rotate-90 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+
+        <div className="relative col-span-2 sm:col-span-1">
+          <ArrowUpDown className="w-3.5 h-3.5 text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="w-full h-11 pl-9 pr-6 rounded-2xl bg-card border border-border/70 text-xs font-bold text-foreground outline-none focus:border-primary appearance-none shadow-sm cursor-pointer"
+          >
+            {SORTS.map((s) => (
+              <option key={s.key} value={s.key}>{s.label}</option>
+            ))}
+          </select>
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground rotate-90 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
       </div>
 
       {activeChips.length > 0 && (
@@ -285,7 +382,7 @@ function BusinessPage() {
             <button
               key={chip.key}
               onClick={chip.clear}
-              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full bg-primary/15 text-primary border border-primary/30 text-[11px] font-semibold"
+              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold"
               aria-label={`Remover filtro ${chip.label}`}
             >
               {chip.label}
@@ -294,32 +391,19 @@ function BusinessPage() {
           ))}
           <button
             onClick={clearAll}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/60 text-[11px] font-semibold text-muted-foreground"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/60 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
           >
-            Limpar tudo
+            Limpar todos os filtros
           </button>
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold text-muted-foreground">
-          {list.length} {list.length === 1 ? "imóvel" : "imóveis"}
+      {/* Header com Contagem de Imóveis */}
+      <div className="flex items-center justify-between gap-3 pt-1">
+        <p className="text-xs font-extrabold text-foreground flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-amber-500" />
+          {list.length} {list.length === 1 ? "imóvel disponível" : "imóveis disponíveis"}
         </p>
-        <label className="inline-flex items-center gap-2">
-          <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            aria-label="Ordenar imóveis"
-            className="h-11 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
-          >
-            {SORTS.map((s) => (
-              <option key={s.key} value={s.key}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
 
       {isLoading ? (
@@ -335,9 +419,8 @@ function BusinessPage() {
         />
       ) : (
         <>
-          <ul className="space-y-4">
+          <ul className="space-y-5">
             {pageItems.map((p) => {
-              const cover = p.images?.[0] || null;
               const waNumber = p.contact_phone ? p.contact_phone.replace(/\D/g, "") : "";
               const fullWa = waNumber ? (waNumber.startsWith("55") ? waNumber : `55${waNumber}`) : "";
               const waText = encodeURIComponent(
@@ -346,62 +429,60 @@ function BusinessPage() {
 
               return (
                 <li key={p.id} className="relative group">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFavorite(p.id);
-                    }}
-                    aria-label={isFavorite(p.id) ? "Remover dos favoritos" : "Salvar nos favoritos"}
-                    aria-pressed={isFavorite(p.id)}
-                    className="absolute top-3.5 right-3.5 z-20 w-10 h-10 rounded-full grid place-items-center bg-background/80 border border-border/60 backdrop-blur shadow-sm transition-transform active:scale-90"
-                  >
-                    <Heart
-                      className={`w-4 h-4 transition-colors ${isFavorite(p.id) ? "text-rose-500 fill-rose-500" : "text-muted-foreground"}`}
-                    />
-                  </button>
-
-                  <div className="overflow-hidden rounded-3xl border border-border/60 bg-card hover:border-primary/50 transition-all shadow-sm">
-                    {/* Carrossel de Fotos com navegação e badges */}
+                  <div className="overflow-hidden rounded-3xl border border-border/70 bg-card hover:border-amber-500/50 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col">
+                    {/* Media / Carousel */}
                     <PropertyImageCarousel
                       images={p.images}
                       propertyId={p.id}
                       dealType={p.deal_type}
                       propertyType={p.property_type}
+                      isFav={isFavorite(p.id)}
+                      onToggleFav={() => toggleFavorite(p.id)}
                     />
 
-                    {/* Conteúdo do Card */}
-                    <div className="p-4 space-y-3">
-                      <Link
-                        to="/marketplace/business/$propertyId"
-                        params={{ propertyId: p.id }}
-                        className="block group-hover:text-primary transition-colors"
-                      >
-                        <h2 className="font-display font-bold text-base leading-tight">
-                          {TYPE_LABEL[p.property_type]} em {p.neighborhood ?? "Primavera do Leste"}
-                        </h2>
-                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-primary shrink-0" />
-                          {[p.city, p.state].filter(Boolean).join(", ")}
-                        </p>
-                      </Link>
+                    {/* Card Body */}
+                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        {/* Title & Location */}
+                        <Link
+                          to="/marketplace/business/$propertyId"
+                          params={{ propertyId: p.id }}
+                          className="block group/title"
+                        >
+                          <div className="flex items-center gap-1.5 text-xs text-amber-500 dark:text-amber-400 font-bold uppercase tracking-wider">
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            <span>{p.neighborhood ?? "Primavera do Leste"}, {p.city || "MT"}</span>
+                          </div>
+                          <h2 className="font-display font-black text-lg sm:text-xl text-foreground group-hover/title:text-primary transition-colors leading-tight mt-1">
+                            {TYPE_LABEL[p.property_type] ?? p.property_type} em {p.neighborhood ?? "Primavera do Leste"}
+                          </h2>
+                        </Link>
 
-                      {p.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                          {p.description}
-                        </p>
-                      )}
-
-                      <PropertyAttrs property={p} />
-
-                      <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2 flex-wrap">
-                        <div>
-                          <p className="text-xs font-semibold text-muted-foreground">Valor:</p>
-                          <p className="font-display font-black text-xl text-black dark:text-white leading-tight">
-                            {formatPrice(p.price)}
-                            {p.deal_type === "locacao" && <span className="text-xs font-normal text-muted-foreground"> /mês</span>}
+                        {/* Description */}
+                        {p.description && (
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed font-medium">
+                            {p.description}
                           </p>
+                        )}
+
+                        {/* Property attributes strip */}
+                        <PropertyAttrs property={p} />
+                      </div>
+
+                      {/* Bottom Pricing & WhatsApp CTA */}
+                      <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-3 flex-wrap">
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                            {p.deal_type === "locacao" ? "Aluguel Mensal" : "Valor de Venda"}
+                          </span>
+                          <div className="flex items-baseline gap-1">
+                            <span className="font-display font-black text-2xl text-foreground tracking-tight">
+                              {formatPrice(p.price)}
+                            </span>
+                            {p.deal_type === "locacao" && (
+                              <span className="text-xs font-semibold text-muted-foreground">/mês</span>
+                            )}
+                          </div>
                         </div>
 
                         {fullWa ? (
@@ -409,28 +490,32 @@ function BusinessPage() {
                             href={`https://wa.me/${fullWa}?text=${waText}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
-                            title="Falar direto no WhatsApp"
+                            className="inline-flex items-center gap-2 h-11 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-green-600 to-teal-600 hover:from-emerald-600 hover:to-green-700 text-white text-xs font-black tracking-wide shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
                           >
-                            <WhatsappIcon className="w-4 h-4" />
+                            <WhatsappIcon className="w-4 h-4 shrink-0" />
                             <span>WhatsApp</span>
                           </a>
                         ) : (
                           <Link
                             to="/marketplace/business/$propertyId"
                             params={{ propertyId: p.id }}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                            className="inline-flex items-center gap-1.5 h-11 px-4 rounded-2xl bg-primary text-primary-foreground text-xs font-black shadow-md hover:bg-primary/90 transition-all"
                           >
-                            Ver detalhes <ChevronRight className="w-3.5 h-3.5" />
+                            <span>Ver Detalhes</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
                           </Link>
                         )}
                       </div>
 
                       {p.contact_phone && (
-                        <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5 pt-1">
-                          <WhatsappIcon className="w-3 h-3 text-[#25D366]" />
-                          <span>Contato: {p.contact_phone}</span>
-                        </p>
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1 border-t border-border/30">
+                          <span className="font-semibold text-foreground/80 flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Anunciante Verificado
+                          </span>
+                          <span className="font-mono text-muted-foreground font-semibold">
+                            {p.contact_phone}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -440,32 +525,36 @@ function BusinessPage() {
           </ul>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-3 pt-1">
+            <div className="flex items-center justify-between gap-3 pt-2">
               <button
                 onClick={() => setPage((v) => Math.max(1, v - 1))}
                 disabled={page === 1}
-                className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+                className="px-4 h-11 rounded-2xl border border-border/70 bg-card text-xs font-bold disabled:opacity-40 hover:bg-muted transition-colors"
               >
                 Anterior
               </button>
-              <span className="text-xs font-semibold text-muted-foreground">
+              <span className="text-xs font-bold text-muted-foreground">
                 Página {page} de {totalPages}
               </span>
               <button
                 onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
                 disabled={page === totalPages}
-                className="px-4 h-10 rounded-2xl border border-border/60 bg-card text-xs font-semibold disabled:opacity-40"
+                className="px-4 h-11 rounded-2xl border border-border/70 bg-card text-xs font-bold disabled:opacity-40 hover:bg-muted transition-colors"
               >
                 Próxima
               </button>
             </div>
           )}
-          {/* Botão Flutuante: Anunciar Imóvel */}
+
+          {/* Botão Flutuante de Alto Padrão: Anunciar Imóvel */}
           <button
             onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
-            className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-24 right-5 z-40 h-13 pl-4 pr-6 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-sm flex items-center gap-2.5 shadow-2xl shadow-amber-500/40 hover:scale-105 active:scale-95 transition-all border border-amber-300/40"
           >
-            <Plus className="w-4 h-4" /> Anunciar Imóvel
+            <div className="w-6 h-6 rounded-full bg-slate-950 text-amber-400 flex items-center justify-center">
+              <Plus className="w-4 h-4 stroke-[3]" />
+            </div>
+            <span>Anunciar Imóvel</span>
           </button>
 
           {showForm && (
@@ -1062,11 +1151,15 @@ export function PropertyImageCarousel({
   propertyId,
   dealType,
   propertyType,
+  isFav,
+  onToggleFav,
 }: {
   images?: string[] | null;
   propertyId: string;
   dealType: PropertyDeal;
   propertyType: PropertyType;
+  isFav?: boolean;
+  onToggleFav?: () => void;
 }) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
@@ -1087,38 +1180,75 @@ export function PropertyImageCarousel({
   return (
     <div
       onClick={() => navigate({ to: "/marketplace/business/$propertyId", params: { propertyId } })}
-      className="relative aspect-[16/9] w-full bg-muted overflow-hidden cursor-pointer select-none group/carousel"
+      className="relative aspect-[16/10] sm:aspect-[16/9] w-full bg-slate-950 overflow-hidden cursor-pointer select-none group/carousel"
     >
       {list.length > 0 ? (
         <img
           src={list[index]}
           alt={propertyType}
-          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-all duration-500 group-hover/carousel:scale-105"
         />
       ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-1 bg-gradient-to-b from-muted/60 to-muted">
-          <Home className="h-10 w-10 text-muted-foreground/30" />
-          <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/50">Sem fotos</span>
+        <div className="w-full h-full relative flex flex-col items-center justify-center p-6 text-center overflow-hidden bg-gradient-to-br from-slate-950 via-zinc-900 to-neutral-900">
+          {/* Subtle architectural grid pattern */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="relative z-10 flex flex-col items-center gap-2">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-lg">
+              <Building2 className="w-7 h-7 text-amber-400" />
+            </div>
+            <span className="text-[10px] uppercase font-black tracking-widest text-amber-400/90 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+              MT 24HORAS EXPRESS • EXCLUSIVIDADE
+            </span>
+            <p className="text-xs font-bold text-zinc-300">
+              {TYPE_LABEL[propertyType] ?? propertyType} para {dealType === "venda" ? "Venda" : "Locação"}
+            </p>
+          </div>
         </div>
       )}
 
+      {/* Subtle bottom shadow vignette for high contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
       {/* Badges de Modalidade e Tipo */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 pointer-events-none">
+      <div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-1.5 pointer-events-none flex-wrap">
         <span
-          className={`text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${dealType === "venda" ? "bg-amber-500 text-slate-950" : "bg-emerald-600 text-white"
-            }`}
+          className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg ${
+            dealType === "venda"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-amber-500/30"
+              : "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/30"
+          }`}
         >
           {dealType === "venda" ? "Venda" : "Locação"}
         </span>
-        <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50">
+        <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-900/80 text-white backdrop-blur-md border border-white/20 shadow-md">
           {TYPE_LABEL[propertyType] ?? propertyType}
         </span>
       </div>
 
+      {/* Favorite button on top-right */}
+      {onToggleFav && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleFav();
+          }}
+          aria-label={isFav ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          className="absolute top-3.5 right-3.5 z-20 w-10 h-10 rounded-full grid place-items-center bg-slate-900/70 hover:bg-slate-900/90 border border-white/20 backdrop-blur-md shadow-lg transition-transform active:scale-90"
+        >
+          <Heart
+            className={`w-4 h-4 transition-colors ${
+              isFav ? "text-rose-500 fill-rose-500 scale-110" : "text-white/80 hover:text-white"
+            }`}
+          />
+        </button>
+      )}
+
       {/* Carrossel: Contador de Fotos */}
       {list.length > 1 && (
-        <span className="absolute bottom-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-full bg-black/75 text-white text-[10px] font-black tracking-wider backdrop-blur-sm pointer-events-none shadow">
-          {index + 1} / {list.length}
+        <span className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-slate-950/80 text-white text-[10px] font-black tracking-wider backdrop-blur-md pointer-events-none shadow-md border border-white/10">
+          📷 {index + 1} de {list.length}
         </span>
       )}
 
@@ -1129,7 +1259,7 @@ export function PropertyImageCarousel({
             type="button"
             onClick={handlePrev}
             aria-label="Foto anterior"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -1137,7 +1267,7 @@ export function PropertyImageCarousel({
             type="button"
             onClick={handleNext}
             aria-label="Próxima foto"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -1146,12 +1276,13 @@ export function PropertyImageCarousel({
 
       {/* Indicador de Bolinhas */}
       {list.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 pointer-events-none">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 pointer-events-none">
           {list.map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 rounded-full transition-all ${i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
-                }`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-4 bg-amber-400 shadow-sm" : "w-1.5 bg-white/50"
+              }`}
             />
           ))}
         </div>
@@ -1161,21 +1292,25 @@ export function PropertyImageCarousel({
 }
 
 export function PropertyAttrs({ property: p }: { property: Property }) {
-  const attrs: Array<{ icon: typeof Ruler; text: string }> = [];
+  const attrs: Array<{ icon: any; text: string }> = [];
   if (p.total_area) attrs.push({ icon: Ruler, text: `${p.total_area} m² total` });
   if (p.built_area) attrs.push({ icon: Ruler, text: `${p.built_area} m² constr.` });
   if (p.bedrooms) attrs.push({ icon: BedDouble, text: `${p.bedrooms} quartos` });
-  if (p.parking) attrs.push({ icon: Car, text: `${p.parking} vagas` });
   if (p.bathrooms) attrs.push({ icon: Bath, text: `${p.bathrooms} banheiros` });
+  if (p.parking) attrs.push({ icon: Car, text: `${p.parking} vagas` });
   if (attrs.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+    <div className="flex flex-wrap gap-1.5 pt-1">
       {attrs.map((a, i) => {
         const Icon = a.icon;
         return (
-          <span key={i} className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-            <Icon className="w-3.5 h-3.5 text-primary" /> {a.text}
+          <span
+            key={i}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-muted/60 border border-border/50 text-[11px] font-bold text-foreground"
+          >
+            <Icon className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span>{a.text}</span>
           </span>
         );
       })}

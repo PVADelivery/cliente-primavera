@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle, Building2 } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle, Building2, Bike, Truck, ArrowUpDown, Shield, SlidersHorizontal, MapPin } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/property";
 import type { Vehicle, VehicleType } from "@/types/database";
-import { AeroSkeletonList, AeroEmptyState, AeroPageHeader } from "@/components/aero";
+import { AeroSkeletonList, AeroEmptyState } from "@/components/aero";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/business/vehicles")({
@@ -32,13 +32,13 @@ const TYPE_LABEL: Record<VehicleType, string> = {
   outro: "Outro",
 };
 
-const TYPES: Array<{ key: VehicleType | "all"; label: string }> = [
-  { key: "all", label: "Todos os tipos" },
-  { key: "carro", label: "Carro" },
-  { key: "moto", label: "Moto" },
-  { key: "caminhao", label: "Caminhão" },
-  { key: "utilitario", label: "Utilitário" },
-  { key: "outro", label: "Outro" },
+const TYPES: Array<{ key: VehicleType | "all"; label: string; icon: any }> = [
+  { key: "all", label: "Todos os tipos", icon: Sparkles },
+  { key: "carro", label: "Carros", icon: Car },
+  { key: "moto", label: "Motos", icon: Bike },
+  { key: "caminhao", label: "Caminhões", icon: Truck },
+  { key: "utilitario", label: "Utilitários", icon: Car },
+  { key: "outro", label: "Outros", icon: Sparkles },
 ];
 
 type SortKey = "price_asc" | "price_desc" | "recent";
@@ -89,133 +89,223 @@ function VehiclesPage() {
   }, [vehicles, type, q, sort]);
 
   return (
-    <div className="space-y-5 pb-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate({ to: "/marketplace/business" })}
-          className="w-9 h-9 rounded-full grid place-items-center bg-card border border-border/50 text-foreground"
-          aria-label="Voltar"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div>
-          <h1 className="font-display text-xl font-bold leading-tight">Central de Negócios</h1>
-          <p className="text-xs text-muted-foreground">Carros, motos, caminhões e utilitários na sua cidade</p>
+    <div className="space-y-6 pb-28">
+      {/* HERO BANNER DE LUXO: CENTRAL DE NEGÓCIOS - VEÍCULOS */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-zinc-900 to-black p-5 sm:p-7 text-white shadow-2xl border border-white/10">
+        {/* Glow de fundo */}
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              onClick={() => navigate({ to: "/marketplace/business" })}
+              className="w-10 h-10 rounded-2xl grid place-items-center bg-white/10 hover:bg-white/20 active:scale-95 text-white backdrop-blur-md border border-white/15 transition-all shadow-md"
+              aria-label="Voltar"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[11px] font-black uppercase tracking-wider backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5" /> Garagem VIP
+              </span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/10 text-white/90 border border-white/15 text-[11px] font-bold">
+                {list.length} {list.length === 1 ? "anúncio" : "anúncios"}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <h1 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+              Central de Veículos <Car className="w-6 h-6 text-amber-400" />
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-300 font-medium mt-1">
+              Carros, motos, caminhões e utilitários selecionados em Primavera do Leste e região.
+            </p>
+          </div>
+
+          {/* Abas de Segmento Luxo */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <Link
+              to="/marketplace/business"
+              className="min-h-[46px] rounded-2xl text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 text-zinc-200 border border-white/10 flex items-center justify-center gap-2 px-3 text-center transition-all active:scale-[0.98]"
+            >
+              <Building2 className="w-4 h-4 shrink-0 text-zinc-400" />
+              <span>Imóveis & Locação</span>
+            </Link>
+            <div className="min-h-[46px] rounded-2xl text-xs sm:text-sm font-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 border border-amber-300 shadow-lg shadow-amber-400/20 flex items-center justify-center gap-2 px-3 text-center select-none">
+              <Car className="w-4 h-4 shrink-0 text-slate-950" />
+              <span>Veículos & Cargas</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Link
-          to="/marketplace/business"
-          className="aero-focus min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-bold bg-card border border-border text-foreground hover:bg-muted active:scale-[0.98] transition-all flex items-center justify-center gap-2 px-2.5 text-center"
-        >
-          <Building2 className="w-4 h-4 shrink-0 text-foreground" />
-          <span>Imóveis & Locação</span>
-        </Link>
-        <span className="min-h-[46px] rounded-2xl text-xs sm:text-[13px] font-black bg-primary text-black border border-primary/40 shadow-sm flex items-center justify-center gap-2 px-2.5 text-center">
-          <Car className="w-4 h-4 shrink-0 text-black" />
-          <span>Carros, Motos & Caminhões</span>
-        </span>
-      </div>
-
+      {/* BARRA DE PESQUISA ELEGANTE */}
       <div className="relative">
-        <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none text-muted-foreground">
+          <Search className="w-4 h-4" />
+        </div>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por marca, modelo ou descrição"
-          className="w-full h-12 pl-11 pr-4 rounded-2xl bg-card border border-border/60 text-sm outline-none focus:border-primary"
+          placeholder="Buscar por marca, modelo, ano ou cidade..."
+          className="w-full h-13 pl-11 pr-10 rounded-2xl bg-card/90 backdrop-blur-md border border-border/80 text-sm font-medium outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all shadow-sm"
         />
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
-        {TYPES.map((t) => (
+        {q && (
           <button
-            key={t.key}
-            onClick={() => setType(t.key)}
-            className={`tap-target aero-focus shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-              type === t.key
-                ? "bg-btn-surface text-btn-ink border-btn-line shadow-sm"
-                : "bg-card text-muted-foreground border-border/60 hover:bg-muted active:bg-btn-active active:text-btn-active-ink"
-            }`}
+            onClick={() => setQ("")}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground"
           >
-            {t.label}
+            <X className="w-3.5 h-3.5" />
           </button>
-        ))}
+        )}
       </div>
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold text-muted-foreground">
-          {list.length} {list.length === 1 ? "veículo" : "veículos"}
+      {/* FILTROS DE CATEGORIA POR TIPO */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 py-1">
+        {TYPES.map((t) => {
+          const Icon = t.icon;
+          const isActive = type === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setType(t.key)}
+              className={`shrink-0 px-4 py-2 rounded-2xl text-xs font-bold border transition-all flex items-center gap-2 shadow-sm ${
+                isActive
+                  ? "bg-slate-950 text-amber-400 border-amber-400/50 shadow-amber-500/10 scale-[1.02]"
+                  : "bg-card/80 text-muted-foreground border-border/60 hover:bg-card hover:text-foreground"
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-muted-foreground"}`} />
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* BARRA DE CONTAGEM E ORDENAÇÃO */}
+      <div className="flex items-center justify-between gap-3 px-1">
+        <p className="text-xs font-bold text-muted-foreground">
+          Mostrando <span className="text-foreground">{list.length}</span> {list.length === 1 ? "veículo disponível" : "veículos disponíveis"}
         </p>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
-          aria-label="Ordenar veículos"
-          className="h-9 px-2.5 rounded-xl bg-card border border-border/60 text-xs font-semibold outline-none focus:border-primary"
-        >
-          <option value="price_asc">Menor valor</option>
-          <option value="price_desc">Maior valor</option>
-          <option value="recent">Mais recentes</option>
-        </select>
+
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            aria-label="Ordenar veículos"
+            className="h-10 pl-3 pr-8 rounded-xl bg-card border border-border/80 text-xs font-bold outline-none focus:border-amber-400 appearance-none cursor-pointer shadow-sm"
+          >
+            <option value="price_asc">Menor valor</option>
+            <option value="price_desc">Maior valor</option>
+            <option value="recent">Atualizados recentemente</option>
+          </select>
+          <ArrowUpDown className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground" />
+        </div>
       </div>
 
+      {/* LISTAGEM DE CARDS DE MILHÕES */}
       {isLoading ? (
-        <AeroSkeletonList count={3} lines={3} label="Carregando veículos" />
+        <AeroSkeletonList count={3} lines={3} label="Carregando catálogo de veículos..." />
       ) : list.length === 0 ? (
-        <AeroEmptyState
-          title="Nenhum veículo anunciado"
-          description="Toque em “Anunciar” para publicar o seu veículo à venda."
-        />
+        <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center space-y-4 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-amber-400/10 border border-amber-400/20 text-amber-500 grid place-items-center mx-auto">
+            <Car className="w-8 h-8" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-display font-black text-lg text-foreground">Nenhum veículo encontrado</h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              {q ? "Nenhum resultado corresponde à sua pesquisa. Tente buscar por outros termos." : "Seja o primeiro a anunciar seu carro, moto ou caminhão na Central de Negócios."}
+            </p>
+          </div>
+          <button
+            onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-400 text-slate-950 font-black text-xs shadow-md hover:bg-amber-300 transition-all"
+          >
+            <Plus className="w-4 h-4" /> Anunciar Veículo Agora
+          </button>
+        </div>
       ) : (
-        <ul className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {list.map((v) => (
-            <li
+            <div
               key={v.id}
-              className="rounded-3xl border border-border/50 bg-card p-4 sm:p-5"
+              className="group rounded-3xl border border-border/70 bg-card overflow-hidden hover:border-amber-400/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
               style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <VehicleImageCarousel images={v.images} vehicleType={v.vehicle_type} />
+              <div>
+                {/* Carrossel ou Canvas Mockup */}
+                <VehicleImageCarousel images={v.images} vehicleType={v.vehicle_type} />
 
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-primary/15 text-primary">
-                  Venda
-                </span>
-                <span className="text-[11px] font-semibold text-muted-foreground">{TYPE_LABEL[v.vehicle_type]}</span>
+                <div className="p-4 sm:p-5 space-y-3.5">
+                  {/* Badges de Venda e Tipo */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-sm">
+                      Venda
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-muted/80 text-foreground border border-border/50">
+                      {TYPE_LABEL[v.vehicle_type]}
+                    </span>
+                  </div>
+
+                  {/* Título & Localização */}
+                  <div>
+                    <h2 className="font-display font-black text-lg sm:text-xl text-foreground leading-snug group-hover:text-amber-500 transition-colors">
+                      {[v.brand, v.model].filter(Boolean).join(" ")}
+                    </h2>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{[v.city, v.state].filter(Boolean).join(", ") || "Primavera do Leste, MT"}</span>
+                    </p>
+                  </div>
+
+                  {/* Descrição */}
+                  {v.description && (
+                    <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
+                      {v.description}
+                    </p>
+                  )}
+
+                  {/* Especificações do Veículo */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    {v.year && (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                        <Calendar className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate">{v.year}</span>
+                      </div>
+                    )}
+                    {v.km != null && (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                        <Gauge className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate">{v.km.toLocaleString("pt-BR")} km</span>
+                      </div>
+                    )}
+                    {v.fuel && (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                        <Fuel className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate">{v.fuel}</span>
+                      </div>
+                    )}
+                    {v.transmission && (
+                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                        <Car className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="truncate">{v.transmission}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <h2 className="font-display font-bold text-base mt-2.5 leading-tight">
-                {[v.brand, v.model].filter(Boolean).join(" ")}
-              </h2>
-              <p className="text-xs text-muted-foreground">{[v.city, v.state].filter(Boolean).join(", ")}</p>
+              {/* Rodapé: Preço e WhatsApp CTA */}
+              <div className="p-4 sm:p-5 pt-3 border-t border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Valor de Venda</p>
+                  <p className="font-display font-black text-2xl text-foreground tracking-tight">
+                    {formatPrice(v.price)}
+                  </p>
+                </div>
 
-              {v.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{v.description}</p>}
-
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
-                {v.year && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5 text-primary" /> {v.year}
-                  </span>
-                )}
-                {v.km != null && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                    <Gauge className="w-3.5 h-3.5 text-primary" /> {v.km.toLocaleString("pt-BR")} km
-                  </span>
-                )}
-                {v.fuel && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                    <Fuel className="w-3.5 h-3.5 text-primary" /> {v.fuel}
-                  </span>
-                )}
-                {v.transmission && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                    <Car className="w-3.5 h-3.5 text-primary" /> {v.transmission}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between mt-3 gap-3 pt-2 border-t border-border/50">
-                <p className="font-display font-black text-xl text-black dark:text-white leading-tight">{formatPrice(v.price)}</p>
                 {v.contact_phone && (
                   <a
                     href={`https://wa.me/55${v.contact_phone.replace(/\D/g, "")}?text=${encodeURIComponent(
@@ -223,23 +313,26 @@ function VehiclesPage() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                    className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-black transition-all shadow-md shadow-[#25D366]/20 active:scale-95"
                     title="Chamar no WhatsApp"
                   >
-                    <WhatsappIcon className="w-3.5 h-3.5" /> WhatsApp
+                    <WhatsappIcon className="w-4 h-4" />
+                    <span>WhatsApp</span>
                   </a>
                 )}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
+      {/* BOTÃO FLUTUANTE DE ANUNCIAR VEÍCULO */}
       <button
         onClick={() => (user ? setShowForm(true) : navigate({ to: "/login" }))}
-        className="fixed bottom-24 right-5 z-40 h-12 pl-4 pr-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2 shadow-lg"
+        className="fixed bottom-24 right-5 z-40 h-13 pl-5 pr-6 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-slate-950 font-black text-sm flex items-center gap-2.5 shadow-2xl shadow-amber-400/40 border border-amber-300 hover:scale-105 active:scale-95 transition-all cursor-pointer"
       >
-        <Plus className="w-4 h-4" /> Anunciar
+        <Plus className="w-5 h-5 text-slate-950 stroke-[3]" />
+        <span>Anunciar Veículo</span>
       </button>
 
       {showForm && (
@@ -746,20 +839,44 @@ function VehicleImageCarousel({
     setIndex((curr) => (curr === list.length - 1 ? 0 : curr + 1));
   };
 
-  if (list.length === 0) return null;
+  if (list.length === 0) {
+    return (
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-zinc-900 via-slate-900 to-black select-none flex flex-col items-center justify-center p-6 text-center border-b border-border/40 group-hover:brightness-105 transition-all">
+        {/* Subtle grid pattern & glow */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-2">
+          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-amber-400 shadow-inner">
+            {vehicleType === "moto" ? (
+              <Bike className="w-7 h-7" />
+            ) : vehicleType === "caminhao" ? (
+              <Truck className="w-7 h-7" />
+            ) : (
+              <Car className="w-7 h-7" />
+            )}
+          </div>
+          <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-white/5 text-zinc-300 border border-white/10 backdrop-blur-sm">
+            MT 24HORAS EXPRESS • GARAGEM VIP
+          </span>
+          <p className="text-[11px] text-zinc-400 font-medium">Fotos disponíveis via WhatsApp com o anunciante</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative aspect-[16/9] w-full bg-muted rounded-2xl overflow-hidden select-none mb-3 group/carousel">
+    <div className="relative aspect-[16/10] w-full bg-muted overflow-hidden select-none group/carousel border-b border-border/40">
       <img
         src={list[index]}
         alt={vehicleType}
-        className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
       />
 
       {/* Carrossel: Contador de Fotos */}
       {list.length > 1 && (
-        <span className="absolute bottom-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-full bg-black/75 text-white text-[10px] font-black tracking-wider backdrop-blur-sm pointer-events-none shadow">
-          {index + 1} / {list.length}
+        <span className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-black/80 text-white text-[10px] font-black tracking-wider backdrop-blur-md pointer-events-none shadow-md border border-white/10">
+          📷 {index + 1} de {list.length}
         </span>
       )}
 
@@ -770,7 +887,7 @@ function VehicleImageCarousel({
             type="button"
             onClick={handlePrev}
             aria-label="Foto anterior"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-md active:scale-90 border border-white/15"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -778,7 +895,7 @@ function VehicleImageCarousel({
             type="button"
             onClick={handleNext}
             aria-label="Próxima foto"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-sm transition-all shadow-md active:scale-90"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-md transition-all shadow-md active:scale-90 border border-white/15"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -787,12 +904,12 @@ function VehicleImageCarousel({
 
       {/* Indicador de Bolinhas */}
       {list.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 pointer-events-none">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 pointer-events-none">
           {list.map((_, i) => (
             <span
               key={i}
               className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-4 bg-white shadow-sm" : "w-1.5 bg-white/50"
+                i === index ? "w-5 bg-amber-400 shadow-sm" : "w-1.5 bg-white/60"
               }`}
             />
           ))}
