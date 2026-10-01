@@ -105,14 +105,9 @@ function VehiclesPage() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[11px] font-black uppercase tracking-wider backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5" /> Garagem VIP
-              </span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/10 text-white/90 border border-white/15 text-[11px] font-bold">
-                {list.length} {list.length === 1 ? "anúncio" : "anúncios"}
-              </span>
-            </div>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-white/10 text-white/90 border border-white/15 text-xs font-bold backdrop-blur-md">
+              {list.length} {list.length === 1 ? "anúncio ativo" : "anúncios ativos"}
+            </span>
           </div>
 
           <div>
@@ -871,7 +866,7 @@ function VehicleImageCarousel({
             )}
           </div>
           <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-white/5 text-zinc-300 border border-white/10 backdrop-blur-sm">
-            MT 24HORAS EXPRESS • GARAGEM VIP
+            MT 24HORAS EXPRESS • VEÍCULOS
           </span>
           <p className="text-[11px] text-zinc-400 font-medium">Fotos disponíveis via WhatsApp com o anunciante</p>
         </div>
