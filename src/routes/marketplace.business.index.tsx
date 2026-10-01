@@ -470,53 +470,55 @@ function BusinessPage() {
                       </div>
 
                       {/* Bottom Pricing & WhatsApp CTA */}
-                      <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-3 flex-wrap">
-                        <div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
-                            {p.deal_type === "locacao" ? "Aluguel Mensal" : "Valor de Venda"}
-                          </span>
-                          <div className="flex items-baseline gap-1">
-                            <span className="font-display font-black text-2xl text-foreground tracking-tight">
-                              {formatPrice(p.price)}
+                      <div className="pt-3.5 border-t border-border/60 flex flex-col gap-3">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <div>
+                            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                              {p.deal_type === "locacao" ? "Aluguel Mensal" : "Valor de Venda"}
                             </span>
-                            {p.deal_type === "locacao" && (
-                              <span className="text-xs font-semibold text-muted-foreground">/mês</span>
-                            )}
+                            <div className="flex items-baseline gap-1 mt-0.5">
+                              <span className="font-display font-black text-2xl sm:text-[26px] text-foreground tracking-tight leading-none">
+                                {formatPrice(p.price)}
+                              </span>
+                              {p.deal_type === "locacao" && (
+                                <span className="text-xs font-bold text-muted-foreground">/mês</span>
+                              )}
+                            </div>
                           </div>
+
+                          {p.contact_phone && (
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground bg-card px-2.5 py-1 rounded-full border border-border/60 shadow-xs">
+                              <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                              <span>{p.contact_phone}</span>
+                            </div>
+                          )}
                         </div>
 
-                        {fullWa ? (
-                          <a
-                            href={`https://wa.me/${fullWa}?text=${waText}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 h-11 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-green-600 to-teal-600 hover:from-emerald-600 hover:to-green-700 text-white text-xs font-black tracking-wide shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
-                          >
-                            <WhatsappIcon className="w-4 h-4 shrink-0" />
-                            <span>WhatsApp</span>
-                          </a>
-                        ) : (
+                        <div className="flex items-center gap-2">
+                          {fullWa && (
+                            <a
+                              href={`https://wa.me/${fullWa}?text=${waText}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 h-12 rounded-2xl bg-gradient-to-r from-emerald-600 via-[#25D366] to-emerald-500 hover:brightness-110 active:scale-[0.98] text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all cursor-pointer"
+                              title="Negociar no WhatsApp"
+                            >
+                              <WhatsappIcon className="w-4 h-4 shrink-0" />
+                              <span>Negociar no WhatsApp</span>
+                            </a>
+                          )}
                           <Link
                             to="/marketplace/business/$propertyId"
                             params={{ propertyId: p.id }}
-                            className="inline-flex items-center gap-1.5 h-11 px-4 rounded-2xl bg-primary text-primary-foreground text-xs font-black shadow-md hover:bg-primary/90 transition-all"
+                            className={`h-12 px-4 rounded-2xl border border-border/70 bg-card hover:bg-muted text-xs font-black text-foreground flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all ${
+                              fullWa ? "" : "flex-1"
+                            }`}
                           >
-                            <span>Ver Detalhes</span>
+                            <span>Detalhes</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </Link>
-                        )}
-                      </div>
-
-                      {p.contact_phone && (
-                        <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1 border-t border-border/30">
-                          <span className="font-semibold text-foreground/80 flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Anunciante Verificado
-                          </span>
-                          <span className="font-mono text-muted-foreground font-semibold">
-                            {p.contact_phone}
-                          </span>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </li>

@@ -261,49 +261,63 @@ function VehiclesPage() {
                   </div>
 
                   {/* Descrição */}
-                  {v.description && (
-                    <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
-                      {v.description}
-                    </p>
-                  )}
+                  {v.description &&
+                    v.description.trim().length > 3 &&
+                    v.description.trim().toLowerCase() !== v.model.trim().toLowerCase() &&
+                    v.description.trim().toLowerCase() !== (v.brand ?? "").trim().toLowerCase() && (
+                      <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
+                        {v.description}
+                      </p>
+                    )}
 
-                  {/* Especificações do Veículo */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                  {/* Especificações do Veículo - Pílulas elegantes sem corte de texto */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     {v.year && (
-                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 border border-border/60 text-xs font-bold text-foreground shadow-xs">
                         <Calendar className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate">{v.year}</span>
-                      </div>
+                        <span>{v.year}</span>
+                      </span>
                     )}
                     {v.km != null && (
-                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 border border-border/60 text-xs font-bold text-foreground shadow-xs">
                         <Gauge className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate">{v.km.toLocaleString("pt-BR")} km</span>
-                      </div>
+                        <span>{v.km.toLocaleString("pt-BR")} km</span>
+                      </span>
                     )}
                     {v.fuel && (
-                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 border border-border/60 text-xs font-bold text-foreground shadow-xs">
                         <Fuel className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate">{v.fuel}</span>
-                      </div>
+                        <span>{v.fuel}</span>
+                      </span>
                     )}
                     {v.transmission && (
-                      <div className="flex items-center gap-1.5 p-2 rounded-xl bg-muted/40 border border-border/50 text-[11px] font-semibold text-foreground">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/60 border border-border/60 text-xs font-bold text-foreground shadow-xs">
                         <Car className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate">{v.transmission}</span>
-                      </div>
+                        <span>{v.transmission}</span>
+                      </span>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Rodapé: Preço e WhatsApp CTA */}
-              <div className="p-4 sm:p-5 pt-3 border-t border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Valor de Venda</p>
-                  <p className="font-display font-black text-2xl text-foreground tracking-tight">
-                    {formatPrice(v.price)}
-                  </p>
+              {/* Rodapé de Milhões: Preço e WhatsApp CTA */}
+              <div className="p-4 sm:p-5 pt-3.5 border-t border-border/60 bg-muted/15 flex flex-col gap-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                      Valor de Venda
+                    </span>
+                    <p className="font-display font-black text-2xl sm:text-[26px] text-foreground tracking-tight leading-none mt-1">
+                      {formatPrice(v.price)}
+                    </p>
+                  </div>
+
+                  {v.contact_phone && (
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground bg-card px-2.5 py-1 rounded-full border border-border/60 shadow-xs">
+                      <Phone className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{v.contact_phone}</span>
+                    </div>
+                  )}
                 </div>
 
                 {v.contact_phone && (
@@ -313,11 +327,11 @@ function VehiclesPage() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-black transition-all shadow-md shadow-[#25D366]/20 active:scale-95"
-                    title="Chamar no WhatsApp"
+                    className="w-full h-12 rounded-2xl bg-gradient-to-r from-emerald-600 via-[#25D366] to-emerald-500 hover:brightness-110 active:scale-[0.98] text-white text-sm font-black flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-500/25 transition-all cursor-pointer"
+                    title="Negociar no WhatsApp"
                   >
-                    <WhatsappIcon className="w-4 h-4" />
-                    <span>WhatsApp</span>
+                    <WhatsappIcon className="w-4 h-4 shrink-0" />
+                    <span>Negociar no WhatsApp</span>
                   </a>
                 )}
               </div>
