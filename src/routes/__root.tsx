@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { initializeGlobalErrorHandlers, reportErrorToTelegram } from "@/services/logger";
 import { useEffect, useState, Suspense } from "react";
 import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
+import { GlobalAntiSpam } from "@/components/GlobalAntiSpam";
 import { AlertTriangle, RefreshCw, Copy, Check, Home, ShieldAlert } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { toast } from "sonner";
@@ -225,6 +226,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
+          <GlobalAntiSpam appName="Marketplace Cliente" />
           <NotificationsBridge />
           <Suspense fallback={null}>
             <Outlet />
