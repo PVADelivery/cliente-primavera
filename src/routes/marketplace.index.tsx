@@ -1034,7 +1034,7 @@ function MarketplaceHome() {
           const fallbackActive = ((rpcData as Company[]) || []).filter((c: any) => c.is_active !== false);
           return fallbackActive;
         }
-        const activeData = (data as Company[] || []).filter((c) => c.is_active !== false);
+        const activeData = ((data as unknown as Company[]) || []).filter((c) => c.is_active !== false);
         if (typeof window !== "undefined") {
           try { sessionStorage.setItem("pva_cached_companies_v2", JSON.stringify(activeData)); } catch {}
         }

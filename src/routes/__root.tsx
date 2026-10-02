@@ -13,7 +13,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "@/components/ui/sonner";
 
-import { initializeGlobalErrorHandlers, reportErrorToTelegram } from "@/services/logger";
+import { initializeGlobalErrorHandlers, reportErrorToTelegram, reportInvalidRoute } from "@/services/logger";
 import { useEffect, useState, Suspense } from "react";
 import { useCustomerNotifications } from "@/hooks/useCustomerNotifications";
 import { GlobalAntiSpam } from "@/components/GlobalAntiSpam";
@@ -22,6 +22,14 @@ import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { toast } from "sonner";
 
 function NotFoundComponent() {
+  useEffect(() => {
+    reportInvalidRoute(
+      typeof window !== "undefined" ? window.location.pathname : "/404",
+      { referrer: typeof document !== "undefined" ? document.referrer : "Direto" },
+      "Marketplace Cliente"
+    );
+  }, []);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">

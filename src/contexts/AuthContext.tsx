@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { recordAuditLog, newRequestId } from "@/lib/auditLog";
+import { reportFailedLogin } from "@/services/logger";
 
 interface AuthContextValue {
   user: User | null;
@@ -97,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       await recordAuditLog({ request_id: requestId, event: "auth.signin.failed", error_message: error.message });
+      reportFailedLogin(email, { error_message: error.message }, "MT 24 Horas Express - Cliente");
       return { error: error.message };
     }
     await recordAuditLog({ request_id: requestId, event: "auth.signin.success" });
