@@ -311,6 +311,36 @@ function Profile() {
     ? { name: 'Prata', progress: ((ordersCount - 5) / 10) * 100, color: 'text-zinc-400 bg-zinc-400/10' }
     : { name: 'Bronze', progress: (ordersCount / 5) * 100, color: 'text-orange-700 bg-orange-700/10' };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    try {
+      try {
+        await supabase.rpc('delete_user_account', { p_user_id: user.id });
+      } catch (_) {}
+
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: 'Usuário Excluído',
+            phone: null,
+            avatar_url: null,
+          })
+          .or(`user_id.eq.${user.id},id.eq.${user.id}`);
+      } catch (_) {}
+
+      try {
+        await supabase.from('customers').delete().eq('user_id', user.id);
+      } catch (_) {}
+
+      toast.success('Sua conta foi excluída com sucesso.');
+      await signOut();
+      navigate({ to: '/marketplace' });
+    } catch (err: any) {
+      toast.error('Erro ao excluir conta: ' + (err?.message || 'Tente novamente.'));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pb-32">
       {/* HEADER SECTION (Premium Design) */}
@@ -517,10 +547,7 @@ function Profile() {
               <AlertDialogFooter className="flex-col gap-3 mt-4">
                 <AlertDialogCancel className="rounded-xl font-bold h-12 m-0 bg-slate-100 border-none hover:bg-slate-200">Cancelar</AlertDialogCancel>
                 <AlertDialogAction 
-                  onClick={() => {
-                    toast.success('Solicitação de exclusão enviada com sucesso. Nossa equipe processará em até 48h.');
-                    signOut();
-                  }}
+                  onClick={handleDeleteAccount}
                   className="bg-rose-500 text-white hover:bg-rose-600 rounded-xl font-black h-12 m-0 shadow-lg shadow-rose-500/30"
                 >
                   Sim, Excluir Minha Conta

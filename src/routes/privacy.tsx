@@ -60,7 +60,7 @@ function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground">5. Segurança dos Dados</h2>
           <p>
-            Adotamos medidas de segurança rígidas e criptografia de ponta a ponta para proteger seus dados contra acessos não autorizados, garantindo conformidade com a Lei Geral de Proteção de Dados (LGPD) e com as diretrizes do Google Play.
+            Adotamos medidas de segurança rígidas e criptografia de ponta a ponta para proteger seus dados contra acessos não autorizados, garantindo total conformidade com a Lei Geral de Proteção de Dados (LGPD) e com as diretrizes de segurança e privacidade da Apple App Store e do Google Play.
           </p>
         </section>
 

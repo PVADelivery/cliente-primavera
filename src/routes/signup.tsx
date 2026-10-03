@@ -183,6 +183,17 @@ function SignupPage() {
         <p className="text-center text-sm text-muted-foreground">
           Já tem conta? <Link to="/login" className="text-foreground font-black underline hover:text-black">Entrar</Link>
         </p>
+
+        <p className="text-center text-[11px] text-muted-foreground/80 mt-4 leading-relaxed">
+          Ao cadastrar-se, você concorda com nossos{" "}
+          <Link to="/marketplace/terms" className="underline hover:text-foreground">
+            Termos de Uso
+          </Link>{" "}
+          e{" "}
+          <Link to="/privacy" className="underline hover:text-foreground">
+            Política de Privacidade
+          </Link>.
+        </p>
       </div>
     </div>
   );

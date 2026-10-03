@@ -64,6 +64,17 @@ function LoginPage() {
         <p className="text-center text-sm text-muted-foreground">
           Não tem conta? <Link to="/signup" className="text-foreground font-black underline hover:text-black">Criar conta</Link>
         </p>
+
+        <p className="text-center text-[11px] text-muted-foreground/80 mt-4 leading-relaxed">
+          Ao continuar, você concorda com nossos{" "}
+          <Link to="/marketplace/terms" className="underline hover:text-foreground">
+            Termos de Uso
+          </Link>{" "}
+          e{" "}
+          <Link to="/privacy" className="underline hover:text-foreground">
+            Política de Privacidade
+          </Link>.
+        </p>
       </div>
     </div>
   );
