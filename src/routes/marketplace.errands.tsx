@@ -767,21 +767,21 @@ async function fetchRoute(lon1: number, lat1: number, lon2: number, lat2: number
 
       // Dispara notificação push para entregadores habilitados
       const payloadToSend = insertedData || newDeliveryPayload;
-      supabase.functions.invoke("send-push", {
-        body: {
-          record: payloadToSend,
-          type: "INSERT",
-          table: "deliveries",
-        },
-      }).catch((e) => console.warn("[Push] send-push invoke error:", e));
-
       supabase.functions.invoke("notify-driver", {
         body: {
           record: payloadToSend,
           type: "INSERT",
           table: "deliveries",
         },
-      }).catch((e) => console.warn("[Push] notify-driver invoke error:", e));
+      }).catch(() => {
+        supabase.functions.invoke("send-push", {
+          body: {
+            record: payloadToSend,
+            type: "INSERT",
+            table: "deliveries",
+          },
+        }).catch(() => {});
+      });
 
       // Salva o ID da entrega no localStorage para persistência e acompanhamento
       if (insertedData?.id && typeof window !== "undefined") {

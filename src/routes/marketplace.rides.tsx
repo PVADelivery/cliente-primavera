@@ -656,13 +656,21 @@ function CustomerRideMap({ activeRide }: { activeRide: any }) {
 
       // Notifica o motorista via Edge Function se houver driver_id
       if (activeRide?.driver_id) {
-        supabase.functions.invoke("send-push", {
+        supabase.functions.invoke("notify-driver", {
           body: {
             record: { id: rideId, driver_id: activeRide.driver_id, status: "cancelled" },
             type: "UPDATE",
             table: "ride_requests",
           },
-        }).catch(() => {});
+        }).catch(() => {
+          supabase.functions.invoke("send-push", {
+            body: {
+              record: { id: rideId, driver_id: activeRide.driver_id, status: "cancelled" },
+              type: "UPDATE",
+              table: "ride_requests",
+            },
+          }).catch(() => {});
+        });
       }
 
       toast.success("Corrida cancelada com sucesso.");

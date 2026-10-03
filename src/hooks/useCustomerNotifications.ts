@@ -57,17 +57,50 @@ export function useCustomerNotifications() {
           console.warn("[FCM] Perfil token update error:", e);
         }
 
+        const platform = Capacitor.getPlatform();
+        const app = "marketplace";
+        const bundleId = "com.mt24horasexpress.cliente";
+
         try {
           await supabase
             .from("device_tokens")
             .upsert({
               token: tokenVal,
               user_id: user.id,
-              platform: Capacitor.getPlatform(),
+              platform,
+              app,
+              bundle_id: bundleId,
               updated_at: new Date().toISOString(),
             } as any, { onConflict: "token" });
         } catch (e) {
           console.warn("[FCM] device_tokens update error:", e);
+        }
+
+        try {
+          const res = await supabase.functions.invoke("notify-driver", {
+            body: {
+              action: "register_token",
+              token: tokenVal,
+              userId: user.id,
+              platform,
+              app,
+              bundleId,
+            },
+          });
+          if (res.error) throw res.error;
+        } catch (e) {
+          try {
+            await supabase.functions.invoke("send-push", {
+              body: {
+                action: "register_token",
+                token: tokenVal,
+                userId: user.id,
+                platform,
+                app,
+                bundleId,
+              },
+            });
+          } catch (_) {}
         }
       };
 
