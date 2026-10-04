@@ -46,7 +46,7 @@ cat << 'EOF' > build/ExportOptions.plist
     <key>teamID</key>
     <string>4YULT95XAK</string>
     <key>manageAppVersionAndBuildNumber</key>
-    <false/>
+    <true/>
 </dict>
 </plist>
 EOF
@@ -59,7 +59,7 @@ fi
 echo "📦 Resolvendo pacotes do Xcode (SPM)..."
 xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj
 
-echo "🔨 Compilando o Release Archive (Versao 1.0.2, Build 1)..."
+echo "🔨 Compilando o Release Archive (Versao 1.0.2, Build 7)..."
 xcodebuild -project ios/App/App.xcodeproj \
   -scheme App \
   -configuration Release \
@@ -67,7 +67,7 @@ xcodebuild -project ios/App/App.xcodeproj \
   -archivePath build/App.xcarchive \
   DEVELOPMENT_TEAM="4YULT95XAK" \
   MARKETING_VERSION="1.0.2" \
-  CURRENT_PROJECT_VERSION="1" \
+  CURRENT_PROJECT_VERSION="7" \
   -allowProvisioningUpdates \
   -authenticationKeyPath "$KEY_FILE" \
   -authenticationKeyID "GNCVF862P9" \
