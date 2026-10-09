@@ -13,7 +13,26 @@ import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModa
 import { searchCityStreets } from "@/data/primaveraStreets";
 
 export const Route = createFileRoute("/marketplace/taxi")({
-  head: () => ({ meta: [{ title: "Solicitar Corrida — MT 24horas express" }] }),
+  head: () => ({
+    meta: [
+      { title: "Táxi & Moto Táxi — MT 24horas express" },
+      { name: "description", content: "Solicite corridas rápidas com táxi ou moto táxi em Primavera do Leste pelo MT 24horas express." },
+      { property: "og:site_name", content: "MT 24horas express" },
+      { property: "og:title", content: "Táxi & Moto Táxi — MT 24horas express" },
+      { property: "og:description", content: "Solicite corridas rápidas com táxi ou moto táxi em Primavera do Leste pelo MT 24horas express." },
+      { property: "og:url", content: "https://www.mt24horasexpress.com/marketplace/taxi" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:secure_url", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Táxi & Moto Táxi — MT 24horas express" },
+      { name: "twitter:description", content: "Solicite corridas rápidas com táxi ou moto táxi em Primavera do Leste pelo MT 24horas express." },
+      { name: "twitter:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+    ],
+  }),
   component: TaxiPage,
 });
 

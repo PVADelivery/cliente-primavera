@@ -20,7 +20,26 @@ function RidesRouteComponent() {
 }
 
 export const Route = createFileRoute("/marketplace/rides")({
-  head: () => ({ meta: [{ title: "Corridas — MT 24horas express" }] }),
+  head: () => ({
+    meta: [
+      { title: "Corridas & Viagens — MT 24horas express" },
+      { name: "description", content: "Chame motoristas e motoqueiros parceiros com rapidez, segurança e preço justo em Primavera do Leste." },
+      { property: "og:site_name", content: "MT 24horas express" },
+      { property: "og:title", content: "Corridas & Viagens — MT 24horas express" },
+      { property: "og:description", content: "Chame motoristas e motoqueiros parceiros com rapidez, segurança e preço justo em Primavera do Leste." },
+      { property: "og:url", content: "https://www.mt24horasexpress.com/marketplace/rides" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:secure_url", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Corridas & Viagens — MT 24horas express" },
+      { name: "twitter:description", content: "Chame motoristas e motoqueiros parceiros com rapidez, segurança e preço justo em Primavera do Leste." },
+      { name: "twitter:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+    ],
+  }),
   component: RidesRouteComponent,
 });
 

@@ -36,6 +36,25 @@ import { ProductCustomizationModal } from "@/components/marketplace/ProductCusto
 import { getFallbackProductsForCompany } from "@/lib/fallbackCatalog";
 
 export const Route = createFileRoute("/marketplace/store/$storeId")({
+  head: () => ({
+    meta: [
+      { title: "Loja — MT 24horas express" },
+      { name: "description", content: "Cardápio completo, promoções e entrega rápida em minutos no MT 24horas express." },
+      { property: "og:site_name", content: "MT 24horas express" },
+      { property: "og:title", content: "Cardápio & Delivery — MT 24horas express" },
+      { property: "og:description", content: "Peça direto desta loja pelo aplicativo oficial do MT 24horas express!" },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:secure_url", content: "https://www.mt24horasexpress.com/og-preview.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Cardápio & Delivery — MT 24horas express" },
+      { name: "twitter:description", content: "Peça direto desta loja pelo aplicativo oficial do MT 24horas express!" },
+      { name: "twitter:image", content: "https://www.mt24horasexpress.com/og-preview.png" },
+    ],
+  }),
   component: StoreDetail,
 });
 
@@ -220,6 +239,36 @@ function StoreDetail() {
   const reviewCount = reviewStats.count;
   const deliveryFee = store?.delivery_fee ?? 4.99;
 
+  const handleShareStore = async () => {
+    const storeName = store?.name || "esta loja";
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+    const shareText = `Confira o cardápio e peça na *${storeName}* pelo MT 24horas express: ${shareUrl}`;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${storeName} — MT 24horas express`,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link da loja copiado com sucesso!");
+    }
+  };
+
+  useEffect(() => {
+    if (store?.name && typeof document !== "undefined") {
+      document.title = `${store.name} — MT 24horas express`;
+    }
+  }, [store?.name]);
+
   if (!isStoreLoading && !store) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6 space-y-4" suppressHydrationWarning>
@@ -304,7 +353,13 @@ function StoreDetail() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300">
+            <button
+              type="button"
+              onClick={handleShareStore}
+              title="Compartilhar loja"
+              aria-label="Compartilhar loja"
+              className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+            >
               <Share2 className="w-4 h-4" />
             </button>
             <button className="w-10 h-10 grid place-items-center rounded-full bg-black/35 backdrop-blur-md text-white border border-white/15 shadow-lg hover:bg-black/55 hover:scale-105 active:scale-95 transition-all duration-300 group">
