@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test:visual": "node tests/visual-regression-tokens.test.cjs",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "node patch-select.cjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.0",
