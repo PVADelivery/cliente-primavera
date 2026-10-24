@@ -98,6 +98,10 @@ export async function reportErrorToTelegram(payload: ErrorPayload, appName = "Ma
 
   const msg = (payload.error_message || "").toLowerCase();
   const isIgnored =
+    msg.includes("failed to fetch") ||
+    msg.includes("load failed") ||
+    msg.includes("networkerror") ||
+    msg.includes("network request failed") ||
     msg.includes("aceita por outro") ||
     msg.includes("delivery_not_available") ||
     msg.includes("row level security") ||
@@ -271,7 +275,14 @@ export function initializeGlobalErrorHandlers(appName: string) {
             return originalToastError.apply(rawToast, [message, options]);
           }
 
-          if (msgStr && typeof msgStr === "string" && !msgStr.includes("cancelada pelo usuário")) {
+          const isNetworkError =
+            lower.includes("failed to fetch") ||
+            lower.includes("load failed") ||
+            lower.includes("networkerror") ||
+            lower.includes("network request failed") ||
+            lower.includes("falha de conexão");
+
+          if (msgStr && typeof msgStr === "string" && !msgStr.includes("cancelada pelo usuário") && !isNetworkError) {
             reportErrorToTelegram({
               error_message: `[Erro na Tela] ${msgStr}`,
               url: window.location.href,
