@@ -1,3 +1,4 @@
+import { BonaSoftLogo } from "@/components/BonaSoftLogo";
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
@@ -817,6 +818,11 @@ function Profile() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* ── ASSINATURA BONASOFT ── */}
+      <div className="pt-10 pb-8 flex justify-center select-none">
+        <BonaSoftLogo showSubtitle />
+      </div>
 
       {/* MODAL DE DETALHES DO PEDIDO */}
       <ClientOrderDetailModal

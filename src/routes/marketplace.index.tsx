@@ -1,3 +1,4 @@
+import { BonaSoftLogo } from "@/components/BonaSoftLogo";
 import { createFileRoute, Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
@@ -1544,25 +1545,8 @@ function MarketplaceHome() {
       )}
 
       {/* ── BONASOFT Watermark ── */}
-      <div className="pt-8 pb-4 flex justify-center select-none">
-        <a
-          href={`https://wa.me/5566992734632?text=${encodeURIComponent("Olá! Conheci a BonaSoft através do aplicativo MT 24 Horas e gostaria de conhecer melhor os serviços de desenvolvimento de aplicativos e sistemas. Podemos conversar?")}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            if (typeof window !== "undefined") {
-              const url = `https://wa.me/5566992734632?text=${encodeURIComponent("Olá! Conheci a BonaSoft através do aplicativo MT 24 Horas e gostaria de conhecer melhor os serviços de desenvolvimento de aplicativos e sistemas. Podemos conversar?")}`;
-              try {
-                window.open(url, "_system") || (window.location.href = url);
-              } catch {
-                window.location.href = url;
-              }
-            }
-          }}
-          className="text-[10px] font-black tracking-[0.5em] text-foreground opacity-30 hover:opacity-100 active:opacity-100 transition-opacity duration-200 uppercase cursor-pointer"
-        >
-          B O N A S O F T
-        </a>
+      <div className="pt-10 pb-6 flex justify-center select-none">
+        <BonaSoftLogo showSubtitle />
       </div>
     </div>
   );

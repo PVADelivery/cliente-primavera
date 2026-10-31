@@ -1,3 +1,4 @@
+import { BonaSoftLogo } from "@/components/BonaSoftLogo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
