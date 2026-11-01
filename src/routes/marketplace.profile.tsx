@@ -821,7 +821,7 @@ function Profile() {
 
       {/* ── ASSINATURA BONASOFT ── */}
       <div className="pt-10 pb-8 flex justify-center select-none">
-        <BonaSoftLogo showSubtitle />
+        <BonaSoftLogo />
       </div>
 
       {/* MODAL DE DETALHES DO PEDIDO */}

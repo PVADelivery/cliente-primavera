@@ -1546,7 +1546,7 @@ function MarketplaceHome() {
 
       {/* ── BONASOFT Watermark ── */}
       <div className="pt-10 pb-6 flex justify-center select-none">
-        <BonaSoftLogo showSubtitle />
+        <BonaSoftLogo />
       </div>
     </div>
   );
