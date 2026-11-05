@@ -1,6 +1,6 @@
 import { BonaSoftLogo } from "@/components/BonaSoftLogo";
 import { createFileRoute, Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
@@ -14,6 +14,7 @@ import type { Company } from "@/types/database";
 import { useAuth } from "@/contexts/AuthContext";
 import { AeroTile, AeroPlate, AeroSection, AeroButton } from "@/components/aero";
 import { getFallbackProductsForCompany } from "@/lib/fallbackCatalog";
+import { isStoreOpenNow } from "@/lib/storeHours";
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 export const Route = createFileRoute("/marketplace/")({
@@ -853,6 +854,7 @@ function FilterBar({
 function StoreCard({ s, i }: { s: Company; i: number }) {
   const eta = 20 + ((i * 7) % 25);
   const freeShip = s.delivery_fee === 0;
+  const isOpen = isStoreOpenNow(s);
   return (
     <motion.li
       layout
@@ -886,7 +888,7 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                 onError={(e) => {
                   (e.currentTarget as HTMLElement).style.display = 'none';
                 }}
-                className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`}
+                className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07] ${!isOpen ? "grayscale" : ""}`}
               />
             ) : (
               <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #FFDE21 0%, #3B82F6 100%)" }} />
@@ -919,8 +921,8 @@ function StoreCard({ s, i }: { s: Company; i: number }) {
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg ${s.is_open ? "bg-emerald-500/90 text-white" : "bg-black/60 text-white/60"}`}>
-                {s.is_open ? "● Aberto" : "● Fechado"}
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm shadow-lg ${isOpen ? "bg-emerald-500/90 text-white" : "bg-black/60 text-white/60"}`}>
+                {isOpen ? "● Aberto" : "● Fechado"}
               </span>
             </div>
 
@@ -1007,6 +1009,29 @@ function MarketplaceHome() {
   }, [sort]);
 
   const isSearching = searchTerm.trim().length >= 2;
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("public-companies-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "companies" },
+        () => {
+          try {
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem("pva_cached_companies_v2");
+            }
+          } catch {}
+          qc.invalidateQueries({ queryKey: ["companies"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [qc]);
 
   const { data: stores, isLoading } = useQuery<Company[]>({
     queryKey: ["companies"],
@@ -1019,7 +1044,7 @@ function MarketplaceHome() {
           if (cached) {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed)) {
-              return parsed.filter((c: any) => c.is_active !== false);
+              return parsed.filter((c: any) => c.is_active !== false && c.show_in_marketplace !== false);
             }
           }
         } catch {}
@@ -1032,7 +1057,7 @@ function MarketplaceHome() {
         // Tenta primeiro via RPC pública (bypassa restrições RLS em tabelas para visitantes anon)
         const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_companies");
         if (!rpcErr && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
-          const activeOnly = rpcData.filter((c: any) => c.is_active !== false);
+          const activeOnly = rpcData.filter((c: any) => c.is_active !== false && c.show_in_marketplace !== false);
           if (typeof window !== "undefined") {
             try { sessionStorage.setItem("pva_cached_companies_v2", JSON.stringify(activeOnly)); } catch {}
           }
@@ -1041,15 +1066,16 @@ function MarketplaceHome() {
 
         const { data, error } = await supabase
           .from("companies")
-          .select("id, name, phone, address, logo_url, rating, delivery_fee, prep_time_min, prep_time_max, is_open, category, description, banner_url, cover_url, is_active")
+          .select("id, name, phone, address, logo_url, rating, delivery_fee, prep_time_min, prep_time_max, is_open, category, description, banner_url, cover_url, is_active, show_in_marketplace, business_hours")
           .eq("is_active", true)
+          .neq("show_in_marketplace", false)
           .order("name", { ascending: true });
         if (error) {
           console.error("Error fetching companies:", error);
-          const fallbackActive = ((rpcData as Company[]) || []).filter((c: any) => c.is_active !== false);
+          const fallbackActive = ((rpcData as Company[]) || []).filter((c: any) => c.is_active !== false && c.show_in_marketplace !== false);
           return fallbackActive;
         }
-        const activeData = ((data as unknown as Company[]) || []).filter((c) => c.is_active !== false);
+        const activeData = ((data as unknown as Company[]) || []).filter((c: any) => c.is_active !== false && c.show_in_marketplace !== false);
         if (typeof window !== "undefined") {
           try { sessionStorage.setItem("pva_cached_companies_v2", JSON.stringify(activeData)); } catch {}
         }
@@ -1082,13 +1108,15 @@ function MarketplaceHome() {
   });
 
   const allStores = useMemo(() => {
-    const raw = (stores ?? []).filter((s) => s.is_active !== false);
+    const raw = (stores ?? []).filter((s) => s.is_active !== false && (s as any).show_in_marketplace !== false);
     return [...raw].sort((a, b) => {
       // Prioritize Açaí Primavera Gourmet (active registered menu) and open stores
       if (a.id === "55b3a1f7-36b8-49c5-b66b-40b16bed7737") return -1;
       if (b.id === "55b3a1f7-36b8-49c5-b66b-40b16bed7737") return 1;
-      if (a.is_open && !b.is_open) return -1;
-      if (!a.is_open && b.is_open) return 1;
+      const aOpen = isStoreOpenNow(a);
+      const bOpen = isStoreOpenNow(b);
+      if (aOpen && !bOpen) return -1;
+      if (!aOpen && bOpen) return 1;
       return (b.rating ?? 0) - (a.rating ?? 0);
     });
   }, [stores]);
@@ -1142,7 +1170,7 @@ function MarketplaceHome() {
     }
 
     if (openOnly) {
-      list = list.filter((s) => s.is_open === true || s.is_open === null || s.is_open === undefined);
+      list = list.filter((s) => isStoreOpenNow(s));
     }
 
     if (sort === "fee") {
@@ -1481,8 +1509,8 @@ function MarketplaceHome() {
                           style={{ boxShadow: "var(--shadow-card)" }}
                         >
                           {s.cover_url
-                            ? <img src={s.cover_url} alt={s.name} loading="lazy" className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07] ${!s.is_open ? "grayscale" : ""}`} />
-                            : <div className={`w-full h-full ${!s.is_open ? "grayscale" : ""}`} style={{ background: "var(--gradient-primary)" }} />
+                            ? <img src={s.cover_url} alt={s.name} loading="lazy" className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07] ${!isStoreOpenNow(s) ? "grayscale" : ""}`} />
+                            : <div className={`w-full h-full ${!isStoreOpenNow(s) ? "grayscale" : ""}`} style={{ background: "var(--gradient-primary)" }} />
                           }
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 

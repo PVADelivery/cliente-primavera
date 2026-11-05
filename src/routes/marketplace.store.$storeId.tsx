@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
@@ -21,6 +21,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { useCart, cleanProductImageUrl } from "@/contexts/CartContext";
 import { SYSTEM_SERVICE_FEE } from "@/lib/constants";
 import { ServiceFeeInfoModal } from "@/components/marketplace/ServiceFeeInfoModal";
+import { isStoreOpenNow } from "@/lib/storeHours";
 import type { Company, Product } from "@/types/database";
 import {
   Drawer,
@@ -77,6 +78,25 @@ function parseImages(imageUrl: string | null | undefined): string[] {
 function StoreDetail() {
   const { storeId } = useParams({ from: "/marketplace/store/$storeId" });
   const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!storeId) return;
+    const channel = supabase
+      .channel(`store-${storeId}-realtime`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "companies", filter: `id=eq.${storeId}` },
+        () => {
+          qc.invalidateQueries({ queryKey: ["store", storeId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [storeId, qc]);
   const { add, items, total, remove, setQty, count } = useCart();
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("");
@@ -421,7 +441,7 @@ function StoreDetail() {
               {reviewCount > 0 ? `(${reviewCount})` : "· Novo"}
             </span>
           </span>
-          {store?.is_open ? (
+          {isStoreOpenNow(store ?? {}) ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-sm font-bold border border-emerald-500/20">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Aberto agora

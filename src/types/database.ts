@@ -55,6 +55,7 @@ export interface Company {
   is_open: boolean | null;
   business_hours: string | null;
   is_active: boolean;
+  show_in_marketplace?: boolean | null;
 }
 
 export interface Product {
