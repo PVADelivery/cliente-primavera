@@ -6,7 +6,7 @@ import {
   Star, Clock, Search, Zap, Tag, ChevronRight,
   UtensilsCrossed, ShoppingBasket, Pill, Pizza, IceCream, Coffee, Sandwich,
   SlidersHorizontal, CheckCircle2, X, History, TrendingUp, ShoppingBag, Wine, Car,
-  Users, Building2, BookUser, ClipboardList, User, Store, ArrowRight, Sparkles, Bike
+  Users, Building2, BookUser, ClipboardList, User, Store, ArrowRight, Bike
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -547,7 +547,7 @@ function SmartSearchBar({
                 <div>
                   <div className="flex items-center justify-between px-4 pt-3 pb-1.5 border-b border-white/5 bg-white/[0.02]">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <Zap className="w-3.5 h-3.5 text-primary" />
                       <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Serviços & Funções do App</span>
                     </div>
                     <span className="text-[10px] text-white/40 font-semibold">Direcionamento rápido</span>

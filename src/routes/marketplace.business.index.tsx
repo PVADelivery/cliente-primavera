@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, Sparkles, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, Compass, SlidersHorizontal } from "lucide-react";
+import { AlertCircle, ArrowLeft, Search, Ruler, BedDouble, Bath, Car, ChevronRight, ChevronLeft, ArrowUpDown, X, Heart, MapPin, Home, Plus, UploadCloud, Loader2, CalendarClock, DollarSign, Building2, User, Phone, FileText, CheckCircle2, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, Compass, SlidersHorizontal } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,7 +55,7 @@ const TYPE_ICONS: Record<PropertyType | "all", any> = {
   casa: Home,
   apartamento: Building2,
   sala: Building2,
-  kitnet: Sparkles,
+  kitnet: Home,
   terreno: Compass,
 };
 
@@ -227,7 +227,7 @@ function BusinessPage() {
                 CENTRAL DE NEGÓCIOS
               </span>
               <span className="text-xs text-amber-300 font-bold flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Imóveis & Oportunidades
+                <Building2 className="w-3.5 h-3.5 text-amber-400" /> Imóveis & Oportunidades
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white font-display">
@@ -1111,7 +1111,7 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             {/* Card Explicativo de Ativação com Admin */}
             <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-1.5">
               <div className="flex items-center gap-2 font-black text-emerald-600 dark:text-emerald-400 text-xs">
-                <Sparkles className="w-4 h-4 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>Mensalidade & Ativação no Sistema</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle, Building2, Bike, Truck, ArrowUpDown, Shield, SlidersHorizontal, MapPin } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, X, Phone, Gauge, Calendar, Fuel, Car, UploadCloud, Image as ImageIcon, CheckCircle2, ChevronLeft, ChevronRight, CalendarClock, DollarSign, User, FileText, ShieldCheck, Tag, Info, Layers, Camera, Trash2, Check, AlertCircle, Building2, Bike, Truck, ArrowUpDown, Shield, SlidersHorizontal, MapPin } from "lucide-react";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,12 +43,12 @@ const TYPE_LABEL: Record<VehicleType, string> = {
 };
 
 const TYPES: Array<{ key: VehicleType | "all"; label: string; icon: any }> = [
-  { key: "all", label: "Todos os tipos", icon: Sparkles },
+  { key: "all", label: "Todos os tipos", icon: Layers },
   { key: "carro", label: "Carros", icon: Car },
   { key: "moto", label: "Motos", icon: Bike },
   { key: "caminhao", label: "Caminhões", icon: Truck },
   { key: "utilitario", label: "Utilitários", icon: Car },
-  { key: "outro", label: "Outros", icon: Sparkles },
+  { key: "outro", label: "Outros", icon: SlidersHorizontal },
 ];
 
 type SortKey = "price_asc" | "price_desc" | "recent";
@@ -789,7 +789,7 @@ Por favor, me informe o valor da mensalidade e a chave Pix para eu efetuar o pag
             {/* Card Explicativo de Ativação com Admin */}
             <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-1.5">
               <div className="flex items-center gap-2 font-black text-emerald-600 dark:text-emerald-400 text-xs">
-                <Sparkles className="w-4 h-4 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>Mensalidade & Ativação no Sistema</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">

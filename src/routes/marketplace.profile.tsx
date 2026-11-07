@@ -20,7 +20,7 @@ import {
   Bike, FileText, ShieldCheck, Moon, Sun,
   Wallet, HelpCircle, X, Check, Phone,
   Package, Clock, CheckCircle2, XCircle, Truck, Ticket, Copy,
-  User, Settings, ArrowRight, History, Sparkles, ArrowUpRight, ArrowDownLeft, PlusCircle
+  User, Settings, ArrowRight, History, Gift, ArrowUpRight, ArrowDownLeft, PlusCircle
 } from 'lucide-react';
 import { useCustomerCredits, useCustomerCreditTransactions, openCreditRechargeWhatsApp } from '@/services/customerCredits';
 import {
@@ -408,7 +408,7 @@ function Profile() {
               </div>
             </div>
             <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3" /> +10% Bônus
+              <Gift className="w-3 h-3" /> +10% Bônus
             </span>
           </div>
 

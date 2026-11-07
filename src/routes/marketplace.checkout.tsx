@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 import { reportErrorToTelegram } from '@/services/logger';
-import { MapPin, Banknote, AlertCircle, ArrowLeft, Loader2, FileText, Smartphone, Bike, CreditCard, ChevronRight, Plus, Wallet, Sparkles, PlusCircle } from 'lucide-react';
+import { MapPin, Banknote, AlertCircle, ArrowLeft, Loader2, FileText, Smartphone, Bike, CreditCard, ChevronRight, Plus, Wallet, Gift, PlusCircle } from 'lucide-react';
 import { useCustomerCredits, openCreditRechargeWhatsApp, deductCustomerCredits } from '@/services/customerCredits';
 import { cn } from '@/lib/utils';
 import { useOrderLock } from '@/hooks/useOrderLock';
@@ -578,7 +578,7 @@ function Checkout() {
               onClick={() => openCreditRechargeWhatsApp(profile?.name || user?.email, 100)}
               className="text-xs font-black text-black flex items-center gap-1.5 bg-primary px-3 py-1.5 rounded-full shadow-sm hover:bg-primary/90 transition-all cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-black" />
+              <Gift className="w-3.5 h-3.5 text-black" />
               Recarregar (+10% Bônus)
             </button>
           </div>

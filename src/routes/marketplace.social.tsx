@@ -11,7 +11,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
-  Sparkles,
   ExternalLink,
   ShieldCheck,
   Copy,

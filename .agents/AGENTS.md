@@ -46,3 +46,6 @@ NUNCA colocar loops ou refreshs autom√°ticos nas p√°ginas sem autoriza√ß√£o do u
 ## üö® REGRA #3 ‚Äî SISTEMA EM PRODU√á√ÉO üö®
 
 Este sistema est√° em produ√ß√£o. Qualquer altera√ß√£o deve ser feita com extremo cuidado. N√£o fa√ßa altera√ß√µes destrutivas sem confirma√ß√£o expl√≠cita do usu√°rio.
+
+## REGRA: PROIBI«√O ABSOLUTA DE ÕCONES DE IA / ESTRELINHAS / SPARKLES
+… ESTRITAMENTE PROIBIDO usar Ìcones de IA, estrelas m·gicas, faÌscas ou brilhos (como Sparkles, Sparkle, Bot, Wand, etc.) em qualquer tela, bot„o, card, badge ou componente de QUALQUER sistema ou aplicativo. NUNCA coloque esses sÌmbolos nos designs. Use Ìcones sem‚nticos objetivos do domÌnio de negÛcio (ex: Wallet, Gift, Headphones, ShieldCheck) ou nenhum Ìcone decorativo.
