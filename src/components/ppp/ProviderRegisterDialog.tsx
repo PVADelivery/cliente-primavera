@@ -8,7 +8,6 @@ import {
   Camera,
   CheckCircle2,
   Clock,
-  Sparkles,
   Copy,
   ShieldCheck,
   X,
@@ -316,7 +315,7 @@ export function ProviderRegisterDialog({
         {step === "form" ? (
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <div className="p-3 rounded-2xl bg-amber-400/10 border border-amber-400/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
-              <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+              <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
               <span>Preencha os dados e o endereço para que os clientes de Primavera encontrem seus serviços no catálogo e no mapa.</span>
             </div>
 

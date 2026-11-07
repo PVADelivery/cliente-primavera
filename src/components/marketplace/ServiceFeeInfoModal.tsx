@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ShieldCheck, MapPin, Headphones, Sparkles, Check } from "lucide-react";
+import { ShieldCheck, MapPin, Headphones, Zap, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ServiceFeeInfoModalProps {
@@ -57,7 +57,7 @@ export function ServiceFeeInfoModal({ isOpen, onClose }: ServiceFeeInfoModalProp
             </div>
 
             <div className="flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <Zap className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-foreground">Evolução do Aplicativo</p>
                 <p className="text-muted-foreground text-[11px]">Melhorias contínuas de velocidade, novos recursos e estabilidade.</p>
